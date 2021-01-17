@@ -14,7 +14,7 @@ export default function Home() {
       <Link href={`/api/wm/astermind`}>
         <a>Word Mastermind</a>
       </Link>
-      <Link href={`/api/wi/wordinfo`}>
+      <Link href={`/wi/wordinfo`}>
         <a>Word Info</a>
       </Link>
 
