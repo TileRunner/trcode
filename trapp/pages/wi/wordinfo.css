@@ -1,9 +1,9 @@
-html {
+.wibody {
   background-color: darkgray;
   color: whitesmoke;
 }
 .tooltip {
-  position: relative;
+  position: top;
   display: inline-block;
 }
 

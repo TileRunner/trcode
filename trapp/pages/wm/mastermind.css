@@ -1,0 +1,69 @@
+.Mastermind {
+    background-color: #16271a;
+    padding-left: 1%;
+    padding-right: 1%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+.Outertable {
+    border-style: none;
+    vertical-align: top;
+    color: whitesmoke;
+}
+.Guesstable {
+    background-color: #1917c0;
+}
+.AlignCenter {
+    text-align: center;
+}
+.AlignLeft {
+    text-align: left;
+}
+.wmlink {
+    color:cyan;
+    text-align: left;
+}
+.wmbutton {
+    font-size: xx-large;
+    background-color: #17c025;
+    color:azure;
+}
+.wmtitle {
+    font-size: 2.8em;
+    text-align: center;
+    font-family: cursive;
+    font-style: italic;
+    color:red;
+}
+.wmh1 {
+    text-align: center;
+    font-size: xx-large;
+    font-family: cursive;
+    color:azure;
+}
+.wmh2 {
+    font-size: x-large;
+    color:azure;
+}
+.wmh3 {
+    color:azure;
+    font-size: x-large;
+}
+.wmth {
+    color: aliceblue;
+    border-style: groove;
+}
+.wmtd {
+    border-style: inset;
+    color:azure;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+.wmp {
+    color: whitesmoke;
+    text-align: center;
+}
+.wmlabel {
+    color: lightgreen;
+    padding-right: 5px;
+}
