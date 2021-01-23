@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link'
+import Showinfo from '../wi/showinfo'
 
 export default function handler(req, res)  {
     return (
-        <Game />
-        );
+        <React.Fragment>
+            <Game />
+            <p>
+                <Link href={'../../'}>
+                    <a className="wmlink">Home</a>
+                </Link>
+            </p>
+        </React.Fragment>
+);
 }
 
 function Game() {
@@ -20,7 +28,7 @@ function Game() {
     const promptForPlayAgain = showPlayAgainPrompt();
     return (
         <div className="Mastermind">
-            <div class="page-header">
+            <div className="page-header">
                 <h1 className="wmtitle">Word Mastermind</h1>
             </div>
             <p className="wmp">Cycle through 2-8 letter words per set.</p>
@@ -70,11 +78,9 @@ function Game() {
                     :
                     <p className="wmp">Keep guessing</p>
             }
-            <p>
-                <Link href={'../../'}>
-                    <a className="wmlink">Home</a>
-                </Link>
-            </p>
+            {guesses.map(g => (
+                <Showinfo word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+            ))}
         </div>
     );
 
