@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import Showswaps from './showswaps'
 import Showanagrams from './showanagrams'
 import Showvalidity from './showvalidity'
@@ -19,6 +18,7 @@ export default function Showinfo( props ) {
                 {props.showSwaps === "Y" ? <Showswaps key={props.word} word={props.word}/> : <></>}
                 {displayWordRow(props.word)}
                 {props.showDrops === "Y" ? displayDropsRow(drops) : <></> }
+                <tr className="divider"><td>&nbsp;</td></tr>
             </table>
             </td>
         </tr>
@@ -66,7 +66,7 @@ export default function Showinfo( props ) {
         const key1 = word;
         const key2 = word + '2';
         return(
-            <tr>
+            <tr className="displayWordRow">
             <td width="5px"></td>
             {word?.split("").map((l, index) => (
                 <>

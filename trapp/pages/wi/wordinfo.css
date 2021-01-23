@@ -27,7 +27,12 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-
+.displayWordRow {
+  line-height: 50%;
+}
+.divider {
+  line-height: 5px;
+}
 .letter {
   border: 1px solid black;
   background-color: darkgreen;
