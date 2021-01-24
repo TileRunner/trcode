@@ -19,7 +19,7 @@ export default function Showswaps( props ) {
                 {s === '' ?
                     <td></td>
                     :
-                    <td class="swapCount" data-toggle="tooltip" title={s}>{s.length}
+                    <td className="swapCount" data-toggle="tooltip" title={s}>{s.length}
                     </td>
                 }
             </>

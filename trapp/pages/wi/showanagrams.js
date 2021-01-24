@@ -16,7 +16,7 @@ export default function Showanagrams( props ) {
             {anagrams.length === 0 ?
             <></>
             :
-            <span class="anagramCount" data-toggle="tooltip" title={anagrams}>{anagrams.length}</span>
+            <span className="anagramCount" data-toggle="tooltip" title={anagrams}>{anagrams.length}</span>
             }
         </span>
 )

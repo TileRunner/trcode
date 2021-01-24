@@ -35,7 +35,7 @@ export default function Showinfo( props ) {
                     {i === '' ?
                         <td></td>
                         :
-                        <td class="insertCount" data-toggle="tooltip" title={i.split(':')[1]}>{i.split(':')[0]}
+                        <td className="insertCount" data-toggle="tooltip" title={i.split(':')[1]}>{i.split(':')[0]}
                         </td>
                     }
                     <td></td>
@@ -52,7 +52,7 @@ export default function Showinfo( props ) {
                 <>
                 <td></td>
                 {d === 1 ?
-                    <td class="dropIndicator">&bull;</td>
+                    <td className="dropIndicator">&bull;</td>
                     :
                     <td></td>
                 }

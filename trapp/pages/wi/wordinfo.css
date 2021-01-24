@@ -33,6 +33,14 @@
 .divider {
   line-height: 5px;
 }
+.letterInput {
+  border: 1px solid black;
+  background-color: darkgreen;
+  color: azure;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: large;
+}
 .letter {
   border: 1px solid black;
   background-color: darkgreen;
