@@ -79,7 +79,7 @@ function Game() {
                     <p className="wmp">Keep guessing</p>
             }
             {guesses.map(g => (
-                <Showinfo word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
             ))}
         </div>
     );
