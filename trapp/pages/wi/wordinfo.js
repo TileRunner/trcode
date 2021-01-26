@@ -3,8 +3,8 @@ import Link from 'next/link'
 import Showinfo from './showinfo'
 
 export default function handler(req, res)  {
-    const [word, setWord] = useState('')
-    const [words, setWords] = useState([])
+    const [word, setWord] = useState('');
+    const [words, setWords] = useState([]);
     return (
         <React.Fragment>
         <div class="container">
@@ -18,15 +18,25 @@ export default function handler(req, res)  {
                         <input className="letterInput"
                             name="word"
                             value={word}
-                            onKeyPress={(e) => {
-                                if (e.key === "Enter") {
-                                    setWords([word, ...words]);
-                                    setWord('');
-                                } else if (e.key.toLowerCase() !== e.key.toUpperCase()) {
-                                    setWord(word + e.key.toUpperCase())
-                                }
+                            onChange={(e) => {
+                                const newword = e.target.value.toUpperCase().replace( /\W/g , '');
+                                let buildneword = ''
+                                newword.split('').map((l) => {
+                                    if (l.toLowerCase() !== l.toUpperCase()) {
+                                        buildneword = buildneword + l
+                                    }
+                                })
+                                setWord(buildneword)
                             }}
                         />
+                        <button id="acceptWord"
+                            onClick={function() {
+                                setWords([word, ...words]);
+                                setWord('');
+                            }}
+                        >
+                            "Get Info"
+                        </button>
                     </div>
                 </div>
             </div>
@@ -34,7 +44,7 @@ export default function handler(req, res)  {
                 <div class="col-sm-12">
                     {words.map((w) => (
                         w === '' ? <></> :
-                        <Showinfo key={w} word={w} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                        <Showinfo key={w} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
                     ))}
                 </div>
             </div>

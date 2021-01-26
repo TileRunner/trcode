@@ -1,41 +1,54 @@
-import Showswaps from './showswaps'
-import Showanagrams from './showanagrams'
-import Showvalidity from './showvalidity'
+import { useEffect, useState } from 'react'
 
 export default function Showinfo( props ) {
-    // These need to be obtained from api when available
-    let inserts = ['','','1:A','','','','','1:S'];
-    let drops = [1,0,0,0,0,0,0];
+    const [info, setInfo] = useState([])
+    const [loaded, setLoaded] = useState(false)
+    console.log( props.word + loaded )
+    useEffect(()=>{
+        const apiCall = async ()=>{
+            let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
+            let data = await response.text()
+            console.log("data=" + data)
+            let jdata = JSON.parse(data)
+            setInfo(jdata)
+            setLoaded(true)
+        }
+        apiCall()
+    },[])
 
     return (
         <html>
         <body className="wibody">
-        <table>
-        <tr>
-            <td>
-            <table>
-                {props.showInserts === "Y" ? displayInsertsRow(inserts) : <></>}
-                {props.showSwaps === "Y" ? <Showswaps key={props.word} word={props.word}/> : <></>}
-                {displayWordRow(props.word)}
-                {props.showDrops === "Y" ? displayDropsRow(drops) : <></> }
-                <tr className="divider"><td>&nbsp;</td></tr>
-            </table>
-            </td>
-        </tr>
-        </table>
+            {loaded ?
+                <table>
+                <tr>
+                    <td>
+                    <table>
+                        {props.showInserts === "Y" ? displayInsertsRow(info.inserts) : <></>}
+                        {props.showSwaps === "Y" ? displaySwapsRow() : <></>}
+                        {displayWordRow()}
+                        {props.showDrops === "Y" ? displayDropsRow(info.drops) : <></> }
+                        <tr className="divider"><td colSpan={props.word.length + props.word.length + 3}>&nbsp;</td></tr>
+                    </table>
+                    </td>
+                </tr>
+                </table>
+            :
+                <p>Loading ...</p>
+            }
         </body>
         </html>        
     );
 
     function displayInsertsRow(inserts) {
         return(
-            <tr>
+            <tr key={props.word}>
             {inserts.map(i => (
                 <>
                     {i === '' ?
                         <td></td>
                         :
-                        <td className="insertCount" data-toggle="tooltip" title={i.split(':')[1]}>{i.split(':')[0]}
+                        <td className="insertCount" data-toggle="tooltip" title={i}>{i.length}
                         </td>
                     }
                     <td></td>
@@ -44,48 +57,80 @@ export default function Showinfo( props ) {
             </tr>
         )
     }
-
-    function displayDropsRow(drops) {
+    function displaySwapsRow() {
+        const swaps2 = [...info.swaps, '']
         return(
-            <tr>
-            {drops.map(d => (
+            <tr key={props.word}>
+            {swaps2?.map((s, index) => (
                 <>
-                <td></td>
-                {d === 1 ?
-                    <td className="dropIndicator">&bull;</td>
+                    {props.showInserts === 'N' || info.inserts[index] === '' ?
+                        <td className="insertCountSpacer"></td>
                     :
-                    <td></td>
-                }
+                        <td className="balloonstring">|</td>
+                    }
+                    {s === '' ?
+                        <td></td>
+                        :
+                        <td className="swapCount" data-toggle="tooltip" title={s}>{s.length}
+                        </td>
+                    }
                 </>
             ))}
         </tr>
         )
     }
 
-    function displayWordRow(word) {
-        const key1 = word;
-        const key2 = word + '2';
+    function displayWordRow() {
+        const key1 = props.word;
+        const key2 = props.word + '2';
         return(
             <tr className="displayWordRow">
-            <td width="5px"></td>
-            {word?.split("").map((l, index) => (
+            <td className="insertCountSpacer"></td>
+            {props.word?.split("").map((l, index) => (
                 <>
-                <td className="letter">{l}</td>
+                <td className={info.valid === "Y" ? "letter" : "letterInvalidWord"}>{l}</td>
                 <td className="facevalue"><sub>{letterValue(l)}</sub></td>
                 </>
             ))}
             <td key={key1}>
             {props.showAnagrams === "Y" ?
-                <Showanagrams word={word} />
-            :
+                <span key={info.anagrams}>
+                {info.anagrams.length === 0 ?
+                <></>
+                :
+                <span className="anagramCount" data-toggle="tooltip" title={info.anagrams}>{info.anagrams.length}</span>
+                }
+                </span>
+        :
             <>
             </>
             }
             </td>
             <td key={key2}>
-                <Showvalidity word={word} />
+                {info.valid === 'Y' ?
+                    <span className="wordIsValid">Valid word</span>
+                :
+                    <span className="wordIsNotValid">Not a recognized word</span>
+                }
             </td>
             </tr>
+        )
+    }
+
+    function displayDropsRow(drops) {
+        return(
+            <tr key={props.word} className="dropRow">
+            {drops.map(d => (
+                <>
+                <td></td>
+                {d === "Y" ?
+                    <td className="dropIndicator" data-toggle="tooltip" title="You can drop this letter">&bull;</td>
+                    :
+                    <td></td>
+                }
+                </>
+            ))}
+        </tr>
         )
     }
 
