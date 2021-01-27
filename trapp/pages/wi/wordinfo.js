@@ -19,14 +19,15 @@ export default function handler(req, res)  {
                             name="word"
                             value={word}
                             onChange={(e) => {
-                                const newword = e.target.value.toUpperCase().replace( /\W/g , '');
-                                let buildneword = ''
-                                newword.split('').map((l) => {
-                                    if (l.toLowerCase() !== l.toUpperCase()) {
-                                        buildneword = buildneword + l
-                                    }
-                                })
-                                setWord(buildneword)
+                                // const newword = e.target.value.toUpperCase().replace( /\W/g , '');
+                                // let buildneword = ''
+                                // newword.split('').map((l) => {
+                                //     if (l.toLowerCase() !== l.toUpperCase()) {
+                                //         buildneword = buildneword + l
+                                //     }
+                                // })
+                                // setWord(buildneword)
+                                setWord(e.target.value)
                             }}
                         />
                         <button id="acceptWord"

@@ -3,10 +3,15 @@ import { useEffect, useState } from 'react'
 export default function Showinfo( props ) {
     const [info, setInfo] = useState([])
     const [loaded, setLoaded] = useState(false)
-    console.log( props.word + loaded )
+    console.log("NODE_ENV=" + process.env.NODE_ENV)
     useEffect(()=>{
         const apiCall = async ()=>{
-            let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
+            let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+             'http://localhost:3000/api/words?word=' 
+             :
+             'https://words-scrabble.herokuapp.com/api/info/'
+            // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
+            let response = await fetch(url + props.word)
             let data = await response.text()
             console.log("data=" + data)
             let jdata = JSON.parse(data)
