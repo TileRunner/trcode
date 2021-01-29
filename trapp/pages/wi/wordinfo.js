@@ -12,10 +12,11 @@ export default function handler(req, res)  {
                 <h1>Word Info</h1>
             </div>
             <div class="row">
-                <div class="col-sm-3">
-                    <div className="form-group">
-                        <label>Word: </label>
-                        <input className="letterInput"
+                <div class="col-sm-6">
+                    <div className="form-inline">
+                        <label>Word:&nbsp;</label>
+                        <input
+                            className="letterInput"
                             name="word"
                             value={word}
                             onChange={(e) => {
@@ -30,14 +31,39 @@ export default function handler(req, res)  {
                                 setWord(e.target.value)
                             }}
                         />
+                        <label>&nbsp;</label>
                         <button id="acceptWord"
                             onClick={function() {
                                 setWords([word, ...words]);
                                 setWord('');
                             }}
                         >
-                            "Get Info"
+                            Get Word Info
                         </button>
+                        {(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+                            <>
+                                <label>&nbsp;</label>
+                                <button id="acceptRegex"
+                                    onClick={function() {
+                                        let url = 'http://localhost:3000/api/words?regex='
+                                        fetch(url + word).then(res => res.text()).then(text => {
+                                            console.log("regex response data=" + text)
+                                            let jdata = JSON.parse(text)
+                                            setWord('');
+                                            let newwords = []
+                                            jdata.map((w) => {
+                                                newwords =[...newwords, w]
+                                            })
+                                            setWords([...newwords, ...words])
+                                        })
+                                    }}
+                                >
+                                    Get Regex Info
+                                </button>
+                            </>
+                            :
+                            <></>
+                        }
                     </div>
                 </div>
             </div>
