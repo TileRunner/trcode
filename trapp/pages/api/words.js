@@ -22,7 +22,11 @@ export default (req, res) => {
           } catch(e) {
             regexmatches = [`Regex internal error ${e}`]
           }
-          res.send([...regexmatches])
+          let count = regexmatches.length;
+          if (regexmatches.length > 50) {
+            regexmatches = regexmatches.slice(0,50)
+          }
+          res.send({regexmatches: [...regexmatches], count: count})
         } else {
           if (req.query.word) {
             let allwords = data.split('\n')
@@ -51,8 +55,25 @@ export default (req, res) => {
               res.send(`Word internal error ${e}`)
             }
           } else {
-            res.statusCode = 405
-            res.send('Bad param')
+            if (req.query.alphagram) {
+              let allwords = data.split('\n')
+              let alphagramarray = req.query.alphagram.toLowerCase().split('')
+              alphagramarray.sort()
+              let alphagram = alphagramarray.join('')
+              let wlen = alphagram.length
+              let wordssamelength = allwords.filter(function (e) {
+                return e.length === wlen;
+              });
+              let anagrams = getAnagrams(alphagram, wordssamelength)
+              // getAnagrams does return the word that is the first parameter
+              if (wordssamelength.indexOf(alphagram) >-1 ) {
+                anagrams = [alphagram, ...anagrams]
+              }
+              res.send({alphagram: alphagram, anagrams: anagrams})
+            } else {
+              res.statusCode = 405
+              res.send('Bad param')
+            }
           }
         }
       })
@@ -63,139 +84,6 @@ export default (req, res) => {
   }
 }
 
-/*
-// Return a random word of requested length
-app.get('/api/random/:length', async (req, res) => {
-    try {
-        fs.readFile('words.json', 'utf8', (err, data) => {
-            let words = JSON.parse(data)
-            try {
-                res.send(words[`len${req.params.length}`][Math.floor(Math.random() * words[`len${req.params.length}`].length)])
-            } catch (e) {
-                res.send(`error ${e}`)
-            }
-            })
-    } catch (e) {
-        res.send(`error ${e}`)
-    }
-    
-})
-
-// Return info about a word
-app.get('/api/info/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let words = JSON.parse(data)
-      let wlen = word.length
-      let wordssamelength = wlen > 1 && wlen < 16 ? words[`len${req.params.word.length}`] : []
-      let sublength = wlen - 1
-      let wordsonelesslength = sublength > 1 && sublength < 16 ? words[`len${sublength}`] : []
-      let nextlength = word.length + 1
-      let wordsonelonger = nextlength > 1 && nextlength < 16 ? words[`len${nextlength}`] : []
-      try {
-        let valid = getValid(word, wordssamelength)
-        let anagrams = getAnagrams(word, wordssamelength)
-        let swaps = getSwaps(word, wordssamelength)
-        let drops = getDrops(word, wordsonelesslength)
-        let inserts = getInserts(word, wordsonelonger)
-        res.send({valid, anagrams, swaps, drops, inserts})
-      } catch(e) {
-        res.send(`error ${e}`)
-      }
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-
-
-// Return whether a word is valid, Y or N
-app.get('/api/valid/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let words = JSON.parse(data)
-      let wlen = word.length
-      let wordssamelength = wlen > 1 && wlen < 16 ? words[`len${req.params.word.length}`] : []
-      try {
-        let valid = getValid(word, wordssamelength)
-        res.send(valid)
-      } catch(e) {
-        res.send(`error ${e}`)
-      }
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-// Return anagrams for a word, the word provided is not returned
-app.get('/api/anagrams/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let alphagram = word.split('')
-      alphagram.sort()
-      jalphagram = alphagram.join()
-      let words = JSON.parse(data)
-      let wlen = word.length
-      let wordssamelength = wlen > 1 && wlen < 16 ? words[`len${req.params.word.length}`] : []
-      let anagrams = getAnagrams(word, wordssamelength)
-      res.send(anagrams);
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-// Return positional array of swaps letters for a word, the word provided is not returned
-// Example: HIRING returns ["AFTW","","DK","","",""]
-app.get('/api/swaps/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let words = JSON.parse(data)
-      let wlen = word.length
-      let wordssamelength = wlen > 1 && wlen < 16 ? words[`len${req.params.word.length}`] : []
-      let swaps = getSwaps(word, wordssamelength)
-      res.send(swaps);
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-// Return positional array of drop flags for a word to indicate which letters can be dropped
-// Example: PINING can drop the N (for PIING) and returns ["N","N","Y","N","N","N"]
-app.get('/api/drops/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let words = JSON.parse(data)
-      let sublength = req.params.word.length - 1
-      let wordsonelesslength =  sublength > 1 && sublength < 16 ? words[`len${sublength}`] : []
-      let drops = getDrops(word, wordsonelesslength)
-      res.send(drops);
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-// Return positional array of insert letters for a word
-// Example: CAT returns ["S","HO","NRS"] because of SCAT then CHAT COAT then CANT CART CAST
-app.get('/api/inserts/:word', async (req, res) => {
-  try {
-    fs.readFile('words.json', 'utf8', (err, data) => {
-      let word = req.params.word.toUpperCase()
-      let words = JSON.parse(data)
-      let nextlength = word.length + 1
-      let wordsonelonger = nextlength > 1 && nextlength < 16 ? words[`len${nextlength}`] : []
-      let inserts = getInserts(word, wordsonelonger)
-      res.send(inserts);
-    })
-  } catch (e) {
-    res.send(`error ${e}`)
-  }
-})
-*/
 function getValid(word, wordssamelength) {
   return wordssamelength.indexOf(word) > -1 ? 'Y' : 'N'
 }

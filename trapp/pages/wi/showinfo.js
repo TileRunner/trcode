@@ -71,7 +71,7 @@ export default function Showinfo( props ) {
                     {props.showInserts === 'N' || info.inserts[index] === '' ?
                         <td className="insertCountSpacer"></td>
                     :
-                        <td className="balloonstring">|</td>
+                        <td className="balloonstring">➻</td>
                     }
                     {s === '' ?
                         <td></td>
@@ -81,7 +81,7 @@ export default function Showinfo( props ) {
                     }
                 </>
             ))}
-        </tr>
+            </tr>
         )
     }
 

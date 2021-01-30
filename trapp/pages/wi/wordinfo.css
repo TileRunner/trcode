@@ -116,6 +116,6 @@
 .balloonstring {
   text-align: center;
   vertical-align: top;
-  color: teal;
-  font-weight: bolder;
+  color: white;
+  transform: rotate(90deg);  
 }

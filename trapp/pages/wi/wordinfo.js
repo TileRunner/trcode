@@ -7,12 +7,15 @@ export default function handler(req, res)  {
     const [words, setWords] = useState([]);
     return (
         <React.Fragment>
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
-                <h1>Word Info</h1>
+            <div class="col-sm-8">
+                <h1 className="wmtitle Mastermind">Word Info</h1>
+            </div>
+                <div class="col-sm-4"></div>
             </div>
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-8">
                     <div className="form-inline">
                         <label>Word:&nbsp;</label>
                         <input
@@ -40,6 +43,24 @@ export default function handler(req, res)  {
                         >
                             Get Word Info
                         </button>
+                        <label>&nbsp;</label>
+                        <button id="acceptAlphagram"
+                            onClick={function() {
+                                let url = 'http://localhost:3000/api/words?alphagram='
+                                fetch(url + word).then(res => res.text()).then(text => {
+                                    console.log("alphagram response data=" + text)
+                                    let jdata = JSON.parse(text)
+                                    setWord('');
+                                    let newwords = []
+                                    jdata.anagrams.map((w) => {
+                                        newwords =[...newwords, w]
+                                    })
+                                    setWords([...newwords, ...words])
+                                })
+                            }}
+                        >
+                            Get Anagrams
+                        </button>
                         {(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
                             <>
                                 <label>&nbsp;</label>
@@ -51,10 +72,13 @@ export default function handler(req, res)  {
                                             let jdata = JSON.parse(text)
                                             setWord('');
                                             let newwords = []
-                                            jdata.map((w) => {
+                                            jdata.regexmatches.map((w) => {
                                                 newwords =[...newwords, w]
                                             })
                                             setWords([...newwords, ...words])
+                                            if (jdata.count > 50) {
+                                                alert('Too many results, only 50 taken')
+                                            }
                                         })
                                     }}
                                 >
@@ -66,14 +90,16 @@ export default function handler(req, res)  {
                         }
                     </div>
                 </div>
+                <div class="col-sm-4"></div>
             </div>
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-8">
                     {words.map((w) => (
                         w === '' ? <></> :
                         <Showinfo key={w} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
                     ))}
                 </div>
+                <div class="col-sm-4"></div>
             </div>
             <div class="row">
                 <div class="col-sm-1">
