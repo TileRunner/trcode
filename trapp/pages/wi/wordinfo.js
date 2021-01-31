@@ -46,15 +46,24 @@ export default function handler(req, res)  {
                         <label>&nbsp;</label>
                         <button id="acceptAlphagram"
                             onClick={function() {
-                                let url = 'http://localhost:3000/api/words?alphagram='
+                                let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+                                'http://localhost:3000/api/words?alphagram=' 
+                                :
+                                'https://words-scrabble.herokuapp.com/api/info/'
                                 fetch(url + word).then(res => res.text()).then(text => {
-                                    console.log("alphagram response data=" + text)
+                                    console.log("alphagram response data=" + text + ". NODE_ENV here is " + process.env.NODE_ENV)
                                     let jdata = JSON.parse(text)
-                                    setWord('');
                                     let newwords = []
                                     jdata.anagrams.map((w) => {
                                         newwords =[...newwords, w]
                                     })
+                                    if (!(!process.env.NODE_ENV || process.env.NODE_ENV === 'development')) {
+                                        if (jdata.valid === 'Y') {
+                                            newwords = [word.toUpperCase(), ...newwords]
+                                        }
+                                    }
+                                    newwords.sort()
+                                    setWord('');
                                     setWords([...newwords, ...words])
                                 })
                             }}

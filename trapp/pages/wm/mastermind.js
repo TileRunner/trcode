@@ -34,32 +34,51 @@ function Game() {
             <p className="wmp">Cycle through 2-8 letter words per set.</p>
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-4">
-                        <div className="Outertable">
-                            <h3 className="wmh3 AlignLeft">Guesses this word: {guesses.length}</h3>
-                            <h3 className="wmh3 AlignLeft">Guesses this set: {setGuessCount}</h3>
-                            {setSolveCounts.length === 0 ?
-                                <p className="AlignLeft">No completed sets yet</p>
-                            :
-                                <p className="AlignLeft">Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
-                            }
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div className="Outertable">
-                            {secretWord === '' ? pickRandomWord() : ''}
-                            <h3 className="wmh3">Secret Word: {solved ? secretWord : secretDisplay}</h3>
-                            {secretWord === '' ?
-                                <h1 className="wmh1">Loading ...</h1>
-                                :
-                                solved ?
-                                    promptForPlayAgain
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div className="Outertable">
+                                    <h3 className="wmh3 AlignLeft">Guesses this word: {guesses.length}</h3>
+                                    <h3 className="wmh3 AlignLeft">Guesses this set: {setGuessCount}</h3>
+                                    {setSolveCounts.length === 0 ?
+                                        <p className="AlignLeft">No completed sets yet</p>
                                     :
-                                    promptForGuess
-                                }
+                                        <p className="AlignLeft">Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div className="Outertable">
+                                    {secretWord === '' ? pickRandomWord() : ''}
+                                    <h3 className="wmh3">Secret Word: {solved ? secretWord : secretDisplay}</h3>
+                                    {secretWord === '' ?
+                                        <h1 className="wmh1">Loading ...</h1>
+                                    :
+                                        solved ?
+                                            promptForPlayAgain
+                                        :
+                                            promptForGuess
+                                    }
+                                    {solved ?
+                                        <br></br>
+                                        :
+                                        guesses.length === 0 ?
+                                            <p className="wmp">Start guessing</p>
+                                            :
+                                            <p className="wmp">Keep guessing</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                {guesses.map(g => (
+                                    <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-lg-4">
                         <div className="Outertable">
                             {guesses.length === 0 ?
                                 <p>No guesses yet</p> 
@@ -70,17 +89,6 @@ function Game() {
                     </div>
                 </div>
             </div>
-            {solved ?
-                <br></br>
-                :
-                guesses.length === 0 ?
-                    <p className="wmp">Start guessing</p>
-                    :
-                    <p className="wmp">Keep guessing</p>
-            }
-            {guesses.map(g => (
-                <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
-            ))}
         </div>
     );
 
