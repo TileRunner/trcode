@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link'
 import Showinfo from '../wi/showinfo'
+import {isMobile} from 'react-device-detect'
 
 export default function handler(req, res)  {
     return (
@@ -70,13 +71,15 @@ function Game() {
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                {guesses.map(g => (
-                                    <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
-                                ))}
+                        if (!isMobile) {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    {guesses.map(g => (
+                                        <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                     <div class="col-lg-4">
                         <div className="Outertable">
