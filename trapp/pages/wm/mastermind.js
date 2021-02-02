@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link'
 import Showinfo from '../wi/showinfo'
-import {isMobile} from 'react-device-detect'
+import {BrowserView} from 'react-device-detect'
 
 export default function handler(req, res)  {
     return (
@@ -71,7 +71,7 @@ function Game() {
                                 </div>
                             </div>
                         </div>
-                        if (!isMobile) {
+                        <BrowserView>
                             <div class="row">
                                 <div class="col-lg-12">
                                     {guesses.map(g => (
@@ -79,7 +79,7 @@ function Game() {
                                     ))}
                                 </div>
                             </div>
-                        }
+                        </BrowserView>
                     </div>
                     <div class="col-lg-4">
                         <div className="Outertable">
