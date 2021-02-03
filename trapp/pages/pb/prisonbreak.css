@@ -1,0 +1,43 @@
+.pbSquare {
+    background-color: blue;
+    border: chartreuse;
+    border-style: solid;
+    width: 40px;
+    color: cornsilk;
+    text-align: center;
+}
+.pbSquareUsed {
+    background-color: purple;
+    border: black;
+    border-style: solid;
+    width: 40px;
+    color: cyan;
+    font-weight: bolder;
+    text-align: center;
+}
+.pbSquareCenterSquare {
+    background-color: orange;
+    border: chartreuse;
+    border-style: solid;
+    width: 40px;
+    color: cornsilk;
+    text-align: center;
+    font-size: xx-large;
+}
+.pbSquareEscapeHatch {
+    background-color: crimson;
+    border: chartreuse;
+    border-style: solid;
+    width: 40px;
+    color: cornsilk;
+    text-align: center;
+}
+.pbRow {
+    line-height: 40px;
+}
+.pbBoard {
+    background-color: blueviolet;
+}
+.pbGame {
+    background-color: cadetblue;
+}

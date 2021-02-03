@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 import './wi/wordinfo.css'
 import './wm/mastermind.css'
+import './pb/prisonbreak.css'
 
 import Head from 'next/head'
 
