@@ -6,12 +6,21 @@
     color: cornsilk;
     text-align: center;
 }
-.pbSquareUsed {
-    background-color: purple;
+.pbSquareUsedByPrisoners {
+    background-color: blueviolet;
     border: black;
     border-style: solid;
     width: 40px;
-    color: cyan;
+    color: whitesmoke;
+    font-weight: bolder;
+    text-align: center;
+}
+.pbSquareUsedByGuards {
+    background-color: black;
+    border: black;
+    border-style: solid;
+    width: 40px;
+    color: whitesmoke;
     font-weight: bolder;
     text-align: center;
 }

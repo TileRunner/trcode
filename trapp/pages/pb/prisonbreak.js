@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Link from 'next/link'
 
 export default function handler(req, res)  {
-    const [squares, setSquares] = useState(Array(15).fill(Array(15).fill('?')))
+    const [squares, setSquares] = useState(Array(15).fill(Array(15).fill('.')))
+    const [usedby, setUsedby] = useState(Array(15).fill(Array(15).fill('')))
     const [tiles, setTiles] = useState(['A','A','A','A','A','A','A','A','A','B','B','C','C','C','D','D','D','D','E','E','E','E','E','E','E','E','E','E','E','E','F','F','G','G','G','H','H','I','I','I','I','I','I','I','I','I','J','K','L','L','L','L','M','M','N','N','N','N','N','N','O','O','O','O','O','O','O','O','P','P','Q','R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V','W','W','X','Y','Y','Z','?','?'])
     const [selection, setSelection] = useState(-1)
     const [ptiles, setPtiles] = useState([])
@@ -73,38 +74,55 @@ export default function handler(req, res)  {
     }
 
     function Square(props) {
-        const tdclass = props.c !== "?" ? "pbSquareUsed" : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : "pbSquare"
-        const tdvalue = props.c !== "?" ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : "⎔"
+        const usedbyrow = usedby[props.ri]
+        const usedbyclass = usedbyrow[props.ci] === "P" ? "pbSquareUsedByPrisoners" : "pbSquareUsedByGuards"
+        const tdclass = props.c !== "." ? usedbyclass : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : "pbSquare"
+        const tdvalue = props.c !== "." ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : "⎔"
         return (
             <div>
                 <td>
                     <button  className={tdclass}
                     onClick={function() {
-                        if (selection > -1 && props.c === "?") {
+                        if (selection > -1 && props.c === ".") {
                             let newSquares = [...squares]
                             let newRow = [...newSquares[props.ri]]
                             newRow[props.ci] = whoseturn === 'P' ? ptiles[selection] : gtiles[selection]
                             newSquares[props.ri] = [...newRow]
                             let newTiles = whoseturn === 'P' ? [...ptiles] : [...gtiles]
                             newTiles.splice(selection, 1)
+                            let newUsedby = [...usedby]
+                            let newUsedbyRow = [...newUsedby[props.ri]]
+                            newUsedbyRow[props.ci] = whoseturn
+                            newUsedby[props.ri] = [...newUsedbyRow]
+                            setUsedby(newUsedby)
                             setSquares(newSquares)
                             whoseturn === 'P' ? setPtiles(newTiles) : setGtiles(newTiles)
-                        } else if (props.c !== "?") {
+                        } else if (props.c !== ".") {
                             // Assuming some good will from the users to click a tile they played
                             if (whoseturn === 'P' && ptiles.length < 7) {
                                 let newPtiles = [...ptiles, props.c]
                                 let newSquares = [...squares]
                                 let newRow = [...newSquares[props.ri]]
-                                newRow[props.ci] = "?"
+                                newRow[props.ci] = "."
                                 newSquares[props.ri] = [...newRow]
+                                let newUsedby = [...usedby]
+                                let newUsedbyRow = [...newUsedby[props.ri]]
+                                newUsedbyRow[props.ci] = ""
+                                newUsedby[props.ri] = [...newUsedbyRow]
+                                setUsedby(newUsedby)
                                 setSquares(newSquares)
                                 setPtiles(newPtiles)
                             } else if (whoseturn === 'G' && gtiles.length < 7) {
                                 let newGtiles = [...gtiles, props.c]
                                 let newSquares = [...squares]
                                 let newRow = [...newSquares[props.ri]]
-                                newRow[props.ci] = "?"
+                                newRow[props.ci] = "."
                                 newSquares[props.ri] = [...newRow]
+                                let newUsedby = [...usedby]
+                                let newUsedbyRow = [...newUsedby[props.ri]]
+                                newUsedbyRow[props.ci] = ""
+                                newUsedby[props.ri] = [...newUsedbyRow]
+                                setUsedby(newUsedby)
                                 setSquares(newSquares)
                                 setGtiles(newGtiles)
                             }
@@ -138,7 +156,7 @@ export default function handler(req, res)  {
             let newPtiles = [...ptiles]
             let newTiles = [...tiles]
             while (newPtiles.length < 7 && newTiles.length > 0) {
-                let rand = Math.floor(Math.random() * tiles.length)
+                let rand = Math.floor(Math.random() * newTiles.length)
                 newPtiles = [...newPtiles, newTiles[rand]]
                 newTiles.splice(rand,1)   
             }
@@ -182,7 +200,7 @@ export default function handler(req, res)  {
             let newGtiles = [...gtiles]
             let newTiles = [...tiles]
             while (newGtiles.length < 7 && newTiles.length > 0) {
-                let rand = Math.floor(Math.random() * tiles.length)
+                let rand = Math.floor(Math.random() * newTiles.length)
                 newGtiles = [...newGtiles, newTiles[rand]]
                 newTiles.splice(rand,1)
             }
