@@ -14,9 +14,6 @@ export default function handler(req, res)  {
         true // picking
         ]);
 
-    function applyChanges(squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking) {
-        setGamedata([squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking]);
-    }
     return(
         <Game/>
     )
@@ -95,7 +92,7 @@ export default function handler(req, res)  {
         const usedbyrow = usedby[props.ri]
         const usedbyclass = usedbyrow[props.ci] === "P" ? "pbSquareUsedByPrisoners" : "pbSquareUsedByGuards"
         const tdclass = props.c !== "." ? usedbyclass : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : "pbSquare"
-        const tdvalue = props.c !== "." ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : "⎔"
+        const tdvalue = props.c !== "." ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : props.ri % 2 === props.ci % 2 ? "⎔" : "✦"
         return (
             <div>
                 <td>
@@ -175,7 +172,7 @@ export default function handler(req, res)  {
                 <p className="pbTilerack">
                     {ptiles.map((t,ti) => (
                         <span key={`ptile${ti}`}>
-                            <button className="pbTileOnRackP"
+                            <button className={whoseturn === 'P' && selection === ti ? "pbTileOnRackSelectedP" : "pbTileOnRackP"}
                                 onClick={function() {
                                     if (whoseturn === 'P') {
                                         selection = ti
@@ -234,7 +231,7 @@ export default function handler(req, res)  {
                 <p className="pbTilerack">
                     {gtiles.map((t,ti) => (
                         <span key={`gtile${ti}`}>
-                            <button className="pbTileOnRackG"
+                            <button className={whoseturn === 'G' && selection === ti ? "pbTileOnRackSelectedG" : "pbTileOnRackG"}
                                 onClick={function() {
                                     if (whoseturn === 'G') {
                                         selection = ti
@@ -265,6 +262,10 @@ export default function handler(req, res)  {
                 }
              </div>
         )
+    }
+
+    function applyChanges(squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking) {
+        setGamedata([squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking]);
     }
 }
 
