@@ -18,6 +18,10 @@ export default function handler(req, res)  {
         <Game/>
     )
 
+    function applyChanges(squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking) {
+        setGamedata([squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking]);
+    }
+
     function Game() {
         return (
             <div class="container-fluid prisonbreak">
@@ -262,10 +266,6 @@ export default function handler(req, res)  {
                 }
              </div>
         )
-    }
-
-    function applyChanges(squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking) {
-        setGamedata([squares, usedby, tiles, selection, ptiles, gtiles, whoseturn, picking]);
     }
 }
 

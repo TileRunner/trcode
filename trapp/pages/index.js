@@ -17,7 +17,7 @@ export default function Home() {
       <Link href={`/wi/wordinfo`}>
         <a>Word Info</a>
       </Link>
-      <Link href={`/pb/prisonbreak`}>
+      <Link href={`/pb/prisonbreak2`}>
         <a>Prison Break (under construction)</a>
       </Link>
 
