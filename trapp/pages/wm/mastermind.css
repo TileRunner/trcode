@@ -5,6 +5,10 @@
     padding-top: 1%;
     padding-bottom: 1%;
 }
+.wmhomelink {
+    background-color: #16271a;
+    text-align: right;
+}
 .Outertable {
     border-style: none;
     vertical-align: top;

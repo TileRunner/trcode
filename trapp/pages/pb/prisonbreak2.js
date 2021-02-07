@@ -1,6 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-const winningcoords = ["0-0", "0-7", "0-14", "7-0", "7-14", "14-0", "14-7", "14-14"]
+
+const escapehatches = ["0-0", "0-7", "0-14", "7-0", "7-14", "14-0", "14-7", "14-14"] // coords of escape hatches
+const initialtiles = ['A','A','A','A','A','A','A','A','A'
+,'B','B','C','C','D','D','D','D','E','E','E','E','E','E','E','E','E','E','E','E'
+,'F','F','G','G','G','H','H','I','I','I','I','I','I','I','I','I','J','K','L','L','L','L'
+,'M','M','N','N','N','N','N','N','O','O','O','O','O','O','O','O','P','P','Q'
+,'R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V'
+,'W','W','X','Y','Y','Z','?','?'] // initial tile pool
 
 export default function PrisonBreak() {
     return(
@@ -14,7 +21,7 @@ function Square(props) { // squareusedby, ri, ci, c, onClick
     // need c to represent which tile is on the square, if any
     // need onClick to handle square click at a higher level
     const usedbyclass = props.squareusedby === "P" ? "pbSquareUsedByPrisoners" : "pbSquareUsedByGuards"
-    const tdclass = props.c !== "." ? usedbyclass : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : "pbSquare"
+    const tdclass = props.c !== "." ? usedbyclass : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : props.ri % 2 === props.ci % 2 ? "pbSquare" : "pbSquare2"
     const tdvalue = props.c !== "." ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : props.ri % 2 === props.ci % 2 ? "⎔" : "✦"
     return (
         <div>
@@ -61,20 +68,27 @@ class Board extends React.Component {
 class Game extends React.Component {
     constructor(props) {
         super(props);
+        let tiles = [...initialtiles]
+        let ptiles = []
+        let gtiles = []
+        while (ptiles.length < 7) {
+            let rand = Math.floor(Math.random() * tiles.length)
+            ptiles.push(tiles[rand])
+            tiles.splice(rand,1)   
+            rand = Math.floor(Math.random() * tiles.length)
+            gtiles.push(tiles[rand])
+            tiles.splice(rand,1)   
+        }
+        ptiles.sort()
+        gtiles.sort()
         this.state = {
             squares: Array(15).fill(Array(15).fill('.')), // squares on the game board
             usedby: Array(15).fill(Array(15).fill('')),  // who put a tile on a square
-            tiles: ['A','A','A','A','A','A','A','A','A'
-                ,'B','B','C','C','D','D','D','D','E','E','E','E','E','E','E','E','E','E','E','E'
-                ,'F','F','G','G','G','H','H','I','I','I','I','I','I','I','I','I','J','K','L','L','L','L'
-                ,'M','M','N','N','N','N','N','N','O','O','O','O','O','O','O','O','P','P','Q'
-                ,'R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V'
-                ,'W','W','X','Y','Y','Z','?','?'], // initial tile pool
+            tiles: tiles,
             selection: -1, // which tile from the tile rack in play is selected
-            ptiles: [], // prisoners tiles
-            gtiles: [], // guards tiles
+            ptiles: ptiles, // prisoners tiles
+            gtiles: gtiles, // guards tiles
             whoseturn: 'P', // prisoners play first
-            picking: true, // picking is true while tiles are being picked
             currentcoords: [], // coords of play currently being made to support tile recall and play validation
             rescues: 0 // number of prisoners rescued
         };
@@ -155,7 +169,7 @@ class Game extends React.Component {
         }
     }
 
-    pickPrisonerTiles() {
+    pickPrisonersTiles() {
         let ptiles = [...this.state.ptiles]
         let tiles = [...this.state.tiles]
         while (ptiles.length < 7 && tiles.length > 0) {
@@ -163,8 +177,8 @@ class Game extends React.Component {
             ptiles.push(tiles[rand])
             tiles.splice(rand,1)   
         }
+        ptiles.sort()
         this.setState({
-            picking: false,
             ptiles: ptiles,
             tiles: tiles
         })
@@ -177,54 +191,54 @@ class Game extends React.Component {
             gtiles.push(tiles[rand])
             tiles.splice(rand,1)   
         }
+        gtiles.sort()
         this.setState({
-            picking: false,
             gtiles: gtiles,
             tiles: tiles
         })
     }
 
     endPrisonersTurn() {
-        console.log("winning coords " + winningcoords.toString())
+        console.log("winning coords " + escapehatches.toString())
         console.log("current coords " + this.state.currentcoords.toString())
         let rescues = this.state.rescues
         for (var i = 0; i < this.state.currentcoords.length; i++) {
-            if (winningcoords.indexOf(this.state.currentcoords[i]) > -1) {
+            if (escapehatches.indexOf(this.state.currentcoords[i]) > -1) {
                 rescues++
             }
         }
         this.setState({
             whoseturn: 'G',
-            picking: true,
             selection: -1,
             currentcoords: [],
             rescues: rescues
         })
+        this.pickPrisonersTiles()
     }
     endGuardsTurn() {
         this.setState({
             whoseturn: 'P',
-            picking: true,
             selection: -1,
             currentcoords: []
         })
+        this.pickGuardsTiles()
     }
 
     render() {
         return (
             <div class="container-fluid prisonbreak">
                 <div class="row">
-                    <div class="col-12">
-                        <h1 className="wmtitle Mastermind">Prison Break</h1>
+                    <div class="col-11 pbtitle">
+                        Prison Break
+                    </div>
+                    <div class="col-1 pbhomelink" data-toggle="tooltip" title="Home">
+                        <Link href={'../../'}>
+                            <a>🏠</a>
+                        </Link>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-2 pbPrisoners">
-                        {this.state.picking && this.state.whoseturn === 'P' && this.state.ptiles.length < 7 && this.state.tiles.length > 0 ?
-                            this.pickPrisonerTiles()
-                            :
-                            <></>
-                        }
                         <Prisoners
                             ptiles={this.state.ptiles}
                             whoseturn={this.state.whoseturn}
@@ -242,11 +256,6 @@ class Game extends React.Component {
                             />
                     </div>
                     <div class="col-2 pbGuards">
-                        {this.state.picking && this.state.whoseturn === 'G' && this.state.gtiles.length < 7 && this.state.tiles.length > 0 ?
-                            this.pickGuardsTiles()
-                            :
-                            <></>
-                        }
                         <Guards
                             gtiles={this.state.gtiles}
                             whoseturn={this.state.whoseturn}
@@ -259,13 +268,6 @@ class Game extends React.Component {
                         <Tiles tiles={this.state.tiles}/>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-1">
-                        <Link href={'../../'}>
-                            <a className="wmlink">Home</a>
-                        </Link>
-                    </div>
-                </div>
             </div>
         );    
     }
@@ -275,7 +277,7 @@ function Tiles(props) {
     // there is a better way ^^^
     return (
         <div className="pbTilepool">
-            <p>TILE POOL</p>
+            <h3>TILE POOL</h3>
             {props.tiles.map((t,ti) => (
                 <span key={`tile${ti}`}>
                     {ti > 0 && t !== props.tiles[ti-1] ? <div className="pbTilepoolDivider"></div> : <></>}
@@ -288,10 +290,8 @@ function Tiles(props) {
 
 function RackTile(props) {
     return (
-        <td>
-            <button className={props.tileclass} onClick={props.onClick}>
-                {props.tilevalue}
-            </button>
+        <td className={props.tileclass} onClick={props.onClick}>
+            {props.tilevalue}
         </td>
     )    
 }
@@ -307,7 +307,7 @@ function FinishTurnButton(props) {
 class Prisoners extends React.Component {
     renderTile(tileclass, tileindex, tilevalue) {
         return (
-            <RackTile tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
+            <RackTile key={tileclass + String(tileindex)} tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
         );
     }
 
@@ -317,6 +317,21 @@ class Prisoners extends React.Component {
         );
     }
 
+    renderFreedPrisoners(count) {
+        let dumb = Array(count).fill('nonsense')
+        return (
+            dumb.map((value,index) => (
+                <span key={value + String(index)}>
+                    <img
+                        src="/breakfree.png"
+                        alt="I'm free! I'm free!"
+                        width="100"
+                        height="100"
+                        />
+                </span>
+            ))
+        )
+    }
     render() {
         return (
             <div>
@@ -333,6 +348,8 @@ class Prisoners extends React.Component {
                 }
                 <p>
                     Rescues made: {this.props.rescues}
+                    <br></br>
+                    {this.renderFreedPrisoners(this.props.rescues)}
                 </p>
             </div>
         )
@@ -341,7 +358,7 @@ class Prisoners extends React.Component {
 class Guards extends React.Component {
     renderTile(tileclass, tileindex, tilevalue) {
         return (
-            <RackTile tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
+            <RackTile key={tileclass + String(tileindex)} tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
         );
     }
 

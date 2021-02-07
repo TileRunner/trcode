@@ -5,15 +5,8 @@ import {BrowserView} from 'react-device-detect'
 
 export default function handler(req, res)  {
     return (
-        <React.Fragment>
-            <Game />
-            <p>
-                <Link href={'../../'}>
-                    <a className="wmlink">Home</a>
-                </Link>
-            </p>
-        </React.Fragment>
-);
+        <Game />
+    );
 }
 
 function Game() {
@@ -29,11 +22,22 @@ function Game() {
     const promptForPlayAgain = showPlayAgainPrompt();
     return (
         <div className="Mastermind">
-            <div className="page-header">
-                <h1 className="wmtitle">Word Mastermind</h1>
-            </div>
-            <p className="wmp">Cycle through 2-8 letter words per set.</p>
-            <div class="container">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-11 wmtitle">
+                        Word Mastermind
+                    </div>
+                    <div class="col-1 wmhomelink" data-toggle="tooltip" title="Home">
+                        <Link href={'../../'}>
+                            <a>🏠</a>
+                        </Link>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11">
+                        <p className="wmp">Cycle through 2-8 letter words per set.</p>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="row">

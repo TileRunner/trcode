@@ -1,6 +1,18 @@
 .prisonbreak {
     background-color: teal;
 }
+.pbtitle {
+    background-color: #16271a;
+    font-size: 2.8em;
+    text-align: center;
+    font-family: cursive;
+    font-style: italic;
+    color:red;
+}
+.pbhomelink {
+    background-color: #16271a;
+    text-align: right;
+}
 .pbPrisoners {
     font-size: x-large;
 }
@@ -9,6 +21,14 @@
 }
 .pbSquare {
     background-color: cadetblue;
+    border: darkgray;
+    border-style: solid;
+    width: 40px;
+    color: cornsilk;
+    text-align: center;
+}
+.pbSquare2 {
+    background-color: rgb(27, 86, 88);
     border: darkgray;
     border-style: solid;
     width: 40px;
@@ -41,13 +61,14 @@
     background-color: cadetblue;
 }
 .pbTilepool {
-    background-color: blueviolet;
+    text-align: right;
     color: burlywood;
     font-family: monospace;
     font-size: large;
     padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 5px;
+    padding-right: 5px;
     width: 165px;
 }
 .pbTilepoolDivider {

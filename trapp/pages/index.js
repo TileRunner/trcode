@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
+import {BrowserView} from 'react-device-detect'
 
 export default function Home() {
   return (
@@ -17,11 +18,11 @@ export default function Home() {
       <Link href={`/wi/wordinfo`}>
         <a>Word Info</a>
       </Link>
-      <Link href={`/pb/prisonbreak2`}>
-        <a>Prison Break (under construction)</a>
-      </Link>
-
-
+      <BrowserView>
+        <Link href={`/pb/prisonbreak2`}>
+          <a>Prison Break (under construction)</a>
+        </Link>
+      </BrowserView>
     </div>
   )
 }

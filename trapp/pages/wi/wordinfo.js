@@ -6,13 +6,16 @@ export default function handler(req, res)  {
     const [word, setWord] = useState('');
     const [words, setWords] = useState([]);
     return (
-        <React.Fragment>
         <div class="container-fluid">
             <div class="row">
-            <div class="col-sm-8">
-                <h1 className="wmtitle Mastermind">Word Info</h1>
-            </div>
-                <div class="col-sm-4"></div>
+                <div class="col-11 wititle">
+                    Word Info
+                </div>
+                <div class="col-1 wihomelink" data-toggle="tooltip" title="Home">
+                    <Link href={'../../'}>
+                        <a>🏠</a>
+                    </Link>
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-8">
@@ -23,14 +26,6 @@ export default function handler(req, res)  {
                             name="word"
                             value={word}
                             onChange={(e) => {
-                                // const newword = e.target.value.toUpperCase().replace( /\W/g , '');
-                                // let buildneword = ''
-                                // newword.split('').map((l) => {
-                                //     if (l.toLowerCase() !== l.toUpperCase()) {
-                                //         buildneword = buildneword + l
-                                //     }
-                                // })
-                                // setWord(buildneword)
                                 setWord(e.target.value)
                             }}
                         />
@@ -110,15 +105,7 @@ export default function handler(req, res)  {
                 </div>
                 <div class="col-sm-4"></div>
             </div>
-            <div class="row">
-                <div class="col-sm-1">
-                    <Link href={'../../'}>
-                        <a className="wmlink">Home</a>
-                    </Link>
-                </div>
-            </div>
         </div>
-        </React.Fragment>
         );
 }
 
