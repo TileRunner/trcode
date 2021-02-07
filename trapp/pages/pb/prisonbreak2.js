@@ -81,16 +81,24 @@ class Game extends React.Component {
         }
         ptiles.sort()
         gtiles.sort()
+        let squares = Array(15).fill(Array(15).fill('.'))
+        let usedby = Array(15).fill(Array(15).fill(''))
         this.state = {
-            squares: Array(15).fill(Array(15).fill('.')), // squares on the game board
-            usedby: Array(15).fill(Array(15).fill('')),  // who put a tile on a square
+            squares: squares, // squares on the game board
+            usedby: usedby,  // who put a tile on a square
             tiles: tiles,
             selection: -1, // which tile from the tile rack in play is selected
             ptiles: ptiles, // prisoners tiles
             gtiles: gtiles, // guards tiles
             whoseturn: 'P', // prisoners play first
             currentcoords: [], // coords of play currently being made to support tile recall and play validation
-            rescues: 0 // number of prisoners rescued
+            rescues: 0, // number of prisoners rescued
+            snapshot: { // for reverting to start of move for tile recall or exchange logic
+                squares: [...squares],
+                usedby: [...usedby],
+                ptiles: [...ptiles],
+                gtiles: [...gtiles]
+             }
         };
     }
 
@@ -169,7 +177,13 @@ class Game extends React.Component {
         }
     }
 
-    pickPrisonersTiles() {
+    endPrisonersTurn() {
+        let rescues = this.state.rescues
+        for (var i = 0; i < this.state.currentcoords.length; i++) {
+            if (escapehatches.indexOf(this.state.currentcoords[i]) > -1) {
+                rescues++
+            }
+        }
         let ptiles = [...this.state.ptiles]
         let tiles = [...this.state.tiles]
         while (ptiles.length < 7 && tiles.length > 0) {
@@ -178,12 +192,25 @@ class Game extends React.Component {
             tiles.splice(rand,1)   
         }
         ptiles.sort()
+        let squares = this.state.squares
+        let usedby = this.state.usedby
+        let gtiles = this.state.gtiles
         this.setState({
+            whoseturn: 'G',
+            selection: -1,
+            currentcoords: [],
+            rescues: rescues,
             ptiles: ptiles,
-            tiles: tiles
+            tiles: tiles,
+            snapshot: { 
+                squares: [...squares],
+                usedby: [...usedby],
+                ptiles: [...ptiles],
+                gtiles: [...gtiles]
+            }
         })
     }
-    pickGuardsTiles() {
+    endGuardsTurn() {
         let gtiles = [...this.state.gtiles]
         let tiles = [...this.state.tiles]
         while (gtiles.length < 7 && tiles.length > 0) {
@@ -192,36 +219,39 @@ class Game extends React.Component {
             tiles.splice(rand,1)   
         }
         gtiles.sort()
-        this.setState({
-            gtiles: gtiles,
-            tiles: tiles
-        })
-    }
-
-    endPrisonersTurn() {
-        console.log("winning coords " + escapehatches.toString())
-        console.log("current coords " + this.state.currentcoords.toString())
-        let rescues = this.state.rescues
-        for (var i = 0; i < this.state.currentcoords.length; i++) {
-            if (escapehatches.indexOf(this.state.currentcoords[i]) > -1) {
-                rescues++
-            }
-        }
-        this.setState({
-            whoseturn: 'G',
-            selection: -1,
-            currentcoords: [],
-            rescues: rescues
-        })
-        this.pickPrisonersTiles()
-    }
-    endGuardsTurn() {
+        let snapsquares = [...this.state.squares]
+        let snapusedby = [...this.state.usedby]
+        let snapptiles = [...this.state.ptiles]
+        let snapgtiles = [...gtiles]
         this.setState({
             whoseturn: 'P',
             selection: -1,
-            currentcoords: []
+            currentcoords: [],
+            gtiles: gtiles,
+            tiles: tiles,
+            snapshot: { 
+                squares: snapsquares,
+                usedby: snapusedby,
+                ptiles: snapptiles,
+                gtiles: snapgtiles
+            }
         })
-        this.pickGuardsTiles()
+    }
+
+    recallTiles() {
+        let squares = [...this.state.snapshot.squares]
+        let usedby = [...this.state.snapshot.usedby]
+        let ptiles = [...this.state.snapshot.ptiles]
+        let gtiles = [...this.state.snapshot.gtiles]
+        console.log("Tile recall " + ptiles.toString() + " : " + gtiles.toString())
+        this.setState({
+            selection: -1,
+            currentcoords: [],
+            squares: squares,
+            usedby: usedby,
+            ptiles: ptiles,
+            gtiles: gtiles
+        })
     }
 
     render() {
@@ -245,6 +275,7 @@ class Game extends React.Component {
                             selection={this.state.selection}
                             onClick={(ti) => this.handlePrisonerTileClick(ti)}
                             onClickFinishTurn={() => this.endPrisonersTurn()}
+                            onClickTileRecall={() => this.recallTiles()}
                             rescues={this.state.rescues}
                         />
                     </div>
@@ -262,6 +293,7 @@ class Game extends React.Component {
                             selection={this.state.selection}
                             onClick={(ti) => this.handleGuardTileClick(ti)}
                             onClickFinishTurn={() => this.endGuardsTurn()}
+                            onClickTileRecall={() => this.recallTiles()}
                         />
                     </div>
                     <div class="col-2">
@@ -298,12 +330,19 @@ function RackTile(props) {
 
 function FinishTurnButton(props) {
     return (
-        <button onClick={props.onClick}>
+        <button className="pbFinishTurn" onClick={props.onClick}>
             Finish Turn
         </button>
     )
 }
 
+function TileRecallButton(props) {
+    return (
+        <button className="pbRecallTiles" onClick={props.onClick}>
+            Recall Tiles
+        </button>
+    )
+}
 class Prisoners extends React.Component {
     renderTile(tileclass, tileindex, tilevalue) {
         return (
@@ -314,6 +353,12 @@ class Prisoners extends React.Component {
     renderFinishTurn() {
         return (
             <FinishTurnButton onClick={() => this.props.onClickFinishTurn()}/>
+        );
+    }
+
+    renderRecallTiles() {
+        return (
+            <TileRecallButton onClick={() => this.props.onClickTileRecall()}/>
         );
     }
 
@@ -346,6 +391,11 @@ class Prisoners extends React.Component {
                     :
                     <></>
                 }
+                {this.props.whoseturn === 'P' ?
+                    this.renderRecallTiles()
+                    :
+                    <></>
+                }
                 <p>
                     Rescues made: {this.props.rescues}
                     <br></br>
@@ -368,6 +418,12 @@ class Guards extends React.Component {
         );
     }
 
+    renderRecallTiles() {
+        return (
+            <TileRecallButton onClick={() => this.props.onClickTileRecall()}/>
+        );
+    }
+
     render() {
         return (
             <div>
@@ -379,6 +435,11 @@ class Guards extends React.Component {
                 </p>
                 {this.props.whoseturn === 'G' ?
                     this.renderFinishTurn()
+                    :
+                    <></>
+                }
+                {this.props.whoseturn === 'G' ?
+                    this.renderRecallTiles()
                     :
                     <></>
                 }
