@@ -1,0 +1,136 @@
+/*
+from trcode (before you cd trapp)
+npm install cors ws
+*/
+
+/* replace server.js with this
+const cors = require('cors');
+const express = require("express");
+const { Server } = require("ws");
+const path = require("path");
+const PORT = process.env.PORT || 5000;
+
+const server = express()
+    .use("/", express.static(path.join(__dirname, "../trapp/out")))
+    .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const wss = new Server({ server });
+
+wss.on("connection", (ws) => {
+    console.log("Client connected");
+
+    ws.on("close", () => console.log("Client disconnected"));
+
+    ws.on("message", (message) => {
+        processMessage(message);
+    });
+});
+
+// merely bounce the message from one client back to all clients
+const processMessage = (message) => {
+  wss.clients.forEach((client) => {
+        client.send(message);
+    });
+}
+*/
+
+
+/* ws.js in trapp folder
+class Timer {
+    constructor(callback, timerCalc) {
+        this.callback = callback;
+        this.timerCalc = timerCalc;
+        this.timer = null;
+        this.tries = 0;
+    }
+
+    reset() {
+        this.tries = 0;
+        clearTimeout(this.timer);
+    }
+
+    scheduleTimeout() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+            this.tries = this.tries + 1;
+            this.callback();
+        }, this.timerCalc(this.tries + 1));
+    }
+}
+export default class CustomSocket {
+    // Constructor which takes socket URL as parameter
+    constructor(url, messageFunction) {
+        this.customSocket = null;
+        this.socketUrl = url;
+        this.reconnectTimer = new Timer(() => {
+            this.disconnect();
+            this.connect();
+        }, this.reconnectAfterMs);
+        this.messageFunction = messageFunction;
+    }
+
+    // Reconnect time intervals based on tries
+    reconnectAfterMs(tries) {
+        return [1000, 2000, 5000, 10000][tries - 1] || 10000;
+    }
+
+    // Create socket and define socket methods
+    connect() {
+        // Create new socket
+        this.customSocket = new WebSocket(this.socketUrl);
+
+        // onopen - called when connection is open and ready to send and receive data.
+        this.customSocket.onopen = (event) => {
+            console.log("connected to " + this.socketUrl);
+        };
+
+        // onclose - called when the connection's closes.
+        this.customSocket.onclose = (event) => {
+            // On connection close try again to connect
+            this.reconnectTimer.scheduleTimeout();
+        };
+
+        // onerror - called when an error occurs.
+        this.customSocket.onerror = (event) => {};
+
+        // onmessage - called when a message is received from the server.
+        this.customSocket.onmessage = this.messageFunction;
+    }
+
+    // close socket connection
+    disconnect() {
+        // resetting in close method to stop timer on disconnect
+        this.customSocket.onclose = function () {};
+        // Closing socket
+        this.customSocket.close();
+    }
+    send(message) {
+        this.customSocket.send(message);
+    }
+}
+/*
+
+/* in prisonbreak.js
+import CustomSocket from "./ws";
+import React, { useState, useEffect } from "react"
+let host = window.location.href;
+host = host.replace("http", "ws");
+const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+    useEffect(() => {
+        client.connect();
+    }, [client]);
+------
+function messageFunction (message) { ... } 
+*/
+
+/* example client send
+client.send(
+            JSON.stringify({
+                type: "GUESS",
+                data: { username: username, guess: word },
+            })
+        );
+----
+to send objects JSON.stringify() them. and on the other side JSON.parse() them
+to turn back into objects
+*/

@@ -1,5 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from "react"
 import Link from 'next/link';
+import CustomSocket from "../../ws";
+
+function messageFunction (message) {
+    try {
+        console.log("prisonbreak2.js messageFunction JSON.parse(message)=" + JSON.parse(message))
+    }
+    catch {
+        console.log("cannot JSON.parse")
+    }
+    console.log("prisonbreak2.js messageFunction message=" + message)
+    console.log("prisonbreak2.js messageFunction JSON.stringify(message)=" + JSON.stringify(message))
+    console.log("prisonbreak2.js messageFunction message.type=" + message.type)
+} 
 
 const escapehatches = ["0-0", "0-7", "0-14", "7-0", "7-14", "14-0", "14-7", "14-14"] // coords of escape hatches
 const initialtiles = ['A','A','A','A','A','A','A','A','A'
@@ -9,9 +22,22 @@ const initialtiles = ['A','A','A','A','A','A','A','A','A'
 ,'R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V'
 ,'W','W','X','Y','Y','Z','?','?'] // initial tile pool
 
+
 export default function PrisonBreak() {
+    const [connected, setConnected] = useState(false)
+    // let host = process.env.NODE_ENV === 'production' ? 'ws://tilerunner.herokuapp.com' : 'ws://192.168.2.15:5000';
+    let host = 'ws://192.168.2.15:5000';
+    const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+        useEffect(() => {
+            client.connect();
+            setConnected(true);
+        }, [client]);
+    
     return(
-        <Game />
+        connected ?
+        <Game client={client}/>       
+        :
+        <p>Connecting...</p>
     )
 }
 
@@ -68,6 +94,7 @@ class Board extends React.Component {
 class Game extends React.Component {
     constructor(props) {
         super(props);
+        let client = props.client
         let tiles = [...initialtiles]
         let ptiles = []
         let gtiles = []
@@ -84,6 +111,7 @@ class Game extends React.Component {
         let squares = Array(15).fill(Array(15).fill('.'))
         let usedby = Array(15).fill(Array(15).fill(''))
         this.state = {
+            client: client,
             squares: squares, // squares on the game board
             usedby: usedby,  // who put a tile on a square
             tiles: tiles,
@@ -103,7 +131,6 @@ class Game extends React.Component {
     }
 
     handleBoardSquareClick(ri, ci) {
-        console.log("click on " + ri + ", " + ci)
         let selection = this.state.selection
         let squares = this.state.squares
         let squarevalue = (squares[ri])[ci]
@@ -209,6 +236,13 @@ class Game extends React.Component {
                 gtiles: [...gtiles]
             }
         })
+        this.state.client.send(
+            JSON.stringify({
+                type: "pb", // prisonbreak
+                func: "test", // test message
+                data: ptiles // what will this look like?
+            })
+        );
     }
     endGuardsTurn() {
         let gtiles = [...this.state.gtiles]
@@ -243,7 +277,6 @@ class Game extends React.Component {
         let usedby = [...this.state.snapshot.usedby]
         let ptiles = [...this.state.snapshot.ptiles]
         let gtiles = [...this.state.snapshot.gtiles]
-        console.log("Tile recall " + ptiles.toString() + " : " + gtiles.toString())
         this.setState({
             selection: -1,
             currentcoords: [],
