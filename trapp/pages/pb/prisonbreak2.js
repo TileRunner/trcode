@@ -3,8 +3,9 @@ import Link from 'next/link';
 import CustomSocket from "../../ws";
 
 function messageFunction (message) {
+    console.log(Object.keys(message))
     try {
-        console.log("prisonbreak2.js messageFunction JSON.parse(message)=" + JSON.parse(message))
+        console.log("prisonbreak2.js messageFunction JSON.parse(message.data)=" + JSON.parse(message.data))
     }
     catch {
         console.log("cannot JSON.parse")
@@ -24,20 +25,15 @@ const initialtiles = ['A','A','A','A','A','A','A','A','A'
 
 
 export default function PrisonBreak() {
-    const [connected, setConnected] = useState(false)
     // let host = process.env.NODE_ENV === 'production' ? 'ws://tilerunner.herokuapp.com' : 'ws://192.168.2.15:5000';
     let host = 'ws://192.168.2.15:5000';
     const [client, setClient] = useState(new CustomSocket(host, messageFunction));
         useEffect(() => {
             client.connect();
-            setConnected(true);
         }, [client]);
     
     return(
-        connected ?
         <Game client={client}/>       
-        :
-        <p>Connecting...</p>
     )
 }
 

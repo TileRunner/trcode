@@ -22,7 +22,8 @@ wss.on("connection", (ws) => {
 
 // merely bounce the message from one client back to all clients
 const processMessage = (message) => {
-    console.log("server.js processMessage: " + message);
+    message = JSON.parse(message);
+    console.log("server.js processMessage: " + JSON.stringify(message));
     wss.clients.forEach((client) => {
         client.send(JSON.stringify(message));
     });
