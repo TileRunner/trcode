@@ -2,19 +2,6 @@ import React, { useState, useEffect } from "react"
 import Link from 'next/link';
 import CustomSocket from "../../ws";
 
-function messageFunction (message) {
-    console.log(Object.keys(message))
-    try {
-        console.log("prisonbreak2.js messageFunction JSON.parse(message.data)=" + JSON.parse(message.data))
-    }
-    catch {
-        console.log("cannot JSON.parse")
-    }
-    console.log("prisonbreak2.js messageFunction message=" + message)
-    console.log("prisonbreak2.js messageFunction JSON.stringify(message)=" + JSON.stringify(message))
-    console.log("prisonbreak2.js messageFunction message.type=" + message.type)
-} 
-
 const escapehatches = ["0-0", "0-7", "0-14", "7-0", "7-14", "14-0", "14-7", "14-14"] // coords of escape hatches
 const initialtiles = ['A','A','A','A','A','A','A','A','A'
 ,'B','B','C','C','D','D','D','D','E','E','E','E','E','E','E','E','E','E','E','E'
@@ -23,15 +10,23 @@ const initialtiles = ['A','A','A','A','A','A','A','A','A'
 ,'R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V'
 ,'W','W','X','Y','Y','Z','?','?'] // initial tile pool
 
+function messageFunction (message) {
+    try {
+        console.log("prisonbreak2.js messageFunction JSON.parse(message.data)=" + JSON.parse(message.data))
+    }
+    catch {
+        console.log("cannot JSON.parse(message), keys=" + Object.keys(message))
+    }
+} 
 
 export default function PrisonBreak() {
     // let host = process.env.NODE_ENV === 'production' ? 'ws://tilerunner.herokuapp.com' : 'ws://192.168.2.15:5000';
-    let host = 'ws://192.168.2.15:5000';
-    const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+    let host = 'ws://localhost:5000';
+    const [client, setClient] = useState(new CustomSocket(host, (message) => messageFunction(message)));
         useEffect(() => {
             client.connect();
         }, [client]);
-    
+           
     return(
         <Game client={client}/>       
     )

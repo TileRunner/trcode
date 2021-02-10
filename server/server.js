@@ -16,7 +16,7 @@ wss.on("connection", (ws) => {
     ws.on("close", () => console.log("Client disconnected"));
 
     ws.on("message", (message) => {
-        processMessage(message);
+        processMessage(JSON.stringify(message));
     });
 });
 
