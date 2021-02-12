@@ -67,7 +67,6 @@ export default class CustomSocket {
         this.customSocket.close();
     }
     send(message) {
-        console.log("ws.js send: " + message);
-        this.customSocket.send(message);
+        this.customSocket.send(JSON.stringify(message));
     }
 }

@@ -1,473 +1,619 @@
-import React, { useState, useEffect } from "react"
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import CustomSocket from "../../ws";
 
-const escapehatches = ["0-0", "0-7", "0-14", "7-0", "7-14", "14-0", "14-7", "14-14"] // coords of escape hatches
-const initialtiles = ['A','A','A','A','A','A','A','A','A'
-,'B','B','C','C','D','D','D','D','E','E','E','E','E','E','E','E','E','E','E','E'
-,'F','F','G','G','G','H','H','I','I','I','I','I','I','I','I','I','J','K','L','L','L','L'
-,'M','M','N','N','N','N','N','N','O','O','O','O','O','O','O','O','P','P','Q'
-,'R','R','R','R','R','R','S','S','S','S','T','T','T','T','T','T','U','U','U','U','V','V'
-,'W','W','X','Y','Y','Z','?','?'] // initial tile pool
 
-function messageFunction (message) {
-    try {
-        console.log("prisonbreak2.js messageFunction JSON.parse(message.data)=" + JSON.parse(message.data))
-    }
-    catch {
-        console.log("cannot JSON.parse(message), keys=" + Object.keys(message))
-    }
-} 
+const escapehatches = [
+  "0-0",
+  "0-7",
+  "0-14",
+  "7-0",
+  "7-14",
+  "14-0",
+  "14-7",
+  "14-14",
+]; // coords of escape hatches
+const initialtiles = [
+  "A",
+  "A",
+  "A",
+  "A",
+  "A",
+  "A",
+  "A",
+  "A",
+  "A",
+  "B",
+  "B",
+  "C",
+  "C",
+  "D",
+  "D",
+  "D",
+  "D",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "E",
+  "F",
+  "F",
+  "G",
+  "G",
+  "G",
+  "H",
+  "H",
+  "I",
+  "I",
+  "I",
+  "I",
+  "I",
+  "I",
+  "I",
+  "I",
+  "I",
+  "J",
+  "K",
+  "L",
+  "L",
+  "L",
+  "L",
+  "M",
+  "M",
+  "N",
+  "N",
+  "N",
+  "N",
+  "N",
+  "N",
+  "O",
+  "O",
+  "O",
+  "O",
+  "O",
+  "O",
+  "O",
+  "O",
+  "P",
+  "P",
+  "Q",
+  "R",
+  "R",
+  "R",
+  "R",
+  "R",
+  "R",
+  "S",
+  "S",
+  "S",
+  "S",
+  "T",
+  "T",
+  "T",
+  "T",
+  "T",
+  "T",
+  "U",
+  "U",
+  "U",
+  "U",
+  "V",
+  "V",
+  "W",
+  "W",
+  "X",
+  "Y",
+  "Y",
+  "Z",
+  "?",
+  "?",
+]; // initial tile pool
 
 export default function PrisonBreak() {
-    // let host = process.env.NODE_ENV === 'production' ? 'ws://tilerunner.herokuapp.com' : 'ws://192.168.2.15:5000';
-    let host = 'ws://localhost:5000';
-    const [client, setClient] = useState(new CustomSocket(host, (message) => messageFunction(message)));
-        useEffect(() => {
-            client.connect();
-        }, [client]);
-           
-    return(
-        <Game client={client}/>       
-    )
+  return <Game/>
 }
 
-function Square(props) { // squareusedby, ri, ci, c, onClick
-    // need squareusedby to pick css className corresponding to who played the tile on the square
-    // need ri, ci to display alternating characters on unused squares
-    // need c to represent which tile is on the square, if any
-    // need onClick to handle square click at a higher level
-    const usedbyclass = props.squareusedby === "P" ? "pbSquareUsedByPrisoners" : "pbSquareUsedByGuards"
-    const tdclass = props.c !== "." ? usedbyclass : props.ri === 7 && props.ci === 7 ? "pbSquareCenterSquare" : (props.ri === 0 || props.ri === 7 || props.ri === 14) && (props.ci === 0 || props.ci === 7 || props.ci === 14) ? "pbSquareEscapeHatch" : props.ri % 2 === props.ci % 2 ? "pbSquare" : "pbSquare2"
-    const tdvalue = props.c !== "." ? props.c : tdclass === "pbSquareCenterSquare" ? "✰" : tdclass === "pbSquareEscapeHatch" ? "💫" : props.ri % 2 === props.ci % 2 ? "⎔" : "✦"
-    return (
-        <div>
-            <td>
-                <button className={tdclass} onClick={props.onClick}>
-                    {tdvalue}
-                </button>
-            </td>
-        </div>
-    )
-}
-
-class Board extends React.Component {
-    renderSquare(ri, ci, c, squareusedby) {
-        return (
-            <div key={`Square${ri}-${ci}`}>
-                <Square c={c} ci={ci} ri={ri} squareusedby={squareusedby} onClick={() => this.props.onClick(ri, ci)} />
-            </div>
-        );
-    }
-    renderRow(ri) {
-        return (
-            <tr key={`BoardRow${ri}`} className="row pbRow">
-                {this.props.squares[ri].map((c,ci) => (
-                    this.renderSquare(ri, ci, c, (this.props.usedby[ri])[ci])
-                ))}
-            </tr>
-        );
-    }
-    render() {
-        return (
-            <table className="pbBoard">
-                <tbody>
-                    {this.props.squares.map((r,ri) => (
-                        this.renderRow(ri)
-                    ))}
-                </tbody>
-            </table>
-        )
-
-    }
-}
-
-class Game extends React.Component {
-    constructor(props) {
-        super(props);
-        let client = props.client
-        let tiles = [...initialtiles]
-        let ptiles = []
-        let gtiles = []
-        while (ptiles.length < 7) {
-            let rand = Math.floor(Math.random() * tiles.length)
-            ptiles.push(tiles[rand])
-            tiles.splice(rand,1)   
-            rand = Math.floor(Math.random() * tiles.length)
-            gtiles.push(tiles[rand])
-            tiles.splice(rand,1)   
-        }
-        ptiles.sort()
-        gtiles.sort()
-        let squares = Array(15).fill(Array(15).fill('.'))
-        let usedby = Array(15).fill(Array(15).fill(''))
-        this.state = {
-            client: client,
-            squares: squares, // squares on the game board
-            usedby: usedby,  // who put a tile on a square
-            tiles: tiles,
-            selection: -1, // which tile from the tile rack in play is selected
-            ptiles: ptiles, // prisoners tiles
-            gtiles: gtiles, // guards tiles
-            whoseturn: 'P', // prisoners play first
-            currentcoords: [], // coords of play currently being made to support tile recall and play validation
-            rescues: 0, // number of prisoners rescued
-            snapshot: { // for reverting to start of move for tile recall or exchange logic
-                squares: [...squares],
-                usedby: [...usedby],
-                ptiles: [...ptiles],
-                gtiles: [...gtiles]
-             }
-        };
-    }
-
-    handleBoardSquareClick(ri, ci) {
-        let selection = this.state.selection
-        let squares = this.state.squares
-        let squarevalue = (squares[ri])[ci]
-        let whoseturn = this.state.whoseturn
-        let ptiles = this.state.ptiles
-        let gtiles = this.state.gtiles
-        let usedby = this.state.usedby
-        let currentcoords = this.state.currentcoords
-        let coord = String(ri) + "-" + String(ci);
-        let cci = currentcoords.indexOf(coord)
-        if (selection > -1 && squarevalue === ".") { // tile is selected from rack and clicked square is not used yet
-            let newRow = [...squares[ri]]
-            newRow[ci] = whoseturn === 'P' ? ptiles[selection] : gtiles[selection]
-            squares[ri] = [...newRow]
-            whoseturn === 'P' ? ptiles.splice(selection, 1) : gtiles.splice(selection,1)
-            let newUsedbyRow = [...usedby[ri]]
-            newUsedbyRow[ci] = whoseturn
-            usedby[ri] = [...newUsedbyRow]
-            selection = -1
-            this.setState({
-                squares: squares,
-                usedby: usedby,
-                ptiles: ptiles,
-                gtiles: gtiles,
-                selection: selection,
-                currentcoords: [...currentcoords, coord]
-            });
-        } else if (squarevalue !== "." && cci > -1) { // clicked square has a tile on it from the current move in progress
-            // Assuming some good will from the users to click a tile they played
-            if ((whoseturn === 'P' && ptiles.length < 7) || (whoseturn === 'G' && gtiles.length < 7)) {
-                whoseturn === 'P' ? ptiles.push(squarevalue) : gtiles.push(squarevalue)
-                let newRow = [...squares[ri]]
-                newRow[ci] = "."
-                squares[ri] = [...newRow]
-                let newUsedbyRow = [...usedby[ri]]
-                newUsedbyRow[ci] = ""
-                usedby[ri] = [...newUsedbyRow]
-                selection = whoseturn === 'P' ? ptiles.length - 1 : gtiles.length - 1
-                currentcoords.splice(cci,1)
-                this.setState({
-                    squares: squares,
-                    usedby: usedby,
-                    ptiles: ptiles,
-                    gtiles: gtiles,
-                    selection: selection,
-                    currentcoords: currentcoords
-                });
-            }
-        }
-    }
-
-    handlePrisonerTileClick(tileindex) { // the index of ptiles
-        if (this.state.whoseturn === 'P') {
-            this.setState({
-                selection: tileindex
-            });
-        }
-        else {
-            alert('It is not your turn')
-        }
-    }
-
-    handleGuardTileClick(tileindex) { // the index of gtiles
-        if (this.state.whoseturn === 'G') {
-            this.setState({
-                selection: tileindex
-            });
-        }
-        else {
-            alert('It is not your turn')
-        }
-    }
-
-    endPrisonersTurn() {
-        let rescues = this.state.rescues
-        for (var i = 0; i < this.state.currentcoords.length; i++) {
-            if (escapehatches.indexOf(this.state.currentcoords[i]) > -1) {
-                rescues++
-            }
-        }
-        let ptiles = [...this.state.ptiles]
-        let tiles = [...this.state.tiles]
-        while (ptiles.length < 7 && tiles.length > 0) {
-            let rand = Math.floor(Math.random() * tiles.length)
-            ptiles.push(tiles[rand])
-            tiles.splice(rand,1)   
-        }
-        ptiles.sort()
-        let squares = this.state.squares
-        let usedby = this.state.usedby
-        let gtiles = this.state.gtiles
-        this.setState({
-            whoseturn: 'G',
-            selection: -1,
-            currentcoords: [],
-            rescues: rescues,
-            ptiles: ptiles,
-            tiles: tiles,
-            snapshot: { 
-                squares: [...squares],
-                usedby: [...usedby],
-                ptiles: [...ptiles],
-                gtiles: [...gtiles]
-            }
-        })
-        this.state.client.send(
-            JSON.stringify({
-                type: "pb", // prisonbreak
-                func: "test", // test message
-                data: ptiles // what will this look like?
-            })
-        );
-    }
-    endGuardsTurn() {
-        let gtiles = [...this.state.gtiles]
-        let tiles = [...this.state.tiles]
-        while (gtiles.length < 7 && tiles.length > 0) {
-            let rand = Math.floor(Math.random() * tiles.length)
-            gtiles.push(tiles[rand])
-            tiles.splice(rand,1)   
-        }
-        gtiles.sort()
-        let snapsquares = [...this.state.squares]
-        let snapusedby = [...this.state.usedby]
-        let snapptiles = [...this.state.ptiles]
-        let snapgtiles = [...gtiles]
-        this.setState({
-            whoseturn: 'P',
-            selection: -1,
-            currentcoords: [],
-            gtiles: gtiles,
-            tiles: tiles,
-            snapshot: { 
-                squares: snapsquares,
-                usedby: snapusedby,
-                ptiles: snapptiles,
-                gtiles: snapgtiles
-            }
-        })
-    }
-
-    recallTiles() {
-        let squares = [...this.state.snapshot.squares]
-        let usedby = [...this.state.snapshot.usedby]
-        let ptiles = [...this.state.snapshot.ptiles]
-        let gtiles = [...this.state.snapshot.gtiles]
-        this.setState({
-            selection: -1,
-            currentcoords: [],
-            squares: squares,
-            usedby: usedby,
-            ptiles: ptiles,
-            gtiles: gtiles
-        })
-    }
-
-    render() {
-        return (
-            <div class="container-fluid prisonbreak">
-                <div class="row">
-                    <div class="col-11 pbtitle">
-                        Prison Break
-                    </div>
-                    <div class="col-1 pbhomelink" data-toggle="tooltip" title="Home">
-                        <Link href={'../../'}>
-                            <a>🏠</a>
-                        </Link>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-2 pbPrisoners">
-                        <Prisoners
-                            ptiles={this.state.ptiles}
-                            whoseturn={this.state.whoseturn}
-                            selection={this.state.selection}
-                            onClick={(ti) => this.handlePrisonerTileClick(ti)}
-                            onClickFinishTurn={() => this.endPrisonersTurn()}
-                            onClickTileRecall={() => this.recallTiles()}
-                            rescues={this.state.rescues}
-                        />
-                    </div>
-                    <div class="col-6" align="center">
-                        <Board
-                            squares={this.state.squares}
-                            usedby={this.state.usedby}
-                            onClick={(ri, ci) => this.handleBoardSquareClick(ri, ci)}
-                            />
-                    </div>
-                    <div class="col-2 pbGuards">
-                        <Guards
-                            gtiles={this.state.gtiles}
-                            whoseturn={this.state.whoseturn}
-                            selection={this.state.selection}
-                            onClick={(ti) => this.handleGuardTileClick(ti)}
-                            onClickFinishTurn={() => this.endGuardsTurn()}
-                            onClickTileRecall={() => this.recallTiles()}
-                        />
-                    </div>
-                    <div class="col-2">
-                        <Tiles tiles={this.state.tiles}/>
-                    </div>
-                </div>
-            </div>
-        );    
-    }
-}
-
-function Tiles(props) {
-    // there is a better way ^^^
-    return (
-        <div className="pbTilepool">
-            <h3>TILE POOL</h3>
-            {props.tiles.map((t,ti) => (
-                <span key={`tile${ti}`}>
-                    {ti > 0 && t !== props.tiles[ti-1] ? <div className="pbTilepoolDivider"></div> : <></>}
-                    <span className="pbTilepoolTile">{t}</span>
-                </span>
-            ))}
-        </div>
-    )
-}
-
-function RackTile(props) {
-    return (
-        <td className={props.tileclass} onClick={props.onClick}>
-            {props.tilevalue}
-        </td>
-    )    
-}
-
-function FinishTurnButton(props) {
-    return (
-        <button className="pbFinishTurn" onClick={props.onClick}>
-            Finish Turn
+const Square = (props) => {
+  // squareusedby, ri, ci, c, onClick
+  // need squareusedby to pick css className corresponding to who played the tile on the square
+  // need ri, ci to display alternating characters on unused squares
+  // need c to represent which tile is on the square, if any
+  // need onClick to handle square click at a higher level
+  const usedbyclass =
+    props.squareusedby === "P"
+      ? "pbSquareUsedByPrisoners"
+      : "pbSquareUsedByGuards";
+  const tdclass =
+    props.c !== "."
+      ? usedbyclass
+      : props.ri === 7 && props.ci === 7
+      ? "pbSquareCenterSquare"
+      : (props.ri === 0 || props.ri === 7 || props.ri === 14) &&
+        (props.ci === 0 || props.ci === 7 || props.ci === 14)
+      ? "pbSquareEscapeHatch"
+      : props.ri % 2 === props.ci % 2
+      ? "pbSquare"
+      : "pbSquare2";
+  const tdvalue =
+    props.c !== "."
+      ? props.c
+      : tdclass === "pbSquareCenterSquare"
+      ? "✰"
+      : tdclass === "pbSquareEscapeHatch"
+      ? "💫"
+      : props.ri % 2 === props.ci % 2
+      ? "⎔"
+      : "✦";
+  return (
+    <div>
+      <td>
+        <button className={tdclass} onClick={props.onClick}>
+          {tdvalue}
         </button>
-    )
-}
+      </td>
+    </div>
+  );
+};
 
-function TileRecallButton(props) {
+const Board = ({ onClick, squares, usedby }) => {
+  const renderSquare = (ri, ci, c, squareusedby) => {
     return (
-        <button className="pbRecallTiles" onClick={props.onClick}>
-            Recall Tiles
-        </button>
-    )
-}
-class Prisoners extends React.Component {
-    renderTile(tileclass, tileindex, tilevalue) {
-        return (
-            <RackTile key={tileclass + String(tileindex)} tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
-        );
-    }
+      <div key={`Square${ri}-${ci}`}>
+        <Square
+          c={c}
+          ci={ci}
+          ri={ri}
+          squareusedby={squareusedby}
+          onClick={() => onClick(ri, ci)}
+        />
+      </div>
+    );
+  };
+  const renderRow = (ri) => {
+    return (
+      <tr key={`BoardRow${ri}`} className="row pbRow">
+        {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
+      </tr>
+    );
+  };
 
-    renderFinishTurn() {
-        return (
-            <FinishTurnButton onClick={() => this.props.onClickFinishTurn()}/>
-        );
-    }
+  return (
+    <table className="pbBoard">
+      <tbody>{squares.map((r, ri) => renderRow(ri))}</tbody>
+    </table>
+  );
+};
 
-    renderRecallTiles() {
-        return (
-            <TileRecallButton onClick={() => this.props.onClickTileRecall()}/>
-        );
+const Game = () => {
+    const [connected, setConnected] = useState(false);
+    let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
+    const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+    useEffect(() => {
+      client.connect();
+      setConnected(true);
+    }, [client]);
+  
+    function messageFunction(message) {
+      let messageData = JSON.parse(message.data);
+      console.log(messageData, "messageData");
+      if (messageData.type === "pb") { // prison break
+          if (messageData.func === "ept") { // end prisoners turn
+            setWhoseturn("G");
+            setSelection(-1);
+            setCurrentcoords([]);
+            setPTiles(messageData.newPtiles);
+            setTiles(messageData.newTiles);
+            setRescues(messageData.newRescues);
+            setSnapshot({
+              squares: [...squares],
+              usedby: [...usedby],
+              ptiles: [...messageData.newPtiles],
+              gtiles: [...gtiles],
+            });       
+          }
+          if (messageData.func === "egt") { // end guards turn
+            setWhoseturn("P");
+            setSelection(-1);
+            setCurrentcoords([]);
+            setGTiles(messageData.newGtiles);
+            setTiles(messageData.newTiles);
+            setSnapshot({
+              squares: [...squares],
+              usedby: [...usedby],
+              ptiles: [...ptiles],
+              gtiles: [...messageData.newGtiles],
+            });       
+          }
+      }
     }
+  
+    useEffect(() => {
+    let tempPTiles = [...ptiles];
+    let tempGTiles = [...gtiles];
+    let tempTiles = [...tiles];
+    while (tempPTiles.length < 7) {
+      let rand = Math.floor(Math.random() * tempTiles.length);
+      tempPTiles.push(tempTiles[rand]);
+      tempTiles.splice(rand, 1);
+      rand = Math.floor(Math.random() * tempTiles.length);
+      tempGTiles.push(tempTiles[rand]);
+      tempTiles.splice(rand, 1);
+    }
+    tempPTiles.sort();
+    tempGTiles.sort();
+    setGTiles(tempGTiles);
+    setPTiles(tempPTiles);
+    setTiles(tempTiles);
+  }, []);
 
-    renderFreedPrisoners(count) {
-        let dumb = Array(count).fill('nonsense')
-        return (
-            dumb.map((value,index) => (
-                <span key={value + String(index)}>
-                    <img
-                        src="/breakfree.png"
-                        alt="I'm free! I'm free!"
-                        width="100"
-                        height="100"
-                        />
-                </span>
-            ))
-        )
-    }
-    render() {
-        return (
-            <div>
-                <p>PRISONERS</p>
-                <p className="pbTilerack">
-                    {this.props.ptiles.map((t,ti) => (
-                        this.renderTile(this.props.whoseturn === 'P' && this.props.selection === ti ? "pbTileOnRackSelectedP" : "pbTileOnRackP", ti, t)
-                    ))}
-                </p>
-                {this.props.whoseturn === 'P' ?
-                    this.renderFinishTurn()
-                    :
-                    <></>
-                }
-                {this.props.whoseturn === 'P' ?
-                    this.renderRecallTiles()
-                    :
-                    <></>
-                }
-                <p>
-                    Rescues made: {this.props.rescues}
-                    <br></br>
-                    {this.renderFreedPrisoners(this.props.rescues)}
-                </p>
-            </div>
-        )
-    }
-}
-class Guards extends React.Component {
-    renderTile(tileclass, tileindex, tilevalue) {
-        return (
-            <RackTile key={tileclass + String(tileindex)} tileclass={tileclass} tilevalue={tilevalue} onClick={() => this.props.onClick(tileindex)}/>
-        );
-    }
+  const [tiles, setTiles] = useState([...initialtiles]);
+  const [ptiles, setPTiles] = useState([]);
+  const [gtiles, setGTiles] = useState([]);
+  const [squares, setSquares] = useState(Array(15).fill(Array(15).fill(".")));
+  const [usedby, setUsedby] = useState(Array(15).fill(Array(15).fill("")));
+  const [selection, setSelection] = useState(-1);
+  const [whoseturn, setWhoseturn] = useState("P");
+  const [currentcoords, setCurrentcoords] = useState([]);
+  const [rescues, setRescues] = useState(0);
+  const [snapshot, setSnapshot] = useState({
+    squares: [...squares],
+    usedby: [...usedby],
+    ptiles: [...ptiles],
+    gtiles: [...gtiles],
+  });
 
-    renderFinishTurn() {
-        return (
-            <FinishTurnButton onClick={() => this.props.onClickFinishTurn()}/>
-        );
-    }
+  const handleBoardSquareClick = (ri, ci) => {
+    let newSquares = [...squares];
+    let newUsedby = [...usedby];
+    let newPtiles = [...ptiles];
+    let newGtiles = [...gtiles]; // tile is selected from rack and clicked square is not used yet
+    let newRow = [...squares[ri]];
+    let squarevalue = squares[ri][ci];
+    let newCurrentcoords = [...currentcoords];
 
-    renderRecallTiles() {
-        return (
-            <TileRecallButton onClick={() => this.props.onClickTileRecall()}/>
-        );
-    }
+    let coord = String(ri) + "-" + String(ci);
+    let cci = currentcoords.indexOf(coord);
+    if (selection > -1 && squarevalue === ".") {
+      newRow[ci] =
+        whoseturn === "P" ? newPtiles[selection] : newGtiles[selection];
+      newSquares[ri] = [...newRow];
+      whoseturn === "P"
+        ? newPtiles.splice(selection, 1)
+        : newGtiles.splice(selection, 1);
+      let newUsedbyRow = [...newUsedby[ri]];
+      newUsedbyRow[ci] = whoseturn;
+      newUsedby[ri] = [...newUsedbyRow];
 
-    render() {
-        return (
-            <div>
-                <p>GUARDS</p>
-                <p className="pbTilerack">
-                    {this.props.gtiles.map((t,ti) => (
-                        this.renderTile(this.props.whoseturn === 'G' && this.props.selection === ti ? "pbTileOnRackSelectedG" : "pbTileOnRackG", ti, t)
-                    ))}
-                </p>
-                {this.props.whoseturn === 'G' ?
-                    this.renderFinishTurn()
-                    :
-                    <></>
-                }
-                {this.props.whoseturn === 'G' ?
-                    this.renderRecallTiles()
-                    :
-                    <></>
-                }
-            </div>
-        )
+      setSelection((curr) => curr - 1);
+      setSquares(newSquares);
+      setUsedby(newUsedby);
+      setPTiles(newPtiles);
+      setGTiles(newGtiles);
+      setCurrentcoords([...currentcoords, coord]);
+    } else if (squarevalue !== "." && cci > -1) {
+      // clicked square has a tile on it from the current move in progress
+      // Assuming some good will from the users to click a tile they played
+      if (
+        (whoseturn === "P" && newPtiles.length < 7) ||
+        (whoseturn === "G" && newGtiles.length < 7)
+      ) {
+        whoseturn === "P"
+          ? newPtiles.push(squarevalue)
+          : newGtiles.push(squarevalue);
+        let newRow = [...newSquares[ri]];
+        newRow[ci] = ".";
+        newSquares[ri] = [...newRow];
+        let newUsedbyRow = [...newUsedby[ri]];
+        newUsedbyRow[ci] = "";
+        newUsedby[ri] = [...newUsedbyRow];
+        setSelection(
+          whoseturn === "P" ? newPtiles.length - 1 : newGtiles.length - 1
+        );
+        newCurrentcoords.splice(cci, 1);
+
+        setSquares(newSquares);
+        setUsedby(newUsedby);
+        setPTiles(newPtiles);
+        setGTiles(newGtiles);
+
+        setCurrentcoords(newCurrentcoords);
+      }
     }
-}
+  };
+
+  const handlePrisonerTileClick = (tileindex) => {
+    // the index of ptiles
+    if (whoseturn === "P") {
+      setSelection(tileindex);
+    } else {
+      alert("It is not your turn");
+    }
+  };
+
+  const handleGuardTileClick = (tileindex) => {
+    // the index of gtiles
+    if (whoseturn === "G") {
+      setSelection(tileindex);
+    } else {
+      alert("It is not your turn");
+    }
+  };
+
+  const endPrisonersTurn = () => {
+    let newRescues = rescues;
+    for (var i = 0; i < currentcoords.length; i++) {
+      if (escapehatches.indexOf(currentcoords[i]) > -1) {
+        newRescues = newRescues + 1;
+      }
+    }
+    let newPtiles = [...ptiles];
+    let newTiles = [...tiles];
+    while (newPtiles.length < 7 && newTiles.length > 0) {
+      let rand = Math.floor(Math.random() * newTiles.length);
+      newPtiles.push(newTiles[rand]);
+      newTiles.splice(rand, 1);
+    }
+    newPtiles.sort();
+    setWhoseturn("G");
+    setSelection(-1);
+    setCurrentcoords([]);
+    setPTiles(newPtiles);
+    setTiles(newTiles);
+    setRescues(newRescues);
+    setSnapshot({
+      squares: [...squares],
+      usedby: [...usedby],
+      ptiles: [...newPtiles],
+      gtiles: [...gtiles],
+    });
+
+    client.send(
+      JSON.stringify({
+        type: "pb", // prisonbreak
+        func: "ept", // end prisoners turn
+        newPtiles: newPtiles, // we picked new tiles for prisoners rack
+        newTiles: newTiles, // we picked new tiles so tile pool changed
+        newRescues: newRescues // may have rescued another prisoner
+      })
+    );
+  };
+  const endGuardsTurn = () => {
+    let newGtiles = [...gtiles];
+    let newTiles = [...tiles];
+    while (newGtiles.length < 7 && newTiles.length > 0) {
+      let rand = Math.floor(Math.random() * newTiles.length);
+      newGtiles.push(newTiles[rand]);
+      newTiles.splice(rand, 1);
+    }
+    newGtiles.sort();
+    let snapsquares = [...squares];
+    let snapusedby = [...usedby];
+    let snapptiles = [...ptiles];
+    let snapgtiles = [...gtiles];
+    setWhoseturn("P");
+    setSelection(-1);
+    setCurrentcoords([]);
+    setGTiles(newGtiles);
+    setTiles(newTiles);
+    setSnapshot({
+      squares: snapsquares,
+      usedby: snapusedby,
+      ptiles: snapptiles,
+      gtiles: snapgtiles,
+    });
+
+    client.send(
+        JSON.stringify({
+          type: "pb", // prisonbreak
+          func: "egt", // end guards turn
+          newGtiles: newGtiles, // we picked new tiles for guards rack
+          newTiles: newTiles // we picked new tiles so tile pool changed
+        })
+      );
+    };
+
+  const recallTiles = () => {
+    setSquares([...snapshot.squares]);
+    setUsedby([...snapshot.usedby]);
+    setPTiles([...snapshot.ptiles]);
+    setGTiles([...snapshot.gtiles]);
+    setSelection(-1);
+    setCurrentcoords([]);
+  };
+
+  return (
+    !connected ? <p>Connecting...</p> : 
+    <div class="container-fluid prisonbreak">
+      <div class="row">
+        <div class="col-11 pbtitle">Prison Break</div>
+        <div class="col-1 pbhomelink" data-toggle="tooltip" title="Home">
+          <Link href={"../../"}>
+            <a>🏠</a>
+          </Link>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 pbPrisoners">
+          <Prisoners
+            ptiles={ptiles}
+            whoseturn={whoseturn}
+            selection={selection}
+            onClick={(ti) => handlePrisonerTileClick(ti)}
+            onClickFinishTurn={() => endPrisonersTurn()}
+            onClickTileRecall={() => recallTiles()}
+            rescues={rescues}
+          />
+        </div>
+        <div class="col-6" align="center">
+          <Board
+            squares={squares}
+            usedby={usedby}
+            onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
+          />
+        </div>
+        <div class="col-2 pbGuards">
+          <Guards
+            gtiles={gtiles}
+            whoseturn={whoseturn}
+            selection={selection}
+            onClick={(ti) => handleGuardTileClick(ti)}
+            onClickFinishTurn={() => endGuardsTurn()}
+            onClickTileRecall={() => recallTiles()}
+          />
+        </div>
+        <div class="col-2">
+          <Tiles tiles={tiles} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Tiles = (props) => {
+  // there is a better way ^^^
+  return (
+    <div className="pbTilepool">
+      <h3>TILE POOL</h3>
+      {props.tiles.map((t, ti) => (
+        <span key={`tile${ti}`}>
+          {ti > 0 && t !== props.tiles[ti - 1] ? (
+            <div className="pbTilepoolDivider"></div>
+          ) : (
+            <></>
+          )}
+          <span className="pbTilepoolTile">{t}</span>
+        </span>
+      ))}
+    </div>
+  );
+};
+
+const RackTile = (props) => {
+  return (
+    <td className={props.tileclass} onClick={props.onClick}>
+      {props.tilevalue}
+    </td>
+  );
+};
+
+const FinishTurnButton = (props) => {
+  return (
+    <button className="pbFinishTurn" onClick={props.onClick}>
+      Finish Turn
+    </button>
+  );
+};
+
+const TileRecallButton = (props) => {
+  return (
+    <button className="pbRecallTiles" onClick={props.onClick}>
+      Recall Tiles
+    </button>
+  );
+};
+
+const Prisoners = (props) => {
+  const renderTile = (tileclass, tileindex, tilevalue) => {
+    return (
+      <RackTile
+        key={tileclass + String(tileindex)}
+        tileclass={tileclass}
+        tilevalue={tilevalue}
+        onClick={() => props.onClick(tileindex)}
+      />
+    );
+  };
+
+  const renderFinishTurn = () => {
+    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
+  };
+
+  const renderRecallTiles = () => {
+    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
+  };
+
+  const renderFreedPrisoners = (count) => {
+    let dumb = Array(count).fill("nonsense");
+    return dumb.map((value, index) => (
+      <span key={value + String(index)}>
+        <img
+          src="/breakfree.png"
+          alt="I'm free! I'm free!"
+          width="100"
+          height="100"
+        />
+      </span>
+    ));
+  };
+
+  return (
+    <div>
+      <p>PRISONERS</p>
+      <p className="pbTilerack">
+        {props.ptiles.map((t, ti) =>
+          renderTile(
+            props.whoseturn === "P" && props.selection === ti
+              ? "pbTileOnRackSelectedP"
+              : "pbTileOnRackP",
+            ti,
+            t
+          )
+        )}
+      </p>
+      {props.whoseturn === "P" ? renderFinishTurn() : <></>}
+      {props.whoseturn === "P" ? renderRecallTiles() : <></>}
+      <p>
+        Rescues made: {props.rescues}
+        <br></br>
+        {renderFreedPrisoners(props.rescues)}
+      </p>
+    </div>
+  );
+};
+
+const Guards = (props) => {
+  const renderTile = (tileclass, tileindex, tilevalue) => {
+    return (
+      <RackTile
+        key={tileclass + String(tileindex)}
+        tileclass={tileclass}
+        tilevalue={tilevalue}
+        onClick={() => props.onClick(tileindex)}
+      />
+    );
+  };
+
+  const renderFinishTurn = () => {
+    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
+  };
+
+  const renderRecallTiles = () => {
+    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
+  };
+
+  return (
+    <div>
+      <p>GUARDS</p>
+      <p className="pbTilerack">
+        {props.gtiles.map((t, ti) =>
+          renderTile(
+            props.whoseturn === "G" && props.selection === ti
+              ? "pbTileOnRackSelectedG"
+              : "pbTileOnRackG",
+            ti,
+            t
+          )
+        )}
+      </p>
+      {props.whoseturn === "G" ? renderFinishTurn() : <></>}
+      {props.whoseturn === "G" ? renderRecallTiles() : <></>}
+    </div>
+  );
+};
