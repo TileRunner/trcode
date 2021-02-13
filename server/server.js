@@ -16,7 +16,7 @@ wss.on("connection", (ws) => {
     ws.on("close", () => console.log("Client disconnected"));
 
     ws.on("message", (message) => {
-        processMessage(JSON.stringify(message));
+        processMessage(message);
     });
 });
 
@@ -24,6 +24,6 @@ wss.on("connection", (ws) => {
 const processMessage = (message) => {
     message = JSON.parse(message);
     wss.clients.forEach((client) => {
-        client.send(JSON.stringify(message));
+        client.send(message);
     });
 }

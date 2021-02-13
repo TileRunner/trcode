@@ -117,7 +117,49 @@ const initialtiles = [
 ]; // initial tile pool
 
 export default function PrisonBreak() {
-  return <Game/>
+  const [inlobby, setInlobby] = useState(true)
+  const [gameid, setGameid] = useState('')
+  const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
+
+  return (
+    inlobby || prisonersOrGuards === '' ?
+    <div>
+      <p>In the lobby</p>
+      <label>Game id:&nbsp;</label>
+      <input
+          name="gameid"
+          value={gameid}
+          onChange={(e) => {
+              setGameid(e.target.value)
+          }}
+      />
+      <label>&nbsp;</label>
+      <button id="startgame"
+          onClick={function() {
+            if (gameid.length > 0) {
+              setPrisonersOrGuards('P');
+              setInlobby(false);
+            }
+          }}
+      >
+          Start Game
+      </button>
+      <label>&nbsp;</label>
+      <button id="joingame"
+          onClick={function() {
+            if (gameid.length > 0) {
+              setPrisonersOrGuards('G');
+              setInlobby(false);
+            }
+          }}
+      >
+          Join Game
+      </button>
+    </div>
+    :
+    // <p>In game as {prisonersOrGuards}</p>
+    <Game prisonersOrGuards={prisonersOrGuards}/>
+  )
 }
 
 const Square = (props) => {
@@ -152,20 +194,16 @@ const Square = (props) => {
       ? "⎔"
       : "✦";
   return (
-    <div>
-      <td>
-        <button className={tdclass} onClick={props.onClick}>
-          {tdvalue}
-        </button>
-      </td>
-    </div>
-  );
+    <button className={tdclass} onClick={props.onClick}>
+      {tdvalue}
+    </button>
+);
 };
 
 const Board = ({ onClick, squares, usedby }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
-      <div key={`Square${ri}-${ci}`}>
+      <td key={`Square${ri}-${ci}`}>
         <Square
           c={c}
           ci={ci}
@@ -173,7 +211,7 @@ const Board = ({ onClick, squares, usedby }) => {
           squareusedby={squareusedby}
           onClick={() => onClick(ri, ci)}
         />
-      </div>
+      </td>
     );
   };
   const renderRow = (ri) => {
@@ -191,68 +229,111 @@ const Board = ({ onClick, squares, usedby }) => {
   );
 };
 
-const Game = () => {
-    const [connected, setConnected] = useState(false);
+const Game = ({prisonersOrGuards}) => {
     let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
     const [client, setClient] = useState(new CustomSocket(host, messageFunction));
     useEffect(() => {
       client.connect();
-      setConnected(true);
+      if (prisonersOrGuards === "P") {
+        let tempPTiles = [...ptiles];
+        let tempGTiles = [...gtiles];
+        let tempTiles = [...tiles];
+        while (tempPTiles.length < 7) {
+          let rand = Math.floor(Math.random() * tempTiles.length);
+          tempPTiles.push(tempTiles[rand]);
+          tempTiles.splice(rand, 1);
+          rand = Math.floor(Math.random() * tempTiles.length);
+          tempGTiles.push(tempTiles[rand]);
+          tempTiles.splice(rand, 1);
+        }
+        tempPTiles.sort();
+        tempGTiles.sort();
+        setGTiles(tempGTiles);
+        setPTiles(tempPTiles);
+        setTiles(tempTiles);  
+      }
+      else
+      {
+        setTimeout(() => {
+          // wait a bit so connection has time to open
+          client.send(
+            JSON.stringify({
+              type: "pb", // prisonbreak
+              func: "ggd" // get game data
+            })
+          );
+        }, 5000); // milliseconds to wait
+      }
     }, [client]);
   
     function messageFunction(message) {
       let messageData = JSON.parse(message.data);
-      console.log(messageData, "messageData");
+      console.log("Message being received by " + prisonersOrGuards);
+      console.log("func : " + messageData.func);
+      console.log("ptiles : " + JSON.stringify(ptiles) + " -> " + messageData.ptiles);
+      console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
       if (messageData.type === "pb") { // prison break
-          if (messageData.func === "ept") { // end prisoners turn
-            setWhoseturn("G");
-            setSelection(-1);
-            setCurrentcoords([]);
-            setPTiles(messageData.newPtiles);
-            setTiles(messageData.newTiles);
-            setRescues(messageData.newRescues);
-            setSnapshot({
-              squares: [...squares],
-              usedby: [...usedby],
-              ptiles: [...messageData.newPtiles],
-              gtiles: [...gtiles],
-            });       
-          }
-          if (messageData.func === "egt") { // end guards turn
-            setWhoseturn("P");
-            setSelection(-1);
-            setCurrentcoords([]);
-            setGTiles(messageData.newGtiles);
-            setTiles(messageData.newTiles);
-            setSnapshot({
-              squares: [...squares],
-              usedby: [...usedby],
-              ptiles: [...ptiles],
-              gtiles: [...messageData.newGtiles],
-            });       
-          }
+        // when guards join game they send ggd, and prisoner picks it up and sends sgd, then guards pick that up and take the data
+        if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
+          client.send(
+            JSON.stringify({
+              type: "pb", // prisonbreak
+              func: "sgd", // send game data
+              tiles: tiles,
+              ptiles: ptiles,
+              gtiles: gtiles,
+              usedby: usedby,
+              whoseturn: whoseturn,
+              selection: selection,
+              currentcoords: currentcoords,
+              snapshot: snapshot,
+              rescues: rescues // may have rescued another prisoner
+            })
+          );
+        }
+        if (messageData.func === "sgd" && prisonersOrGuards === "G") { // send game data (prisoners sent it, guards now get it)
+          setTiles(messageData.tiles);
+          setPTiles(messageData.ptiles);
+          setGTiles(messageData.gtiles);
+          setUsedby(messageData.usedby);
+          setWhoseturn(messageData.whoseturn);
+          setSelection(messageData.selection);
+          setCurrentcoords(messageData.currentcoords);
+          setSnapshot(messageData.snapshot);
+          setRescues(messageData.rescues);
+        }
+        if (messageData.func === "ept") { // end prisoners turn
+          setWhoseturn("G");
+          setSelection(-1);
+          setCurrentcoords([]);
+          setUsedby(messageData.usedby);
+          setPTiles(messageData.ptiles);
+          setTiles(messageData.tiles);
+          setRescues(messageData.rescues);
+          setSnapshot({
+            squares: [...squares],
+            usedby: [...messageData.usedby],
+            ptiles: [...messageData.ptiles],
+            gtiles: [...gtiles],
+          });       
+        }
+        if (messageData.func === "egt") { // end guards turn
+          setWhoseturn("P");
+          setSelection(-1);
+          setCurrentcoords([]);
+          setUsedby(messageData.usedby);
+          setGTiles(messageData.gtiles);
+          setTiles(messageData.tiles);
+          setSnapshot({
+            squares: [...squares],
+            usedby: [...messageData.usedby],
+            ptiles: [...ptiles],
+            gtiles: [...messageData.gtiles],
+          });       
+        }
       }
     }
   
-    useEffect(() => {
-    let tempPTiles = [...ptiles];
-    let tempGTiles = [...gtiles];
-    let tempTiles = [...tiles];
-    while (tempPTiles.length < 7) {
-      let rand = Math.floor(Math.random() * tempTiles.length);
-      tempPTiles.push(tempTiles[rand]);
-      tempTiles.splice(rand, 1);
-      rand = Math.floor(Math.random() * tempTiles.length);
-      tempGTiles.push(tempTiles[rand]);
-      tempTiles.splice(rand, 1);
-    }
-    tempPTiles.sort();
-    tempGTiles.sort();
-    setGTiles(tempGTiles);
-    setPTiles(tempPTiles);
-    setTiles(tempTiles);
-  }, []);
-
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPTiles] = useState([]);
   const [gtiles, setGTiles] = useState([]);
@@ -378,9 +459,10 @@ const Game = () => {
       JSON.stringify({
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
-        newPtiles: newPtiles, // we picked new tiles for prisoners rack
-        newTiles: newTiles, // we picked new tiles so tile pool changed
-        newRescues: newRescues // may have rescued another prisoner
+        usedby: usedby, // this was being changed as the tiles were being played
+        ptiles: newPtiles, // we picked new tiles for prisoners rack
+        tiles: newTiles, // we picked new tiles so tile pool changed
+        rescues: newRescues // may have rescued another prisoner
       })
     );
   };
@@ -410,11 +492,12 @@ const Game = () => {
     });
 
     client.send(
-        JSON.stringify({
-          type: "pb", // prisonbreak
-          func: "egt", // end guards turn
-          newGtiles: newGtiles, // we picked new tiles for guards rack
-          newTiles: newTiles // we picked new tiles so tile pool changed
+      JSON.stringify({
+        type: "pb", // prisonbreak
+        func: "egt", // end guards turn
+        usedby: usedby, // this was being changed as the tiles were being played
+        gtiles: newGtiles, // we picked new tiles for guards rack
+        tiles: newTiles // we picked new tiles so tile pool changed
         })
       );
     };
@@ -429,18 +512,17 @@ const Game = () => {
   };
 
   return (
-    !connected ? <p>Connecting...</p> : 
-    <div class="container-fluid prisonbreak">
-      <div class="row">
-        <div class="col-11 pbtitle">Prison Break</div>
-        <div class="col-1 pbhomelink" data-toggle="tooltip" title="Home">
+    <div className="container-fluid prisonbreak">
+      <div className="row">
+        <div className="col-11 pbtitle">Prison Break</div>
+        <div className="col-1 pbhomelink" data-toggle="tooltip" title="Home">
           <Link href={"../../"}>
             <a>🏠</a>
           </Link>
         </div>
       </div>
-      <div class="row">
-        <div class="col-2 pbPrisoners">
+      <div className="row">
+        <div className="col-2 pbPrisoners">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -449,16 +531,17 @@ const Game = () => {
             onClickFinishTurn={() => endPrisonersTurn()}
             onClickTileRecall={() => recallTiles()}
             rescues={rescues}
+            prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div class="col-6" align="center">
+        <div className="col-6" align="center">
           <Board
             squares={squares}
             usedby={usedby}
             onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
           />
         </div>
-        <div class="col-2 pbGuards">
+        <div className="col-2 pbGuards">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -466,9 +549,10 @@ const Game = () => {
             onClick={(ti) => handleGuardTileClick(ti)}
             onClickFinishTurn={() => endGuardsTurn()}
             onClickTileRecall={() => recallTiles()}
+            prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div class="col-2">
+        <div className="col-2">
           <Tiles tiles={tiles} />
         </div>
       </div>
@@ -497,9 +581,9 @@ const Tiles = (props) => {
 
 const RackTile = (props) => {
   return (
-    <td className={props.tileclass} onClick={props.onClick}>
+    <span className={props.tileclass} onClick={props.onClick}>
       {props.tilevalue}
-    </td>
+    </span>
   );
 };
 
@@ -563,12 +647,12 @@ const Prisoners = (props) => {
               ? "pbTileOnRackSelectedP"
               : "pbTileOnRackP",
             ti,
-            t
+            props.prisonersOrGuards === "P" ? t : "*"
           )
         )}
       </p>
-      {props.whoseturn === "P" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "P" ? renderRecallTiles() : <></>}
+      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderFinishTurn() : <></>}
+      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderRecallTiles() : <></>}
       <p>
         Rescues made: {props.rescues}
         <br></br>
@@ -608,12 +692,12 @@ const Guards = (props) => {
               ? "pbTileOnRackSelectedG"
               : "pbTileOnRackG",
             ti,
-            t
+            props.prisonersOrGuards === "G" ? t : "*"
           )
         )}
       </p>
-      {props.whoseturn === "G" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "G" ? renderRecallTiles() : <></>}
+      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderFinishTurn() : <></>}
+      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderRecallTiles() : <></>}
     </div>
   );
 };
