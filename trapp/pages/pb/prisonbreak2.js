@@ -319,6 +319,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
             type: "pb", // prisonbreak
             func: "sgd", // send game data
             tiles: tiles,
+            squares: squares,
             ptiles: ptiles,
             gtiles: gtiles,
             usedby: usedby,
@@ -332,6 +333,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
       }
       if (messageData.func === "sgd" && prisonersOrGuards === "G") { // send game data (prisoners sent it, guards now get it)
         setTiles(messageData.tiles);
+        setSquares(messageData.squares);
         setPtiles(messageData.ptiles);
         setGtiles(messageData.gtiles);
         setUsedby(messageData.usedby);
@@ -345,12 +347,13 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
         setWhoseturn("G");
         setSelection(-1);
         setCurrentcoords([]);
+        setSquares(messageData.squares);
         setUsedby(messageData.usedby);
         setPtiles(messageData.ptiles);
         setTiles(messageData.tiles);
         setRescues(messageData.rescues);
         setSnapshot({
-          squares: [...squares],
+          squares: [...messageData.squares],
           usedby: [...messageData.usedby],
           ptiles: [...messageData.ptiles],
           gtiles: [...gtiles],
@@ -360,11 +363,12 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
         setWhoseturn("P");
         setSelection(-1);
         setCurrentcoords([]);
+        setSquares(messageData.squares);
         setUsedby(messageData.usedby);
         setGtiles(messageData.gtiles);
         setTiles(messageData.tiles);
         setSnapshot({
-          squares: [...squares],
+          squares: [...messageData.squares],
           usedby: [...messageData.usedby],
           ptiles: [...ptiles],
           gtiles: [...messageData.gtiles],
@@ -483,6 +487,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
+        squares: squares, // this was being changed as the tiles were being played
         usedby: usedby, // this was being changed as the tiles were being played
         ptiles: newPtiles, // we picked new tiles for prisoners rack
         tiles: newTiles, // we picked new tiles so tile pool changed
@@ -520,6 +525,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
+        squares: squares, // this was being changed as the tiles were being played
         usedby: usedby, // this was being changed as the tiles were being played
         gtiles: newGtiles, // we picked new tiles for guards rack
         tiles: newTiles // we picked new tiles so tile pool changed
@@ -552,8 +558,15 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
           <p>Why is wsmsgs.length never greater than 1?</p>
           <p>What is the syntax and where do I put it to process the message?</p>
           {wsmsgs.map( (msg, inx) => (
-            <li key={inx}>{msg}</li>
+            <li key={inx}>Message function = {(JSON.parse(msg)).func}</li>
           ))}
+          <button id="processlastmessage"
+            onClick={function() {
+              messageFunction(wsmsgs[wsmsgs.length-1])
+            }}
+          >
+            Process last message
+          </button>
         </div>
       </div>
       <div className="row">
