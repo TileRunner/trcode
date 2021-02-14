@@ -120,7 +120,15 @@ export default function PrisonBreak() {
   const [inlobby, setInlobby] = useState(true)
   const [gameid, setGameid] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
-
+  const [wsmsgs, setWsmsgs] = useState([])
+  let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
+  const acceptMessage = (message) => {
+    setWsmsgs([...wsmsgs, message.data])
+  }
+  const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
+  useEffect(() => (
+    client.connect()
+  ),[]);
   return (
     inlobby || prisonersOrGuards === '' ?
     <div>
@@ -155,10 +163,18 @@ export default function PrisonBreak() {
       >
           Join Game
       </button>
+      {wsmsgs.map( (msg, inx) => (
+        <li key={inx}>{msg}</li>
+      ))}
     </div>
     :
     // <p>In game as {prisonersOrGuards}</p>
-    <Game prisonersOrGuards={prisonersOrGuards}/>
+    <Game prisonersOrGuards={prisonersOrGuards}
+      gameid={gameid}
+      msgid={wsmsgs.length} 
+      wsmsgs={wsmsgs}
+      client={client}
+      />
   )
 }
 
@@ -229,114 +245,11 @@ const Board = ({ onClick, squares, usedby }) => {
   );
 };
 
-const Game = ({prisonersOrGuards}) => {
-    let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
-    const [client, setClient] = useState(new CustomSocket(host, messageFunction));
-    useEffect(() => {
-      client.connect();
-      if (prisonersOrGuards === "P") {
-        let tempPTiles = [...ptiles];
-        let tempGTiles = [...gtiles];
-        let tempTiles = [...tiles];
-        while (tempPTiles.length < 7) {
-          let rand = Math.floor(Math.random() * tempTiles.length);
-          tempPTiles.push(tempTiles[rand]);
-          tempTiles.splice(rand, 1);
-          rand = Math.floor(Math.random() * tempTiles.length);
-          tempGTiles.push(tempTiles[rand]);
-          tempTiles.splice(rand, 1);
-        }
-        tempPTiles.sort();
-        tempGTiles.sort();
-        setGTiles(tempGTiles);
-        setPTiles(tempPTiles);
-        setTiles(tempTiles);  
-      }
-      else
-      {
-        setTimeout(() => {
-          // wait a bit so connection has time to open
-          client.send(
-            JSON.stringify({
-              type: "pb", // prisonbreak
-              func: "ggd" // get game data
-            })
-          );
-        }, 5000); // milliseconds to wait
-      }
-    }, [client]);
-  
-    function messageFunction(message) {
-      let messageData = JSON.parse(message.data);
-      console.log("Message being received by " + prisonersOrGuards);
-      console.log("func : " + messageData.func);
-      console.log("ptiles : " + JSON.stringify(ptiles) + " -> " + messageData.ptiles);
-      console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
-      if (messageData.type === "pb") { // prison break
-        // when guards join game they send ggd, and prisoner picks it up and sends sgd, then guards pick that up and take the data
-        if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
-          client.send(
-            JSON.stringify({
-              type: "pb", // prisonbreak
-              func: "sgd", // send game data
-              tiles: tiles,
-              ptiles: ptiles,
-              gtiles: gtiles,
-              usedby: usedby,
-              whoseturn: whoseturn,
-              selection: selection,
-              currentcoords: currentcoords,
-              snapshot: snapshot,
-              rescues: rescues // may have rescued another prisoner
-            })
-          );
-        }
-        if (messageData.func === "sgd" && prisonersOrGuards === "G") { // send game data (prisoners sent it, guards now get it)
-          setTiles(messageData.tiles);
-          setPTiles(messageData.ptiles);
-          setGTiles(messageData.gtiles);
-          setUsedby(messageData.usedby);
-          setWhoseturn(messageData.whoseturn);
-          setSelection(messageData.selection);
-          setCurrentcoords(messageData.currentcoords);
-          setSnapshot(messageData.snapshot);
-          setRescues(messageData.rescues);
-        }
-        if (messageData.func === "ept") { // end prisoners turn
-          setWhoseturn("G");
-          setSelection(-1);
-          setCurrentcoords([]);
-          setUsedby(messageData.usedby);
-          setPTiles(messageData.ptiles);
-          setTiles(messageData.tiles);
-          setRescues(messageData.rescues);
-          setSnapshot({
-            squares: [...squares],
-            usedby: [...messageData.usedby],
-            ptiles: [...messageData.ptiles],
-            gtiles: [...gtiles],
-          });       
-        }
-        if (messageData.func === "egt") { // end guards turn
-          setWhoseturn("P");
-          setSelection(-1);
-          setCurrentcoords([]);
-          setUsedby(messageData.usedby);
-          setGTiles(messageData.gtiles);
-          setTiles(messageData.tiles);
-          setSnapshot({
-            squares: [...squares],
-            usedby: [...messageData.usedby],
-            ptiles: [...ptiles],
-            gtiles: [...messageData.gtiles],
-          });       
-        }
-      }
-    }
-  
+const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
+  const [lastmsgid, setLastmsgid] = useState(0);
   const [tiles, setTiles] = useState([...initialtiles]);
-  const [ptiles, setPTiles] = useState([]);
-  const [gtiles, setGTiles] = useState([]);
+  const [ptiles, setPtiles] = useState([]);
+  const [gtiles, setGtiles] = useState([]);
   const [squares, setSquares] = useState(Array(15).fill(Array(15).fill(".")));
   const [usedby, setUsedby] = useState(Array(15).fill(Array(15).fill("")));
   const [selection, setSelection] = useState(-1);
@@ -350,6 +263,116 @@ const Game = ({prisonersOrGuards}) => {
     gtiles: [...gtiles],
   });
 
+  // let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
+  // const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+  useEffect(() => {
+    // client.connect();
+    if (prisonersOrGuards === "P") {
+      let tempPTiles = [...ptiles];
+      let tempGTiles = [...gtiles];
+      let tempTiles = [...tiles];
+      while (tempPTiles.length < 7) {
+        let rand = Math.floor(Math.random() * tempTiles.length);
+        tempPTiles.push(tempTiles[rand]);
+        tempTiles.splice(rand, 1);
+        rand = Math.floor(Math.random() * tempTiles.length);
+        tempGTiles.push(tempTiles[rand]);
+        tempTiles.splice(rand, 1);
+      }
+      tempPTiles.sort();
+      tempGTiles.sort();
+      setGtiles(tempGTiles);
+      setPtiles(tempPTiles);
+      setTiles(tempTiles);  
+    }
+    else
+    {
+      try {
+        console.log("Sending ggd")
+        client.send(
+          JSON.stringify({
+            gameid: gameid, // the id for the game
+            type: "pb", // prisonbreak
+            func: "ggd" // get game data
+        }));
+      }
+      catch {}
+    }
+  }, []);
+
+  const logMessageFromWS = (messageData) => {
+    console.log("Message being received by " + prisonersOrGuards);
+    console.log("func : " + messageData.func);
+    console.log("ptiles : " + JSON.stringify(ptiles) + " -> " + messageData.ptiles);
+    console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
+  }
+
+  function messageFunction(message) {
+    let messageData = JSON.parse(message); // was message.data
+    logMessageFromWS(messageData);
+    if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+      // when guards join game they send ggd, and prisoner picks it up and sends sgd, then guards pick that up and take the data
+      if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
+        client.send(
+          JSON.stringify({
+            gameid: gameid, // the id for the game
+            type: "pb", // prisonbreak
+            func: "sgd", // send game data
+            tiles: tiles,
+            ptiles: ptiles,
+            gtiles: gtiles,
+            usedby: usedby,
+            whoseturn: whoseturn,
+            selection: selection,
+            currentcoords: currentcoords,
+            snapshot: snapshot,
+            rescues: rescues // may have rescued another prisoner
+          })
+        );
+      }
+      if (messageData.func === "sgd" && prisonersOrGuards === "G") { // send game data (prisoners sent it, guards now get it)
+        setTiles(messageData.tiles);
+        setPtiles(messageData.ptiles);
+        setGtiles(messageData.gtiles);
+        setUsedby(messageData.usedby);
+        setWhoseturn(messageData.whoseturn);
+        setSelection(messageData.selection);
+        setCurrentcoords(messageData.currentcoords);
+        setSnapshot(messageData.snapshot);
+        setRescues(messageData.rescues);
+      }
+      if (messageData.func === "ept") { // end prisoners turn
+        setWhoseturn("G");
+        setSelection(-1);
+        setCurrentcoords([]);
+        setUsedby(messageData.usedby);
+        setPtiles(messageData.ptiles);
+        setTiles(messageData.tiles);
+        setRescues(messageData.rescues);
+        setSnapshot({
+          squares: [...squares],
+          usedby: [...messageData.usedby],
+          ptiles: [...messageData.ptiles],
+          gtiles: [...gtiles],
+        });       
+      }
+      if (messageData.func === "egt") { // end guards turn
+        setWhoseturn("P");
+        setSelection(-1);
+        setCurrentcoords([]);
+        setUsedby(messageData.usedby);
+        setGtiles(messageData.gtiles);
+        setTiles(messageData.tiles);
+        setSnapshot({
+          squares: [...squares],
+          usedby: [...messageData.usedby],
+          ptiles: [...ptiles],
+          gtiles: [...messageData.gtiles],
+        });       
+      }
+    }
+  }
+  
   const handleBoardSquareClick = (ri, ci) => {
     let newSquares = [...squares];
     let newUsedby = [...usedby];
@@ -375,8 +398,8 @@ const Game = ({prisonersOrGuards}) => {
       setSelection((curr) => curr - 1);
       setSquares(newSquares);
       setUsedby(newUsedby);
-      setPTiles(newPtiles);
-      setGTiles(newGtiles);
+      setPtiles(newPtiles);
+      setGtiles(newGtiles);
       setCurrentcoords([...currentcoords, coord]);
     } else if (squarevalue !== "." && cci > -1) {
       // clicked square has a tile on it from the current move in progress
@@ -401,8 +424,8 @@ const Game = ({prisonersOrGuards}) => {
 
         setSquares(newSquares);
         setUsedby(newUsedby);
-        setPTiles(newPtiles);
-        setGTiles(newGtiles);
+        setPtiles(newPtiles);
+        setGtiles(newGtiles);
 
         setCurrentcoords(newCurrentcoords);
       }
@@ -445,7 +468,7 @@ const Game = ({prisonersOrGuards}) => {
     setWhoseturn("G");
     setSelection(-1);
     setCurrentcoords([]);
-    setPTiles(newPtiles);
+    setPtiles(newPtiles);
     setTiles(newTiles);
     setRescues(newRescues);
     setSnapshot({
@@ -457,6 +480,7 @@ const Game = ({prisonersOrGuards}) => {
 
     client.send(
       JSON.stringify({
+        gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
         usedby: usedby, // this was being changed as the tiles were being played
@@ -482,7 +506,7 @@ const Game = ({prisonersOrGuards}) => {
     setWhoseturn("P");
     setSelection(-1);
     setCurrentcoords([]);
-    setGTiles(newGtiles);
+    setGtiles(newGtiles);
     setTiles(newTiles);
     setSnapshot({
       squares: snapsquares,
@@ -493,6 +517,7 @@ const Game = ({prisonersOrGuards}) => {
 
     client.send(
       JSON.stringify({
+        gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
         usedby: usedby, // this was being changed as the tiles were being played
@@ -505,8 +530,8 @@ const Game = ({prisonersOrGuards}) => {
   const recallTiles = () => {
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
-    setPTiles([...snapshot.ptiles]);
-    setGTiles([...snapshot.gtiles]);
+    setPtiles([...snapshot.ptiles]);
+    setGtiles([...snapshot.gtiles]);
     setSelection(-1);
     setCurrentcoords([]);
   };
@@ -519,6 +544,16 @@ const Game = ({prisonersOrGuards}) => {
           <Link href={"../../"}>
             <a>🏠</a>
           </Link>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-12">
+          <p>gameid={gameid} msgid={msgid} lastmsgid={lastmsgid} wsmsgs.length={wsmsgs.length}</p>
+          <p>Why is wsmsgs.length never greater than 1?</p>
+          <p>What is the syntax and where do I put it to process the message?</p>
+          {wsmsgs.map( (msg, inx) => (
+            <li key={inx}>{msg}</li>
+          ))}
         </div>
       </div>
       <div className="row">
