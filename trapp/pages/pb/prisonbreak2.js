@@ -121,9 +121,17 @@ export default function PrisonBreak() {
   const [gameid, setGameid] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
   const [wsmsgs, setWsmsgs] = useState([])
+  const [msgid, setMsgid] = useState(0)
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
-    setWsmsgs([...wsmsgs, message.data])
+    setMsgid((curr) => curr + 1)
+    setWsmsgs((curr) => [...curr, message.data]);
+  }
+  const removeMessage = (messageData) => {
+    let i = wsmsgs.indexOf(messageData);
+    let w = [...wsmsgs];
+    w.splice(i,1);
+    setWsmsgs(w);
   }
   const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
   useEffect(() => (
@@ -171,9 +179,10 @@ export default function PrisonBreak() {
     // <p>In game as {prisonersOrGuards}</p>
     <Game prisonersOrGuards={prisonersOrGuards}
       gameid={gameid}
-      msgid={wsmsgs.length} 
+      msgid={msgid} 
       wsmsgs={wsmsgs}
       client={client}
+      removeMessage={removeMessage}
       />
   )
 }
@@ -245,7 +254,7 @@ const Board = ({ onClick, squares, usedby }) => {
   );
 };
 
-const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
+const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage}) => {
   const [lastmsgid, setLastmsgid] = useState(0);
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
@@ -543,6 +552,17 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
   };
 
   return (
+    wsmsgs.length > 0 ?
+      <button id="processNextMessage"
+        onClick={function() {
+          let msg = wsmsgs[0]
+          messageFunction(msg)
+          removeMessage(msg)
+        }}
+      >
+        Click to get update
+      </button>
+    :
     <div className="container-fluid prisonbreak">
       <div className="row">
         <div className="col-11 pbtitle">Prison Break</div>
@@ -550,23 +570,6 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client}) => {
           <Link href={"../../"}>
             <a>🏠</a>
           </Link>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-12">
-          <p>gameid={gameid} msgid={msgid} lastmsgid={lastmsgid} wsmsgs.length={wsmsgs.length}</p>
-          <p>Why is wsmsgs.length never greater than 1?</p>
-          <p>What is the syntax and where do I put it to process the message?</p>
-          {wsmsgs.map( (msg, inx) => (
-            <li key={inx}>Message function = {(JSON.parse(msg)).func}</li>
-          ))}
-          <button id="processlastmessage"
-            onClick={function() {
-              messageFunction(wsmsgs[wsmsgs.length-1])
-            }}
-          >
-            Process last message
-          </button>
         </div>
       </div>
       <div className="row">
