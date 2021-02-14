@@ -176,7 +176,6 @@ export default function PrisonBreak() {
       ))}
     </div>
     :
-    // <p>In game as {prisonersOrGuards}</p>
     <Game prisonersOrGuards={prisonersOrGuards}
       gameid={gameid}
       msgid={msgid} 
@@ -273,7 +272,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
   });
 
   // let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
-  // const [client, setClient] = useState(new CustomSocket(host, messageFunction));
+  // const [client, setClient] = useState(new CustomSocket(host, processMessage));
   useEffect(() => {
     // client.connect();
     if (prisonersOrGuards === "P") {
@@ -316,7 +315,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
     console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
   }
 
-  function messageFunction(message) {
+  function processMessage(message) {
     let messageData = JSON.parse(message); // was message.data
     logMessageFromWS(messageData);
     if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
@@ -384,6 +383,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         });       
       }
     }
+    removeMessage(message);
   }
   
   const handleBoardSquareClick = (ri, ci) => {
@@ -553,15 +553,14 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
 
   return (
     wsmsgs.length > 0 ?
-      <button id="processNextMessage"
-        onClick={function() {
-          let msg = wsmsgs[0]
-          messageFunction(msg)
-          removeMessage(msg)
-        }}
-      >
-        Click to get update
-      </button>
+    <button id="processNextMessage"
+      onClick={function() {
+        let msg = wsmsgs[0]
+        processMessage(msg)
+      }}
+    >
+      Click to get update
+    </button>
     :
     <div className="container-fluid prisonbreak">
       <div className="row">
