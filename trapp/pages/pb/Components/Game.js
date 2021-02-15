@@ -1,259 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import CustomSocket from "../../ws";
+import { escapehatches } from "../constants/escapehatches";
+import { initialtiles } from "../constants/initialtiles";
+import { Board } from "./Board";
+import { Guards } from "./Guards";
+import { Prisoners } from "./Prisoners";
+import { Tiles } from "./Tiles";
 
-
-const escapehatches = [
-  "0-0",
-  "0-7",
-  "0-14",
-  "7-0",
-  "7-14",
-  "14-0",
-  "14-7",
-  "14-14",
-]; // coords of escape hatches
-const initialtiles = [
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "B",
-  "B",
-  "C",
-  "C",
-  "D",
-  "D",
-  "D",
-  "D",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "F",
-  "F",
-  "G",
-  "G",
-  "G",
-  "H",
-  "H",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "J",
-  "K",
-  "L",
-  "L",
-  "L",
-  "L",
-  "M",
-  "M",
-  "N",
-  "N",
-  "N",
-  "N",
-  "N",
-  "N",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "P",
-  "P",
-  "Q",
-  "R",
-  "R",
-  "R",
-  "R",
-  "R",
-  "R",
-  "S",
-  "S",
-  "S",
-  "S",
-  "T",
-  "T",
-  "T",
-  "T",
-  "T",
-  "T",
-  "U",
-  "U",
-  "U",
-  "U",
-  "V",
-  "V",
-  "W",
-  "W",
-  "X",
-  "Y",
-  "Y",
-  "Z",
-  "?",
-  "?",
-]; // initial tile pool
-
-export default function PrisonBreak() {
-  const [inlobby, setInlobby] = useState(true)
-  const [gameid, setGameid] = useState('')
-  const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
-  const [wsmsgs, setWsmsgs] = useState([])
-  const [msgid, setMsgid] = useState(0)
-  let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
-  const acceptMessage = (message) => {
-    setMsgid((curr) => curr + 1)
-    setWsmsgs((curr) => [...curr, message.data]);
-  }
-  const removeMessage = (messageData) => {
-    let i = wsmsgs.indexOf(messageData);
-    let w = [...wsmsgs];
-    w.splice(i,1);
-    setWsmsgs(w);
-  }
-  const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
-  useEffect(() => (
-    client.connect()
-  ),[]);
-  return (
-    inlobby || prisonersOrGuards === '' ?
-    <div>
-      <p>In the lobby</p>
-      <label>Game id:&nbsp;</label>
-      <input
-          name="gameid"
-          value={gameid}
-          onChange={(e) => {
-              setGameid(e.target.value)
-          }}
-      />
-      <label>&nbsp;</label>
-      <button id="startgame"
-          onClick={function() {
-            if (gameid.length > 0) {
-              setPrisonersOrGuards('P');
-              setInlobby(false);
-            }
-          }}
-      >
-          Start Game
-      </button>
-      <label>&nbsp;</label>
-      <button id="joingame"
-          onClick={function() {
-            if (gameid.length > 0) {
-              setPrisonersOrGuards('G');
-              setInlobby(false);
-            }
-          }}
-      >
-          Join Game
-      </button>
-      {wsmsgs.map( (msg, inx) => (
-        <li key={inx}>{msg}</li>
-      ))}
-    </div>
-    :
-    <Game prisonersOrGuards={prisonersOrGuards}
-      gameid={gameid}
-      msgid={msgid} 
-      wsmsgs={wsmsgs}
-      client={client}
-      removeMessage={removeMessage}
-      />
-  )
-}
-
-const Square = (props) => {
-  // squareusedby, ri, ci, c, onClick
-  // need squareusedby to pick css className corresponding to who played the tile on the square
-  // need ri, ci to display alternating characters on unused squares
-  // need c to represent which tile is on the square, if any
-  // need onClick to handle square click at a higher level
-  const usedbyclass =
-    props.squareusedby === "P"
-      ? "pbSquareUsedByPrisoners"
-      : "pbSquareUsedByGuards";
-  const tdclass =
-    props.c !== "."
-      ? usedbyclass
-      : props.ri === 7 && props.ci === 7
-      ? "pbSquareCenterSquare"
-      : (props.ri === 0 || props.ri === 7 || props.ri === 14) &&
-        (props.ci === 0 || props.ci === 7 || props.ci === 14)
-      ? "pbSquareEscapeHatch"
-      : props.ri % 2 === props.ci % 2
-      ? "pbSquare"
-      : "pbSquare2";
-  const tdvalue =
-    props.c !== "."
-      ? props.c
-      : tdclass === "pbSquareCenterSquare"
-      ? "✰"
-      : tdclass === "pbSquareEscapeHatch"
-      ? "💫"
-      : props.ri % 2 === props.ci % 2
-      ? "⎔"
-      : "✦";
-  return (
-    <button className={tdclass} onClick={props.onClick}>
-      {tdvalue}
-    </button>
-);
-};
-
-const Board = ({ onClick, squares, usedby }) => {
-  const renderSquare = (ri, ci, c, squareusedby) => {
-    return (
-      <td key={`Square${ri}-${ci}`}>
-        <Square
-          c={c}
-          ci={ci}
-          ri={ri}
-          squareusedby={squareusedby}
-          onClick={() => onClick(ri, ci)}
-        />
-      </td>
-    );
-  };
-  const renderRow = (ri) => {
-    return (
-      <tr key={`BoardRow${ri}`} className="row pbRow">
-        {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
-      </tr>
-    );
-  };
-
-  return (
-    <table className="pbBoard">
-      <tbody>{squares.map((r, ri) => renderRow(ri))}</tbody>
-    </table>
-  );
-};
-
-const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage}) => {
+export const Game = ({ prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage }) => {
   const [lastmsgid, setLastmsgid] = useState(0);
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
@@ -291,33 +45,34 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
       tempGTiles.sort();
       setGtiles(tempGTiles);
       setPtiles(tempPTiles);
-      setTiles(tempTiles);  
+      setTiles(tempTiles);
     }
-    else
-    {
+
+    else {
       try {
-        console.log("Sending ggd")
+        console.log("Sending ggd");
         client.send(
           JSON.stringify({
-            gameid: gameid, // the id for the game
-            type: "pb", // prisonbreak
+            gameid: gameid,
+            type: "pb",
             func: "ggd" // get game data
-        }));
+          }));
       }
-      catch {}
+      catch { }
     }
   }, []);
   useEffect(() => {
     let msg = wsmsgs[0];
-    if (msg) processMessage(msg);
-        
-  },[wsmsgs])
+    if (msg)
+      processMessage(msg);
+
+  }, [wsmsgs]);
   const logMessageFromWS = (messageData) => {
     console.log("Message being received by " + prisonersOrGuards);
     console.log("func : " + messageData.func);
     console.log("ptiles : " + JSON.stringify(ptiles) + " -> " + messageData.ptiles);
     console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
-  }
+  };
 
   function processMessage(message) {
     let messageData = JSON.parse(message); // was message.data
@@ -327,9 +82,9 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
       if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
         client.send(
           JSON.stringify({
-            gameid: gameid, // the id for the game
-            type: "pb", // prisonbreak
-            func: "sgd", // send game data
+            gameid: gameid,
+            type: "pb",
+            func: "sgd",
             tiles: tiles,
             squares: squares,
             ptiles: ptiles,
@@ -369,7 +124,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
           usedby: [...messageData.usedby],
           ptiles: [...messageData.ptiles],
           gtiles: [...gtiles],
-        });       
+        });
       }
       if (messageData.func === "egt") { // end guards turn
         setWhoseturn("P");
@@ -384,12 +139,12 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
           usedby: [...messageData.usedby],
           ptiles: [...ptiles],
           gtiles: [...messageData.gtiles],
-        });       
+        });
       }
     }
     removeMessage(message);
   }
-  
+
   const handleBoardSquareClick = (ri, ci) => {
     let newSquares = [...squares];
     let newUsedby = [...usedby];
@@ -421,10 +176,8 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
     } else if (squarevalue !== "." && cci > -1) {
       // clicked square has a tile on it from the current move in progress
       // Assuming some good will from the users to click a tile they played
-      if (
-        (whoseturn === "P" && newPtiles.length < 7) ||
-        (whoseturn === "G" && newGtiles.length < 7)
-      ) {
+      if ((whoseturn === "P" && newPtiles.length < 7) ||
+        (whoseturn === "G" && newGtiles.length < 7)) {
         whoseturn === "P"
           ? newPtiles.push(squarevalue)
           : newGtiles.push(squarevalue);
@@ -497,13 +250,13 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
 
     client.send(
       JSON.stringify({
-        gameid: gameid, // the id for the game
-        type: "pb", // prisonbreak
-        func: "ept", // end prisoners turn
-        squares: squares, // this was being changed as the tiles were being played
-        usedby: usedby, // this was being changed as the tiles were being played
-        ptiles: newPtiles, // we picked new tiles for prisoners rack
-        tiles: newTiles, // we picked new tiles so tile pool changed
+        gameid: gameid,
+        type: "pb",
+        func: "ept",
+        squares: squares,
+        usedby: usedby,
+        ptiles: newPtiles,
+        tiles: newTiles,
         rescues: newRescues // may have rescued another prisoner
       })
     );
@@ -535,16 +288,16 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
 
     client.send(
       JSON.stringify({
-        gameid: gameid, // the id for the game
-        type: "pb", // prisonbreak
-        func: "egt", // end guards turn
-        squares: squares, // this was being changed as the tiles were being played
-        usedby: usedby, // this was being changed as the tiles were being played
-        gtiles: newGtiles, // we picked new tiles for guards rack
+        gameid: gameid,
+        type: "pb",
+        func: "egt",
+        squares: squares,
+        usedby: usedby,
+        gtiles: newGtiles,
         tiles: newTiles // we picked new tiles so tile pool changed
-        })
-      );
-    };
+      })
+    );
+  };
 
   const recallTiles = () => {
     setSquares([...snapshot.squares]);
@@ -575,15 +328,13 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
             onClickFinishTurn={() => endPrisonersTurn()}
             onClickTileRecall={() => recallTiles()}
             rescues={rescues}
-            prisonersOrGuards={prisonersOrGuards}
-          />
+            prisonersOrGuards={prisonersOrGuards} />
         </div>
         <div className="col-6" align="center">
           <Board
             squares={squares}
             usedby={usedby}
-            onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
-          />
+            onClick={(ri, ci) => handleBoardSquareClick(ri, ci)} />
         </div>
         <div className="col-2 pbGuards">
           <Guards
@@ -593,155 +344,12 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
             onClick={(ti) => handleGuardTileClick(ti)}
             onClickFinishTurn={() => endGuardsTurn()}
             onClickTileRecall={() => recallTiles()}
-            prisonersOrGuards={prisonersOrGuards}
-          />
+            prisonersOrGuards={prisonersOrGuards} />
         </div>
         <div className="col-2">
           <Tiles tiles={tiles} />
         </div>
       </div>
-    </div>
-  );
-};
-
-const Tiles = (props) => {
-  // there is a better way ^^^
-  return (
-    <div className="pbTilepool">
-      <h3>TILE POOL</h3>
-      {props.tiles.map((t, ti) => (
-        <span key={`tile${ti}`}>
-          {ti > 0 && t !== props.tiles[ti - 1] ? (
-            <div className="pbTilepoolDivider"></div>
-          ) : (
-            <></>
-          )}
-          <span className="pbTilepoolTile">{t}</span>
-        </span>
-      ))}
-    </div>
-  );
-};
-
-const RackTile = (props) => {
-  return (
-    <span className={props.tileclass} onClick={props.onClick}>
-      {props.tilevalue}
-    </span>
-  );
-};
-
-const FinishTurnButton = (props) => {
-  return (
-    <button className="pbFinishTurn" onClick={props.onClick}>
-      Finish Turn
-    </button>
-  );
-};
-
-const TileRecallButton = (props) => {
-  return (
-    <button className="pbRecallTiles" onClick={props.onClick}>
-      Recall Tiles
-    </button>
-  );
-};
-
-const Prisoners = (props) => {
-  const renderTile = (tileclass, tileindex, tilevalue) => {
-    return (
-      <RackTile
-        key={tileclass + String(tileindex)}
-        tileclass={tileclass}
-        tilevalue={tilevalue}
-        onClick={() => props.onClick(tileindex)}
-      />
-    );
-  };
-
-  const renderFinishTurn = () => {
-    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
-  };
-
-  const renderRecallTiles = () => {
-    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
-  };
-
-  const renderFreedPrisoners = (count) => {
-    let dumb = Array(count).fill("nonsense");
-    return dumb.map((value, index) => (
-      <span key={value + String(index)}>
-        <img
-          src="/breakfree.png"
-          alt="I'm free! I'm free!"
-          width="100"
-          height="100"
-        />
-      </span>
-    ));
-  };
-
-  return (
-    <div>
-      <p>PRISONERS</p>
-      <p className="pbTilerack">
-        {props.ptiles.map((t, ti) =>
-          renderTile(
-            props.whoseturn === "P" && props.selection === ti
-              ? "pbTileOnRackSelectedP"
-              : "pbTileOnRackP",
-            ti,
-            props.prisonersOrGuards === "P" ? t : "*"
-          )
-        )}
-      </p>
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderRecallTiles() : <></>}
-      <p>
-        Rescues made: {props.rescues}
-        <br></br>
-        {renderFreedPrisoners(props.rescues)}
-      </p>
-    </div>
-  );
-};
-
-const Guards = (props) => {
-  const renderTile = (tileclass, tileindex, tilevalue) => {
-    return (
-      <RackTile
-        key={tileclass + String(tileindex)}
-        tileclass={tileclass}
-        tilevalue={tilevalue}
-        onClick={() => props.onClick(tileindex)}
-      />
-    );
-  };
-
-  const renderFinishTurn = () => {
-    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
-  };
-
-  const renderRecallTiles = () => {
-    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
-  };
-
-  return (
-    <div>
-      <p>GUARDS</p>
-      <p className="pbTilerack">
-        {props.gtiles.map((t, ti) =>
-          renderTile(
-            props.whoseturn === "G" && props.selection === ti
-              ? "pbTileOnRackSelectedG"
-              : "pbTileOnRackG",
-            ti,
-            props.prisonersOrGuards === "G" ? t : "*"
-          )
-        )}
-      </p>
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderRecallTiles() : <></>}
     </div>
   );
 };
