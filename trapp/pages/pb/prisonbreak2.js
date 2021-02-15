@@ -307,7 +307,11 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
       catch {}
     }
   }, []);
-
+  useEffect(() => {
+    let msg = wsmsgs[0];
+    if (msg) processMessage(msg);
+        
+  },[wsmsgs])
   const logMessageFromWS = (messageData) => {
     console.log("Message being received by " + prisonersOrGuards);
     console.log("func : " + messageData.func);
@@ -383,6 +387,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         });       
       }
     }
+    removeMessage(message);
   }
   
   const handleBoardSquareClick = (ri, ci) => {
@@ -551,17 +556,6 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
   };
 
   return (
-    wsmsgs.length > 0 ?
-    <button id="processNextMessage"
-      onClick={() => {
-        let msg = wsmsgs[0];
-        processMessage(msg);
-        removeMessage(msg);
-      }}
-    >
-      Click to get update
-    </button>
-    :
     <div className="container-fluid prisonbreak">
       <div className="row">
         <div className="col-11 pbtitle">Prison Break</div>
