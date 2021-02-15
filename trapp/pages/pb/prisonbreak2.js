@@ -383,7 +383,6 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         });       
       }
     }
-    removeMessage(message);
   }
   
   const handleBoardSquareClick = (ri, ci) => {
@@ -554,9 +553,10 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
   return (
     wsmsgs.length > 0 ?
     <button id="processNextMessage"
-      onClick={function() {
-        let msg = wsmsgs[0]
-        processMessage(msg)
+      onClick={() => {
+        let msg = wsmsgs[0];
+        processMessage(msg);
+        removeMessage(msg);
       }}
     >
       Click to get update
