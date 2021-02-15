@@ -21,34 +21,52 @@
 }
 .pbSquare {
     background-color: cadetblue;
-    border: darkgray;
-    border-style: solid;
+    /* border: darkgray;
+    border-style: solid; */
     width: 40px;
     color: cornsilk;
     text-align: center;
 }
 .pbSquare2 {
     background-color: rgb(27, 86, 88);
-    border: darkgray;
-    border-style: solid;
+    /* border: darkgray;
+    border-style: solid; */
     width: 40px;
     color: cornsilk;
     text-align: center;
 }
 .pbSquareCenterSquare {
     background-color: darkslateblue;
-    border: darkgreen;
-    border-style: inset;
+    /* border: darkgreen;
+    border-style: inset; */
     width: 40px;
     color: cornsilk;
     font-size: x-large;
 }
 .pbSquareEscapeHatch {
     background-color: darkslateblue;
-    border: darkgreen;
-    border-style: inset;
+    /* border: darkgreen;
+    border-style: inset; */
     width: 40px;
     color: cornsilk;
+    text-align: center;
+}
+.pbSquareUsedByPrisoners {
+    background-color: blueviolet;
+    /* border: black;
+    border-style: solid; */
+    width: 40px;
+    color: whitesmoke;
+    font-weight: bolder;
+    text-align: center;
+}
+.pbSquareUsedByGuards {
+    background-color: black;
+    /* border: blueviolet;
+    border-style: solid; */
+    width: 40px;
+    color: whitesmoke;
+    font-weight: bolder;
     text-align: center;
 }
 .pbRow {
@@ -101,15 +119,6 @@
     text-align: center;
     padding: 5px;
 }
-.pbSquareUsedByPrisoners {
-    background-color: blueviolet;
-    border: black;
-    border-style: solid;
-    width: 40px;
-    color: whitesmoke;
-    font-weight: bolder;
-    text-align: center;
-}
 .pbTileOnRackG {
     background-color: black;
     border: blueviolet;
@@ -129,15 +138,6 @@
     font-weight: bolder;
     text-align: center;
     padding: 5px;
-}
-.pbSquareUsedByGuards {
-    background-color: black;
-    border: blueviolet;
-    border-style: solid;
-    width: 40px;
-    color: whitesmoke;
-    font-weight: bolder;
-    text-align: center;
 }
 .pbBreakfree {
     vertical-align: middle;
