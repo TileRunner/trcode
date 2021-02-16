@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
-
-
 const escapehatches = [
   "0-0",
   "0-7",
@@ -597,21 +595,30 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
           />
         </div>
         <div className="col-2">
-          <Tiles tiles={tiles} />
+          <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
         </div>
       </div>
     </div>
   );
 };
 
-const Tiles = (props) => {
-  // there is a better way ^^^
+const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles on other players rack
+  let unseenTiles = [...props.tiles, ...props.othertiles];
+  unseenTiles.sort();
+  if (unseenTiles[0] === "?") {
+      unseenTiles.splice(0,1)
+      unseenTiles.push("?")
+  }
+  if (unseenTiles[0] === "?") {
+      unseenTiles.splice(0,1)
+      unseenTiles.push("?")
+  }
   return (
     <div className="pbTilepool">
-      <h3>TILE POOL</h3>
-      {props.tiles.map((t, ti) => (
+      <h3>TILES</h3>
+      {unseenTiles.map((t, ti) => (
         <span key={`tile${ti}`}>
-          {ti > 0 && t !== props.tiles[ti - 1] ? (
+          {ti > 0 && t !== unseenTiles[ti - 1] ? (
             <div className="pbTilepoolDivider"></div>
           ) : (
             <></>
