@@ -10,8 +10,8 @@
 ** Opened new terminal
 ** npx create-next-app trapp --use-npm
 # commands from terminal
-* From trcode folder, npm run start to run the server if you need the websocket stuff
-* From trapp folder, npm run dev to run the app
-* From trapp folder, npm run build and npm run export to build and export the app for production, then git push, then heroku deploy
-* From trapp folder, npm start to run the app in production mode
+* cd trapp to get to the app folder
+* npm run dev to run the app
+* npm run build and npm run export to build and export the app for production, then git push, then heroku deploy
+* npm start to run the app in production mode
 

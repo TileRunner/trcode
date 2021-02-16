@@ -19,7 +19,7 @@ export default function Home() {
         <a>Word Info</a>
       </Link>
       <BrowserView>
-        <Link href={`/pb/PrisonBreak`}>
+        <Link href={`/pb/prisonbreak2`}>
           <a>Prison Break (under construction)</a>
         </Link>
       </BrowserView>
