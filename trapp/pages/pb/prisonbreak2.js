@@ -466,6 +466,9 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
   };
 
   const endPrisonersTurn = () => {
+    if (!isPlayValid()) {
+      return;
+    }
     let newRescues = rescues;
     for (var i = 0; i < currentcoords.length; i++) {
       if (escapehatches.indexOf(currentcoords[i]) > -1) {
@@ -507,6 +510,9 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
     );
   };
   const endGuardsTurn = () => {
+    if (!isPlayValid()) {
+      return;
+    }
     let newGtiles = [...gtiles];
     let newTiles = [...tiles];
     while (newGtiles.length < 7 && newTiles.length > 0) {
@@ -543,6 +549,68 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         })
       );
     };
+
+  function isPlayValid() {
+    if (squares[7][7] === ".") {
+      window.alert("First play must hit center square");
+      return false;
+    }
+    let lowrow = 15;
+    let highrow = -1;
+    let lowcol = 15;
+    let highcol = -1;
+    for (var r=0; r < 15; ++r) {
+      for (var c=0; c < 15; ++c) {
+        if (squares[r][c] !== ".") {
+          if (!(r > 0 && squares[r-1][c] !== ".") &&
+           !(c > 0 && squares[r][c-1] !== ".") &&
+           !(r < 15 && squares[r+1][c] !== ".") &&
+           !(c < 15 && squares[r][c+1] !== ".")
+           ) {
+            window.alert("Each played tile must be part of a word");
+            return false;
+           }
+           if (snapshot.squares[r][c] === ".") {
+             // This square was played on this turn
+             if (r < lowrow) { lowrow = r;}
+             if (r > highrow) { highrow = r;}
+             if (c < lowcol) { lowcol = c;}
+             if (c > highcol) { highcol = c;}
+           }
+        }        
+      }
+    }
+    if (lowrow === 15) {
+      window.alert("You didn't play any tiles");
+      return false;
+    }
+    if (lowrow !== highrow && lowcol !== highcol) {
+      window.alert("Tiles played must be in a straight line");
+      return false;
+    }
+    let playthru = false;
+    let hookmade = false;
+    for (var r = lowrow; r <= highrow; ++r) {
+      for (var c = lowcol; c <= highcol; ++c) {
+        if (squares[r][c] === ".") {
+          window.alert("There is a gap in your word");
+          return false;
+        }
+        if (snapshot.squares[r][c] !== ".") {
+          playthru = true;
+        }
+        if (lowrow === highrow && r > 0 && squares[r-1][c] !== ".") { hookmade = true; }
+        if (lowrow === highrow && r < 15 && squares[r+1][c] !== ".") { hookmade = true; }
+        if (lowcol === highcol && c > 0 && squares[r][c-1] !== ".") { hookmade = true; }
+        if (lowcol === highcol && c < 15 && squares[r][c+1] !== ".") { hookmade = true; }
+      }
+    }
+    if (!playthru && !hookmade && snapshot.squares[7][7] !== ".") {
+      window.alert("Words must be connected");
+      return false;
+    }
+    return true;
+  }
 
   const recallTiles = () => {
     setSquares([...snapshot.squares]);
