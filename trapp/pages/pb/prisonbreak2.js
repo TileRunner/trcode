@@ -605,6 +605,11 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         if (lowcol === highcol && c < 15 && squares[r][c+1] !== ".") { hookmade = true; }
       }
     }
+    // Check play to or from a tile (play through but not either side)
+    if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== ".") { playthru = true; }
+    if (lowrow === highrow && highcol < 15 && snapshot.squares[lowrow][highcol+1] !== ".") { playthru = true; }
+    if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== ".") { playthru = true; }
+    if (lowcol === highcol && highrow < 15 && snapshot.squares[highrow+1][lowcol] !== ".") { playthru = true; }
     if (!playthru && !hookmade && snapshot.squares[7][7] !== ".") {
       window.alert("Words must be connected");
       return false;
