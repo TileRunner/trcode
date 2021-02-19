@@ -176,7 +176,6 @@ export default function PrisonBreak() {
     :
     <Game prisonersOrGuards={prisonersOrGuards}
       gameid={gameid}
-      msgid={msgid} 
       wsmsgs={wsmsgs}
       client={client}
       removeMessage={removeMessage}
@@ -251,8 +250,7 @@ const Board = ({ onClick, squares, usedby }) => {
   );
 };
 
-const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage}) => {
-  const [lastmsgid, setLastmsgid] = useState(0);
+const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
@@ -269,10 +267,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
     gtiles: [...gtiles],
   });
 
-  // let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
-  // const [client, setClient] = useState(new CustomSocket(host, processMessage));
   useEffect(() => {
-    // client.connect();
     if (prisonersOrGuards === "P") {
       let tempPTiles = [...ptiles];
       let tempGTiles = [...gtiles];
@@ -289,7 +284,13 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
       tempGTiles.sort();
       setGtiles(tempGTiles);
       setPtiles(tempPTiles);
-      setTiles(tempTiles);  
+      setTiles(tempTiles);
+      setSnapshot({
+        squares: [...squares],
+        usedby: [...usedby],
+        ptiles: [...tempPTiles],
+        gtiles: [...tempGTiles]    
+      });
     }
     else
     {
@@ -509,6 +510,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
       })
     );
   };
+
   const endGuardsTurn = () => {
     if (!isPlayValid()) {
       return;
@@ -549,6 +551,99 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         })
       );
     };
+
+  const swapPrisonersTiles = () => {
+    if (tiles.length < 7) {
+      window.alert("Need 7 in the bag to exchange")
+      return;
+    }
+    let newPtiles = [];
+    let newTiles = [...tiles];
+    while (newPtiles.length < 7 && newTiles.length > 0) {
+      let rand = Math.floor(Math.random() * newTiles.length);
+      newPtiles.push(newTiles[rand]);
+      newTiles.splice(rand, 1);
+    }
+    newPtiles.sort();
+    newTiles = [...newTiles, ...snapshot.ptiles];
+    newTiles.sort();
+    console.log("Exchange ptiles")
+    console.log(snapshot.ptiles)
+    console.log(ptiles)
+    console.log(newPtiles)
+    console.log(tiles)
+    console.log(newTiles)
+    setSquares([...snapshot.squares]);
+    setUsedby([...snapshot.usedby]);
+    setWhoseturn("G");
+    setSelection(-1);
+    setCurrentcoords([]);
+    setPtiles(newPtiles);
+    setTiles(newTiles);
+    setSnapshot({
+      squares: [...snapshot.squares],
+      usedby: [...snapshot.usedby],
+      ptiles: [...newPtiles],
+      gtiles: [...gtiles],
+    });
+
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "ept", // end prisoners turn
+        squares: snapshot.squares, // revert to start of turn squares
+        usedby: snapshot.usedby, // revert to start of turn used by
+        ptiles: newPtiles, // we picked new tiles for prisoners rack
+        tiles: newTiles, // we picked new tiles so tile pool changed
+        rescues: rescues // no rescues on an exchange
+      })
+    );
+
+  }
+  
+  const swapGuardsTiles = () => {
+    if (tiles.length < 7) {
+      window.alert("Need 7 in the bag to exchange")
+      return;
+    }
+    let newGtiles = [];
+    let newTiles = [...tiles];
+    while (newGtiles.length < 7 && newTiles.length > 0) {
+      let rand = Math.floor(Math.random() * newTiles.length);
+      newGtiles.push(newTiles[rand]);
+      newTiles.splice(rand, 1);
+    }
+    newGtiles.sort();
+    newTiles = [...newTiles, ...snapshot.gtiles];
+    newTiles.sort();
+    setSquares([...snapshot.squares]);
+    setUsedby([...snapshot.usedby]);
+    setWhoseturn("P");
+    setSelection(-1);
+    setCurrentcoords([]);
+    setGtiles(newGtiles);
+    setTiles(newTiles);
+    setSnapshot({
+      squares: [...snapshot.squares],
+      usedby: [...snapshot.usedby],
+      ptiles: [...ptiles],
+      gtiles: [...newGtiles],
+    });
+
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "egt", // end prisoners turn
+        squares: snapshot.squares, // revert to start of turn squares
+        usedby: snapshot.usedby, // revert to start of turn used by
+        gtiles: newGtiles, // we picked new tiles for prisoners rack
+        tiles: newTiles // we picked new tiles so tile pool changed
+      })
+    );
+
+  }
 
   function isPlayValid() {
     if (squares[7][7] === ".") {
@@ -645,6 +740,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
             onClick={(ti) => handlePrisonerTileClick(ti)}
             onClickFinishTurn={() => endPrisonersTurn()}
             onClickTileRecall={() => recallTiles()}
+            onClickTileExchange={() => swapPrisonersTiles()}
             rescues={rescues}
             prisonersOrGuards={prisonersOrGuards}
           />
@@ -664,6 +760,7 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
             onClick={(ti) => handleGuardTileClick(ti)}
             onClickFinishTurn={() => endGuardsTurn()}
             onClickTileRecall={() => recallTiles()}
+            onClickTileExchange={() => swapGuardsTiles()}
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
@@ -727,6 +824,14 @@ const TileRecallButton = (props) => {
   );
 };
 
+const TileExchangeButton = (props) => {
+  return (
+    <button className="pbExchangeTiles" onClick={props.onClick}>
+      Exchange
+    </button>
+  );
+};
+
 const Prisoners = (props) => {
   const renderTile = (tileclass, tileindex, tilevalue) => {
     return (
@@ -753,6 +858,10 @@ const Prisoners = (props) => {
 
   const renderRecallTiles = () => {
     return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
+  };
+
+  const renderExchangeTiles = () => {
+    return <TileExchangeButton onClick={() => props.onClickTileExchange()} />;
   };
 
   const renderFreedPrisoners = (count) => {
@@ -785,6 +894,7 @@ const Prisoners = (props) => {
       </p>
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderFinishTurn() : <></>}
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderRecallTiles() : <></>}
+      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderExchangeTiles() : <></>}
       <p>
         Rescues made: {props.rescues}
         <br></br>
@@ -822,6 +932,10 @@ const Guards = (props) => {
     return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
   };
 
+  const renderExchangeTiles = () => {
+    return <TileExchangeButton onClick={() => props.onClickTileExchange()} />;
+  };
+
   return (
     <div>
       <p>GUARDS</p>
@@ -838,6 +952,7 @@ const Guards = (props) => {
       </p>
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderFinishTurn() : <></>}
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderRecallTiles() : <></>}
+      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderExchangeTiles() : <></>}
     </div>
   );
 };
