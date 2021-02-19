@@ -564,8 +564,8 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
         if (squares[r][c] !== ".") {
           if (!(r > 0 && squares[r-1][c] !== ".") &&
            !(c > 0 && squares[r][c-1] !== ".") &&
-           !(r < 15 && squares[r+1][c] !== ".") &&
-           !(c < 15 && squares[r][c+1] !== ".")
+           !(r < 14 && squares[r+1][c] !== ".") &&
+           !(c < 14 && squares[r][c+1] !== ".")
            ) {
             window.alert("Each played tile must be part of a word");
             return false;
@@ -600,16 +600,16 @@ const Game = ({prisonersOrGuards, gameid, msgid, wsmsgs, client, removeMessage})
           playthru = true;
         }
         if (lowrow === highrow && r > 0 && squares[r-1][c] !== ".") { hookmade = true; }
-        if (lowrow === highrow && r < 15 && squares[r+1][c] !== ".") { hookmade = true; }
+        if (lowrow === highrow && r < 14 && squares[r+1][c] !== ".") { hookmade = true; }
         if (lowcol === highcol && c > 0 && squares[r][c-1] !== ".") { hookmade = true; }
-        if (lowcol === highcol && c < 15 && squares[r][c+1] !== ".") { hookmade = true; }
+        if (lowcol === highcol && c < 14 && squares[r][c+1] !== ".") { hookmade = true; }
       }
     }
     // Check play to or from a tile (play through but not either side)
     if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== ".") { playthru = true; }
-    if (lowrow === highrow && highcol < 15 && snapshot.squares[lowrow][highcol+1] !== ".") { playthru = true; }
+    if (lowrow === highrow && highcol < 14 && snapshot.squares[lowrow][highcol+1] !== ".") { playthru = true; }
     if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== ".") { playthru = true; }
-    if (lowcol === highcol && highrow < 15 && snapshot.squares[highrow+1][lowcol] !== ".") { playthru = true; }
+    if (lowcol === highcol && highrow < 14 && snapshot.squares[highrow+1][lowcol] !== ".") { playthru = true; }
     if (!playthru && !hookmade && snapshot.squares[7][7] !== ".") {
       window.alert("Words must be connected");
       return false;
@@ -730,11 +730,19 @@ const TileRecallButton = (props) => {
 const Prisoners = (props) => {
   const renderTile = (tileclass, tileindex, tilevalue) => {
     return (
+      props.prisonersOrGuards === "P" ?
       <RackTile
         key={tileclass + String(tileindex)}
         tileclass={tileclass}
         tilevalue={tilevalue}
         onClick={() => props.onClick(tileindex)}
+      />
+      :
+      <RackTile
+        key={tileclass + String(tileindex)}
+        tileclass={tileclass}
+        tilevalue={tilevalue}
+        onClick={() => window.alert("No peeking!")}
       />
     );
   };
@@ -789,11 +797,19 @@ const Prisoners = (props) => {
 const Guards = (props) => {
   const renderTile = (tileclass, tileindex, tilevalue) => {
     return (
+      props.prisonersOrGuards === "G" ?
       <RackTile
         key={tileclass + String(tileindex)}
         tileclass={tileclass}
         tilevalue={tilevalue}
         onClick={() => props.onClick(tileindex)}
+      />
+      :
+      <RackTile
+        key={tileclass + String(tileindex)}
+        tileclass={tileclass}
+        tilevalue={tilevalue}
+        onClick={() => window.alert("No peeking!")}
       />
     );
   };
