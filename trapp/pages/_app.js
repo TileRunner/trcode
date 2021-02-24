@@ -26,6 +26,8 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
+<script src="https://kit.fontawesome.com/77514d28aa.js" crossOrigin="anonymous"></script>
+
             </Head>
             <Component {...pageProps}/>
         </>

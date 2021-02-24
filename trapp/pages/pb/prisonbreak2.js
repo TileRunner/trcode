@@ -774,6 +774,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
                   requestGameData(prisonersOrGuards);
               }}
           >
+<i className="fas fa-sync"></i>
               Request Update
           </button>
           <Link href={"../../"}>
