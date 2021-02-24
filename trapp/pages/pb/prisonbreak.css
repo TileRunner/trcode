@@ -1,6 +1,6 @@
 .prisonbreak {
     background-color: grey;
-    background-image: url("..\\..\\public\\prisonbars.png");
+    background-image: url("../../public/prisonbars.png");
     background-size: cover;
     background-blend-mode: normal;
     color:lightgrey;
@@ -24,7 +24,7 @@
     font-size: x-large;
 }
 .pbSquare {
-    background-image: url("..\\..\\public\\prisonbars.png");
+    background-image: url("../../public/prisonbars.png");
     background-size: cover;
     background-color: grey;
     width: 40px;
