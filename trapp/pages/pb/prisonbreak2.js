@@ -212,8 +212,8 @@ const Square = (props) => {
       : tdclass === "pbSquareEscapeHatch"
       ? "💫"
       : props.ri % 2 === props.ci % 2
-      ? "⎔"
-      : "✦";
+      ? "☹"//"⎔"
+      : "ꐕ";//"✦";
   return (
     <button className={tdclass} onClick={props.onClick}>
       {tdvalue}
@@ -322,6 +322,38 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     let messageData = JSON.parse(message); // was message.data
     logMessageFromWS(messageData);
     if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+      if (messageData.func === "requestgamedata" && messageData.requestor !== prisonersOrGuards) { // Opponent requested game info
+        client.send(
+          JSON.stringify({
+            gameid: gameid, // the id for the game
+            type: "pb", // prisonbreak
+            func: "providegamedata", // provide game data
+            sender: prisonersOrGuards, // who sent the data
+            tiles: tiles,
+            squares: squares,
+            ptiles: ptiles,
+            gtiles: gtiles,
+            usedby: usedby,
+            whoseturn: whoseturn,
+            selection: selection,
+            currentcoords: currentcoords,
+            snapshot: snapshot,
+            rescues: rescues
+          })
+        );
+      }
+      if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards) { // opponent provided game data
+        setTiles(messageData.tiles);
+        setSquares(messageData.squares);
+        setPtiles(messageData.ptiles);
+        setGtiles(messageData.gtiles);
+        setUsedby(messageData.usedby);
+        setWhoseturn(messageData.whoseturn);
+        setSelection(messageData.selection);
+        setCurrentcoords(messageData.currentcoords);
+        setSnapshot(messageData.snapshot);
+        setRescues(messageData.rescues);
+      }
       // when guards join game they send ggd, and prisoner picks it up and sends sgd, then guards pick that up and take the data
       if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
         client.send(
@@ -721,11 +753,29 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     setCurrentcoords([]);
   };
 
+  const requestGameData = (playertype) => {
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "requestgamedata", // request game data
+        requestor: prisonersOrGuards
+      })
+    )
+  }
+
   return (
     <div className="container-fluid prisonbreak">
       <div className="row">
         <div className="col-11 pbtitle">Prison Break</div>
         <div className="col-1 pbhomelink" data-toggle="tooltip" title="Home">
+          <button id="requestGameData"
+              onClick={function() {
+                  requestGameData(prisonersOrGuards);
+              }}
+          >
+              Request Update
+          </button>
           <Link href={"../../"}>
             <a>🏠</a>
           </Link>

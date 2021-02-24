@@ -1,5 +1,9 @@
 .prisonbreak {
-    background-color: teal;
+    background-color: grey;
+    background-image: url("..\\..\\public\\prisonbars.png");
+    background-size: cover;
+    background-blend-mode: normal;
+    color:lightgrey;
 }
 .pbtitle {
     background-color: #16271a;
@@ -20,15 +24,15 @@
     font-size: x-large;
 }
 .pbSquare {
-    background-color: cadetblue;
-    /* border: darkgray;
-    border-style: solid; */
+    background-image: url("..\\..\\public\\prisonbars.png");
+    background-size: cover;
+    background-color: grey;
     width: 40px;
     color: cornsilk;
     text-align: center;
 }
 .pbSquare2 {
-    background-color: rgb(27, 86, 88);
+    background-color: darkgrey;
     /* border: darkgray;
     border-style: solid; */
     width: 40px;
@@ -73,7 +77,7 @@
     line-height: 40px;
 }
 .pbBoard {
-    background-color: teal;
+    background-color: grey;
 }
 .pbGame {
     background-color: cadetblue;
@@ -146,10 +150,13 @@
 }
 .pbFinishTurn {
     margin-left: 5px;
+    background-color: grey;
 }
 .pbRecallTiles {
     margin-left: 5px;
+    background-color: grey;
 }
 .pbExchangeTiles {
     margin-left: 5px;
+    background-color: grey;
 }
