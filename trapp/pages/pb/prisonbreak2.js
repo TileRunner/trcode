@@ -768,17 +768,18 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     <div className="container-fluid prisonbreak">
       <div className="row">
         <div className="col-11 pbtitle">Prison Break</div>
-        <div className="col-1 pbhomelink" data-toggle="tooltip" title="Home">
+        <div className="col-1 pbhomelink">
           <button id="requestGameData"
-              onClick={function() {
-                  requestGameData(prisonersOrGuards);
+            data-toggle="tooltip" title="Sync with opponent"
+            onClick={function() {
+              requestGameData(prisonersOrGuards);
               }}
           >
-<i className="fas fa-sync"></i>
-              Request Update
+            <i className="fas fa-sync"></i>
           </button>
+          
           <Link href={"../../"}>
-            <a>🏠</a>
+            <a><i className="fas fa-home"  data-toggle="tooltip" title="Home"></i></a>
           </Link>
         </div>
       </div>
