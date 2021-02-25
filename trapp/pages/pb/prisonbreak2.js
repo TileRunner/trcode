@@ -767,19 +767,18 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   return (
     <div className="container-fluid prisonbreak">
       <div className="row">
-        <div className="col-11 pbtitle">Prison Break</div>
-        <div className="col-1 pbhomelink">
+        <div className="col-10 pbtitle">Prison Break</div>
+        <div className="col-2 pbhomelink">
           <button id="requestGameData"
             data-toggle="tooltip" title="Sync with opponent"
             onClick={function() {
               requestGameData(prisonersOrGuards);
               }}
           >
-            <i className="fas fa-sync"></i>
+            <i className="fas fa-sync"></i>Sync
           </button>
-          
           <Link href={"../../"}>
-            <a><i className="fas fa-home"  data-toggle="tooltip" title="Home"></i></a>
+            <a><i className="fas fa-home" data-toggle="tooltip" title="Home"></i>Home</a>
           </Link>
         </div>
       </div>
@@ -863,7 +862,7 @@ const RackTile = (props) => {
 const FinishTurnButton = (props) => {
   return (
     <button className="pbFinishTurn" onClick={props.onClick}>
-      Finish Turn
+      <i className="fas fa-check"></i>Finish Turn
     </button>
   );
 };
@@ -871,7 +870,7 @@ const FinishTurnButton = (props) => {
 const TileRecallButton = (props) => {
   return (
     <button className="pbRecallTiles" onClick={props.onClick}>
-      Recall Tiles
+      <i className="fas fa-undo"></i>Recall Tiles
     </button>
   );
 };
@@ -879,7 +878,7 @@ const TileRecallButton = (props) => {
 const TileExchangeButton = (props) => {
   return (
     <button className="pbExchangeTiles" onClick={props.onClick}>
-      Exchange
+      <i className="fas fa-angry"></i>Exchange Tiles
     </button>
   );
 };
@@ -905,15 +904,15 @@ const Prisoners = (props) => {
   };
 
   const renderFinishTurn = () => {
-    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
+    return <p><FinishTurnButton onClick={() => props.onClickFinishTurn()} /></p>;
   };
 
   const renderRecallTiles = () => {
-    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
+    return <p><TileRecallButton onClick={() => props.onClickTileRecall()} /></p>;
   };
 
   const renderExchangeTiles = () => {
-    return <TileExchangeButton onClick={() => props.onClickTileExchange()} />;
+    return <p><TileExchangeButton onClick={() => props.onClickTileExchange()} /></p>;
   };
 
   const renderFreedPrisoners = (count) => {

@@ -27,8 +27,8 @@ function MyApp({Component,pageProps}) {
                     crossOrigin="anonymous"
                     />
                 <script
-                    src="https://kit.fontawesome.com/77514d28aa.js"
-                    // src="https://kit.fontawesome.com/47e7c5fc23.js"
+                    // src="https://kit.fontawesome.com/77514d28aa.js" // Rod
+                    src="https://kit.fontawesome.com/47e7c5fc23.js" // Christopher
                     crossOrigin="anonymous"
                     />
             </Head>

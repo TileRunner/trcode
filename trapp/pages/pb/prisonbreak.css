@@ -33,16 +33,12 @@
 }
 .pbSquare2 {
     background-color: darkgrey;
-    /* border: darkgray;
-    border-style: solid; */
     width: 40px;
     color: cornsilk;
     text-align: center;
 }
 .pbSquareCenterSquare {
     background-color: darkslateblue;
-    /* border: darkgreen;
-    border-style: inset; */
     width: 40px;
     color: cornsilk;
     font-size: x-large;
@@ -56,20 +52,16 @@
     text-align: center;
 }
 .pbSquareUsedByPrisoners {
-    background-color: blueviolet;
-    /* border: black;
-    border-style: solid; */
+    background-color: black;
     width: 40px;
-    color: whitesmoke;
+    color: rgb(157, 198, 231);
     font-weight: bolder;
     text-align: center;
 }
 .pbSquareUsedByGuards {
     background-color: black;
-    /* border: blueviolet;
-    border-style: solid; */
     width: 40px;
-    color: whitesmoke;
+    color: burlywood;
     font-weight: bolder;
     text-align: center;
 }
@@ -104,31 +96,31 @@
     margin-top: 5px;
 }
 .pbTileOnRackP {
-    background-color: blueviolet;
+    background-color: black;
     border: black;
     border-style: solid;
     width: 40px;
-    color: whitesmoke;
+    color: rgb(157, 198, 231);
     font-weight: bolder;
     text-align: center;
     padding: 5px;
 }
 .pbTileOnRackSelectedP {
-    background-color: blueviolet;
+    background-color: black;
     border: white;
     border-style: inset;
     width: 40px;
-    color: whitesmoke;
+    color: rgb(157, 198, 231);
     font-weight: bolder;
     text-align: center;
     padding: 5px;
 }
 .pbTileOnRackG {
     background-color: black;
-    border: blueviolet;
+    border: black;
     border-style: solid;
     width: 40px;
-    color: whitesmoke;
+    color: burlywood;
     font-weight: bolder;
     text-align: center;
     padding: 5px;
@@ -138,7 +130,7 @@
     border: white;
     border-style: inset;
     width: 40px;
-    color: whitesmoke;
+    color: burlywood;
     font-weight: bolder;
     text-align: center;
     padding: 5px;
@@ -150,13 +142,37 @@
 }
 .pbFinishTurn {
     margin-left: 5px;
-    background-color: grey;
+    border-radius: 35%;
+    border-width: 3px;
+    border-color: burlywood;
+    border-style: solid;
+    background-color: black;
+    color: burlywood;
+    font-family: cursive;
+    height: 40px;
+    /* width: 150px; */
 }
 .pbRecallTiles {
     margin-left: 5px;
-    background-color: grey;
+    border-radius: 35%;
+    border-width: 3px;
+    border-color: burlywood;
+    border-style: solid;
+    background-color: black;
+    color: burlywood;
+    font-family: cursive;
+    height: 40px;
+    /* width: 150px; */
 }
 .pbExchangeTiles {
     margin-left: 5px;
-    background-color: grey;
+    border-radius: 35%;
+    border-width: 3px;
+    border-color: burlywood;
+    border-style: solid;
+    background-color: black;
+    color: burlywood;
+    font-family: cursive;
+    height: 40px;
+    /* width: 150px; */
 }
