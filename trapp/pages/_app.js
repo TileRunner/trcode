@@ -14,6 +14,10 @@ function MyApp({Component,pageProps}) {
                     href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
                     crossOrigin="anonymous"
                     />
+                <link
+                    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+                    rel="stylesheet"
+                    />
                 <script 
                     src="https://code.jquery.com/jquery-3.5.1.slim.min.js" 
                     crossOrigin="anonymous"
@@ -26,11 +30,14 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
-                <script
+                {/* <script
+                    // for some reason these fontawesome icons are sometimish about whether to show up or not.
+                    // I switched to material-icons instead.
                     // src="https://kit.fontawesome.com/77514d28aa.js" // Rod
-                    src="https://kit.fontawesome.com/47e7c5fc23.js" // Christopher
+                    // src="https://kit.fontawesome.com/47e7c5fc23.js" // Christopher
+                    src="https://kit.fontawesome.com/TileRunner.js" // Christopher
                     crossOrigin="anonymous"
-                    />
+                    /> */}
             </Head>
             <Component {...pageProps}/>
         </>

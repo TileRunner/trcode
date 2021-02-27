@@ -12,15 +12,16 @@ export default function Home() {
       </Head>
 
       <h1>My coded stuff</h1>
+      
       <Link href={`/wm/mastermind`}>
-        <a>Word Mastermind</a>
+        <a>Word Mastermind<span class="material-icons">psychology</span></a>
       </Link>
       <Link href={`/wi/wordinfo`}>
-        <a>Word Info</a>
+        <a>Word Info<span class="material-icons">biotech</span></a>
       </Link>
       <BrowserView>
         <Link href={`/pb/prisonbreak2`}>
-          <a>Prison Break (under construction)</a>
+          <a>Prison Break (under construction)<span class="material-icons">fingerprint run_circle</span></a>
         </Link>
       </BrowserView>
     </div>

@@ -775,10 +775,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
               requestGameData(prisonersOrGuards);
               }}
           >
-            <i className="fas fa-sync"></i>Sync
+            <i className="material-icons">sync</i>
           </button>
           <Link href={"../../"}>
-            <a><i className="fas fa-home" data-toggle="tooltip" title="Home"></i>Home</a>
+            <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>
         </div>
       </div>
@@ -862,7 +862,7 @@ const RackTile = (props) => {
 const FinishTurnButton = (props) => {
   return (
     <button className="pbFinishTurn" onClick={props.onClick}>
-      <i className="fas fa-check"></i>Finish Turn
+      <i className="material-icons">check</i>Finish Turn
     </button>
   );
 };
@@ -870,7 +870,7 @@ const FinishTurnButton = (props) => {
 const TileRecallButton = (props) => {
   return (
     <button className="pbRecallTiles" onClick={props.onClick}>
-      <i className="fas fa-undo"></i>Recall Tiles
+      <i className="material-icons">undo</i>Recall Tiles
     </button>
   );
 };
@@ -878,7 +878,7 @@ const TileRecallButton = (props) => {
 const TileExchangeButton = (props) => {
   return (
     <button className="pbExchangeTiles" onClick={props.onClick}>
-      <i className="fas fa-angry"></i>Exchange Tiles
+      <i className="material-icons">sentiment_dissatisfied</i>Exchange Tiles
     </button>
   );
 };
