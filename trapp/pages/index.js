@@ -21,7 +21,7 @@ export default function Home() {
       </Link>
       <BrowserView>
         <Link href={`/pb/prisonbreak2`}>
-          <a>Prison Break (under construction)<span class="material-icons">fingerprint run_circle</span></a>
+          <a>Prison Break (under construction)<span class="material-icons">fingerprint lock_clock carpenter lock_open run_circle</span></a>
         </Link>
       </BrowserView>
     </div>

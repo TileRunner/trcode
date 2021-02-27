@@ -176,3 +176,15 @@
     height: 40px;
     /* width: 150px; */
 }
+.pbPassPlay {
+    margin-left: 5px;
+    border-radius: 35%;
+    border-width: 3px;
+    border-color: burlywood;
+    border-style: solid;
+    background-color: black;
+    color: burlywood;
+    font-family: cursive;
+    height: 40px;
+    /* width: 150px; */
+}

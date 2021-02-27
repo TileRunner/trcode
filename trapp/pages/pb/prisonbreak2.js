@@ -311,16 +311,9 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     if (msg) processMessage(msg);
         
   },[wsmsgs])
-  const logMessageFromWS = (messageData) => {
-    console.log("Message being received by " + prisonersOrGuards);
-    console.log("func : " + messageData.func);
-    console.log("ptiles : " + JSON.stringify(ptiles) + " -> " + messageData.ptiles);
-    console.log("gtiles : " + JSON.stringify(gtiles) + " -> " + messageData.gtiles);
-  }
 
   function processMessage(message) {
     let messageData = JSON.parse(message); // was message.data
-    logMessageFromWS(messageData);
     if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
       if (messageData.func === "requestgamedata" && messageData.requestor !== prisonersOrGuards) { // Opponent requested game info
         client.send(
@@ -425,14 +418,14 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     let newSquares = [...squares];
     let newUsedby = [...usedby];
     let newPtiles = [...ptiles];
-    let newGtiles = [...gtiles]; // tile is selected from rack and clicked square is not used yet
+    let newGtiles = [...gtiles];
     let newRow = [...squares[ri]];
     let squarevalue = squares[ri][ci];
     let newCurrentcoords = [...currentcoords];
 
     let coord = String(ri) + "-" + String(ci);
     let cci = currentcoords.indexOf(coord);
-    if (selection > -1 && squarevalue === ".") {
+    if (selection > -1 && squarevalue === ".") { // tile is selected from rack and clicked square is not used yet
       newRow[ci] =
         whoseturn === "P" ? newPtiles[selection] : newGtiles[selection];
       newSquares[ri] = [...newRow];
@@ -442,41 +435,39 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       let newUsedbyRow = [...newUsedby[ri]];
       newUsedbyRow[ci] = whoseturn;
       newUsedby[ri] = [...newUsedbyRow];
-
-      setSelection((curr) => curr - 1);
+      let newSelection = selection;
+      if (whoseturn === "P" && newSelection === newPtiles.length) { 
+        newSelection = newSelection - 1
+      }
+      if (whoseturn === "G" && newSelection === newGtiles.length) { 
+        newSelection = newSelection - 1
+      }
+      setSelection(newSelection);
       setSquares(newSquares);
       setUsedby(newUsedby);
       setPtiles(newPtiles);
       setGtiles(newGtiles);
       setCurrentcoords([...currentcoords, coord]);
-    } else if (squarevalue !== "." && cci > -1) {
-      // clicked square has a tile on it from the current move in progress
-      // Assuming some good will from the users to click a tile they played
-      if (
-        (whoseturn === "P" && newPtiles.length < 7) ||
-        (whoseturn === "G" && newGtiles.length < 7)
-      ) {
-        whoseturn === "P"
-          ? newPtiles.push(squarevalue)
-          : newGtiles.push(squarevalue);
-        let newRow = [...newSquares[ri]];
-        newRow[ci] = ".";
-        newSquares[ri] = [...newRow];
-        let newUsedbyRow = [...newUsedby[ri]];
-        newUsedbyRow[ci] = "";
-        newUsedby[ri] = [...newUsedbyRow];
-        setSelection(
-          whoseturn === "P" ? newPtiles.length - 1 : newGtiles.length - 1
-        );
-        newCurrentcoords.splice(cci, 1);
+    } else if (cci > -1) { // clicked square has a tile on it from the current move in progress
+      whoseturn === "P"
+        ? newPtiles.push(squarevalue)
+        : newGtiles.push(squarevalue);
+      let newRow = [...newSquares[ri]];
+      newRow[ci] = ".";
+      newSquares[ri] = [...newRow];
+      let newUsedbyRow = [...newUsedby[ri]];
+      newUsedbyRow[ci] = "";
+      newUsedby[ri] = [...newUsedbyRow];
+      setSelection(
+        whoseturn === "P" ? newPtiles.length - 1 : newGtiles.length - 1
+      );
+      newCurrentcoords.splice(cci, 1);
 
-        setSquares(newSquares);
-        setUsedby(newUsedby);
-        setPtiles(newPtiles);
-        setGtiles(newGtiles);
-
-        setCurrentcoords(newCurrentcoords);
-      }
+      setSquares(newSquares);
+      setUsedby(newUsedby);
+      setPtiles(newPtiles);
+      setGtiles(newGtiles);
+      setCurrentcoords(newCurrentcoords);
     }
   };
 
@@ -667,7 +658,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       JSON.stringify({
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
-        func: "egt", // end prisoners turn
+        func: "egt", // end guards turn
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
         gtiles: newGtiles, // we picked new tiles for prisoners rack
@@ -753,6 +744,39 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     setCurrentcoords([]);
   };
 
+  const prisonerPass = () => {
+    recallTiles(); // In case they put some tiles on the board before clicking Pass
+    setWhoseturn("G");
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "ept", // end prisoners turn
+        squares: snapshot.squares, // revert to start of turn squares
+        usedby: snapshot.usedby, // revert to start of turn used by
+        ptiles: snapshot.ptiles, // prisoners rack did not change
+        tiles: tiles, // tile pool did not change
+        rescues: rescues // no rescues on a pass
+      })
+    );
+  }
+
+  const guardsPass = () => {
+    recallTiles(); // In case they put some tiles on the board before clicking Pass
+    setWhoseturn("P");
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "egt", // end guards turn
+        squares: snapshot.squares, // revert to start of turn squares
+        usedby: snapshot.usedby, // revert to start of turn used by
+        gtiles: snapshot.gtiles, // guards rack did not change
+        tiles: tiles // tile pool did not change
+      })
+    );
+  }
+
   const requestGameData = (playertype) => {
     client.send(
       JSON.stringify({
@@ -792,16 +816,25 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             onClickFinishTurn={() => endPrisonersTurn()}
             onClickTileRecall={() => recallTiles()}
             onClickTileExchange={() => swapPrisonersTiles()}
+            onClickPassPlay={() => prisonerPass()}
             rescues={rescues}
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
         <div className="col-6" align="center">
+          {prisonersOrGuards === whoseturn ?
           <Board
             squares={squares}
             usedby={usedby}
             onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
           />
+          :
+          <Board
+            squares={squares}
+            usedby={usedby}
+            onClick={() => window.alert("That tickles!")}
+          />
+          }
         </div>
         <div className="col-2 pbGuards">
           <Guards
@@ -812,6 +845,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             onClickFinishTurn={() => endGuardsTurn()}
             onClickTileRecall={() => recallTiles()}
             onClickTileExchange={() => swapGuardsTiles()}
+            onClickPassPlay={() => guardsPass()}
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
@@ -878,7 +912,15 @@ const TileRecallButton = (props) => {
 const TileExchangeButton = (props) => {
   return (
     <button className="pbExchangeTiles" onClick={props.onClick}>
-      <i className="material-icons">sentiment_dissatisfied</i>Exchange Tiles
+      <i className="material-icons">sentiment_very_dissatisfied</i>Exchange Tiles
+    </button>
+  );
+};
+
+const PassPlayButton = (props) => {
+  return (
+    <button className="pbPassPlay" onClick={props.onClick}>
+      <i className="material-icons">sentiment_neutral</i>Pass
     </button>
   );
 };
@@ -915,6 +957,10 @@ const Prisoners = (props) => {
     return <p><TileExchangeButton onClick={() => props.onClickTileExchange()} /></p>;
   };
 
+  const renderPassPlay = () => {
+    return <p><PassPlayButton onClick={() => props.onClickPassPlay()} /></p>;
+  };
+
   const renderFreedPrisoners = (count) => {
     let dumb = Array(count).fill("nonsense");
     return dumb.map((value, index) => (
@@ -946,6 +992,7 @@ const Prisoners = (props) => {
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderFinishTurn() : <></>}
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderRecallTiles() : <></>}
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderExchangeTiles() : <></>}
+      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderPassPlay() : <></>}
       <p>
         Rescues made: {props.rescues}
         <br></br>
@@ -987,6 +1034,10 @@ const Guards = (props) => {
     return <TileExchangeButton onClick={() => props.onClickTileExchange()} />;
   };
 
+  const renderPassPlay = () => {
+    return <PassPlayButton onClick={() => props.onClickPassPlay()} />;
+  };
+
   return (
     <div>
       <p>GUARDS</p>
@@ -1004,6 +1055,7 @@ const Guards = (props) => {
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderFinishTurn() : <></>}
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderRecallTiles() : <></>}
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderExchangeTiles() : <></>}
+      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderPassPlay() : <></>}
     </div>
   );
 };
