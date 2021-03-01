@@ -189,6 +189,7 @@ const Square = (props) => {
   // need ri, ci to display alternating characters on unused squares
   // need c to represent which tile is on the square, if any
   // need onClick to handle square click at a higher level
+  // need rcd to display selected direction arrow when appropriate
   const usedbyclass =
     props.squareusedby === "P"
       ? "pbSquareUsedByPrisoners"
@@ -196,6 +197,10 @@ const Square = (props) => {
   const tdclass =
     props.c !== "."
       ? usedbyclass
+      : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
+      ? "pbSquareRightArrow"
+      : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
+      ? "pbSquareDownArrow"
       : props.ri === 7 && props.ci === 7
       ? "pbSquareCenterSquare"
       : (props.ri === 0 || props.ri === 7 || props.ri === 14) &&
@@ -207,6 +212,10 @@ const Square = (props) => {
   const tdvalue =
     props.c !== "."
       ? props.c
+      : tdclass === "pbSquareRightArrow"
+      ? "➡"
+      : tdclass === "pbSquareDownArrow"
+      ? "⬇"
       : tdclass === "pbSquareCenterSquare"
       ? "✰"
       : tdclass === "pbSquareEscapeHatch"
@@ -221,7 +230,7 @@ const Square = (props) => {
 );
 };
 
-const Board = ({ onClick, squares, usedby }) => {
+const Board = ({ onClick, squares, usedby, rcd }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
       <td key={`Square${ri}-${ci}`}>
@@ -230,6 +239,7 @@ const Board = ({ onClick, squares, usedby }) => {
           ci={ci}
           ri={ri}
           squareusedby={squareusedby}
+          rcd={rcd}
           onClick={() => onClick(ri, ci)}
         />
       </td>
@@ -256,10 +266,11 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   const [gtiles, setGtiles] = useState([]);
   const [squares, setSquares] = useState(Array(15).fill(Array(15).fill(".")));
   const [usedby, setUsedby] = useState(Array(15).fill(Array(15).fill("")));
-  const [selection, setSelection] = useState(-1);
-  const [whoseturn, setWhoseturn] = useState("P");
+  const [selection, setSelection] = useState(-1); // relative to rack of player making a play
+  const [whoseturn, setWhoseturn] = useState("P"); // game starts with prisoners play
   const [currentcoords, setCurrentcoords] = useState([]);
   const [rescues, setRescues] = useState(0);
+  const [rcd, setRcd] = useState([-1,-1,""]);
   const [snapshot, setSnapshot] = useState({
     squares: [...squares],
     usedby: [...usedby],
@@ -382,6 +393,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       if (messageData.func === "ept") { // end prisoners turn
         setWhoseturn("G");
         setSelection(-1);
+        setRcd(-1,-1,"");
         setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
@@ -398,6 +410,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       if (messageData.func === "egt") { // end guards turn
         setWhoseturn("P");
         setSelection(-1);
+        setRcd(-1,-1,"");
         setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
@@ -414,7 +427,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     removeMessage(message);
   }
   
-  const handleBoardSquareClick = (ri, ci) => {
+  // Calling setSelection (from handleKeyDown) then handleBoardSquareClick does not let it recognize selection with the new value
+  // So I pass newSelection when I want to also set it, otherwise I pass -1 to instruct it to use current value of selection
+  // Also passing newRcd
+  const handleBoardSquareClick = (ri, ci, newSelection, newRcd) => {
     let newSquares = [...squares];
     let newUsedby = [...usedby];
     let newPtiles = [...ptiles];
@@ -422,20 +438,22 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     let newRow = [...squares[ri]];
     let squarevalue = squares[ri][ci];
     let newCurrentcoords = [...currentcoords];
-
     let coord = String(ri) + "-" + String(ci);
     let cci = currentcoords.indexOf(coord);
-    if (selection > -1 && squarevalue === ".") { // tile is selected from rack and clicked square is not used yet
+    if (newSelection === -1) {
+      newSelection = selection;
+      newRcd = rcd;
+    }
+    if (newSelection > -1 && squarevalue === ".") { // tile is selected from rack and clicked square is not used yet
       newRow[ci] =
-        whoseturn === "P" ? newPtiles[selection] : newGtiles[selection];
+        whoseturn === "P" ? newPtiles[newSelection] : newGtiles[newSelection];
       newSquares[ri] = [...newRow];
       whoseturn === "P"
-        ? newPtiles.splice(selection, 1)
-        : newGtiles.splice(selection, 1);
+        ? newPtiles.splice(newSelection, 1)
+        : newGtiles.splice(newSelection, 1);
       let newUsedbyRow = [...newUsedby[ri]];
       newUsedbyRow[ci] = whoseturn;
       newUsedby[ri] = [...newUsedbyRow];
-      let newSelection = selection;
       if (whoseturn === "P" && newSelection === newPtiles.length) { 
         newSelection = newSelection - 1
       }
@@ -448,7 +466,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       setPtiles(newPtiles);
       setGtiles(newGtiles);
       setCurrentcoords([...currentcoords, coord]);
-    } else if (cci > -1) { // clicked square has a tile on it from the current move in progress
+      setRcd(newRcd); // key down handler figured it out
+      return;
+    }
+    if (cci > -1) { // clicked square has a tile on it from the current move in progress
       whoseturn === "P"
         ? newPtiles.push(squarevalue)
         : newGtiles.push(squarevalue);
@@ -468,6 +489,20 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       setPtiles(newPtiles);
       setGtiles(newGtiles);
       setCurrentcoords(newCurrentcoords);
+      setRcd(-1,-1,""); // make playre click again to set direction
+      return;
+    }
+    // They didn't click a square to place a selected tile there
+    // They didn't click a square to remove an existing tile
+    if (squares[ri][ci] === ".") {
+      // There is nothing on the square so they are picking where to place the next tile via keyboard
+      let newDirection = rcd[0] !== ri || rcd[1] !== ci ? "r" : //click new square, start with "r"
+       rcd[2] === "r" ? "d" : //click same square that was "r", change to "d"
+       rcd[2] === "d" ? "" : //click same square that was "d", change to ""
+       "r"; // click same square that was "", change to "r"
+      newRcd = [ri,ci,newDirection];
+      setRcd(newRcd);
+      return;
     }
   };
 
@@ -788,8 +823,57 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     )
   }
 
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+    if (prisonersOrGuards !== whoseturn) {return;}
+    if (event.key === "Enter") {
+      whoseturn === "P" ? endPrisonersTurn() : endGuardsTurn();
+      return;
+    }
+    let lettertest = /^[A-Za-z\?]$/; // single letter or question mark key pressed
+    if (event.key.match(lettertest)) {
+      let letter = event.key.toUpperCase();
+      let rack = whoseturn === "P" ? ptiles : gtiles;
+      let newSelection = rack.indexOf(letter);
+      if (newSelection > -1) { // Pressed letter is on the rack
+        let row = rcd[0];
+        let col = rcd[1];
+        let dir = rcd[2];
+        if (row >-1 && col > -1 && dir !== "") { // row, col, dir are set to accept keystroke
+          // Need to figure out next sqaure to auto-place a tile
+          let newRcd = rcd;
+          if (dir === "r") { // playing rightwards
+            let newc = -1;
+            for (var c = col + 1; c < 15 && newc === -1; c++) {
+              if (squares[row][c] === ".") {newc = c;}
+            }
+            if (newc === -1) {
+              newRcd = [-1,-1,""];
+            } else {
+              newRcd = [row, newc, "r"];
+            }
+            handleBoardSquareClick(row,col,newSelection,newRcd);
+            return;
+          }
+          if (dir === "d") { // playing downwards
+            let newr = -1;
+            for (var r = row + 1; r < 15 && newr === -1; r++) {
+              if (squares[r][col] === ".") {newr = r;}
+            }
+            if (newr === -1) {
+              newRcd = [-1,-1,""];
+            } else {
+              newRcd = [newr, col, "d"];
+            }
+            handleBoardSquareClick(row,col,newSelection,newRcd);
+            return;
+          }
+        }
+      }
+    }
+  }
   return (
-    <div className="container-fluid prisonbreak">
+    <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
       <div className="row">
         <div className="col-10 pbtitle">Prison Break</div>
         <div className="col-2 pbhomelink">
@@ -826,13 +910,14 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
           <Board
             squares={squares}
             usedby={usedby}
-            onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
+            rcd={rcd}
+            onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
           />
           :
           <Board
             squares={squares}
             usedby={usedby}
-            onClick={() => window.alert("That tickles!")}
+            rcd={rcd}
           />
           }
         </div>

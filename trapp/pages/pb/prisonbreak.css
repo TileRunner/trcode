@@ -65,6 +65,20 @@
     font-weight: bolder;
     text-align: center;
 }
+.pbSquareRightArrow {
+    background-color: black;
+    width: 40px;
+    color: cyan;
+    font-weight: bolder;
+    text-align: center;
+}
+.pbSquareDownArrow {
+    background-color: black;
+    width: 40px;
+    color: cyan;
+    font-weight: bolder;
+    text-align: center;
+}
 .pbRow {
     line-height: 40px;
 }
