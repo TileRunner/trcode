@@ -870,6 +870,47 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
           }
         }
       }
+      return;
+    }
+    if (event.key === "Backspace" && currentcoords.length > 0) {
+      // Same as clicking on a played-this-move tile in terms of returning the tile to the rack
+      // However we also want to set up rcd so they can press the key they meant and continue
+      let coord = currentcoords[currentcoords.length - 1]; // tile to return to rack
+      let newCurrentcoords = [...currentcoords];
+      let newPtiles = [...ptiles];
+      let newGtiles = [...gtiles];
+      let newUsedby = [...usedby];
+      let newSquares = [...squares];
+      let newRcd = [-1,-1,""];
+      let newSelection = selection;
+      newCurrentcoords.splice(currentcoords.length-1,1);
+      let row = parseInt(coord.split("-")[0]);
+      let col = parseInt(coord.split("-")[1]);
+      let returnedTile = squares[row][col];
+      if (whoseturn === "P") {
+        newPtiles.push(returnedTile);
+        newSelection = newPtiles.length-1;
+      } else {
+        newGtiles.push(returnedTile);
+        newSelection = newGtiles.length-1;
+      }
+      newUsedby[row][col] = "";
+      newSquares[row][col] = ".";
+      let dir = rcd[2];
+      if (dir !== "") {
+        // direction was set so keep it
+        newRcd = [row,col,dir];
+        if (currentcoords.length === 1) {
+          newSelection = -1; // if they backspace all the letters off leave rack tile unselected
+        }
+      }
+      setCurrentcoords(newCurrentcoords);
+      setGtiles(newGtiles);
+      setPtiles(newPtiles);
+      setSquares(newSquares);
+      setUsedby(newUsedby);
+      setRcd(newRcd);
+      setSelection(newSelection);
     }
   }
   return (

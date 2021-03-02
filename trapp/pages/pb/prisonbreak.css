@@ -66,14 +66,14 @@
     text-align: center;
 }
 .pbSquareRightArrow {
-    background-color: black;
+    background-color: grey;
     width: 40px;
     color: cyan;
     font-weight: bolder;
     text-align: center;
 }
 .pbSquareDownArrow {
-    background-color: black;
+    background-color: grey;
     width: 40px;
     color: cyan;
     font-weight: bolder;
