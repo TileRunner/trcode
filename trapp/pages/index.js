@@ -5,7 +5,17 @@ import {BrowserView} from 'react-device-detect'
 import React, { useState } from 'react';
 
 export default function Home() {
-  const [descPb, setDescPb] = useState(false);
+  const [descWm, setDescWm] = useState(false); // describe word mastermind
+  const [descWi, setDescWi] = useState(false); // describe word info
+  const [descPb, setDescPb] = useState(false); // describe prison break
+
+  const toggleDescWm = () => {
+    setDescWm(!descWm);
+  }
+
+  const toggleDescWi = () => {
+    setDescWi(!descWi);
+  }
 
   const toggleDescPb = () => {
     setDescPb(!descPb);
@@ -17,39 +27,105 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="row">
-        <h1>My coded stuff</h1>
+        <h1>Menu</h1>
       </div>
       <div className="row">
         <Link href={`/wm/mastermind`}>
-          <a>Word Mastermind
-            <span class="material-icons">psychology</span>
+          <a>
+            <h2>Word Mastermind
+              <span class="material-icons">psychology</span>
+            </h2>
           </a>
         </Link>
+          <button id="toggleDescribeWm" className={descWm ? "mybutton" : "mymaterialicon"}
+            onClick={() => toggleDescWm()}
+          >
+            {descWm ? "Hide info" : <i className="material-icons">help_outline</i>}
+          </button>
+          {descWm ?
+            <div className="container">
+              <div className="row myinfo">
+                <h1>Word Mastermind Information</h1>
+              </div>
+              <div className="row myinfo">
+                <p>Word Mastermind is a single player code cracking game.</p>
+              </div>
+              <div className="row myinfo">
+                <ul>
+                  <li>The computer picks a random word.</li>
+                  <li>You enter guesses until you guess correctly.</li>
+                  <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
+                  <BrowserView>
+                    <li>The computer shows you word info for guessed words.</li>
+                  </BrowserView>
+                  <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
+                  <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
+                </ul>
+              </div>
+            </div>
+          :
+            <></>
+          }
       </div>
       <div className="row">
         <Link href={`/wi/wordinfo`}>
-          <a>Word Info<span class="material-icons">biotech</span></a>
+          <a>
+            <h2>Word Info
+              <span class="material-icons">biotech</span>
+            </h2>
+          </a>
         </Link>
+          <button id="toggleDescribeWi" className={descWi ? "mybutton" : "mymaterialicon"}
+            onClick={() => toggleDescWi()}
+          >
+            {descWi ? "Hide info" : <i className="material-icons">help_outline</i>}
+          </button>
+          {descWi ?
+            <div className="container">
+              <div className="row myinfo">
+                <h1>Word Info Information</h1>
+              </div>
+              <div className="row myinfo">
+                <p>Enter search criteria and get information on the matching words.</p>
+              </div>
+              <div className="row myinfo">
+                <ul>
+                  <li>Anagrams - words that use the exact same letters.</li>
+                  <li>Inserts - words that can be made by inserting a single letter.</li>
+                  <li>Drops - words that can be made by dropping a single letter.</li>
+                  <li>Swaps - words that can be made by swapping a single letter.</li>
+                  <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
+                </ul>
+              </div>
+            </div>
+          :
+            <></>
+          }
       </div>
       <BrowserView>
         <div className="row">
           <Link href={`/pb/prisonbreak2`}>
-            <a>Prison Break (under construction)<span class="material-icons">fingerprint lock_clock carpenter lock_open run_circle</span></a>
+            <a>
+              <h2>
+                Prison Break
+                <span class="material-icons">run_circle</span>
+              </h2>
+            </a>
           </Link>
-          <button id="toggleDescribePb" className="mybutton"
+          <button id="toggleDescribePb" className={descPb ? "mybutton" : "mymaterialicon"}
             onClick={() => toggleDescPb()}
           >
-            {descPb ? "Hide rules" : "Show rules"}
+            {descPb ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
           {descPb ?
             <div className="container">
-              <div className="row">
-                <h1>Prison Break Rules</h1>
+              <div className="row myinfo">
+                <h1>Prison Break Information</h1>
               </div>
-              <div className="row">
+              <div className="row myinfo">
                 <p>Prison Break is a two player crossword style game.</p>
               </div>
-              <div className="row">
+              <div className="row myinfo">
                 <ul>
                   <li>You play two games, one as the Prisoners and one as the Guards. Whoever frees the most prisoners wins.</li>
                   <li>When playing as the Prisoners, go to the lobby and enter a game id and start a new game. Tell your opponent the game id.</li>
@@ -57,6 +133,7 @@ export default function Home() {
                   <li>Prisoners always play first.</li>
                   <li>The first word played must touch the centre square.</li>
                   <li>To free a prisoner, the Prisoners must play a tile on one of the special 💫 squares.</li>
+                  <li>When a blank is played it does not have to remain as the same letter throughout the game.</li>
                   <li>A player may continue to make words when the opponent rack is empty (there is no point for Guards to do so).</li>
                   <li>The game ends when both players agree it ends.</li>
                   <li>Due to licensing restrictions, this game does not validate words against any lexicon.</li>

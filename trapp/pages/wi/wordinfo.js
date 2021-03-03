@@ -10,10 +10,11 @@ export default function handler(req, res)  {
             <div class="row">
                 <div class="col-11 wititle">
                     Word Info
+                    <i className="material-icons">help_outline</i>
                 </div>
-                <div class="col-1 wihomelink" data-toggle="tooltip" title="Home">
-                    <Link href={'../../'}>
-                        <a>🏠</a>
+                <div class="col-1 wihomelink">
+                    <Link href={"../../"}>
+                        <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
                     </Link>
                 </div>
             </div>
@@ -86,7 +87,7 @@ export default function handler(req, res)  {
                                         })
                                     }}
                                 >
-                                    Get Regex Info
+                                    Get Regex Matches
                                 </button>
                             </>
                             :

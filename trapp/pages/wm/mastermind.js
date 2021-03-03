@@ -26,10 +26,11 @@ function Game() {
                 <div class="row">
                     <div class="col-11 wmtitle">
                         Word Mastermind
+                        <span class="material-icons">psychology</span>
                     </div>
-                    <div class="col-1 wmhomelink" data-toggle="tooltip" title="Home">
-                        <Link href={'../../'}>
-                            <a>🏠</a>
+                    <div class="col-1 wmhomelink">
+                        <Link href={"../../"}>
+                            <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
                         </Link>
                     </div>
                 </div>

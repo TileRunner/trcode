@@ -137,41 +137,63 @@ export default function PrisonBreak() {
   ),[]);
   return (
     inlobby || prisonersOrGuards === '' ?
-    <div>
-      <p>In the lobby</p>
-      <label>Game id:&nbsp;</label>
-      <input
-          name="gameid"
-          value={gameid}
-          onChange={(e) => {
-              setGameid(e.target.value)
-          }}
-      />
-      <label>&nbsp;</label>
-      <button id="startgame"
-          onClick={function() {
-            if (gameid.length > 0) {
-              setPrisonersOrGuards('P');
-              setInlobby(false);
-            }
-          }}
-      >
-          Start Game
-      </button>
-      <label>&nbsp;</label>
-      <button id="joingame"
-          onClick={function() {
-            if (gameid.length > 0) {
-              setPrisonersOrGuards('G');
-              setInlobby(false);
-            }
-          }}
-      >
-          Join Game
-      </button>
-      {wsmsgs.map( (msg, inx) => (
-        <li key={inx}>{msg}</li>
-      ))}
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-10 pbtitle">
+            Prison Break Lobby
+            <span class="material-icons">run_circle</span>
+          </div>
+          <div className="col-2 pbhomelink">
+            <Link href={"../../"}>
+              <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
+            </Link>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-11 offset-1">
+            <h2>Prisoners: enter a game id and click "Start Game". Tell the Guards the id.</h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-11 offset-1">
+            <h2>Guards: get the game id from the Prisoners. Enter the game id and click "Join Game".</h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-11 offset-1">
+            <h2>Game id:
+            <input
+                name="gameid"
+                value={gameid}
+                onChange={(e) => {
+                    setGameid(e.target.value)
+                }}
+            />
+            <label>&nbsp;</label>
+            <button id="startgame"
+                onClick={function() {
+                  if (gameid.length > 0) {
+                    setPrisonersOrGuards('P');
+                    setInlobby(false);
+                  }
+                }}
+            >
+                Start Game
+            </button>
+            <label>&nbsp;</label>
+            <button id="joingame"
+                onClick={function() {
+                  if (gameid.length > 0) {
+                    setPrisonersOrGuards('G');
+                    setInlobby(false);
+                  }
+                }}
+            >
+                Join Game
+            </button>
+            </h2>
+          </div>
+        </div>
     </div>
     :
     <Game prisonersOrGuards={prisonersOrGuards}
@@ -835,6 +857,9 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       let letter = event.key.toUpperCase();
       let rack = whoseturn === "P" ? ptiles : gtiles;
       let newSelection = rack.indexOf(letter);
+      if (newSelection === -1) {
+        newSelection = rack.indexOf("?"); // Use the blank if they have one
+      }
       if (newSelection > -1) { // Pressed letter is on the rack
         let row = rcd[0];
         let col = rcd[1];
@@ -916,7 +941,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   return (
     <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
       <div className="row">
-        <div className="col-10 pbtitle">Prison Break</div>
+        <div className="col-10 pbtitle">
+          Prison Break
+          <span class="material-icons">run_circle</span>
+        </div>
         <div className="col-2 pbhomelink">
           <button id="requestGameData"
             data-toggle="tooltip" title="Sync with opponent"

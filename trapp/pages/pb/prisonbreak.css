@@ -6,15 +6,16 @@
     color:lightgrey;
 }
 .pbtitle {
-    background-color: #16271a;
+    background-color: grey;
     font-size: 2.8em;
     text-align: center;
     font-family: cursive;
     font-style: italic;
-    color:red;
+    color:black;
 }
 .pbhomelink {
-    background-color: #16271a;
+    background-color: grey;
+    color: black;
     text-align: right;
 }
 .pbPrisoners {

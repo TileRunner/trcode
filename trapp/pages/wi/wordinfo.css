@@ -1,13 +1,14 @@
 .wititle {
-  background-color: #16271a;
+  background-color: grey;
   font-size: 2.8em;
   text-align: center;
   font-family: cursive;
   font-style: italic;
-  color:red;
+  color:black;
 }
 .wihomelink {
-  background-color: #16271a;
+  background-color: grey;
+  color: black;
   text-align: right;
 }
 .wibody {
