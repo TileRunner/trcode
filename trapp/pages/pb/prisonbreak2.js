@@ -941,11 +941,14 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   return (
     <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
       <div className="row">
+        <div className="col-1 gameid">
+          Game id: {gameid}
+        </div>
         <div className="col-10 pbtitle">
           Prison Break
           <span class="material-icons">run_circle</span>
         </div>
-        <div className="col-2 pbhomelink">
+        <div className="col-1 pbhomelink">
           <button id="requestGameData"
             data-toggle="tooltip" title="Sync with opponent"
             onClick={function() {
@@ -1131,7 +1134,7 @@ const Prisoners = (props) => {
 
   return (
     <div>
-      <p>PRISONERS</p>
+      <p className="playerTitle">PRISONERS<i className="material-icons">run_circle run_circle run_circle</i></p>
       <p className="pbTilerack">
         {props.ptiles.map((t, ti) =>
           renderTile(
@@ -1194,7 +1197,7 @@ const Guards = (props) => {
 
   return (
     <div>
-      <p>GUARDS</p>
+      <p className="playerTitle">GUARDS<i className="material-icons">security security security</i></p>
       <p className="pbTilerack">
         {props.gtiles.map((t, ti) =>
           renderTile(

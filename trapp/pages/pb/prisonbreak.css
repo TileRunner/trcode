@@ -5,6 +5,17 @@
     background-blend-mode: normal;
     color:lightgrey;
 }
+.gameid {
+    background-color: grey;
+    color:black;
+}
+.playerTitle {
+    border-style: solid;
+    background-color: whitesmoke;
+    color: black;
+    font-family: fantasy;
+    text-indent: 1em;
+}
 .pbtitle {
     background-color: grey;
     font-size: 2.8em;
