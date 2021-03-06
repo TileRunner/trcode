@@ -1,6 +1,7 @@
 .prisonbreak {
     background-color: grey;
     background-image: url("../../public/prisonbars.png");
+    /* background-repeat: repeat; */
     background-size: cover;
     background-blend-mode: normal;
     color:lightgrey;
@@ -35,25 +36,34 @@
 .pbGuards {
     font-size: x-large;
 }
+.pbTdSquare {
+    padding: 0%;
+    border: solid;
+    border-width: thin;
+    border-color: black;
+}
 .pbSquare {
-    background-image: url("../../public/prisonbars.png");
+    background-image: url("../../public/prisonbars-orig.png");
     background-size: cover;
     background-color: grey;
     width: 40px;
-    color: cornsilk;
+    color: black;
     text-align: center;
+    padding: 0%;
 }
 .pbSquare2 {
     background-color: darkgrey;
     width: 40px;
-    color: cornsilk;
+    color: darkgrey;
     text-align: center;
+    padding: 0%;
 }
 .pbSquareCenterSquare {
     background-color: darkslateblue;
     width: 40px;
     color: cornsilk;
     font-size: x-large;
+    padding: 0%;
 }
 .pbSquareEscapeHatch {
     background-color: darkslateblue;
@@ -62,20 +72,24 @@
     width: 40px;
     color: cornsilk;
     text-align: center;
+    padding: 0%;
 }
 .pbSquareUsedByPrisoners {
-    background-color: black;
+    background-color: orangered;
     width: 40px;
-    color: rgb(157, 198, 231);
+    /* color: rgb(157, 198, 231); */
+    color:whitesmoke;
     font-weight: bolder;
     text-align: center;
+    padding: 0%;
 }
 .pbSquareUsedByGuards {
-    background-color: black;
+    background-color: orangered;
     width: 40px;
-    color: burlywood;
+    color: black;
     font-weight: bolder;
     text-align: center;
+    padding: 0%;
 }
 .pbSquareRightArrow {
     background-color: grey;
@@ -83,6 +97,7 @@
     color: cyan;
     font-weight: bolder;
     text-align: center;
+    padding: 0%;
 }
 .pbSquareDownArrow {
     background-color: grey;
@@ -90,6 +105,7 @@
     color: cyan;
     font-weight: bolder;
     text-align: center;
+    padding: 0%;
 }
 .pbRow {
     line-height: 40px;
@@ -97,12 +113,9 @@
 .pbBoard {
     background-color: grey;
 }
-.pbGame {
-    background-color: cadetblue;
-}
 .pbTilepool {
     text-align: right;
-    color: burlywood;
+    color: whitesmoke;
     font-family: monospace;
     font-size: large;
     padding-top: 3px;
@@ -122,17 +135,17 @@
     margin-top: 5px;
 }
 .pbTileOnRackP {
-    background-color: black;
+    background-color: orangered;
     border: black;
     border-style: solid;
     width: 40px;
-    color: rgb(157, 198, 231);
+    color: whitesmoke;
     font-weight: bolder;
     text-align: center;
     padding: 5px;
 }
 .pbTileOnRackSelectedP {
-    background-color: black;
+    background-color: orangered;
     border: white;
     border-style: inset;
     width: 40px;
@@ -142,21 +155,21 @@
     padding: 5px;
 }
 .pbTileOnRackG {
-    background-color: black;
+    background-color: orangered;
     border: black;
     border-style: solid;
     width: 40px;
-    color: burlywood;
+    color: black;
     font-weight: bolder;
     text-align: center;
     padding: 5px;
 }
 .pbTileOnRackSelectedG {
-    background-color: black;
+    background-color: orangered;
     border: white;
     border-style: inset;
     width: 40px;
-    color: burlywood;
+    color: whitesmoke;
     font-weight: bolder;
     text-align: center;
     padding: 5px;
@@ -170,10 +183,10 @@
     margin-left: 5px;
     border-radius: 35%;
     border-width: 3px;
-    border-color: burlywood;
+    border-color: whitesmoke;
     border-style: solid;
     background-color: black;
-    color: burlywood;
+    color: whitesmoke;
     font-family: cursive;
     height: 40px;
     /* width: 150px; */
@@ -182,10 +195,10 @@
     margin-left: 5px;
     border-radius: 35%;
     border-width: 3px;
-    border-color: burlywood;
+    border-color: whitesmoke;
     border-style: solid;
     background-color: black;
-    color: burlywood;
+    color: whitesmoke;
     font-family: cursive;
     height: 40px;
     /* width: 150px; */
@@ -194,10 +207,10 @@
     margin-left: 5px;
     border-radius: 35%;
     border-width: 3px;
-    border-color: burlywood;
+    border-color: whitesmoke;
     border-style: solid;
     background-color: black;
-    color: burlywood;
+    color: whitesmoke;
     font-family: cursive;
     height: 40px;
     /* width: 150px; */
@@ -206,10 +219,10 @@
     margin-left: 5px;
     border-radius: 35%;
     border-width: 3px;
-    border-color: burlywood;
+    border-color: whitesmoke;
     border-style: solid;
     background-color: black;
-    color: burlywood;
+    color: whitesmoke;
     font-family: cursive;
     height: 40px;
     /* width: 150px; */

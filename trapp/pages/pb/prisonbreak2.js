@@ -243,8 +243,8 @@ const Square = (props) => {
       : tdclass === "pbSquareEscapeHatch"
       ? "💫"
       : props.ri % 2 === props.ci % 2
-      ? "☹"//"⎔"
-      : "ꐕ";//"✦";
+      ? "."//"☹"//"⎔"
+      : ".";//"ꐕ";//"✦";
   return (
     <button className={tdclass} onClick={props.onClick}>
       {tdvalue}
@@ -255,7 +255,7 @@ const Square = (props) => {
 const Board = ({ onClick, squares, usedby, rcd }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
-      <td key={`Square${ri}-${ci}`}>
+      <td key={`Square${ri}-${ci}`} className="pbTdSquare">
         <Square
           c={c}
           ci={ci}
