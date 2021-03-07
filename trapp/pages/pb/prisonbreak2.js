@@ -141,7 +141,7 @@ export default function PrisonBreak() {
         <div className="row">
           <div className="col-10 pbtitle">
             Prison Break Lobby
-            <span class="material-icons">run_circle</span>
+            <span className="material-icons">run_circle</span>
           </div>
           <div className="col-2 pbhomelink">
             <Link href={"../../"}>
@@ -216,7 +216,7 @@ const Square = (props) => {
     props.squareusedby === "P"
       ? "pbSquareUsedByPrisoners"
       : "pbSquareUsedByGuards";
-  const tdclass =
+  const tdclass = 
     props.c !== "."
       ? usedbyclass
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
@@ -229,7 +229,7 @@ const Square = (props) => {
         (props.ci === 0 || props.ci === 7 || props.ci === 14)
       ? "pbSquareEscapeHatch"
       : props.ri % 2 === props.ci % 2
-      ? "pbSquare"
+      ? "pbSquare1"
       : "pbSquare2";
   const tdvalue =
     props.c !== "."
@@ -241,11 +241,16 @@ const Square = (props) => {
       : tdclass === "pbSquareCenterSquare"
       ? "✰"
       : tdclass === "pbSquareEscapeHatch"
-      ? "💫"
+      ? "ꐕ" //💫
       : props.ri % 2 === props.ci % 2
       ? "."//"☹"//"⎔"
       : ".";//"ꐕ";//"✦";
   return (
+    tdclass === "pbSquareEscapeHatch" ?
+    <button className={tdclass} onClick={props.onClick}>
+      <span className="material-icons">run_circle</span>
+    </button>
+    :
     <button className={tdclass} onClick={props.onClick}>
       {tdvalue}
     </button>
@@ -255,7 +260,7 @@ const Square = (props) => {
 const Board = ({ onClick, squares, usedby, rcd }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
-      <td key={`Square${ri}-${ci}`} className="pbTdSquare">
+      <td key={`Square${ri}-${ci}`} className="pbSquare">
         <Square
           c={c}
           ci={ci}
@@ -269,7 +274,7 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   };
   const renderRow = (ri) => {
     return (
-      <tr key={`BoardRow${ri}`} className="row pbRow">
+      <tr key={`BoardRow${ri}`} className="pbRow">
         {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
       </tr>
     );
@@ -946,7 +951,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         </div>
         <div className="col-10 pbtitle">
           Prison Break
-          <span class="material-icons">run_circle</span>
+          <span className="material-icons">run_circle</span>
         </div>
         <div className="col-1 pbhomelink">
           <button id="requestGameData"
@@ -990,6 +995,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             squares={squares}
             usedby={usedby}
             rcd={rcd}
+            onClick={() => {}}
           />
           }
         </div>

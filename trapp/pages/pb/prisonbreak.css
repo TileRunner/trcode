@@ -36,82 +36,119 @@
 .pbGuards {
     font-size: x-large;
 }
-.pbTdSquare {
+.pbSquare {
     padding: 0%;
     border: solid;
     border-width: thin;
     border-color: black;
 }
-.pbSquare {
-    background-image: url("../../public/prisonbars-orig.png");
+.pbSquare1 {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
+    background-image: url("../../public/prisonbars-square.png");
     background-size: cover;
     background-color: grey;
-    width: 40px;
     color: black;
     text-align: center;
-    padding: 0%;
+    width: 40px;
+}
+.pbSquare1:focus {
+    outline: none;
 }
 .pbSquare2 {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: darkgrey;
-    width: 40px;
     color: darkgrey;
     text-align: center;
-    padding: 0%;
+    width: 40px;
+}
+.pbSquare2:focus {
+    outline: none;
 }
 .pbSquareCenterSquare {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: darkslateblue;
-    width: 40px;
     color: cornsilk;
     font-size: x-large;
-    padding: 0%;
+    width: 40px;
+}
+.pbSquareCenterSquare:focus {
+    outline: none;
 }
 .pbSquareEscapeHatch {
-    background-color: darkslateblue;
-    /* border: darkgreen;
-    border-style: inset; */
-    width: 40px;
-    color: cornsilk;
-    text-align: center;
+    height: 40px;
     padding: 0%;
+    padding-top: 3px;
+    border-style: solid;
+    border-color: red;
+    border-width: thin;
+    background-color: black;
+    color: red;
+    text-align: center;
+    width: 40px;
+}
+.pbSquareEscapeHatch:focus {
+    outline: none;
 }
 .pbSquareUsedByPrisoners {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: orangered;
-    width: 40px;
-    /* color: rgb(157, 198, 231); */
     color:whitesmoke;
     font-weight: bolder;
     text-align: center;
-    padding: 0%;
+    width: 40px;
+}
+.pbSquareUsedByPrisoners:focus {
+    outline: none;
 }
 .pbSquareUsedByGuards {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: orangered;
-    width: 40px;
     color: black;
     font-weight: bolder;
     text-align: center;
-    padding: 0%;
+    width: 40px;
+}
+.pbSquareUsedByGuards:focus {
+    outline: none;
 }
 .pbSquareRightArrow {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: grey;
-    width: 40px;
     color: cyan;
     font-weight: bolder;
     text-align: center;
-    padding: 0%;
+    width: 40px;
 }
 .pbSquareDownArrow {
+    height: 40px;
+    padding: 0%;
+    border-style: none;
     background-color: grey;
-    width: 40px;
     color: cyan;
     font-weight: bolder;
     text-align: center;
-    padding: 0%;
+    width: 40px;
 }
 .pbRow {
-    line-height: 40px;
+    padding: 0%;
 }
 .pbBoard {
     background-color: grey;
+    border-style: solid;
+    border-width: 5px;
+    border-color: darkgrey;
 }
 .pbTilepool {
     text-align: right;
@@ -136,8 +173,9 @@
 }
 .pbTileOnRackP {
     background-color: orangered;
-    border: black;
     border-style: solid;
+    border-width: thin;
+    border-color: black;
     width: 40px;
     color: whitesmoke;
     font-weight: bolder;
@@ -156,7 +194,8 @@
 }
 .pbTileOnRackG {
     background-color: orangered;
-    border: black;
+    border-color: black;
+    border-width: thin;
     border-style: solid;
     width: 40px;
     color: black;
