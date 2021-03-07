@@ -33,7 +33,7 @@ export default function Home() {
         <Link href={`/wm/mastermind`}>
           <a>
             <h2>Word Mastermind
-              <span class="material-icons">psychology</span>
+              <span className="material-icons">psychology</span>
             </h2>
           </a>
         </Link>
@@ -71,7 +71,7 @@ export default function Home() {
         <Link href={`/wi/wordinfo`}>
           <a>
             <h2>Word Info
-              <span class="material-icons">biotech</span>
+              <span className="material-icons">biotech</span>
             </h2>
           </a>
         </Link>
@@ -108,7 +108,7 @@ export default function Home() {
             <a>
               <h2>
                 Prison Break
-                <span class="material-icons">run_circle</span>
+                <span className="material-icons">run_circle</span>
               </h2>
             </a>
           </Link>
@@ -132,7 +132,7 @@ export default function Home() {
                   <li>When playing as the Guards, go to the lobby and enter the game id that your opponent gave you and join the game.</li>
                   <li>Prisoners always play first.</li>
                   <li>The first word played must touch the centre square.</li>
-                  <li>To free a prisoner, the Prisoners must play a tile on one of the special 💫 squares.</li>
+                  <li>To free a prisoner, the Prisoners must play a tile on one of the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares.</li>
                   <li>When a blank is played it does not have to remain as the same letter throughout the game.</li>
                   <li>A player may continue to make words when the opponent rack is empty (there is no point for Guards to do so).</li>
                   <li>The game ends when both players agree it ends.</li>

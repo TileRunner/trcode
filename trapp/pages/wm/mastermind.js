@@ -22,27 +22,27 @@ function Game() {
     const promptForPlayAgain = showPlayAgainPrompt();
     return (
         <div className="Mastermind">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-11 wmtitle">
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-11 wmtitle">
                         Word Mastermind
-                        <span class="material-icons">psychology</span>
+                        <span className="material-icons">psychology</span>
                     </div>
-                    <div class="col-1 wmhomelink">
+                    <div className="col-1 wmhomelink">
                         <Link href={"../../"}>
                             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
                         </Link>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-11">
+                <div className="row">
+                    <div className="col-11">
                         <p className="wmp">Cycle through 2-8 letter words per set.</p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="row">
-                            <div class="col-lg-6">
+                <div className="row">
+                    <div className="col-lg-8">
+                        <div className="row">
+                            <div className="col-lg-6">
                                 <div className="Outertable">
                                     <h3 className="wmh3 AlignLeft">Guesses this word: {guesses.length}</h3>
                                     <h3 className="wmh3 AlignLeft">Guesses this set: {setGuessCount}</h3>
@@ -53,7 +53,7 @@ function Game() {
                                     }
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div className="col-lg-6">
                                 <div className="Outertable">
                                     {secretWord === '' ? pickRandomWord() : ''}
                                     <h3 className="wmh3">Secret Word: {solved ? secretWord : secretDisplay}</h3>
@@ -77,8 +77,8 @@ function Game() {
                             </div>
                         </div>
                         <BrowserView>
-                            <div class="row">
-                                <div class="col-lg-12">
+                            <div className="row">
+                                <div className="col-lg-12">
                                     {guesses.map(g => (
                                         <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
                                     ))}
@@ -86,7 +86,7 @@ function Game() {
                             </div>
                         </BrowserView>
                     </div>
-                    <div class="col-lg-4">
+                    <div className="col-lg-4">
                         <div className="Outertable">
                             {guesses.length === 0 ?
                                 <p>No guesses yet</p> 

@@ -6,20 +6,20 @@ export default function handler(req, res)  {
     const [word, setWord] = useState('');
     const [words, setWords] = useState([]);
     return (
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-11 wititle">
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-11 wititle">
                     Word Info
                     <i className="material-icons">help_outline</i>
                 </div>
-                <div class="col-1 wihomelink">
+                <div className="col-1 wihomelink">
                     <Link href={"../../"}>
                         <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
                     </Link>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-8">
+            <div className="row">
+                <div className="col-sm-8">
                     <div className="form-inline">
                         <label>Word:&nbsp;</label>
                         <input
@@ -95,16 +95,16 @@ export default function handler(req, res)  {
                         }
                     </div>
                 </div>
-                <div class="col-sm-4"></div>
+                <div className="col-sm-4"></div>
             </div>
-            <div class="row">
-                <div class="col-sm-8">
+            <div className="row">
+                <div className="col-sm-8">
                     {words.map((w) => (
                         w === '' ? <></> :
                         <Showinfo key={w} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
                     ))}
                 </div>
-                <div class="col-sm-4"></div>
+                <div className="col-sm-4"></div>
             </div>
         </div>
         );

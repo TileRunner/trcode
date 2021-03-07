@@ -239,7 +239,7 @@ const Square = (props) => {
       : tdclass === "pbSquareDownArrow"
       ? "⬇"
       : tdclass === "pbSquareCenterSquare"
-      ? "✰"
+      ? <i className="material-icons">stars</i>
       : tdclass === "pbSquareEscapeHatch"
       ? "ꐕ" //💫
       : props.ri % 2 === props.ci % 2
@@ -1058,32 +1058,32 @@ const RackTile = (props) => {
 
 const FinishTurnButton = (props) => {
   return (
-    <button className="pbFinishTurn" onClick={props.onClick}>
-      <i className="material-icons">check</i>Finish Turn
+    <button className="pbActionButton" onClick={props.onClick}>
+      <span className="pbActionButtonText"><i className="material-icons">check</i>Finish Turn</span>
     </button>
   );
 };
 
 const TileRecallButton = (props) => {
   return (
-    <button className="pbRecallTiles" onClick={props.onClick}>
-      <i className="material-icons">undo</i>Recall Tiles
+    <button className="pbActionButton" onClick={props.onClick}>
+      <span className="pbActionButtonText"><i className="material-icons">undo</i>Recall Tiles</span>
     </button>
   );
 };
 
 const TileExchangeButton = (props) => {
   return (
-    <button className="pbExchangeTiles" onClick={props.onClick}>
-      <i className="material-icons">sentiment_very_dissatisfied</i>Exchange Tiles
+    <button className="pbActionButton" onClick={props.onClick}>
+      <span className="pbActionButtonText"><i className="material-icons">cached</i>Swap Tiles</span>
     </button>
   );
 };
 
 const PassPlayButton = (props) => {
   return (
-    <button className="pbPassPlay" onClick={props.onClick}>
-      <i className="material-icons">sentiment_neutral</i>Pass
+    <button className="pbActionButton" onClick={props.onClick}>
+      <span className="pbActionButtonText"><i className="material-icons">not_interested</i>Pass Turn</span>
     </button>
   );
 };
