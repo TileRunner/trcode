@@ -135,7 +135,10 @@ export default function Home() {
                   <li>To free a prisoner, the Prisoners must play a tile on one of the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares.</li>
                   <li>When a blank is played it does not have to remain as the same letter throughout the game.</li>
                   <li>A player may continue to make words when the opponent rack is empty (there is no point for Guards to do so).</li>
-                  <li>The game ends when both players agree it ends.</li>
+                  <li>The game ends if a player empties their rack.</li>
+                  <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
+                  <li>The game ends if both players pass.</li>
+                  <li>The game ends if both players agree it ends.</li>
                   <li>Due to licensing restrictions, this game does not validate words against any lexicon.</li>
                 </ul>
               </div>
