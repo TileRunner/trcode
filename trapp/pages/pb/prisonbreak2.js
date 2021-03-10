@@ -307,6 +307,18 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   });
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      // If it is not my turn && the game has not ended
+      if (prisonersOrGuards !== whoseturn && whoseturn !== "X") {
+        // I am waiting for opponent move to come through but sometimes it gets missed (no idea why)
+        console.log("Interval: prisonersOrGuards=" + prisonersOrGuards + " whoseturn=" + whoseturn + " at " + Date().toLocaleString());
+        requestGameData(); // Send a request for game data in case opponent moved and we missed the update
+      }
+    }, 120000); // this many milliseconds between above code block executions
+    return () => clearInterval(interval);
+  }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
+
+  useEffect(() => {
     if (prisonersOrGuards === "P") {
       let tempPTiles = [...ptiles];
       let tempGTiles = [...gtiles];
@@ -334,7 +346,6 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     else
     {
       try {
-        console.log("Sending ggd")
         client.send(
           JSON.stringify({
             gameid: gameid, // the id for the game
@@ -375,7 +386,8 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
           })
         );
       }
-      if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards) { // opponent provided game data
+      if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards && whoseturn !== prisonersOrGuards && whoseturn !== "X") { 
+        // opponent provided game data and this player is still waiting to see opponent move
         setTiles(messageData.tiles);
         setSquares(messageData.squares);
         setPtiles(messageData.ptiles);
@@ -577,7 +589,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     }
     newPtiles.sort();
     let newWhoseturn = newPtiles.length > 0 ? "G" : "X"; // X = game over
-    if (usedby[0][0] !== "" && useby[0][7] !== "" && useby[0][14] !== "" && useby[7][0] !== "" && useby[7][14] !== "" && usedby[14][0] !== "" && useby[14][7] !== "" && useby[14][14] !== "") {
+    if (usedby[0][0] !== "" && usedby[0][7] !== "" && usedby[0][14] !== "" && usedby[7][0] !== "" && usedby[7][14] !== "" && usedby[14][0] !== "" && usedby[14][7] !== "" && usedby[14][14] !== "") {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -627,7 +639,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     let snapptiles = [...ptiles];
     let snapgtiles = [...gtiles];
     let newWhoseturn = newGtiles.length > 0 ? "P" : "X"; // X = game over
-    if (usedby[0][0] !== "" && useby[0][7] !== "" && useby[0][14] !== "" && useby[7][0] !== "" && useby[7][14] !== "" && usedby[14][0] !== "" && useby[14][7] !== "" && useby[14][14] !== "") {
+    if (usedby[0][0] !== "" && usedby[0][7] !== "" && usedby[0][14] !== "" && usedby[7][0] !== "" && usedby[7][14] !== "" && usedby[14][0] !== "" && usedby[14][7] !== "" && usedby[14][14] !== "") {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -868,7 +880,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     );
   }
 
-  const requestGameData = (playertype) => {
+  const requestGameData = () => {
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
@@ -983,14 +995,6 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
           <span className="material-icons">run_circle</span>
         </div>
         <div className="col-1 pbhomelink">
-          <button id="requestGameData"
-            data-toggle="tooltip" title="Sync with opponent"
-            onClick={function() {
-              requestGameData(prisonersOrGuards);
-              }}
-          >
-            <i className="material-icons">sync</i>
-          </button>
           <Link href={"../../"}>
             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>
@@ -1030,20 +1034,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             }
           </div>
           <div className="row pbUnderboard">
-            {whoseturn === "X" ? <h1>Game Over!</h1> : prisonersOrGuards === whoseturn ?
-              <p>Two peanuts were walking down a back alley. One was a salted.</p>
+            {whoseturn === "X" ?
+              <h1>Game Over!</h1>
             :
-              <p>If you do not see your opponents last move then click the&nbsp;
-                <button id="requestGameData2"
-                  data-toggle="tooltip" title="Sync with opponent"
-                  onClick={function() {
-                    requestGameData(prisonersOrGuards);
-                    }}
-                >
-                  <i className="material-icons">sync</i>
-                </button>
-                &nbsp;button
-              </p>
+              <p>Two peanuts were walking down a back alley. One was a salted.</p>
             }
           </div>
         </div>
