@@ -946,7 +946,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   return (
     <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
       <div className="row">
-        <div className="col-1 gameid">
+        <div className="col-1 pbGameid">
           Game id: {gameid}
         </div>
         <div className="col-10 pbtitle">
@@ -968,7 +968,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         </div>
       </div>
       <div className="row">
-        <div className="col-2 pbPrisoners">
+        <div className="col pbPrisoners">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -982,24 +982,43 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col-6" align="center">
-          {prisonersOrGuards === whoseturn ?
-          <Board
-            squares={squares}
-            usedby={usedby}
-            rcd={rcd}
-            onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
-          />
-          :
-          <Board
-            squares={squares}
-            usedby={usedby}
-            rcd={rcd}
-            onClick={() => {}}
-          />
-          }
+        <div className="col">
+          <div className="row">
+            {prisonersOrGuards === whoseturn ?
+              <Board
+                squares={squares}
+                usedby={usedby}
+                rcd={rcd}
+                onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
+              />
+              :
+              <Board
+                squares={squares}
+                usedby={usedby}
+                rcd={rcd}
+                onClick={() => {}}
+              />
+            }
+          </div>
+          <div className="row pbUnderboard">
+            {prisonersOrGuards === whoseturn ?
+              <p>Two peanuts were walking down a back alley. One was a salted.</p>
+            :
+              <p>If you do not see your opponents last move then click the&nbsp;
+                <button id="requestGameData2"
+                  data-toggle="tooltip" title="Sync with opponent"
+                  onClick={function() {
+                    requestGameData(prisonersOrGuards);
+                    }}
+                >
+                  <i className="material-icons">sync</i>
+                </button>
+                &nbsp;button
+              </p>
+            }
+          </div>
         </div>
-        <div className="col-2 pbGuards">
+        <div className="col pbGuards">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -1012,7 +1031,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col-2">
+        <div className="col">
           <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
         </div>
       </div>
@@ -1033,7 +1052,8 @@ const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles
   }
   return (
     <div className="pbTilepool">
-      <h3>TILES</h3>
+      <span className="pbTilepoolTitle">TILES</span>
+      <div className="pbTilepoolDivider"></div>
       {unseenTiles.map((t, ti) => (
         <span key={`tile${ti}`}>
           {ti > 0 && t !== unseenTiles[ti - 1] ? (
@@ -1059,7 +1079,7 @@ const RackTile = (props) => {
 const FinishTurnButton = (props) => {
   return (
     <button className="pbActionButton" onClick={props.onClick}>
-      <span className="pbActionButtonText"><i className="material-icons">check</i>Finish Turn</span>
+      <span className="pbActionButtonText"><i className="material-icons">check</i>&nbsp;Finish Turn</span>
     </button>
   );
 };
@@ -1067,7 +1087,7 @@ const FinishTurnButton = (props) => {
 const TileRecallButton = (props) => {
   return (
     <button className="pbActionButton" onClick={props.onClick}>
-      <span className="pbActionButtonText"><i className="material-icons">undo</i>Recall Tiles</span>
+      <span className="pbActionButtonText"><i className="material-icons">undo</i>&nbsp;Recall Tiles</span>
     </button>
   );
 };
@@ -1075,7 +1095,7 @@ const TileRecallButton = (props) => {
 const TileExchangeButton = (props) => {
   return (
     <button className="pbActionButton" onClick={props.onClick}>
-      <span className="pbActionButtonText"><i className="material-icons">cached</i>Swap Tiles</span>
+      <span className="pbActionButtonText"><i className="material-icons">cached</i>&nbsp;Swap Tiles</span>
     </button>
   );
 };
@@ -1083,7 +1103,7 @@ const TileExchangeButton = (props) => {
 const PassPlayButton = (props) => {
   return (
     <button className="pbActionButton" onClick={props.onClick}>
-      <span className="pbActionButtonText"><i className="material-icons">not_interested</i>Pass Turn</span>
+      <span className="pbActionButtonText"><i className="material-icons">not_interested</i>&nbsp;Pass Turn</span>
     </button>
   );
 };
@@ -1108,22 +1128,6 @@ const Prisoners = (props) => {
     );
   };
 
-  const renderFinishTurn = () => {
-    return <p><FinishTurnButton onClick={() => props.onClickFinishTurn()} /></p>;
-  };
-
-  const renderRecallTiles = () => {
-    return <p><TileRecallButton onClick={() => props.onClickTileRecall()} /></p>;
-  };
-
-  const renderExchangeTiles = () => {
-    return <p><TileExchangeButton onClick={() => props.onClickTileExchange()} /></p>;
-  };
-
-  const renderPassPlay = () => {
-    return <p><PassPlayButton onClick={() => props.onClickPassPlay()} /></p>;
-  };
-
   const renderFreedPrisoners = (count) => {
     let dumb = Array(count).fill("nonsense");
     return dumb.map((value, index) => (
@@ -1140,7 +1144,7 @@ const Prisoners = (props) => {
 
   return (
     <div>
-      <p className="playerTitle">PRISONERS<i className="material-icons">run_circle run_circle run_circle</i></p>
+      <p className="pbPlayerTitle"><i className="material-icons">run_circle run_circle run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle run_circle run_circle</i></p>
       <p className="pbTilerack">
         {props.ptiles.map((t, ti) =>
           renderTile(
@@ -1152,10 +1156,23 @@ const Prisoners = (props) => {
           )
         )}
       </p>
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderRecallTiles() : <></>}
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderExchangeTiles() : <></>}
-      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? renderPassPlay() : <></>}
+      {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? 
+        <div className="pbActionButtonDiv">
+          <p>
+            <FinishTurnButton onClick={() => props.onClickFinishTurn()} />
+          </p>
+          <p>
+            <TileRecallButton onClick={() => props.onClickTileRecall()} />
+          </p>
+          <p>
+            <TileExchangeButton onClick={() => props.onClickTileExchange()} />
+          </p>
+          <p>
+            <PassPlayButton onClick={() => props.onClickPassPlay()} />
+          </p>
+        </div>
+      : <></>
+      }
       <p>
         Rescues made: {props.rescues}
         <br></br>
@@ -1185,25 +1202,9 @@ const Guards = (props) => {
     );
   };
 
-  const renderFinishTurn = () => {
-    return <FinishTurnButton onClick={() => props.onClickFinishTurn()} />;
-  };
-
-  const renderRecallTiles = () => {
-    return <TileRecallButton onClick={() => props.onClickTileRecall()} />;
-  };
-
-  const renderExchangeTiles = () => {
-    return <TileExchangeButton onClick={() => props.onClickTileExchange()} />;
-  };
-
-  const renderPassPlay = () => {
-    return <PassPlayButton onClick={() => props.onClickPassPlay()} />;
-  };
-
   return (
     <div>
-      <p className="playerTitle">GUARDS<i className="material-icons">security security security</i></p>
+      <p className="pbPlayerTitle"><i className="material-icons">security security security</i>&nbsp;GUARDS&nbsp;<i className="material-icons">security security security</i></p>
       <p className="pbTilerack">
         {props.gtiles.map((t, ti) =>
           renderTile(
@@ -1215,10 +1216,23 @@ const Guards = (props) => {
           )
         )}
       </p>
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderFinishTurn() : <></>}
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderRecallTiles() : <></>}
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderExchangeTiles() : <></>}
-      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? renderPassPlay() : <></>}
+      {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? 
+        <div className="pbActionButtonDiv">
+          <p>
+            <FinishTurnButton onClick={() => props.onClickFinishTurn()} />
+          </p>
+          <p>
+            <TileRecallButton onClick={() => props.onClickTileRecall()} />
+          </p>
+          <p>
+            <TileExchangeButton onClick={() => props.onClickTileExchange()} />
+          </p>
+          <p>
+            <PassPlayButton onClick={() => props.onClickPassPlay()} />
+          </p>
+        </div>
+      : <></>
+      }
     </div>
   );
 };
