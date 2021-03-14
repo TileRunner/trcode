@@ -113,96 +113,287 @@ const initialtiles = [
   "?",
   "?",
 ]; // initial tile pool
+const initialsquares = Array(15).fill(Array(15).fill("."));
+const initialusedby = Array(15).fill(Array(15).fill(""));
 
 export default function PrisonBreak() {
-  const [inlobby, setInlobby] = useState(true)
+  const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins
   const [gameid, setGameid] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
-  const [wsmsgs, setWsmsgs] = useState([])
-  const [msgid, setMsgid] = useState(0)
+  const [gameMessages, setGameMessages] = useState([]) // Messages for while playing the game
+  const [lobbyMessages, setLobbyMessages] = useState([]) // Messages for while in the lobby
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
-    setMsgid((curr) => curr + 1)
-    setWsmsgs((curr) => [...curr, message.data]);
+    // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
+    // Hence I cannot selectively set lobby or game messages based on whether prisonersOrGuards is set yet.
+    // However, setting the arrays below does somehow seem to get the message across.
+    // Perhaps the arrays are always empty here and it only ever adds a value? I am confused about this.
+    setLobbyMessages((curr) => [...curr, message.data])
+    setGameMessages((curr) => [...curr, message.data])
   }
-  const removeMessage = (messageData) => {
-    let i = wsmsgs.indexOf(messageData);
-    let w = [...wsmsgs];
+  const removeLobbyMessage = (messageData) => {
+    let i = lobbyMessages.indexOf(messageData);
+    let w = [...lobbyMessages];
     w.splice(i,1);
-    setWsmsgs(w);
+    setLobbyMessages(w);
+  }
+  const removeGameMessage = (messageData) => {
+    let i = gameMessages.indexOf(messageData);
+    let w = [...gameMessages];
+    w.splice(i,1);
+    setGameMessages(w);
   }
   const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
   useEffect(() => (
     client.connect()
   ),[]);
   return (
-    inlobby || prisonersOrGuards === '' ?
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-10 pbtitle">
-            Prison Break Lobby
-            <span className="material-icons">run_circle</span>
-          </div>
-          <div className="col-2 pbhomelink">
-            <Link href={"../../"}>
-              <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-            </Link>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-11 offset-1">
-            <h2>Prisoners: enter a game id and click "Start Game". Tell the Guards the id.</h2>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-11 offset-1">
-            <h2>Guards: get the game id from the Prisoners. Enter the game id and click "Join Game".</h2>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-11 offset-1">
-            <h2>Game id:
-            <input
-                name="gameid"
-                value={gameid}
-                onChange={(e) => {
-                    setGameid(e.target.value)
-                }}
-            />
-            <label>&nbsp;</label>
-            <button id="startgame"
-                onClick={function() {
-                  if (gameid.length > 0) {
-                    setPrisonersOrGuards('P');
-                    setInlobby(false);
-                  }
-                }}
-            >
-                Start Game
-            </button>
-            <label>&nbsp;</label>
-            <button id="joingame"
-                onClick={function() {
-                  if (gameid.length > 0) {
-                    setPrisonersOrGuards('G');
-                    setInlobby(false);
-                  }
-                }}
-            >
-                Join Game
-            </button>
-            </h2>
-          </div>
-        </div>
-    </div>
+    prisonersOrGuards === '' ?
+      <Lobby
+        setIsrejoin={setIsrejoin}
+        lobbyMessages={lobbyMessages}
+        removeLobbyMessage={removeLobbyMessage}
+        // client={client}
+        gameid={gameid}
+        setGameid={setGameid}
+        setPrisonersOrGuards={setPrisonersOrGuards}
+      />
     :
-    <Game prisonersOrGuards={prisonersOrGuards}
-      gameid={gameid}
-      wsmsgs={wsmsgs}
-      client={client}
-      removeMessage={removeMessage}
+      <Game
+        prisonersOrGuards={prisonersOrGuards}
+        gameid={gameid}
+        gameMessages={gameMessages}
+        client={client}
+        removeGameMessage={removeGameMessage}
       />
   )
+}
+
+const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGameid, setPrisonersOrGuards}) => {
+  const [gamelist, setGamelist] = useState([]) // Game ids from other clients
+  const [gamelistP, setGamelistP] = useState([]) // Prisoners game ids from other clients
+  const [gamelistG, setGamelistG] = useState([]) // Guards game ids from other clients
+  const [gamestatuslist, setGamestatuslist] = useState([]) // List of games statuses
+
+  useEffect(() => {
+    let msg = lobbyMessages[0];
+    if (msg) processLobbyMessage(msg);
+        
+  },[lobbyMessages])
+
+  function processLobbyMessage(message) {
+    let messageData = JSON.parse(message);
+    let sendergameid = messageData.gameid;
+    let senderPG = messageData.sender;
+    let newGamelist = [...gamelist];
+    let newGamelistP = [...gamelistP];
+    let newGamelistG = [...gamelistG];
+    let newGamestatuslist = [...gamestatuslist];
+    let anyUpdates = false;
+    if (sendergameid && sendergameid.length > 0) {
+      try {
+        let wt = messageData.whoseturn;
+        if (wt) {
+          let foundgame = false;
+          let gamestatus = "Unknown";
+          if (wt === "X") {
+            gamestatus = "Game over";
+          } else if (wt === "P") {
+            gamestatus = "Prisoners turn";
+          } else if (wt === "G") {
+            gamestatus = "Guards turn";
+          }
+          for(var i = 0; i < newGamestatuslist.length; ++i) {
+            let gs = newGamestatuslist[i];
+            if (gs.gameid === sendergameid) {
+              foundgame = true;
+              if (gs.status !== gamestatus) {
+                anyUpdates = true;
+                newGamestatuslist[i].status = gamestatus;
+              }
+            }
+          }
+          if (!foundgame) {
+            newGamestatuslist = [...newGamestatuslist, {gameid: sendergameid, status: gamestatus}];
+          }
+        }
+        if (newGamelist.indexOf(sendergameid) < 0) {
+          anyUpdates = true;
+          newGamelist = [...newGamelist, sendergameid];
+        }
+        if (senderPG === "P" && newGamelistP.indexOf(sendergameid) < 0) {
+          anyUpdates = true;
+          newGamelistP = [...newGamelistP, sendergameid];
+        } else if (senderPG === "G" && newGamelistG.indexOf(sendergameid) < 0) {
+          anyUpdates = true;
+          newGamelistG = [...newGamelistG, sendergameid];
+        }
+      } catch {
+        window.alert("Error handling game id arrays");
+      }
+      if (anyUpdates) {
+        setGamelist(newGamelist);
+        setGamelistP(newGamelistP);
+        setGamelistG(newGamelistG);
+        setGamestatuslist(newGamestatuslist);
+      }
+    }
+    removeLobbyMessage(message);
+  }
+  function getGameStatus(gid) {
+    for (var i = 0; i < gamestatuslist.length; ++i) {
+      let gs = gamestatuslist[i];
+      if (gs.gameid === gid) {
+        return gs.status;
+      }
+    }
+    return "Unknown";
+  }
+  return <div className="container-fluid">
+    <div className="row">
+      <div className="col-10 pbtitle">
+        Prison Break Lobby
+        <span className="material-icons">run_circle</span>
+      </div>
+      <div className="col-2 pbhomelink">
+        <Link href={"../../"}>
+          <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
+        </Link>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-11 offset-1">
+        <h2>Prisoners: enter a game id and click "Start Game". Tell the Guards the id.</h2>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-11 offset-1">
+        <h2>Guards: get the game id from the Prisoners. Enter the game id and click "Join Game".</h2>
+        <h3>If you lost connection, find and the "Rejoin Game" for your game id and player type.</h3>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-11 offset-1">
+        <h2>Game id:
+          <input
+            name="gameid"
+            value={gameid}
+            onChange={(e) => {
+              setGameid(e.target.value);
+            } } />
+          <label>&nbsp;</label>
+          <button id="startgame" className="pbLobbyActionButton"
+            onClick={function () {
+              if (gameid.length > 0) {
+                if (gamelistP.indexOf(gameid) > -1) {
+                  window.alert("Prisoners already playing that game");
+                } else {
+                  setPrisonersOrGuards('P');
+                }
+              }
+            } }
+          >
+            Start Game
+          </button>
+          <label>&nbsp;</label>
+          <button id="joingame" className="pbLobbyActionButton"
+            onClick={function () {
+              if (gameid.length > 0) {
+                if (gamelistG.indexOf(gameid) > -1) {
+                  window.alert("Guards already playing that game");
+                } else {
+                  setPrisonersOrGuards('G');
+                }
+              }
+            } }
+          >
+            Join Game
+          </button>
+        </h2>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col offset-1">
+        <h1>Games in progress:</h1>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col offset-2">
+        <table>
+          <thead>
+            <tr className="pbLobbyGamesHeader">
+              <th className="pbLobbyGamesHeaderCol">Game ID<p>Click to select</p></th>
+              <th className="pbLobbyGamesHeaderCol">Prisoners<p>Playing?</p></th>
+              <th className="pbLobbyGamesHeaderCol">Available<p>Action</p></th>
+              <th className="pbLobbyGamesHeaderCol">Guards<p>Playing?</p></th>
+              <th className="pbLobbyGamesHeaderCol">Available<p>Action</p></th>
+              <th className="pbLobbyGamesHeaderCol">Game status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {gamelist.map((value, index) => (
+              <tr key={`OtherGame${index}`}>
+                <td className="pbLobbyGameid" onClick={function(){setGameid(value)}}>{value}</td>
+                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistP.indexOf(value) > -1 ? "check_circle" : "cancel"}</span></td>
+                {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistP.indexOf(value) > -1 ?
+                  <td id={`PrisonersRejoin${index}`}>
+                    <button className="pbLobbyActionButton"
+                      onClick={function () {
+                        setIsrejoin(true);
+                        setGameid(value);
+                        setPrisonersOrGuards('P');
+                      } }
+                    >
+                      Rejoin Game
+                    </button>
+                  </td>
+                :
+                  <td id={`PrisonersStart${index}`}>
+                    <button className="pbLobbyActionButton"
+                      onClick={function () {
+                        setGameid(value);
+                        setPrisonersOrGuards('P');
+                      } }
+                    >
+                      Start Game
+                    </button>
+                  </td>
+                }
+                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistG.indexOf(value) > -1 ? "check_circle_outline" : "highlight_off"}</span></td>
+                {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistG.indexOf(value) > -1 ?
+                  <td id={`GuardsRejoin${index}`}>
+                    <button className="pbLobbyActionButton"
+                      onClick={function () {
+                        setIsrejoin(true);
+                        setGameid(value);
+                        setPrisonersOrGuards('G');
+                      } }
+                    >
+                      Rejoin Game
+                    </button>
+                  </td>
+                :
+                  <td id={`GuardsJoin${index}`}>
+                    <button className="pbLobbyActionButton"
+                      onClick={function () {
+                        setGameid(value);
+                        setPrisonersOrGuards('G');
+                      } }
+                    >
+                      Join Game
+                    </button>
+                  </td>
+                }
+                <td className="pbLobbyGameStatus">
+                  {getGameStatus(value)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>;
 }
 
 const Square = (props) => {
@@ -287,12 +478,12 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   );
 };
 
-const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
+const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, removeGameMessage}) => {
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
-  const [squares, setSquares] = useState(Array(15).fill(Array(15).fill(".")));
-  const [usedby, setUsedby] = useState(Array(15).fill(Array(15).fill("")));
+  const [squares, setSquares] = useState([...initialsquares]);
+  const [usedby, setUsedby] = useState([...initialusedby]);
   const [selection, setSelection] = useState(-1); // relative to rack of player making a play
   const [whoseturn, setWhoseturn] = useState("P"); // game starts with prisoners play
   const [currentcoords, setCurrentcoords] = useState([]);
@@ -300,10 +491,10 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
   const [rcd, setRcd] = useState([-1,-1,""]);
   const [passed, setPassed] = useState(false); // true when opponent just passed; if both pass the game ends
   const [snapshot, setSnapshot] = useState({
-    squares: [...squares],
-    usedby: [...usedby],
-    ptiles: [...ptiles],
-    gtiles: [...gtiles],
+    squares: [...initialsquares],
+    usedby: [...initialusedby],
+    ptiles: [],
+    gtiles: [],
   });
 
   useEffect(() => {
@@ -318,11 +509,11 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
     return () => clearInterval(interval);
   }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
 
-  useEffect(() => {
-    if (prisonersOrGuards === "P") {
-      let tempPTiles = [...ptiles];
-      let tempGTiles = [...gtiles];
-      let tempTiles = [...tiles];
+  useEffect(() => { // This code executes first time Game is used only
+    if (!isrejoin && prisonersOrGuards === "P") { // Prisoner is starting the game so pick racks
+      let tempPTiles = [];
+      let tempGTiles = [];
+      let tempTiles = [...initialtiles];
       while (tempPTiles.length < 7) {
         let rand = Math.floor(Math.random() * tempTiles.length);
         tempPTiles.push(tempTiles[rand]);
@@ -337,41 +528,57 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       setPtiles(tempPTiles);
       setTiles(tempTiles);
       setSnapshot({
-        squares: [...squares],
-        usedby: [...usedby],
+        squares: [...initialsquares],
+        usedby: [...initialusedby],
         ptiles: [...tempPTiles],
         gtiles: [...tempGTiles]    
       });
     }
     else
     {
+      // Prisoner rejoin or guard join or guard rejoin
       try {
         client.send(
           JSON.stringify({
             gameid: gameid, // the id for the game
             type: "pb", // prisonbreak
-            func: "ggd" // get game data
+            func: "requestgamedata", // request game data
+            sender: prisonersOrGuards
         }));
       }
       catch {}
     }
   }, []);
   useEffect(() => {
-    let msg = wsmsgs[0];
-    if (msg) processMessage(msg);
+    let msg = gameMessages[0];
+    if (msg) processGameMessage(msg);
         
-  },[wsmsgs])
+  },[gameMessages])
 
-  function processMessage(message) {
-    let messageData = JSON.parse(message); // was message.data
-    if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
-      if (messageData.func === "requestgamedata" && messageData.requestor !== prisonersOrGuards) { // Opponent requested game info
+  function processGameMessage(message) {
+    let messageData = JSON.parse(message);
+    console.log("processGameMessage type=" + messageData.type + ", func=" + messageData.func);
+    console.log(messageData.gameid + " vs " + gameid);
+    console.log(messageData.sender + " vs " + prisonersOrGuards);
+    if (messageData.type === "announce") {
+      client.send(
+        JSON.stringify({
+          type: "pb",
+          func: "hello",
+          sender: prisonersOrGuards,
+          gameid: gameid,
+          whoseturn: whoseturn
+        })
+      );
+    }
+    else if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+      if (messageData.func === "requestgamedata" && messageData.sender !== prisonersOrGuards) { // Opponent requested game info
         client.send(
           JSON.stringify({
             gameid: gameid, // the id for the game
             type: "pb", // prisonbreak
             func: "providegamedata", // provide game data
-            sender: prisonersOrGuards, // who sent the data
+            sender: prisonersOrGuards,
             tiles: tiles,
             squares: squares,
             ptiles: ptiles,
@@ -388,40 +595,6 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       }
       if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards && whoseturn !== prisonersOrGuards && whoseturn !== "X") { 
         // opponent provided game data and this player is still waiting to see opponent move
-        setTiles(messageData.tiles);
-        setSquares(messageData.squares);
-        setPtiles(messageData.ptiles);
-        setGtiles(messageData.gtiles);
-        setUsedby(messageData.usedby);
-        setWhoseturn(messageData.whoseturn);
-        setSelection(messageData.selection);
-        setCurrentcoords(messageData.currentcoords);
-        setSnapshot(messageData.snapshot);
-        setPassed(messageData.passed);
-        setRescues(messageData.rescues);
-      }
-      // when guards join game they send ggd, and prisoner picks it up and sends sgd, then guards pick that up and take the data
-      if (messageData.func === "ggd" && prisonersOrGuards === "P") { // get game data (sent by guards, prisoners respond here)
-        client.send(
-          JSON.stringify({
-            gameid: gameid, // the id for the game
-            type: "pb", // prisonbreak
-            func: "sgd", // send game data
-            tiles: tiles,
-            squares: squares,
-            ptiles: ptiles,
-            gtiles: gtiles,
-            usedby: usedby,
-            whoseturn: whoseturn,
-            selection: selection,
-            currentcoords: currentcoords,
-            snapshot: snapshot,
-            passed: passed,
-            rescues: rescues // may have rescued another prisoner
-          })
-        );
-      }
-      if (messageData.func === "sgd" && prisonersOrGuards === "G") { // send game data (prisoners sent it, guards now get it)
         setTiles(messageData.tiles);
         setSquares(messageData.squares);
         setPtiles(messageData.ptiles);
@@ -470,7 +643,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         });       
       }
     }
-    removeMessage(message);
+    removeGameMessage(message);
   }
   
   // Calling setSelection (from handleKeyDown) then handleBoardSquareClick does not let it recognize selection with the new value
@@ -611,6 +784,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
+        sender: prisonersOrGuards,
         squares: squares, // this was being changed as the tiles were being played
         usedby: usedby, // this was being changed as the tiles were being played
         ptiles: newPtiles, // we picked new tiles for prisoners rack
@@ -660,6 +834,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
+        sender: prisonersOrGuards,
         squares: squares, // this was being changed as the tiles were being played
         usedby: usedby, // this was being changed as the tiles were being played
         gtiles: newGtiles, // we picked new tiles for guards rack
@@ -705,6 +880,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
+        sender: prisonersOrGuards,
         whoseturn: "G", // swap never ends the game so go to opponent
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
@@ -752,6 +928,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
+        sender: prisonersOrGuards,
         whoseturn: "P", // swap never ends the game so go to opponent
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
@@ -849,6 +1026,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
+        sender: prisonersOrGuards,
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
         ptiles: snapshot.ptiles, // prisoners rack did not change
@@ -870,6 +1048,7 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
+        sender: prisonersOrGuards,
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
         gtiles: snapshot.gtiles, // guards rack did not change
@@ -885,8 +1064,8 @@ const Game = ({prisonersOrGuards, gameid, wsmsgs, client, removeMessage}) => {
       JSON.stringify({
         gameid: gameid, // the id for the game
         type: "pb", // prisonbreak
-        func: "requestgamedata", // request game data
-        requestor: prisonersOrGuards
+        sender: prisonersOrGuards,
+        func: "requestgamedata" // request game data
       })
     )
   }

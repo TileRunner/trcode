@@ -44,6 +44,7 @@ export default class CustomSocket {
         // onopen - called when connection is open and ready to send and receive data.
         this.customSocket.onopen = (event) => {
             console.log("connected to " + this.socketUrl);
+            this.send(JSON.stringify({type:"announce",func:"announce"}));
         };
 
         // onclose - called when the connection's closes.
