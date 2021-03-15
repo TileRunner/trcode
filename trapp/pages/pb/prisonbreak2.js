@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
+const numrows = 15;
+const middlerow = 7;
+const lastrow = numrows - 1;
+const numcols = 15;
+const middlecol = 7;
+const lastcol = numcols - 1;
+const racklen = 7;
+const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
+
 const escapehatches = [
   "0-0",
-  "0-7",
-  "0-14",
-  "7-0",
-  "7-14",
-  "14-0",
-  "14-7",
-  "14-14",
+  "0-" + middlecol,
+  "0-" + lastcol,
+  middlerow + "-0",
+  middlerow + "-" + lastcol,
+  lastrow + "-0",
+  lastrow + "-" + middlecol,
+  lastrow + "-" + lastcol
 ]; // coords of escape hatches
 const initialtiles = [
   "A",
@@ -113,8 +122,8 @@ const initialtiles = [
   "?",
   "?",
 ]; // initial tile pool
-const initialsquares = Array(15).fill(Array(15).fill("."));
-const initialusedby = Array(15).fill(Array(15).fill(""));
+const initialsquares = Array(numrows).fill(Array(numcols).fill("."));
+const initialusedby = Array(numrows).fill(Array(numcols).fill(""));
 
 export default function PrisonBreak() {
   const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins
@@ -269,7 +278,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
     <div className="row">
       <div className="col-11 offset-1">
         <h2>Guards: get the game id from the Prisoners. Enter the game id and click "Join Game".</h2>
-        <h3>If you lost connection, find and the "Rejoin Game" for your game id and player type.</h3>
+        <h3>If you lost connection, find and click the "Reconnect" button for your game id and player type.</h3>
       </div>
     </div>
     <div className="row">
@@ -332,7 +341,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
           </thead>
           <tbody>
             {gamelist.map((value, index) => (
-              <tr key={`OtherGame${index}`}>
+              <tr key={`OtherGame${index}`} className="pbGamesInProgressRow">
                 <td className="pbLobbyGameid" onClick={function(){setGameid(value)}}>{value}</td>
                 <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistP.indexOf(value) > -1 ? "check_circle" : "cancel"}</span></td>
                 {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistP.indexOf(value) > -1 ?
@@ -344,7 +353,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
                         setPrisonersOrGuards('P');
                       } }
                     >
-                      Rejoin Game
+                      Reconnect
                     </button>
                   </td>
                 :
@@ -359,7 +368,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
                     </button>
                   </td>
                 }
-                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistG.indexOf(value) > -1 ? "check_circle_outline" : "highlight_off"}</span></td>
+                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistG.indexOf(value) > -1 ? "check_circle" : "cancel"}</span></td>
                 {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistG.indexOf(value) > -1 ?
                   <td id={`GuardsRejoin${index}`}>
                     <button className="pbLobbyActionButton"
@@ -369,7 +378,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
                         setPrisonersOrGuards('G');
                       } }
                     >
-                      Rejoin Game
+                      Reconnect
                     </button>
                   </td>
                 :
@@ -414,10 +423,10 @@ const Square = (props) => {
       ? "pbSquareRightArrow"
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
       ? "pbSquareDownArrow"
-      : props.ri === 7 && props.ci === 7
+      : props.ri === middlerow && props.ci === middlecol
       ? "pbSquareCenterSquare"
-      : (props.ri === 0 || props.ri === 7 || props.ri === 14) &&
-        (props.ci === 0 || props.ci === 7 || props.ci === 14)
+      : (props.ri === 0 || props.ri === middlerow || props.ri === lastrow) &&
+        (props.ci === 0 || props.ci === middlecol || props.ci === lastcol)
       ? "pbSquareEscapeHatch"
       : props.ri % 2 === props.ci % 2
       ? "pbSquare1"
@@ -505,7 +514,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         console.log("Interval: prisonersOrGuards=" + prisonersOrGuards + " whoseturn=" + whoseturn + " at " + Date().toLocaleString());
         requestGameData(); // Send a request for game data in case opponent moved and we missed the update
       }
-    }, 120000); // this many milliseconds between above code block executions
+    }, movewaittime); // this many milliseconds between above code block executions
     return () => clearInterval(interval);
   }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
 
@@ -514,7 +523,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       let tempPTiles = [];
       let tempGTiles = [];
       let tempTiles = [...initialtiles];
-      while (tempPTiles.length < 7) {
+      while (tempPTiles.length < racklen) {
         let rand = Math.floor(Math.random() * tempTiles.length);
         tempPTiles.push(tempTiles[rand]);
         tempTiles.splice(rand, 1);
@@ -755,14 +764,14 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     }
     let newPtiles = [...ptiles];
     let newTiles = [...tiles];
-    while (newPtiles.length < 7 && newTiles.length > 0) {
+    while (newPtiles.length < racklen && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newPtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
     }
     newPtiles.sort();
     let newWhoseturn = newPtiles.length > 0 ? "G" : "X"; // X = game over
-    if (usedby[0][0] !== "" && usedby[0][7] !== "" && usedby[0][14] !== "" && usedby[7][0] !== "" && usedby[7][14] !== "" && usedby[14][0] !== "" && usedby[14][7] !== "" && usedby[14][14] !== "") {
+    if (usedby[0][0] !== "" && usedby[0][middlecol] !== "" && usedby[0][lastcol] !== "" && usedby[middlerow][0] !== "" && usedby[middlerow][lastcol] !== "" && usedby[lastrow][0] !== "" && usedby[lastrow][middlecol] !== "" && usedby[lastrow][lastcol] !== "") {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -802,7 +811,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     }
     let newGtiles = [...gtiles];
     let newTiles = [...tiles];
-    while (newGtiles.length < 7 && newTiles.length > 0) {
+    while (newGtiles.length < racklen && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newGtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -813,7 +822,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     let snapptiles = [...ptiles];
     let snapgtiles = [...gtiles];
     let newWhoseturn = newGtiles.length > 0 ? "P" : "X"; // X = game over
-    if (usedby[0][0] !== "" && usedby[0][7] !== "" && usedby[0][14] !== "" && usedby[7][0] !== "" && usedby[7][14] !== "" && usedby[14][0] !== "" && usedby[14][7] !== "" && usedby[14][14] !== "") {
+    if (usedby[0][0] !== "" && usedby[0][middlecol] !== "" && usedby[0][lastcol] !== "" && usedby[middlerow][0] !== "" && usedby[middlerow][lastcol] !== "" && usedby[lastrow][0] !== "" && usedby[lastrow][middlecol] !== "" && usedby[lastrow][lastcol] !== "") {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -846,13 +855,13 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     };
 
   const swapPrisonersTiles = () => {
-    if (tiles.length < 7) {
-      window.alert("Need 7 in the bag to exchange")
+    if (tiles.length < racklen) {
+      window.alert("Need " + $racklen + " tiles in the bag to exchange")
       return;
     }
     let newPtiles = [];
     let newTiles = [...tiles];
-    while (newPtiles.length < 7 && newTiles.length > 0) {
+    while (newPtiles.length < racklen && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newPtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -894,13 +903,13 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
   }
   
   const swapGuardsTiles = () => {
-    if (tiles.length < 7) {
-      window.alert("Need 7 in the bag to exchange")
+    if (tiles.length < racklen) {
+      window.alert("Need " + $racklen + " tiles in the bag to exchange")
       return;
     }
     let newGtiles = [];
     let newTiles = [...tiles];
-    while (newGtiles.length < 7 && newTiles.length > 0) {
+    while (newGtiles.length < racklen && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newGtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -941,16 +950,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
   }
 
   function isPlayValid() {
-    if (squares[7][7] === ".") {
+    if (squares[middlerow][middlecol] === ".") {
       window.alert("First play must hit center square");
       return false;
     }
-    let lowrow = 15;
+    let lowrow = numrows;
     let highrow = -1;
-    let lowcol = 15;
+    let lowcol = numcols;
     let highcol = -1;
-    for (var r=0; r < 15; ++r) {
-      for (var c=0; c < 15; ++c) {
+    for (var r=0; r < numrows; ++r) {
+      for (var c=0; c < numcols; ++c) {
         if (squares[r][c] !== ".") {
           if (!(r > 0 && squares[r-1][c] !== ".") &&
            !(c > 0 && squares[r][c-1] !== ".") &&
@@ -970,7 +979,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         }        
       }
     }
-    if (lowrow === 15) {
+    if (lowrow === numrows) {
       window.alert("You didn't play any tiles");
       return false;
     }
@@ -1000,7 +1009,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     if (lowrow === highrow && highcol < 14 && snapshot.squares[lowrow][highcol+1] !== ".") { playthru = true; }
     if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== ".") { playthru = true; }
     if (lowcol === highcol && highrow < 14 && snapshot.squares[highrow+1][lowcol] !== ".") { playthru = true; }
-    if (!playthru && !hookmade && snapshot.squares[7][7] !== ".") {
+    if (!playthru && !hookmade && snapshot.squares[middlerow][middlecol] !== ".") {
       window.alert("Words must be connected");
       return false;
     }
@@ -1094,7 +1103,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
           let newRcd = rcd;
           if (dir === "r") { // playing rightwards
             let newc = -1;
-            for (var c = col + 1; c < 15 && newc === -1; c++) {
+            for (var c = col + 1; c < numcols && newc === -1; c++) {
               if (squares[row][c] === ".") {newc = c;}
             }
             if (newc === -1) {
@@ -1107,7 +1116,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
           }
           if (dir === "d") { // playing downwards
             let newr = -1;
-            for (var r = row + 1; r < 15 && newr === -1; r++) {
+            for (var r = row + 1; r < numrows && newr === -1; r++) {
               if (squares[r][col] === ".") {newr = r;}
             }
             if (newr === -1) {

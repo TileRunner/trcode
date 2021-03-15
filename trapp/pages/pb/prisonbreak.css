@@ -264,17 +264,31 @@
 .pbLobbyGamesHeader {
     font-weight: bolder;
     font-size: larger;
-    background-color: lightseagreen;
+    background-color: darkslateblue;
+    color: whitesmoke;
     text-align: center;
+}
+.pbGamesInProgressRow:nth-child(odd) {
+    background-color: lightblue;
+}
+.pbGamesInProgressRow:nth-child(even) {
+    background-color: cornflowerblue;
+}
+.pbGamesInProgressRow:last-child {
+    border-bottom-style: double;
+    border-color: whitesmoke;
+    border-left-style: solid;
+    border-right-style: solid;
 }
 .pbLobbyGamesHeaderCol {
     padding-left: 10px;
     padding-right: 10px;
     border-left-style: solid;
     border-right-style: solid;
+    border-top-style:double
 }
 .pbLobbyGameid {
-    font-family: monospace;
+    font-family: 'Courier New', Courier, monospace;
     font-weight: bolder;
     font-size: larger;
 }
