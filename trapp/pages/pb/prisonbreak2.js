@@ -122,35 +122,32 @@ const initialtiles = [
   "?",
   "?",
 ]; // initial tile pool
-const initialsquares = Array(numrows).fill(Array(numcols).fill("."));
-const initialusedby = Array(numrows).fill(Array(numcols).fill(""));
+const squareunused = ".";
+const usedbynoone = "";
+const initialsquares = Array(numrows).fill(Array(numcols).fill(squareunused));
+const initialusedby = Array(numrows).fill(Array(numcols).fill(usedbynoone));
+const nodirection = "";
+const availableActionNone = 0;
+const availableActionStart = 1;
+const availableActionJoin = 2;
+const availableActionReconnect = 3;
 
 export default function PrisonBreak() {
   const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins
   const [gameid, setGameid] = useState('')
+  const [nickname, setNickname] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
-  const [gameMessages, setGameMessages] = useState([]) // Messages for while playing the game
-  const [lobbyMessages, setLobbyMessages] = useState([]) // Messages for while in the lobby
+  const [messages, setMessages] = useState([]) // Messages from the websocket
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
     // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
-    // Hence I cannot selectively set lobby or game messages based on whether prisonersOrGuards is set yet.
-    // However, setting the arrays below does somehow seem to get the message across.
-    // Perhaps the arrays are always empty here and it only ever adds a value? I am confused about this.
-    setLobbyMessages((curr) => [...curr, message.data])
-    setGameMessages((curr) => [...curr, message.data])
+    setMessages((curr) => [...curr, message.data])
   }
-  const removeLobbyMessage = (messageData) => {
-    let i = lobbyMessages.indexOf(messageData);
-    let w = [...lobbyMessages];
+  const removeMessage = (messageData) => {
+    let i = messages.indexOf(messageData);
+    let w = [...messages];
     w.splice(i,1);
-    setLobbyMessages(w);
-  }
-  const removeGameMessage = (messageData) => {
-    let i = gameMessages.indexOf(messageData);
-    let w = [...gameMessages];
-    w.splice(i,1);
-    setGameMessages(w);
+    setMessages(w);
   }
   const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
   useEffect(() => (
@@ -160,103 +157,119 @@ export default function PrisonBreak() {
     prisonersOrGuards === '' ?
       <Lobby
         setIsrejoin={setIsrejoin}
-        lobbyMessages={lobbyMessages}
-        removeLobbyMessage={removeLobbyMessage}
+        lobbyMessages={messages}
+        removeLobbyMessage={removeMessage}
         // client={client}
         gameid={gameid}
         setGameid={setGameid}
+        nickname={nickname}
+        setNickname={setNickname}
         setPrisonersOrGuards={setPrisonersOrGuards}
       />
     :
       <Game
+        isrejoin={isrejoin}
         prisonersOrGuards={prisonersOrGuards}
         gameid={gameid}
-        gameMessages={gameMessages}
+        nickname={nickname}
+        gameMessages={messages}
         client={client}
-        removeGameMessage={removeGameMessage}
+        removeGameMessage={removeMessage}
       />
   )
 }
 
-const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGameid, setPrisonersOrGuards}) => {
-  const [gamelist, setGamelist] = useState([]) // Game ids from other clients
-  const [gamelistP, setGamelistP] = useState([]) // Prisoners game ids from other clients
-  const [gamelistG, setGamelistG] = useState([]) // Guards game ids from other clients
-  const [gamestatuslist, setGamestatuslist] = useState([]) // List of games statuses
+const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards}) => {
+  const [gamelist, setGamelist] = useState([]) // Game info by game id
 
   useEffect(() => {
     let msg = lobbyMessages[0];
     if (msg) processLobbyMessage(msg);
-        
   },[lobbyMessages])
 
   function processLobbyMessage(message) {
-    let messageData = JSON.parse(message);
-    let sendergameid = messageData.gameid;
-    let senderPG = messageData.sender;
-    let newGamelist = [...gamelist];
-    let newGamelistP = [...gamelistP];
-    let newGamelistG = [...gamelistG];
-    let newGamestatuslist = [...gamestatuslist];
-    let anyUpdates = false;
-    if (sendergameid && sendergameid.length > 0) {
-      try {
-        let wt = messageData.whoseturn;
-        if (wt) {
-          let foundgame = false;
-          let gamestatus = "Unknown";
-          if (wt === "X") {
-            gamestatus = "Game over";
-          } else if (wt === "P") {
-            gamestatus = "Prisoners turn";
-          } else if (wt === "G") {
-            gamestatus = "Guards turn";
-          }
-          for(var i = 0; i < newGamestatuslist.length; ++i) {
-            let gs = newGamestatuslist[i];
-            if (gs.gameid === sendergameid) {
-              foundgame = true;
-              if (gs.status !== gamestatus) {
-                anyUpdates = true;
-                newGamestatuslist[i].status = gamestatus;
-              }
+    try {
+      let messageData = JSON.parse(message);
+      let sendergameid = messageData.gameid;
+      let sendernickname = messageData.nickname;
+      let wt = messageData.whoseturn;
+      if (sendergameid && sendergameid.length > 0 && wt && wt.length > 0) {
+        let anyUpdates = false;
+        let senderPG = messageData.sender;
+        let newGamelist = [...gamelist];
+        let gi = getGamelistIndex(sendergameid);
+        let newPlayingP = senderPG === "P" ? true : gi > -1 ? gamelist[gi].playingP : false;
+        let newPlayingG = senderPG === "G" ? true : gi > -1 ? gamelist[gi].playingG : false;
+
+        let newgamestatus = "Unknown";
+        if (wt === "X") {
+          newgamestatus = "Game over";
+        } else if (wt === "P") {
+          newgamestatus = "Prisoners turn";
+        } else if (wt === "G") {
+          newgamestatus = "Guards turn";
+        }
+
+        let newgamedata = {
+          gameid: sendergameid,
+          nicknameP: senderPG === "P" ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
+          nicknameG: senderPG === "G" ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
+          gamestatus: newgamestatus,
+          playingP: newPlayingP,
+          playingG: newPlayingG
+        }
+        if (gi < 0) { // Game not in list yet, put it in the list
+          anyUpdates = true;
+          newGamelist = [...newGamelist, newgamedata];
+        }
+        else { // Game is in the list, check for needed updates
+          let oldgamedata = gamelist[gi];
+          if (oldgamedata.nicknameP !== newgamedata.nicknameP ||
+              oldgamedata.nicknameG !== newgamedata.nicknameG ||
+              oldgamedata.gamestatus !== newgamedata.gamestatus ||
+              oldgamedata.playingP !== newgamedata.playingP ||
+              oldgamedata.playingG !== newgamedata.playingG
+            ) {
+              anyUpdates = true;
+              newGamelist[gi] = newgamedata;
             }
-          }
-          if (!foundgame) {
-            newGamestatuslist = [...newGamestatuslist, {gameid: sendergameid, status: gamestatus}];
-          }
         }
-        if (newGamelist.indexOf(sendergameid) < 0) {
-          anyUpdates = true;
-          newGamelist = [...newGamelist, sendergameid];
+        if (anyUpdates) {
+          setGamelist(newGamelist);
         }
-        if (senderPG === "P" && newGamelistP.indexOf(sendergameid) < 0) {
-          anyUpdates = true;
-          newGamelistP = [...newGamelistP, sendergameid];
-        } else if (senderPG === "G" && newGamelistG.indexOf(sendergameid) < 0) {
-          anyUpdates = true;
-          newGamelistG = [...newGamelistG, sendergameid];
-        }
-      } catch {
-        window.alert("Error handling game id arrays");
-      }
-      if (anyUpdates) {
-        setGamelist(newGamelist);
-        setGamelistP(newGamelistP);
-        setGamelistG(newGamelistG);
-        setGamestatuslist(newGamestatuslist);
-      }
+      }  
+    } catch {
+      window.alert("Error processing lobby message");
     }
     removeLobbyMessage(message);
   }
-  function getGameStatus(gid) {
-    for (var i = 0; i < gamestatuslist.length; ++i) {
-      let gs = gamestatuslist[i];
-      if (gs.gameid === gid) {
-        return gs.status;
+  function getGamelistIndex(gid) {
+    for (var i = 0; i < gamelist.length; ++i) {
+      if (gamelist[i].gameid === gid) {
+        return i;
       }
     }
-    return "Unknown";
+    return -1;
+  }
+  function isPlayingP(gid) {
+    let gi = getGamelistIndex(gid);
+    return gi < 0 ? false : gamelist[gi].playingP;
+  }
+  function isPlayingG(gid) {
+    let gi = getGamelistIndex(gid);
+    return gi < 0 ? false : gamelist[gi].playingG;
+  }
+  function availableActionP(gd) {
+    if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
+    if (!gd.playingP) { return availableActionStart; }
+    if (gd.nicknameP === nickname) { return availableActionReconnect; }
+    return availableActionNone;
+  }
+  function availableActionG(gd) {
+    if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
+    if (!gd.playingG) { return availableActionJoin; }
+    if (gd.nicknameG === nickname) { return availableActionReconnect; }
+    return availableActionNone;
   }
   return <div className="container-fluid">
     <div className="row">
@@ -271,19 +284,25 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
       </div>
     </div>
     <div className="row">
-      <div className="col-11 offset-1">
-        <h2>Prisoners: enter a game id and click "Start Game". Tell the Guards the id.</h2>
+      <div className="col-11 offset-1 h2">
+        <label>*Nickname:&nbsp;</label>
+        <input
+              name="nickname"
+              value={nickname}
+              onChange={(e) => {
+                setNickname(e.target.value);
+              } } />
+        <span>(*required)</span>
       </div>
     </div>
     <div className="row">
       <div className="col-11 offset-1">
-        <h2>Guards: get the game id from the Prisoners. Enter the game id and click "Join Game".</h2>
-        <h3>If you lost connection, find and click the "Reconnect" button for your game id and player type.</h3>
+        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id and click "Start Game".</span>
       </div>
     </div>
     <div className="row">
-      <div className="col-11 offset-1">
-        <h2>Game id:
+      <div className="col-10 offset-2">
+        <h2>Game id:&nbsp;
           <input
             name="gameid"
             value={gameid}
@@ -294,7 +313,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
           <button id="startgame" className="pbLobbyActionButton"
             onClick={function () {
               if (gameid.length > 0) {
-                if (gamelistP.indexOf(gameid) > -1) {
+                if (isPlayingP(gameid)) {
                   window.alert("Prisoners already playing that game");
                 } else {
                   setPrisonersOrGuards('P');
@@ -304,26 +323,19 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
           >
             Start Game
           </button>
-          <label>&nbsp;</label>
-          <button id="joingame" className="pbLobbyActionButton"
-            onClick={function () {
-              if (gameid.length > 0) {
-                if (gamelistG.indexOf(gameid) > -1) {
-                  window.alert("Guards already playing that game");
-                } else {
-                  setPrisonersOrGuards('G');
-                }
-              }
-            } }
-          >
-            Join Game
-          </button>
         </h2>
       </div>
     </div>
     <div className="row">
+      <div className="col-11 offset-1">
+        <span className="pbPlayerTitle h2">&nbsp;GUARDS&nbsp;</span><span className="h3">&nbsp;&nbsp;&nbsp;Find and click the "Join Game" button for your game.</span>
+        <hr></hr>
+        <h3>If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+      </div>
+    </div>
+    <div className="row">
       <div className="col offset-1">
-        <h1>Games in progress:</h1>
+        <h1>Game list:</h1>
       </div>
     </div>
     <div className="row">
@@ -331,36 +343,36 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
         <table>
           <thead>
             <tr className="pbLobbyGamesHeader">
-              <th className="pbLobbyGamesHeaderCol">Game ID<p>Click to select</p></th>
-              <th className="pbLobbyGamesHeaderCol">Prisoners<p>Playing?</p></th>
-              <th className="pbLobbyGamesHeaderCol">Available<p>Action</p></th>
-              <th className="pbLobbyGamesHeaderCol">Guards<p>Playing?</p></th>
-              <th className="pbLobbyGamesHeaderCol">Available<p>Action</p></th>
+              <th className="pbLobbyGamesHeaderCol">Game ID</th>
+              <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
+              <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
               <th className="pbLobbyGamesHeaderCol">Game status</th>
             </tr>
           </thead>
           <tbody>
             {gamelist.map((value, index) => (
               <tr key={`OtherGame${index}`} className="pbGamesInProgressRow">
-                <td className="pbLobbyGameid" onClick={function(){setGameid(value)}}>{value}</td>
-                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistP.indexOf(value) > -1 ? "check_circle" : "cancel"}</span></td>
-                {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistP.indexOf(value) > -1 ?
+                <td className="pbLobbyGameid">{value.gameid}</td>
+                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingP ? "check_circle" : "cancel"}</span></td>
+                {availableActionP(value) === availableActionNone ?
+                  <td className="pbLobbyActionNone">No action available</td>
+                : availableActionP(value) === availableActionReconnect ?
                   <td id={`PrisonersRejoin${index}`}>
                     <button className="pbLobbyActionButton"
                       onClick={function () {
                         setIsrejoin(true);
-                        setGameid(value);
+                        setGameid(value.gameid);
                         setPrisonersOrGuards('P');
                       } }
                     >
                       Reconnect
                     </button>
                   </td>
-                :
+                  :
                   <td id={`PrisonersStart${index}`}>
                     <button className="pbLobbyActionButton"
                       onClick={function () {
-                        setGameid(value);
+                        setGameid(value.gameid);
                         setPrisonersOrGuards('P');
                       } }
                     >
@@ -368,24 +380,26 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
                     </button>
                   </td>
                 }
-                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{gamelistG.indexOf(value) > -1 ? "check_circle" : "cancel"}</span></td>
-                {getGameStatus(value) === "Game over" ? <td className="pbLobbyActionNone">None</td> : gamelistG.indexOf(value) > -1 ?
+                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingG ? "check_circle" : "cancel"}</span></td>
+                {availableActionG(value) === availableActionNone ?
+                  <td className="pbLobbyActionNone">No action available</td>
+                : availableActionG(value) === availableActionReconnect ?
                   <td id={`GuardsRejoin${index}`}>
                     <button className="pbLobbyActionButton"
                       onClick={function () {
                         setIsrejoin(true);
-                        setGameid(value);
+                        setGameid(value.gameid);
                         setPrisonersOrGuards('G');
                       } }
                     >
                       Reconnect
                     </button>
                   </td>
-                :
+                  :
                   <td id={`GuardsJoin${index}`}>
                     <button className="pbLobbyActionButton"
                       onClick={function () {
-                        setGameid(value);
+                        setGameid(value.gameid);
                         setPrisonersOrGuards('G');
                       } }
                     >
@@ -394,7 +408,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
                   </td>
                 }
                 <td className="pbLobbyGameStatus">
-                  {getGameStatus(value)}
+                  {value.gamestatus}
                 </td>
               </tr>
             ))}
@@ -417,7 +431,7 @@ const Square = (props) => {
       ? "pbSquareUsedByPrisoners"
       : "pbSquareUsedByGuards";
   const tdclass = 
-    props.c !== "."
+    props.c !== squareunused
       ? usedbyclass
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
       ? "pbSquareRightArrow"
@@ -432,7 +446,7 @@ const Square = (props) => {
       ? "pbSquare1"
       : "pbSquare2";
   const tdvalue =
-    props.c !== "."
+    props.c !== squareunused
       ? props.c
       : tdclass === "pbSquareRightArrow"
       ? "➡"
@@ -443,8 +457,8 @@ const Square = (props) => {
       : tdclass === "pbSquareEscapeHatch"
       ? "ꐕ" //💫
       : props.ri % 2 === props.ci % 2
-      ? "."//"☹"//"⎔"
-      : ".";//"ꐕ";//"✦";
+      ? "."// Display truly mucked up if I use empty string
+      : ".";// Ditto. The dot blends in with the background image.
   return (
     tdclass === "pbSquareEscapeHatch" ?
     <button className={tdclass} onClick={props.onClick}>
@@ -487,7 +501,7 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   );
 };
 
-const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, removeGameMessage}) => {
+const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, gameMessages, client, removeGameMessage}) => {
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
@@ -497,7 +511,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
   const [whoseturn, setWhoseturn] = useState("P"); // game starts with prisoners play
   const [currentcoords, setCurrentcoords] = useState([]);
   const [rescues, setRescues] = useState(0);
-  const [rcd, setRcd] = useState([-1,-1,""]);
+  const [rcd, setRcd] = useState([-1,-1,nodirection]);
   const [passed, setPassed] = useState(false); // true when opponent just passed; if both pass the game ends
   const [snapshot, setSnapshot] = useState({
     squares: [...initialsquares],
@@ -542,6 +556,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         ptiles: [...tempPTiles],
         gtiles: [...tempGTiles]    
       });
+      client.send(
+        JSON.stringify({
+          type: "pb",
+          func: "hello",
+          sender: prisonersOrGuards,
+          gameid: gameid,
+          nickname: nickname, // player nickname
+          whoseturn: whoseturn
+        })
+      );
     }
     else
     {
@@ -550,6 +574,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         client.send(
           JSON.stringify({
             gameid: gameid, // the id for the game
+            nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "requestgamedata", // request game data
             sender: prisonersOrGuards
@@ -566,9 +591,6 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
 
   function processGameMessage(message) {
     let messageData = JSON.parse(message);
-    console.log("processGameMessage type=" + messageData.type + ", func=" + messageData.func);
-    console.log(messageData.gameid + " vs " + gameid);
-    console.log(messageData.sender + " vs " + prisonersOrGuards);
     if (messageData.type === "announce") {
       client.send(
         JSON.stringify({
@@ -576,6 +598,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
           func: "hello",
           sender: prisonersOrGuards,
           gameid: gameid,
+          nickname: nickname, // player nickname
           whoseturn: whoseturn
         })
       );
@@ -585,6 +608,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         client.send(
           JSON.stringify({
             gameid: gameid, // the id for the game
+            nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "providegamedata", // provide game data
             sender: prisonersOrGuards,
@@ -619,7 +643,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       if (messageData.func === "ept") { // end prisoners turn
         setWhoseturn(messageData.whoseturn);
         setSelection(-1);
-        setRcd(-1,-1,"");
+        setRcd(-1,-1,nodirection);
         setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
@@ -637,7 +661,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       if (messageData.func === "egt") { // end guards turn
         setWhoseturn(messageData.whoseturn);
         setSelection(-1);
-        setRcd(-1,-1,"");
+        setRcd(-1,-1,nodirection);
         setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
@@ -672,7 +696,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       newSelection = selection;
       newRcd = rcd;
     }
-    if (newSelection > -1 && squarevalue === ".") { // tile is selected from rack and clicked square is not used yet
+    if (newSelection > -1 && squarevalue === squareunused) { // tile is selected from rack and clicked square is not used yet
       newRow[ci] =
         whoseturn === "P" ? newPtiles[newSelection] : newGtiles[newSelection];
       newSquares[ri] = [...newRow];
@@ -702,10 +726,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         ? newPtiles.push(squarevalue)
         : newGtiles.push(squarevalue);
       let newRow = [...newSquares[ri]];
-      newRow[ci] = ".";
+      newRow[ci] = squareunused;
       newSquares[ri] = [...newRow];
       let newUsedbyRow = [...newUsedby[ri]];
-      newUsedbyRow[ci] = "";
+      newUsedbyRow[ci] = usedbynoone;
       newUsedby[ri] = [...newUsedbyRow];
       setSelection(
         whoseturn === "P" ? newPtiles.length - 1 : newGtiles.length - 1
@@ -717,17 +741,17 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       setPtiles(newPtiles);
       setGtiles(newGtiles);
       setCurrentcoords(newCurrentcoords);
-      setRcd(-1,-1,""); // make playre click again to set direction
+      setRcd(-1,-1,nodirection); // make player click again to set direction
       return;
     }
     // They didn't click a square to place a selected tile there
     // They didn't click a square to remove an existing tile
-    if (squares[ri][ci] === ".") {
+    if (squares[ri][ci] === squareunused) {
       // There is nothing on the square so they are picking where to place the next tile via keyboard
       let newDirection = rcd[0] !== ri || rcd[1] !== ci ? "r" : //click new square, start with "r"
        rcd[2] === "r" ? "d" : //click same square that was "r", change to "d"
-       rcd[2] === "d" ? "" : //click same square that was "d", change to ""
-       "r"; // click same square that was "", change to "r"
+       rcd[2] === "d" ? nodirection : //click same square that was "d", change to nodirection
+       "r"; // click same square that was nodirection, change to "r"
       newRcd = [ri,ci,newDirection];
       setRcd(newRcd);
       return;
@@ -771,7 +795,14 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     }
     newPtiles.sort();
     let newWhoseturn = newPtiles.length > 0 ? "G" : "X"; // X = game over
-    if (usedby[0][0] !== "" && usedby[0][middlecol] !== "" && usedby[0][lastcol] !== "" && usedby[middlerow][0] !== "" && usedby[middlerow][lastcol] !== "" && usedby[lastrow][0] !== "" && usedby[lastrow][middlecol] !== "" && usedby[lastrow][lastcol] !== "") {
+    if (usedby[0][0]               !== usedbynoone &&
+        usedby[0][middlecol]       !== usedbynoone &&
+        usedby[0][lastcol]         !== usedbynoone &&
+        usedby[middlerow][0]       !== usedbynoone &&
+        usedby[middlerow][lastcol] !== usedbynoone &&
+        usedby[lastrow][0]         !== usedbynoone &&
+        usedby[lastrow][middlecol] !== usedbynoone &&
+        usedby[lastrow][lastcol]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -791,6 +822,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
         sender: prisonersOrGuards,
@@ -822,7 +854,14 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     let snapptiles = [...ptiles];
     let snapgtiles = [...gtiles];
     let newWhoseturn = newGtiles.length > 0 ? "P" : "X"; // X = game over
-    if (usedby[0][0] !== "" && usedby[0][middlecol] !== "" && usedby[0][lastcol] !== "" && usedby[middlerow][0] !== "" && usedby[middlerow][lastcol] !== "" && usedby[lastrow][0] !== "" && usedby[lastrow][middlecol] !== "" && usedby[lastrow][lastcol] !== "") {
+    if (usedby[0][0]               !== usedbynoone &&
+        usedby[0][middlecol]       !== usedbynoone &&
+        usedby[0][lastcol]         !== usedbynoone &&
+        usedby[middlerow][0]       !== usedbynoone &&
+        usedby[middlerow][lastcol] !== usedbynoone &&
+        usedby[lastrow][0]         !== usedbynoone &&
+        usedby[lastrow][middlecol] !== usedbynoone &&
+        usedby[lastrow][lastcol]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -841,6 +880,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
         sender: prisonersOrGuards,
@@ -887,6 +927,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
         sender: prisonersOrGuards,
@@ -935,6 +976,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
         sender: prisonersOrGuards,
@@ -950,7 +992,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
   }
 
   function isPlayValid() {
-    if (squares[middlerow][middlecol] === ".") {
+    if (squares[middlerow][middlecol] === squareunused) {
       window.alert("First play must hit center square");
       return false;
     }
@@ -960,23 +1002,23 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     let highcol = -1;
     for (var r=0; r < numrows; ++r) {
       for (var c=0; c < numcols; ++c) {
-        if (squares[r][c] !== ".") {
-          if (!(r > 0 && squares[r-1][c] !== ".") &&
-           !(c > 0 && squares[r][c-1] !== ".") &&
-           !(r < 14 && squares[r+1][c] !== ".") &&
-           !(c < 14 && squares[r][c+1] !== ".")
+        if (squares[r][c] !== squareunused) {
+          if (!(r > 0 && squares[r-1][c] !== squareunused) &&
+           !(c > 0 && squares[r][c-1] !== squareunused) &&
+           !(r < lastrow && squares[r+1][c] !== squareunused) &&
+           !(c < lastcol && squares[r][c+1] !== squareunused)
            ) {
             window.alert("Each played tile must be part of a word");
             return false;
            }
-           if (snapshot.squares[r][c] === ".") {
+           if (snapshot.squares[r][c] === squareunused) {
              // This square was played on this turn
              if (r < lowrow) { lowrow = r;}
              if (r > highrow) { highrow = r;}
              if (c < lowcol) { lowcol = c;}
              if (c > highcol) { highcol = c;}
            }
-        }        
+        }
       }
     }
     if (lowrow === numrows) {
@@ -991,25 +1033,25 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     let hookmade = false;
     for (var r = lowrow; r <= highrow; ++r) {
       for (var c = lowcol; c <= highcol; ++c) {
-        if (squares[r][c] === ".") {
+        if (squares[r][c] === squareunused) {
           window.alert("There is a gap in your word");
           return false;
         }
-        if (snapshot.squares[r][c] !== ".") {
+        if (snapshot.squares[r][c] !== squareunused) {
           playthru = true;
         }
-        if (lowrow === highrow && r > 0 && squares[r-1][c] !== ".") { hookmade = true; }
-        if (lowrow === highrow && r < 14 && squares[r+1][c] !== ".") { hookmade = true; }
-        if (lowcol === highcol && c > 0 && squares[r][c-1] !== ".") { hookmade = true; }
-        if (lowcol === highcol && c < 14 && squares[r][c+1] !== ".") { hookmade = true; }
+        if (lowrow === highrow && r > 0 && squares[r-1][c] !== squareunused) { hookmade = true; }
+        if (lowrow === highrow && r < lastrow && squares[r+1][c] !== squareunused) { hookmade = true; }
+        if (lowcol === highcol && c > 0 && squares[r][c-1] !== squareunused) { hookmade = true; }
+        if (lowcol === highcol && c < lastcol && squares[r][c+1] !== squareunused) { hookmade = true; }
       }
     }
     // Check play to or from a tile (play through but not either side)
-    if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== ".") { playthru = true; }
-    if (lowrow === highrow && highcol < 14 && snapshot.squares[lowrow][highcol+1] !== ".") { playthru = true; }
-    if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== ".") { playthru = true; }
-    if (lowcol === highcol && highrow < 14 && snapshot.squares[highrow+1][lowcol] !== ".") { playthru = true; }
-    if (!playthru && !hookmade && snapshot.squares[middlerow][middlecol] !== ".") {
+    if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== squareunused) { playthru = true; }
+    if (lowrow === highrow && highcol < lastcol && snapshot.squares[lowrow][highcol+1] !== squareunused) { playthru = true; }
+    if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== squareunused) { playthru = true; }
+    if (lowcol === highcol && highrow < lastrow && snapshot.squares[highrow+1][lowcol] !== squareunused) { playthru = true; }
+    if (!playthru && !hookmade && snapshot.squares[middlerow][middlecol] !== squareunused) {
       window.alert("Words must be connected");
       return false;
     }
@@ -1033,6 +1075,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "ept", // end prisoners turn
         sender: prisonersOrGuards,
@@ -1055,6 +1098,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         func: "egt", // end guards turn
         sender: prisonersOrGuards,
@@ -1072,8 +1116,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
         type: "pb", // prisonbreak
         sender: prisonersOrGuards,
+        whoseturn: whoseturn, // for lobby to pick up this message
         func: "requestgamedata" // request game data
       })
     )
@@ -1098,16 +1144,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         let row = rcd[0];
         let col = rcd[1];
         let dir = rcd[2];
-        if (row >-1 && col > -1 && dir !== "") { // row, col, dir are set to accept keystroke
+        if (row >-1 && col > -1 && dir !== nodirection) { // row, col, dir are set to accept keystroke
           // Need to figure out next sqaure to auto-place a tile
           let newRcd = rcd;
           if (dir === "r") { // playing rightwards
             let newc = -1;
             for (var c = col + 1; c < numcols && newc === -1; c++) {
-              if (squares[row][c] === ".") {newc = c;}
+              if (squares[row][c] === squareunused) {newc = c;}
             }
             if (newc === -1) {
-              newRcd = [-1,-1,""];
+              newRcd = [-1,-1,nodirection];
             } else {
               newRcd = [row, newc, "r"];
             }
@@ -1117,10 +1163,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
           if (dir === "d") { // playing downwards
             let newr = -1;
             for (var r = row + 1; r < numrows && newr === -1; r++) {
-              if (squares[r][col] === ".") {newr = r;}
+              if (squares[r][col] === squareunused) {newr = r;}
             }
             if (newr === -1) {
-              newRcd = [-1,-1,""];
+              newRcd = [-1,-1,nodirection];
             } else {
               newRcd = [newr, col, "d"];
             }
@@ -1140,7 +1186,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
       let newGtiles = [...gtiles];
       let newUsedby = [...usedby];
       let newSquares = [...squares];
-      let newRcd = [-1,-1,""];
+      let newRcd = [-1,-1,nodirection];
       let newSelection = selection;
       newCurrentcoords.splice(currentcoords.length-1,1);
       let row = parseInt(coord.split("-")[0]);
@@ -1153,10 +1199,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
         newGtiles.push(returnedTile);
         newSelection = newGtiles.length-1;
       }
-      newUsedby[row][col] = "";
-      newSquares[row][col] = ".";
+      newUsedby[row][col] = usedbynoone;
+      newSquares[row][col] = squareunused;
       let dir = rcd[2];
-      if (dir !== "") {
+      if (dir !== nodirection) {
         // direction was set so keep it
         newRcd = [row,col,dir];
         if (currentcoords.length === 1) {
@@ -1175,14 +1221,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, gameMessages, client, remove
   return (
     <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
       <div className="row">
-        <div className="col-1 pbGameid">
-          Game id: {gameid}
+        <div className="col-2 pbGameid">
+          Game id: {gameid}<br></br>
+          Nickname: {nickname}
         </div>
-        <div className="col-10 pbtitle">
+        <div className="col-8 pbtitle">
           Prison Break
           <span className="material-icons">run_circle</span>
         </div>
-        <div className="col-1 pbhomelink">
+        <div className="col-2 pbhomelink">
           <Link href={"../../"}>
             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>

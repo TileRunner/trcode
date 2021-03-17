@@ -270,22 +270,25 @@
 }
 .pbGamesInProgressRow:nth-child(odd) {
     background-color: lightblue;
-}
-.pbGamesInProgressRow:nth-child(even) {
-    background-color: cornflowerblue;
-}
-.pbGamesInProgressRow:last-child {
-    border-bottom-style: double;
     border-color: whitesmoke;
     border-left-style: solid;
     border-right-style: solid;
+}
+.pbGamesInProgressRow:nth-child(even) {
+    background-color: cornflowerblue;
+    border-color: whitesmoke;
+    border-left-style: solid;
+    border-right-style: solid;
+}
+.pbGamesInProgressRow:last-child {
+    border-bottom-style: double;
 }
 .pbLobbyGamesHeaderCol {
     padding-left: 10px;
     padding-right: 10px;
     border-left-style: solid;
     border-right-style: solid;
-    border-top-style:double
+    border-top-style: double;
 }
 .pbLobbyGameid {
     font-family: 'Courier New', Courier, monospace;
@@ -296,19 +299,26 @@
     font-style: italic;
     font-size: larger;
     padding-left: 5px;
+    border-left-style: solid;
+    border-color: whitesmoke;
 }
 .pbLobbyPlayerIndicator {
     text-align: center;
     padding-top: 3px;
+    border-left-style: solid;
+    border-color: whitesmoke;
 }
 .pbLobbyActionButton {
     background-color: lightsteelblue;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 30px;
-    height: 43px;
-    width: 200px;
+    /* font-size: 30px; */
+    /* height: 43px; */
+    margin-left: 10px;
+    width: 180px;
     vertical-align: top;
 }
 .pbLobbyActionNone {
-    background-color: grey;
+    /* height: 43px; */
+    width: 200px;
+    text-align: center;
 }
