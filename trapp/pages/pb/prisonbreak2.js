@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
-const numrows = 15;
-const middlerow = 7;
+const racklen = 6;
+const numrows = racklen + racklen + 1;
+const middlerow = racklen;
 const lastrow = numrows - 1;
-const numcols = 15;
-const middlecol = 7;
+const numcols = numrows;
+const middlecol = racklen;
 const lastcol = numcols - 1;
-const racklen = 7;
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
-
+const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
+const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
+const jokes = [joke, joke2];
 const escapehatches = [
   "0-0",
   "0-" + middlecol,
@@ -137,19 +139,13 @@ export default function PrisonBreak() {
   const [gameid, setGameid] = useState('')
   const [nickname, setNickname] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
-  const [messages, setMessages] = useState([]) // Messages from the websocket
+  const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
     // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
-    setMessages((curr) => [...curr, message.data])
+    setWsmessage(message.data)
   }
-  const removeMessage = (messageData) => {
-    let i = messages.indexOf(messageData);
-    let w = [...messages];
-    w.splice(i,1);
-    setMessages(w);
-  }
-  const [client, setClient] = useState(new CustomSocket(host, acceptMessage));
+  const [client] = useState(new CustomSocket(host, acceptMessage));
   useEffect(() => (
     client.connect()
   ),[]);
@@ -157,8 +153,7 @@ export default function PrisonBreak() {
     prisonersOrGuards === '' ?
       <Lobby
         setIsrejoin={setIsrejoin}
-        lobbyMessages={messages}
-        removeLobbyMessage={removeMessage}
+        wsmessage={wsmessage}
         // client={client}
         gameid={gameid}
         setGameid={setGameid}
@@ -172,20 +167,19 @@ export default function PrisonBreak() {
         prisonersOrGuards={prisonersOrGuards}
         gameid={gameid}
         nickname={nickname}
-        gameMessages={messages}
+        wsmessage={wsmessage}
         client={client}
-        removeGameMessage={removeMessage}
       />
   )
 }
 
-const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards}) => {
+const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards}) => {
   const [gamelist, setGamelist] = useState([]) // Game info by game id
 
   useEffect(() => {
-    let msg = lobbyMessages[0];
-    if (msg) processLobbyMessage(msg);
-  },[lobbyMessages])
+    let msg = wsmessage;
+    if (msg !== '') processLobbyMessage(msg);
+  },[wsmessage])
 
   function processLobbyMessage(message) {
     try {
@@ -241,7 +235,6 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
     } catch {
       window.alert("Error processing lobby message");
     }
-    removeLobbyMessage(message);
   }
   function getGamelistIndex(gid) {
     for (var i = 0; i < gamelist.length; ++i) {
@@ -254,10 +247,6 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
   function isPlayingP(gid) {
     let gi = getGamelistIndex(gid);
     return gi < 0 ? false : gamelist[gi].playingP;
-  }
-  function isPlayingG(gid) {
-    let gi = getGamelistIndex(gid);
-    return gi < 0 ? false : gamelist[gi].playingG;
   }
   function availableActionP(gd) {
     if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
@@ -284,7 +273,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
       </div>
     </div>
     <div className="row">
-      <div className="col-11 offset-1 h2">
+      <div className="col-10 offset-1 h2">
         <label>*Nickname:&nbsp;</label>
         <input
               name="nickname"
@@ -292,17 +281,18 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
               onChange={(e) => {
                 setNickname(e.target.value);
               } } />
-        <span>(*required)</span>
+        <span>&nbsp;(*required)</span>
       </div>
     </div>
     <div className="row">
-      <div className="col-11 offset-1">
+      <div className="col-7 offset-1">
+        <hr></hr>
         <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id and click "Start Game".</span>
       </div>
     </div>
     <div className="row">
-      <div className="col-10 offset-2">
-        <h2>Game id:&nbsp;
+      <div className="col-7 offset-1">
+        <span class="h2"><span class="h1">&nbsp;</span>&nbsp;&nbsp;&nbsp;Game id:&nbsp;
           <input
             name="gameid"
             value={gameid}
@@ -323,12 +313,13 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
           >
             Start Game
           </button>
-        </h2>
+        </span>
       </div>
     </div>
     <div className="row">
-      <div className="col-11 offset-1">
-        <span className="pbPlayerTitle h2">&nbsp;GUARDS&nbsp;</span><span className="h3">&nbsp;&nbsp;&nbsp;Find and click the "Join Game" button for your game.</span>
+      <div className="col-7 offset-1">
+        <hr></hr>
+        <span className="pbPlayerTitle h2"><i className="material-icons">security</i>GUARDS<i className="material-icons">security</i></span><span className="h3">&nbsp;&nbsp;Find and click the "Join Game" button for your game.</span>
         <hr></hr>
         <h3>If you lost connection, find and click the "Reconnect" button for your game id.</h3>
       </div>
@@ -422,7 +413,7 @@ const Lobby = ({setIsrejoin, lobbyMessages, removeLobbyMessage, gameid, setGamei
 const Square = (props) => {
   // squareusedby, ri, ci, c, onClick
   // need squareusedby to pick css className corresponding to who played the tile on the square
-  // need ri, ci to display alternating characters on unused squares
+  // need ri, ci to display alternating backgrounds on unused squares
   // need c to represent which tile is on the square, if any
   // need onClick to handle square click at a higher level
   // need rcd to display selected direction arrow when appropriate
@@ -501,7 +492,7 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   );
 };
 
-const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, gameMessages, client, removeGameMessage}) => {
+const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}) => {
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
@@ -584,10 +575,9 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, gameMessages, clie
     }
   }, []);
   useEffect(() => {
-    let msg = gameMessages[0];
-    if (msg) processGameMessage(msg);
-        
-  },[gameMessages])
+    let msg = wsmessage;
+    if (msg !== '') processGameMessage(msg);      
+  },[wsmessage])
 
   function processGameMessage(message) {
     let messageData = JSON.parse(message);
@@ -676,7 +666,6 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, gameMessages, clie
         });       
       }
     }
-    removeGameMessage(message);
   }
   
   // Calling setSelection (from handleKeyDown) then handleBoardSquareClick does not let it recognize selection with the new value
@@ -1272,7 +1261,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, gameMessages, clie
             {whoseturn === "X" ?
               <h1>Game Over!</h1>
             :
-              <p>Two peanuts were walking down a back alley. One was a salted.</p>
+              <p>{whoseturn === "P" ? jokes[0] : jokes[1]}</p>
             }
           </div>
         </div>
