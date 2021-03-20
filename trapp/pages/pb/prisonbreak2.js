@@ -1240,23 +1240,35 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}
           />
         </div>
         <div className="col">
-          <div className="row">
-            {prisonersOrGuards === whoseturn ?
+          {prisonersOrGuards === whoseturn ?
+            <div className="row">
               <Board
                 squares={squares}
                 usedby={usedby}
                 rcd={rcd}
                 onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
               />
-              :
-              <Board
-                squares={squares}
-                usedby={usedby}
-                rcd={rcd}
-                onClick={() => {}}
-              />
-            }
-          </div>
+            </div>
+          :
+            whoseturn === "X" ?
+              <div className="row">
+                <Board
+                  squares={squares}
+                  usedby={usedby}
+                  rcd={rcd}
+                  onClick={() => {}}
+                />
+              </div>
+            :
+              <div className="row upsidedown">
+                <Board
+                  squares={squares}
+                  usedby={usedby}
+                  rcd={rcd}
+                  onClick={() => {}}
+                />
+              </div>
+          }
           <div className="row pbUnderboard">
             {whoseturn === "X" ?
               <h1>Game Over!</h1>

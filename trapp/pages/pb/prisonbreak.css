@@ -322,3 +322,6 @@
     width: 200px;
     text-align: center;
 }
+.upsidedown {
+    transform: rotate(180deg);
+}
