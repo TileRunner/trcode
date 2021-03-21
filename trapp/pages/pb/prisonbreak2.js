@@ -22,108 +22,64 @@ const escapehatches = [
   lastrow + "-" + middlecol,
   lastrow + "-" + lastcol
 ]; // coords of escape hatches
-const initialtiles = [
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "A",
-  "B",
-  "B",
-  "C",
-  "C",
-  "D",
-  "D",
-  "D",
-  "D",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
-  "E",
+const initialtiles6 = [
+  "A",  "A",  "A",  "A",  "A",  "A",
+  "B",  "B",
+  "C",  "C",  "C",
+  "D",  "D",  "D",
+  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
   "F",
-  "F",
-  "G",
-  "G",
-  "G",
-  "H",
-  "H",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
-  "I",
+  "G",  "G",
+  "H",  "H",
+  "I",  "I",  "I",  "I",  "I",  "I",
   "J",
   "K",
-  "L",
-  "L",
-  "L",
-  "L",
-  "M",
-  "M",
-  "N",
-  "N",
-  "N",
-  "N",
-  "N",
-  "N",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "O",
-  "P",
-  "P",
+  "L",  "L",  "L",  "L",
+  "M",  "M",
+  "N",  "N",  "N",  "N",
+  "O",  "O",  "O",  "O",  "O",
+  "P",  "P",
   "Q",
-  "R",
-  "R",
-  "R",
-  "R",
-  "R",
-  "R",
-  "S",
-  "S",
-  "S",
-  "S",
-  "T",
-  "T",
-  "T",
-  "T",
-  "T",
-  "T",
-  "U",
-  "U",
-  "U",
-  "U",
+  "R",  "R",  "R",  "R",  "R",
+  "S",  "S",  "S",  "S",  "S",  "S",  "S",
+  "T",  "T",  "T",  "T",
+  "U",  "U",  "U",
   "V",
-  "V",
-  "W",
   "W",
   "X",
   "Y",
-  "Y",
   "Z",
-  "?",
-  "?",
-]; // initial tile pool
+  "?",  "?",
+]; // initial tile pool for 6 letter rack mode
+const initialtiles7 = [
+  "A",  "A",  "A",  "A",  "A",  "A",  "A",  "A",
+  "B",  "B",
+  "C",  "C",  "C",
+  "D",  "D",  "D",  "D",
+  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
+  "F",
+  "G",  "G",  "G",
+  "H",  "H",
+  "I",  "I",  "I",  "I",  "I",  "I",  "I",
+  "J",
+  "K",
+  "L",  "L",  "L",  "L",  "L",
+  "M",  "M",  "M",
+  "N",  "N",  "N",  "N",  "N",  "N",
+  "O",  "O",  "O",  "O",  "O",  "O",
+  "P",  "P",  "P",
+  "Q",
+  "R",  "R",  "R",  "R",  "R",  "R",  "R",
+  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",
+  "T",  "T",  "T",  "T",  "T",  "T",
+  "U",  "U",  "U",  "U",
+  "V",
+  "W",
+  "X",
+  "Y",  "Y",
+  "Z",
+  "?",  "?",
+]; // initial tile pool for 7 letter rack mode
 const squareunused = ".";
 const usedbynoone = "";
 const initialsquares = Array(numrows).fill(Array(numcols).fill(squareunused));
@@ -140,6 +96,7 @@ export default function PrisonBreak() {
   const [nickname, setNickname] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
   const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
+  const [upsidedownMode, setUpsidedownMode] = useState(false);
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
     // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
@@ -160,6 +117,8 @@ export default function PrisonBreak() {
         nickname={nickname}
         setNickname={setNickname}
         setPrisonersOrGuards={setPrisonersOrGuards}
+        upsidedownMode={upsidedownMode}
+        setUpsidedownMode={setUpsidedownMode}
       />
     :
       <Game
@@ -169,11 +128,12 @@ export default function PrisonBreak() {
         nickname={nickname}
         wsmessage={wsmessage}
         client={client}
+        upsidedownMode={upsidedownMode}
       />
   )
 }
 
-const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards}) => {
+const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards, upsidedownMode, setUpsidedownMode}) => {
   const [gamelist, setGamelist] = useState([]) // Game info by game id
 
   useEffect(() => {
@@ -260,6 +220,9 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     if (gd.nicknameG === nickname) { return availableActionReconnect; }
     return availableActionNone;
   }
+  function togglerUpsidedownMode() {
+    setUpsidedownMode((curr) => !curr);
+  }
   return <div className="container-fluid">
     <div className="row">
       <div className="col-10 pbtitle">
@@ -283,11 +246,18 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               } } />
         <span>&nbsp;(*required)</span>
       </div>
+      <div class="custom-control custom-checkbox h3 col offset-2">
+        <input type="checkbox" id="upsidedownModeCheckbox" className="custom-control-input"
+          value={upsidedownMode}
+          onChange={() => togglerUpsidedownMode()}
+        />
+        <label className="custom-control-label" for="upsidedownModeCheckbox">&nbsp;Upside board on opponents turn</label>
+      </div>
     </div>
     <div className="row">
       <div className="col-7 offset-1">
         <hr></hr>
-        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id and click "Start Game".</span>
+        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id, select options and click "Start Game".</span>
       </div>
     </div>
     <div className="row">
@@ -299,7 +269,6 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
             onChange={(e) => {
               setGameid(e.target.value);
             } } />
-          <label>&nbsp;</label>
           <button id="startgame" className="pbLobbyActionButton"
             onClick={function () {
               if (gameid.length > 0) {
@@ -492,7 +461,8 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   );
 };
 
-const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}) => {
+const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client, upsidedownMode}) => {
+  const initialtiles = racklen === 6 ? initialtiles6 : initialtiles7;
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
@@ -510,6 +480,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}
     ptiles: [],
     gtiles: [],
   });
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -885,7 +856,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}
 
   const swapPrisonersTiles = () => {
     if (tiles.length < racklen) {
-      window.alert("Need " + $racklen + " tiles in the bag to exchange")
+      window.alert("Need " + racklen + " tiles in the bag to exchange")
       return;
     }
     let newPtiles = [];
@@ -934,7 +905,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}
   
   const swapGuardsTiles = () => {
     if (tiles.length < racklen) {
-      window.alert("Need " + $racklen + " tiles in the bag to exchange")
+      window.alert("Need " + racklen + " tiles in the bag to exchange")
       return;
     }
     let newGtiles = [];
@@ -1250,7 +1221,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client}
               />
             </div>
           :
-            whoseturn === "X" ?
+            whoseturn === "X" || !upsidedownMode ?
               <div className="row">
                 <Board
                   squares={squares}

@@ -46,9 +46,10 @@
     height: 40px;
     padding: 0%;
     border-style: none;
-    background-image: url("../../public/prisonbars-square.png");
+    /* background-image: url("../../public/prisonbars-square.png");
+    background-color: grey; */
+    background-color: black;
     background-size: cover;
-    background-color: grey;
     color: black;
     text-align: center;
     width: 40px;
@@ -315,7 +316,7 @@
     /* height: 43px; */
     margin-left: 10px;
     width: 180px;
-    vertical-align: top;
+    /* vertical-align: middle; */
 }
 .pbLobbyActionNone {
     /* height: 43px; */

@@ -128,8 +128,6 @@ export default function Home() {
               <div className="row myinfo">
                 <ul>
                   <li>You play two games, one as the Prisoners and one as the Guards. Whoever frees the most prisoners wins.</li>
-                  <li>When playing as the Prisoners, go to the lobby and enter a game id and start a new game. Tell your opponent the game id.</li>
-                  <li>When playing as the Guards, go to the lobby and enter the game id that your opponent gave you and join the game.</li>
                   <li>Prisoners always play first.</li>
                   <li>The first word played must touch the centre square.</li>
                   <li>To free a prisoner, the Prisoners must play a tile on one of the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares.</li>
@@ -137,7 +135,6 @@ export default function Home() {
                   <li>The game ends if a player empties their rack.</li>
                   <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
                   <li>The game ends if both players pass.</li>
-                  <li>The game ends if both players agree it ends.</li>
                   <li>Due to licensing restrictions, this game does not validate words against any lexicon.</li>
                 </ul>
               </div>
