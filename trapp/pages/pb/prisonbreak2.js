@@ -2,26 +2,39 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
 const racklen = 6;
-const numrows = racklen + racklen + 1;
-const middlerow = racklen;
-const lastrow = numrows - 1;
-const numcols = numrows;
-const middlecol = racklen;
-const lastcol = numcols - 1;
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
 const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
 const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
 const jokes = [joke, joke2];
-const escapehatches = [
-  "0-0",
-  "0-" + middlecol,
-  "0-" + lastcol,
-  middlerow + "-0",
-  middlerow + "-" + lastcol,
-  lastrow + "-0",
-  lastrow + "-" + middlecol,
-  lastrow + "-" + lastcol
-]; // coords of escape hatches
+const initialtiles5 = [
+  "A",  "A",  "A",  "A",  "A",
+  "B",
+  "C",  "C",
+  "D",  "D",  "D",
+  "E",  "E",  "E",  "E",  "E",  "E",  "E",
+  "F",
+  "G",  "G",
+  "H",  "H",
+  "I",  "I",  "I",  "I",  "I",
+  "J",
+  "K",
+  "L",  "L",  "L",  "L",
+  "M",  "M",
+  "N",  "N",  "N",  "N",
+  "O",  "O",  "O",  "O",
+  "P",  "P",
+  "Q",
+  "R",  "R",  "R",  "R",  "R",
+  "S",  "S",  "S",  "S",  "S",  "S",
+  "T",  "T",  "T",  "T",
+  "U",  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  "?",  "?",
+]; // initial tile pool for 5 letter rack mode
 const initialtiles6 = [
   "A",  "A",  "A",  "A",  "A",  "A",
   "B",  "B",
@@ -82,8 +95,6 @@ const initialtiles7 = [
 ]; // initial tile pool for 7 letter rack mode
 const squareunused = ".";
 const usedbynoone = "";
-const initialsquares = Array(numrows).fill(Array(numcols).fill(squareunused));
-const initialusedby = Array(numrows).fill(Array(numcols).fill(usedbynoone));
 const nodirection = "";
 const availableActionNone = 0;
 const availableActionStart = 1;
@@ -97,6 +108,7 @@ export default function PrisonBreak() {
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
   const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
   const [upsidedownMode, setUpsidedownMode] = useState(false);
+  const [racksize, setRacksize] = useState(6); // Default to 6 letter racks
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
     // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
@@ -119,6 +131,8 @@ export default function PrisonBreak() {
         setPrisonersOrGuards={setPrisonersOrGuards}
         upsidedownMode={upsidedownMode}
         setUpsidedownMode={setUpsidedownMode}
+        racksize={racksize}
+        setRacksize={setRacksize}
       />
     :
       <Game
@@ -129,11 +143,15 @@ export default function PrisonBreak() {
         wsmessage={wsmessage}
         client={client}
         upsidedownMode={upsidedownMode}
+        racksize={racksize}
       />
   )
 }
 
-const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards, upsidedownMode, setUpsidedownMode}) => {
+const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards
+  , upsidedownMode, setUpsidedownMode // Option for upside down mode
+  , racksize, setRacksize // Option for rack size
+  }) => {
   const [gamelist, setGamelist] = useState([]) // Game info by game id
 
   useEffect(() => {
@@ -147,13 +165,15 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
       let sendergameid = messageData.gameid;
       let sendernickname = messageData.nickname;
       let wt = messageData.whoseturn;
-      if (sendergameid && sendergameid.length > 0 && wt && wt.length > 0) {
+      let rs = messageData.racksize;
+      if (sendergameid && sendergameid.length > 0 && rs && wt && wt.length > 0) {
         let anyUpdates = false;
         let senderPG = messageData.sender;
         let newGamelist = [...gamelist];
         let gi = getGamelistIndex(sendergameid);
         let newPlayingP = senderPG === "P" ? true : gi > -1 ? gamelist[gi].playingP : false;
         let newPlayingG = senderPG === "G" ? true : gi > -1 ? gamelist[gi].playingG : false;
+        let newRacksize = rs;
 
         let newgamestatus = "Unknown";
         if (wt === "X") {
@@ -170,7 +190,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
           nicknameG: senderPG === "G" ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
           gamestatus: newgamestatus,
           playingP: newPlayingP,
-          playingG: newPlayingG
+          playingG: newPlayingG,
+          racksize: newRacksize
         }
         if (gi < 0) { // Game not in list yet, put it in the list
           anyUpdates = true;
@@ -182,7 +203,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               oldgamedata.nicknameG !== newgamedata.nicknameG ||
               oldgamedata.gamestatus !== newgamedata.gamestatus ||
               oldgamedata.playingP !== newgamedata.playingP ||
-              oldgamedata.playingG !== newgamedata.playingG
+              oldgamedata.playingG !== newgamedata.playingG ||
+              oldgamedata.racksize !== newgamedata.racksize
             ) {
               anyUpdates = true;
               newGamelist[gi] = newgamedata;
@@ -222,6 +244,9 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
   }
   function togglerUpsidedownMode() {
     setUpsidedownMode((curr) => !curr);
+  }
+  function selectRackSize(newRacksize) {
+    setRacksize(newRacksize);
   }
   return <div className="container-fluid">
     <div className="row">
@@ -286,6 +311,27 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
       </div>
     </div>
     <div className="row">
+      <div className="col offset-1">
+        <span className="h2">&nbsp;&nbsp;&nbsp;Rack size:</span>
+        <button id="selectracksize6" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(5)}
+        >
+          5
+        </button>
+        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(6)}
+        >
+          6
+        </button>
+        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(7)}
+        >
+          7
+        </button>
+        <span className="h2">(rack size determines board size too)</span>
+      </div>
+    </div>
+    <div className="row">
       <div className="col-7 offset-1">
         <hr></hr>
         <span className="pbPlayerTitle h2"><i className="material-icons">security</i>GUARDS<i className="material-icons">security</i></span><span className="h3">&nbsp;&nbsp;Find and click the "Join Game" button for your game.</span>
@@ -306,6 +352,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               <th className="pbLobbyGamesHeaderCol">Game ID</th>
               <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
               <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
+              <th className="pbLobbyGamesHeaderCol">Rack size</th>
               <th className="pbLobbyGamesHeaderCol">Game status</th>
             </tr>
           </thead>
@@ -323,6 +370,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         setIsrejoin(true);
                         setGameid(value.gameid);
                         setPrisonersOrGuards('P');
+                        setRacksize(value.racksize);
                       } }
                     >
                       Reconnect
@@ -350,6 +398,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         setIsrejoin(true);
                         setGameid(value.gameid);
                         setPrisonersOrGuards('G');
+                        setRacksize(value.racksize);
                       } }
                     >
                       Reconnect
@@ -361,12 +410,16 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                       onClick={function () {
                         setGameid(value.gameid);
                         setPrisonersOrGuards('G');
+                        setRacksize(value.racksize);
                       } }
                     >
                       Join Game
                     </button>
                   </td>
                 }
+                <td className="pbLobbyGameRacksize">
+                  {value.racksize}
+                </td>
                 <td className="pbLobbyGameStatus">
                   {value.gamestatus}
                 </td>
@@ -386,6 +439,9 @@ const Square = (props) => {
   // need c to represent which tile is on the square, if any
   // need onClick to handle square click at a higher level
   // need rcd to display selected direction arrow when appropriate
+  // need racksize to determine centre and board aarry edge positions
+  const edge = (props.racksize * 2);
+  const middle = props.racksize;
   const usedbyclass =
     props.squareusedby === "P"
       ? "pbSquareUsedByPrisoners"
@@ -397,10 +453,10 @@ const Square = (props) => {
       ? "pbSquareRightArrow"
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
       ? "pbSquareDownArrow"
-      : props.ri === middlerow && props.ci === middlecol
+      : props.ri === middle && props.ci === middle
       ? "pbSquareCenterSquare"
-      : (props.ri === 0 || props.ri === middlerow || props.ri === lastrow) &&
-        (props.ci === 0 || props.ci === middlecol || props.ci === lastcol)
+      : (props.ri === 0 || props.ri === middle || props.ri === edge) &&
+        (props.ci === 0 || props.ci === middle || props.ci === edge)
       ? "pbSquareEscapeHatch"
       : props.ri % 2 === props.ci % 2
       ? "pbSquare1"
@@ -431,7 +487,7 @@ const Square = (props) => {
 );
 };
 
-const Board = ({ onClick, squares, usedby, rcd }) => {
+const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
       <td key={`Square${ri}-${ci}`} className="pbSquare">
@@ -442,6 +498,7 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
           squareusedby={squareusedby}
           rcd={rcd}
           onClick={() => onClick(ri, ci)}
+          racksize={racksize}
         />
       </td>
     );
@@ -461,8 +518,15 @@ const Board = ({ onClick, squares, usedby, rcd }) => {
   );
 };
 
-const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client, upsidedownMode}) => {
-  const initialtiles = racklen === 6 ? initialtiles6 : initialtiles7;
+const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
+  , upsidedownMode // Option for upside down mode
+  , racksize // Option for rack size
+  }) => {
+  const middle = racksize; // Middle element in row or column array
+  const edge = racksize * 2; // Last element in row or column array
+  const initialtiles = racksize === 6 ? initialtiles6 : racksize === 7 ? initialtiles7 : initialtiles5;
+  const initialsquares = Array(edge+1).fill(Array(edge+1).fill(squareunused));
+  const initialusedby = Array(edge+1).fill(Array(edge+1).fill(usedbynoone));
   const [tiles, setTiles] = useState([...initialtiles]);
   const [ptiles, setPtiles] = useState([]);
   const [gtiles, setGtiles] = useState([]);
@@ -499,7 +563,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
       let tempPTiles = [];
       let tempGTiles = [];
       let tempTiles = [...initialtiles];
-      while (tempPTiles.length < racklen) {
+      while (tempPTiles.length < racksize) {
         let rand = Math.floor(Math.random() * tempTiles.length);
         tempPTiles.push(tempTiles[rand]);
         tempTiles.splice(rand, 1);
@@ -525,7 +589,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
           sender: prisonersOrGuards,
           gameid: gameid,
           nickname: nickname, // player nickname
-          whoseturn: whoseturn
+          whoseturn: whoseturn,
+          racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
         })
       );
     }
@@ -560,7 +625,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
           sender: prisonersOrGuards,
           gameid: gameid,
           nickname: nickname, // player nickname
-          whoseturn: whoseturn
+          whoseturn: whoseturn,
+          racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
         })
       );
     }
@@ -583,7 +649,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
             currentcoords: currentcoords,
             snapshot: snapshot,
             passed: passed,
-            rescues: rescues
+            rescues: rescues,
+            racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
           })
         );
       }
@@ -741,6 +808,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
       return;
     }
     let newRescues = rescues;
+    let escapehatches = [
+      "0-0",
+      "0-" + middle,
+      "0-" + edge,
+      middle+ "-0",
+      middle + "-" + edge,
+      edge + "-0",
+      edge + "-" + middle,
+      edge + "-" + edge
+    ]; // coords of escape hatches
     for (var i = 0; i < currentcoords.length; i++) {
       if (escapehatches.indexOf(currentcoords[i]) > -1) {
         newRescues = newRescues + 1;
@@ -748,21 +825,21 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
     }
     let newPtiles = [...ptiles];
     let newTiles = [...tiles];
-    while (newPtiles.length < racklen && newTiles.length > 0) {
+    while (newPtiles.length < racksize && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newPtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
     }
     newPtiles.sort();
     let newWhoseturn = newPtiles.length > 0 ? "G" : "X"; // X = game over
-    if (usedby[0][0]               !== usedbynoone &&
-        usedby[0][middlecol]       !== usedbynoone &&
-        usedby[0][lastcol]         !== usedbynoone &&
-        usedby[middlerow][0]       !== usedbynoone &&
-        usedby[middlerow][lastcol] !== usedbynoone &&
-        usedby[lastrow][0]         !== usedbynoone &&
-        usedby[lastrow][middlecol] !== usedbynoone &&
-        usedby[lastrow][lastcol]   !== usedbynoone) {
+    if (usedby[0][0]         !== usedbynoone &&
+        usedby[0][middle]    !== usedbynoone &&
+        usedby[0][edge]      !== usedbynoone &&
+        usedby[middle][0]    !== usedbynoone &&
+        usedby[middle][edge] !== usedbynoone &&
+        usedby[edge][0]      !== usedbynoone &&
+        usedby[edge][middle] !== usedbynoone &&
+        usedby[edge][edge]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -791,6 +868,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         ptiles: newPtiles, // we picked new tiles for prisoners rack
         tiles: newTiles, // we picked new tiles so tile pool changed
         whoseturn: newWhoseturn, // may have ended the game (whoseturn=X)
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         passed: false, // did not just pass
         rescues: newRescues // may have rescued another prisoner
       })
@@ -803,7 +881,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
     }
     let newGtiles = [...gtiles];
     let newTiles = [...tiles];
-    while (newGtiles.length < racklen && newTiles.length > 0) {
+    while (newGtiles.length < racksize && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newGtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -814,14 +892,14 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
     let snapptiles = [...ptiles];
     let snapgtiles = [...gtiles];
     let newWhoseturn = newGtiles.length > 0 ? "P" : "X"; // X = game over
-    if (usedby[0][0]               !== usedbynoone &&
-        usedby[0][middlecol]       !== usedbynoone &&
-        usedby[0][lastcol]         !== usedbynoone &&
-        usedby[middlerow][0]       !== usedbynoone &&
-        usedby[middlerow][lastcol] !== usedbynoone &&
-        usedby[lastrow][0]         !== usedbynoone &&
-        usedby[lastrow][middlecol] !== usedbynoone &&
-        usedby[lastrow][lastcol]   !== usedbynoone) {
+    if (usedby[0][0]         !== usedbynoone &&
+        usedby[0][middle]    !== usedbynoone &&
+        usedby[0][edge]      !== usedbynoone &&
+        usedby[middle][0]    !== usedbynoone &&
+        usedby[middle][edge] !== usedbynoone &&
+        usedby[edge][0]      !== usedbynoone &&
+        usedby[edge][middle] !== usedbynoone &&
+        usedby[edge][edge]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
     setWhoseturn(newWhoseturn);
@@ -849,19 +927,20 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         gtiles: newGtiles, // we picked new tiles for guards rack
         tiles: newTiles, // we picked new tiles so tile pool changed
         passed: false, // did not just pass
-        whoseturn: newWhoseturn // may have ended the game (whoseturn=X)
+        whoseturn: newWhoseturn, // may have ended the game (whoseturn=X)
+        racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
         })
       );
     };
 
   const swapPrisonersTiles = () => {
-    if (tiles.length < racklen) {
-      window.alert("Need " + racklen + " tiles in the bag to exchange")
+    if (tiles.length < racksize) {
+      window.alert("Need " + racksize + " tiles in the bag to exchange")
       return;
     }
     let newPtiles = [];
     let newTiles = [...tiles];
-    while (newPtiles.length < racklen && newTiles.length > 0) {
+    while (newPtiles.length < racksize && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newPtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -892,6 +971,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         func: "ept", // end prisoners turn
         sender: prisonersOrGuards,
         whoseturn: "G", // swap never ends the game so go to opponent
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
         ptiles: newPtiles, // we picked new tiles for prisoners rack
@@ -904,13 +984,13 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
   }
   
   const swapGuardsTiles = () => {
-    if (tiles.length < racklen) {
-      window.alert("Need " + racklen + " tiles in the bag to exchange")
+    if (tiles.length < racksize) {
+      window.alert("Need " + racksize + " tiles in the bag to exchange")
       return;
     }
     let newGtiles = [];
     let newTiles = [...tiles];
-    while (newGtiles.length < racklen && newTiles.length > 0) {
+    while (newGtiles.length < racksize && newTiles.length > 0) {
       let rand = Math.floor(Math.random() * newTiles.length);
       newGtiles.push(newTiles[rand]);
       newTiles.splice(rand, 1);
@@ -941,6 +1021,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         func: "egt", // end guards turn
         sender: prisonersOrGuards,
         whoseturn: "P", // swap never ends the game so go to opponent
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         squares: snapshot.squares, // revert to start of turn squares
         usedby: snapshot.usedby, // revert to start of turn used by
         gtiles: newGtiles, // we picked new tiles for prisoners rack
@@ -952,10 +1033,12 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
   }
 
   function isPlayValid() {
-    if (squares[middlerow][middlecol] === squareunused) {
+    if (squares[middle][middle] === squareunused) {
       window.alert("First play must hit center square");
       return false;
     }
+    let numrows = edge+1;
+    let numcols = edge+1;
     let lowrow = numrows;
     let highrow = -1;
     let lowcol = numcols;
@@ -965,8 +1048,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         if (squares[r][c] !== squareunused) {
           if (!(r > 0 && squares[r-1][c] !== squareunused) &&
            !(c > 0 && squares[r][c-1] !== squareunused) &&
-           !(r < lastrow && squares[r+1][c] !== squareunused) &&
-           !(c < lastcol && squares[r][c+1] !== squareunused)
+           !(r < edge && squares[r+1][c] !== squareunused) &&
+           !(c < edge && squares[r][c+1] !== squareunused)
            ) {
             window.alert("Each played tile must be part of a word");
             return false;
@@ -1001,17 +1084,17 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
           playthru = true;
         }
         if (lowrow === highrow && r > 0 && squares[r-1][c] !== squareunused) { hookmade = true; }
-        if (lowrow === highrow && r < lastrow && squares[r+1][c] !== squareunused) { hookmade = true; }
+        if (lowrow === highrow && r < edge && squares[r+1][c] !== squareunused) { hookmade = true; }
         if (lowcol === highcol && c > 0 && squares[r][c-1] !== squareunused) { hookmade = true; }
-        if (lowcol === highcol && c < lastcol && squares[r][c+1] !== squareunused) { hookmade = true; }
+        if (lowcol === highcol && c < edge && squares[r][c+1] !== squareunused) { hookmade = true; }
       }
     }
     // Check play to or from a tile (play through but not either side)
     if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== squareunused) { playthru = true; }
-    if (lowrow === highrow && highcol < lastcol && snapshot.squares[lowrow][highcol+1] !== squareunused) { playthru = true; }
+    if (lowrow === highrow && highcol < edge && snapshot.squares[lowrow][highcol+1] !== squareunused) { playthru = true; }
     if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== squareunused) { playthru = true; }
-    if (lowcol === highcol && highrow < lastrow && snapshot.squares[highrow+1][lowcol] !== squareunused) { playthru = true; }
-    if (!playthru && !hookmade && snapshot.squares[middlerow][middlecol] !== squareunused) {
+    if (lowcol === highcol && highrow < edge && snapshot.squares[highrow+1][lowcol] !== squareunused) { playthru = true; }
+    if (!playthru && !hookmade && snapshot.squares[middle][middle] !== squareunused) {
       window.alert("Words must be connected");
       return false;
     }
@@ -1044,6 +1127,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         ptiles: snapshot.ptiles, // prisoners rack did not change
         tiles: tiles, // tile pool did not change
         whoseturn: newWhoseturn, // may have ended the game
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         passed: true,
         rescues: rescues // no rescues on a pass
       })
@@ -1067,6 +1151,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         gtiles: snapshot.gtiles, // guards rack did not change
         tiles: tiles, // tile pool did not change
         whoseturn: newWhoseturn, // may have ended the game
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         passed: true
       })
     );
@@ -1080,6 +1165,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
         type: "pb", // prisonbreak
         sender: prisonersOrGuards,
         whoseturn: whoseturn, // for lobby to pick up this message
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         func: "requestgamedata" // request game data
       })
     )
@@ -1109,7 +1195,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
           let newRcd = rcd;
           if (dir === "r") { // playing rightwards
             let newc = -1;
-            for (var c = col + 1; c < numcols && newc === -1; c++) {
+            for (var c = col + 1; c < edge + 1 && newc === -1; c++) {
               if (squares[row][c] === squareunused) {newc = c;}
             }
             if (newc === -1) {
@@ -1122,6 +1208,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
           }
           if (dir === "d") { // playing downwards
             let newr = -1;
+            let numrows = (racksize*2)+1;
             for (var r = row + 1; r < numrows && newr === -1; r++) {
               if (squares[r][col] === squareunused) {newr = r;}
             }
@@ -1218,6 +1305,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
                 usedby={usedby}
                 rcd={rcd}
                 onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
+                racksize={racksize}
               />
             </div>
           :
@@ -1228,6 +1316,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
                   usedby={usedby}
                   rcd={rcd}
                   onClick={() => {}}
+                  racksize={racksize}
                 />
               </div>
             :
@@ -1237,6 +1326,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client,
                   usedby={usedby}
                   rcd={rcd}
                   onClick={() => {}}
+                  racksize={racksize}
                 />
               </div>
           }

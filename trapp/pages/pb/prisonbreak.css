@@ -87,10 +87,10 @@
     padding: 0%;
     padding-top: 3px;
     border-style: solid;
-    border-color: red;
+    border-color: darkslateblue;
     border-width: thin;
-    background-color: black;
-    color: red;
+    background-color: darkslateblue;
+    color: cornsilk;
     text-align: center;
     width: 40px;
 }
@@ -259,6 +259,8 @@
     /* width: 150px; */
 }
 .pbUnderboard {
+    border-style: solid;
+    border-color: cornsilk;
     background-color: darkslateblue;
     text-indent: 1em;
 }
@@ -296,6 +298,14 @@
     font-weight: bolder;
     font-size: larger;
 }
+.pbLobbyGameRacksize {
+    font-style: italic;
+    font-size: larger;
+    padding-left: 5px;
+    border-left-style: solid;
+    border-color: whitesmoke;
+    text-align: center;
+}
 .pbLobbyGameStatus {
     font-style: italic;
     font-size: larger;
@@ -323,6 +333,22 @@
     width: 200px;
     text-align: center;
 }
+.pbLobbyRackSize {
+    background-color: black;
+    border-style: dotted;
+    color: white;
+    margin-left: 10px;
+    margin-right: 20px;
+}
+.pbLobbyRackSizeSelected {
+    background-color: green;
+    border-style: solid;
+    color: whitesmoke;
+    margin-left: 10px;
+    margin-right: 20px;
+    padding: 10px;
+}
+
 .upsidedown {
     transform: rotate(180deg);
 }
