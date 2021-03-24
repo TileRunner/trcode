@@ -442,10 +442,11 @@ const Square = (props) => {
   // need racksize to determine centre and board aarry edge positions
   const edge = (props.racksize * 2);
   const middle = props.racksize;
+  const addu = props.c === "Q" ? " u" : "";
   const usedbyclass =
     props.squareusedby === "P"
-      ? "pbSquareUsedByPrisoners"
-      : "pbSquareUsedByGuards";
+      ? "pbSquareUsedByPrisoners" + addu
+      : "pbSquareUsedByGuards" + addu;
   const tdclass = 
     props.c !== squareunused
       ? usedbyclass
@@ -1381,7 +1382,7 @@ const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles
           ) : (
             <></>
           )}
-          <span className="pbTilepoolTile">{t}</span>
+          <span className={t === "Q" ? "pbTilepoolTile u" : "pbTilepoolTile"}>{t}</span>
         </span>
       ))}
     </div>
@@ -1452,8 +1453,8 @@ const Prisoners = (props) => {
         {props.ptiles.map((t, ti) =>
           renderTile(
             props.whoseturn === "P" && props.selection === ti
-              ? "pbTileOnRackSelectedP"
-              : "pbTileOnRackP",
+            ? t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRackSelectedP u" : "pbTileOnRackSelectedP"
+            : t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRackP u" :  "pbTileOnRackP",
             ti,
             props.prisonersOrGuards === "P" ? t : "*"
           )
@@ -1482,8 +1483,8 @@ const Guards = (props) => {
         {props.gtiles.map((t, ti) =>
           renderTile(
             props.whoseturn === "G" && props.selection === ti
-              ? "pbTileOnRackSelectedG"
-              : "pbTileOnRackG",
+              ? t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRackSelectedG u" : "pbTileOnRackSelectedG"
+              : t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRackG u" :  "pbTileOnRackG",
             ti,
             props.prisonersOrGuards === "G" ? t : "*"
           )

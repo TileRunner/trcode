@@ -123,6 +123,10 @@
 .pbSquareUsedByGuards:focus {
     outline: none;
 }
+.u::after {
+    content: "u";
+    font-size: small;
+}
 .pbSquareRightArrow {
     height: 40px;
     padding: 0%;

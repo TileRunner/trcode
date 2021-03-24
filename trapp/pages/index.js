@@ -131,7 +131,8 @@ export default function Home() {
                   <li>Prisoners always play first.</li>
                   <li>The first word played must touch the centre square.</li>
                   <li>To free a prisoner, the Prisoners must play a tile on one of the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares.</li>
-                  <li>When a blank is played it does not have to remain as the same letter throughout the game.</li>
+                  <li>When a <span className="pbSquareUsedByGuards">&nbsp;?&nbsp;</span> is played it represents any letter and does not have to remain as the same letter throughout the game.</li>
+                  <li>The <span className="pbSquareUsedByGuards u">Q</span> tile can represent "Q" or "QU", does not have to be the same in both directions, and does not have to remain at the same designation throughout the game.</li>
                   <li>The game ends if a player empties their rack.</li>
                   <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
                   <li>The game ends if both players pass.</li>
