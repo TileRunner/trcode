@@ -545,7 +545,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     ptiles: [],
     gtiles: [],
   });
-
+  const [oppname, setOppname] = useState('');
+  const [chatmsgs, setChatmsgs] = useState([{from: 'Fred', msg: 'Hello Betty'}, {from: 'Betty', msg: 'Hi Fred'}]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -632,6 +633,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       );
     }
     else if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+      if (messageData.sender != prisonersOrGuards && oppname === "" && messageData.nickname && messageData.nickname.length > 0) {
+        // Opponent sent a message including their nickname and I don't have their nickname yet
+        setOppname(messageData.nickname);
+      }
       if (messageData.func === "requestgamedata" && messageData.sender !== prisonersOrGuards) { // Opponent requested game info
         client.send(
           JSON.stringify({
@@ -703,6 +708,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           ptiles: [...ptiles],
           gtiles: [...messageData.gtiles],
         });       
+      }
+      if (messageData.func === "chat" && messageData.sender != prisonersOrGuards) { // Opponent chat message
+        let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
+        setChatmsgs(newChatmsgs);
       }
     }
   }
@@ -1267,7 +1276,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     }
   }
   return (
-    <div className="container-fluid prisonbreak" onKeyDownCapture={handleKeyDown}>
+    <div className="container-fluid prisonbreak">
       <div className="row">
         <div className="col-2 pbGameid">
           Game id: {gameid}<br></br>
@@ -1281,10 +1290,12 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           <Link href={"../../"}>
             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>
+          <br></br>
+          Opponent: {oppname}
         </div>
       </div>
       <div className="row">
-        <div className="col pbPrisoners">
+        <div className="col-2 pbPrisoners">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -1300,7 +1311,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         </div>
         <div className="col">
           {prisonersOrGuards === whoseturn ?
-            <div className="row">
+            <div className="row" onKeyDownCapture={handleKeyDown}>
               <Board
                 squares={squares}
                 usedby={usedby}
@@ -1339,7 +1350,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             }
           </div>
         </div>
-        <div className="col pbGuards">
+        <div className="col-2 pbGuards">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -1352,8 +1363,11 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col">
+        <div className="col-1">
           <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
+        </div>
+        <div className="col-3">
+          <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
         </div>
       </div>
     </div>
@@ -1534,3 +1548,62 @@ function showActionButtons(props) {
   </div>;
 }
 
+const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
+  const [nextmsg, setNextmsg] = useState('');
+ 
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+    if (event.key === "Enter" && nextmsg.length > 0) {
+      let newMsgs = [...msgs, {from: nickname, msg: nextmsg}]
+      let sendmsg = nextmsg;
+      setMsgs(newMsgs);
+      setNextmsg('');
+      client.send(
+        JSON.stringify({
+          gameid: gameid, // the id for the game
+          nickname: nickname, // player nickname
+          type: "pb", // prisonbreak
+          func: "chat", // send chat message
+          sender: prisonersOrGuards, // who sent it
+          sendmsg: sendmsg // the message typed in the chat
+        })
+      );
+      return;
+    }
+    let chartest = /^[A-Za-z0-9 \.,\(\)\?]$/; // Allow letter, number, space, period, comma, round brackets, question mark
+    if (event.key.match(chartest)) {
+      let newNextmsg = nextmsg + event.key;
+      setNextmsg(newNextmsg);
+    }
+    if (event.key === "Backspace" && nextmsg.length > 0) {
+      let newNextmsg = nextmsg.slice(0,nextmsg.length-1);
+      setNextmsg(newNextmsg);
+    }
+  }
+
+  return (
+    <div className="pbChat">
+      <span className="pbChatTitle">Chatter box</span>
+      <table>
+        <tbody>
+          {msgs.filter((value, index) => msgs.length - index < 15).map((value, index) => (
+            <tr key={`ChatMessage${index}`}>
+              <td className="pbChatFrom">{value.from}</td>
+              <td className="pbChatMsg">{value.msg}</td>
+            </tr>
+          ))}
+          <tr>
+            <td className="pbChatInputPrompt">Message:</td>
+            <td>
+              <input className="pbChatInput"
+                name="nextmsg"
+                value={nextmsg}
+                onKeyDownCapture={handleKeyDown}
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+   </div>
+  )
+}
