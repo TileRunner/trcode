@@ -150,11 +150,25 @@
 .pbRow {
     padding: 0%;
 }
+.pbBoardPlusUnderboard {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
 .pbBoard {
     background-color: grey;
     border-style: solid;
     border-width: 5px;
     border-color: darkslateblue;
+}
+.pbUnderboard {
+    margin-top: 10px;
+    border-style: solid;
+    border-color: cornsilk;
+    background-color: darkslateblue;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .pbTilepool {
     text-align: left;
@@ -261,12 +275,6 @@
     font-family: cursive;
     height: 40px;
     /* width: 150px; */
-}
-.pbUnderboard {
-    border-style: solid;
-    border-color: cornsilk;
-    background-color: darkslateblue;
-    text-indent: 1em;
 }
 .pbLobbyGamesHeader {
     font-weight: bolder;

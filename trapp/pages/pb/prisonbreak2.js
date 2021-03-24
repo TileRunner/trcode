@@ -546,7 +546,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     gtiles: [],
   });
   const [oppname, setOppname] = useState('');
-  const [chatmsgs, setChatmsgs] = useState([{from: 'Fred', msg: 'Hello Betty'}, {from: 'Betty', msg: 'Hi Fred'}]);
+  const [chatmsgs, setChatmsgs] = useState([{from: 'Author', msg: 'Have fun!'}]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -1309,7 +1309,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col">
+        <div className="col pbBoardPlusUnderboard">
           {prisonersOrGuards === whoseturn ?
             <div className="row" onKeyDownCapture={handleKeyDown}>
               <Board
@@ -1342,7 +1342,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
                 />
               </div>
           }
-          <div className="row pbUnderboard">
+          <div className="pbUnderboard">
             {whoseturn === "X" ?
               <h1>Game Over!</h1>
             :
