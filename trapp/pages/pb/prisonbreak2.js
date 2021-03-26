@@ -6,6 +6,35 @@ const movewaittime = 20000; // when waiting for opponent ping every this many mi
 const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
 const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
 const jokes = [joke, joke2];
+const initialtiles4 = [
+  "A",  "A",  "A",
+  "B",
+  "C",
+  "D",
+  "E",  "E",  "E",  "E",
+  "F",
+  "G",
+  "H",
+  "I",  "I",  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",  "N",
+  "O",  "O",  "O",
+  "P",
+  "Q",
+  "R",  "R",
+  "S",
+  "T",  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  "?",  "?",
+]; // initial tile pool for 4 letter rack mode
 const initialtiles5 = [
   "A",  "A",  "A",  "A",  "A",
   "B",
@@ -316,7 +345,13 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     <div className="row">
       <div className="col offset-1">
         <span className="h2 pbRackSizePrompt"></span>
-        <button id="selectracksize6" className={racksize === 5 ? "pbLobbyRackSizeSelected5" : "pbLobbyRackSize5"}
+        <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected4" : "pbLobbyRackSize4"}
+          onClick={() => selectRackSize(4)}
+          data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
+        >
+          4
+        </button>
+        <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected5" : "pbLobbyRackSize5"}
           onClick={() => selectRackSize(5)}
           data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
         >
@@ -531,7 +566,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   }) => {
   const middle = racksize; // Middle element in row or column array
   const edge = racksize * 2; // Last element in row or column array
-  const initialtiles = racksize === 6 ? initialtiles6 : racksize === 7 ? initialtiles7 : initialtiles5;
+  const initialtiles = racksize === 6 ? initialtiles6 : racksize === 7 ? initialtiles7 : racksize === 5 ? initialtiles5 : initialtiles4;
   const initialsquares = Array(edge+1).fill(Array(edge+1).fill(squareunused));
   const initialusedby = Array(edge+1).fill(Array(edge+1).fill(usedbynoone));
   const [tiles, setTiles] = useState([...initialtiles]);

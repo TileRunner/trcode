@@ -366,6 +366,33 @@
 .pbRackSizePrompt:before {
     content: "Cell Block:";
 }
+.pbLobbyRackSize4 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 50px;
+    margin-right:20px;
+    margin-top:5px;
+}
+.pbLobbyRackSizeSelected4 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 55px;
+    margin-right:20px;
+    margin-top:5px;
+    border-width: 5px;
+    border-color: whitesmoke;
+    border-style: solid;
+}
 .pbLobbyRackSize5 {
     background-image: url("../../public/prisonbars-square.png");
     background-size: 50px;
