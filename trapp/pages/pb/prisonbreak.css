@@ -345,22 +345,117 @@
     width: 200px;
     text-align: center;
 }
-.pbLobbyRackSize {
-    background-color: black;
-    border-style: dotted;
-    color: white;
-    margin-left: 10px;
+.pbNicknameInput {
+    vertical-align: middle;
+    width: 200px;
+    width: 300px;
+}
+.pbGameIdPrompt {
+    margin-left: 15px;
+    margin-right: 25px;
+    vertical-align: middle;
+}
+.pbGameIdInput {
+    vertical-align: middle;
+    width: 300px;
+}
+.pbRackSizePrompt {
+    margin-left: 15px;
     margin-right: 20px;
 }
-.pbLobbyRackSizeSelected {
-    background-color: green;
-    border-style: solid;
+.pbRackSizePrompt:before {
+    content: "Cell Block:";
+}
+.pbLobbyRackSize5 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: whitesmoke;
-    margin-left: 10px;
-    margin-right: 20px;
-    padding: 10px;
+    width: 50px;
+    height: 50px;
+    margin-right:20px;
+    margin-top:5px;
 }
-
+.pbLobbyRackSizeSelected5 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 55px;
+    margin-right:20px;
+    margin-top:5px;
+    border-width: 5px;
+    border-color: whitesmoke;
+    border-style: solid;
+}
+.pbLobbyRackSize6 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 50px;
+    margin-right:20px;
+    margin-top:5px;
+}
+.pbLobbyRackSizeSelected6 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 55px;
+    margin-right:20px;
+    margin-top:5px;
+    border-width: 5px;
+    border-color: whitesmoke;
+    border-style: solid;
+}
+.pbLobbyRackSize7 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 50px;
+    margin-right:20px;
+    margin-top:5px;
+}
+.pbLobbyRackSizeSelected7 {
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: 50px;
+    background-color: grey;
+    font-size: xx-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: whitesmoke;
+    width: 50px;
+    height: 55px;
+    margin-right:20px;
+    margin-top:5px;
+    border-width: 5px;
+    border-color: whitesmoke;
+    border-style: solid;
+}
+.pbLobbyRackSizeSelected5:focus {
+    outline: none;
+}
+.pbLobbyRackSizeSelected6:focus {
+    outline: none;
+}
+.pbLobbyRackSizeSelected7:focus {
+    outline: none;
+}
 .upsidedown {
     transform: rotate(180deg);
 }

@@ -261,15 +261,15 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
       </div>
     </div>
     <div className="row">
-      <div className="col-10 offset-1 h2">
-        <label>*Nickname:&nbsp;</label>
-        <input
+      <div className="col-10 offset-1">
+        <label className="h2">*Nickname:&nbsp;</label>
+        <input className="h2 pbNicknameInput"
               name="nickname"
               value={nickname}
               onChange={(e) => {
                 setNickname(e.target.value);
               } } />
-        <span>&nbsp;(*required)</span>
+        <span className="h2">&nbsp;(*required)</span>
       </div>
       <div class="custom-control custom-checkbox h3 col offset-2">
         <input type="checkbox" id="upsidedownModeCheckbox" className="custom-control-input"
@@ -282,53 +282,59 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     <div className="row">
       <div className="col-7 offset-1">
         <hr></hr>
-        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id, select options and click "Start Game".</span>
+        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id, select a cell block, and then click "Start Game".</span>
       </div>
     </div>
     <div className="row">
       <div className="col-7 offset-1">
-        <span class="h2"><span class="h1">&nbsp;</span>&nbsp;&nbsp;&nbsp;Game id:&nbsp;
-          <input
-            name="gameid"
-            value={gameid}
-            onChange={(e) => {
-              setGameid(e.target.value);
-            } } />
-          <button id="startgame" className="pbLobbyActionButton"
-            onClick={function () {
-              if (gameid.length > 0) {
-                if (isPlayingP(gameid)) {
-                  window.alert("Prisoners already playing that game");
-                } else {
-                  setPrisonersOrGuards('P');
-                }
+        <span className="h2 pbGameIdPrompt">Game ID:</span>
+        <input className="h2 pbGameIdInput"
+          name="gameid"
+          value={gameid}
+          onChange={(e) => {
+            setGameid(e.target.value);
+          } } />
+        <button id="startgame" className="pbLobbyActionButton h2"
+          onClick={function () {
+            if (nickname.length === 0) {
+              window.alert("Please enter nickname before starting a game");
+            } else if (gameid.length > 0) {
+              if (isPlayingP(gameid)) {
+                window.alert("Prisoners already playing that game");
+              } else {
+                setPrisonersOrGuards('P');
               }
-            } }
-          >
-            Start Game
-          </button>
-        </span>
+            } else {
+              window.alert("Please enter Game ID before starting a game");
+            }
+          } }
+        >
+          Start Game
+        </button>
       </div>
     </div>
     <div className="row">
       <div className="col offset-1">
-        <span className="h2">&nbsp;&nbsp;&nbsp;Rack size:</span>
-        <button id="selectracksize6" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+        <span className="h2 pbRackSizePrompt"></span>
+        <button id="selectracksize6" className={racksize === 5 ? "pbLobbyRackSizeSelected5" : "pbLobbyRackSize5"}
           onClick={() => selectRackSize(5)}
+          data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
         >
           5
         </button>
-        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-          onClick={() => selectRackSize(6)}
+        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected6" : "pbLobbyRackSize6"}
+          onClick={() => selectRackSize(6)} autoFocus
+          data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
         >
           6
         </button>
-        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected7" : "pbLobbyRackSize7"}
           onClick={() => selectRackSize(7)}
+          data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
         >
           7
         </button>
-        <span className="h2">(rack size determines board size too)</span>
+        <span className="h2">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
       </div>
     </div>
     <div className="row">
@@ -352,8 +358,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               <th className="pbLobbyGamesHeaderCol">Game ID</th>
               <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
               <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
-              <th className="pbLobbyGamesHeaderCol">Rack size</th>
-              <th className="pbLobbyGamesHeaderCol">Game status</th>
+              <th className="pbLobbyGamesHeaderCol">Cell Block</th>
+              <th className="pbLobbyGamesHeaderCol">Game Status</th>
             </tr>
           </thead>
           <tbody>
