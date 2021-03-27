@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
-const racklen = 6;
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
 const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
 const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
@@ -137,7 +136,7 @@ export default function PrisonBreak() {
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
   const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
   const [upsidedownMode, setUpsidedownMode] = useState(false);
-  const [racksize, setRacksize] = useState(6); // Default to 6 letter racks
+  const [racksize, setRacksize] = useState(4); // Default to 4 letter racks
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
     // React is hard to understand. If I reference prisonersOrGuards here it will always be the initial value.
@@ -348,6 +347,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
         <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected4" : "pbLobbyRackSize4"}
           onClick={() => selectRackSize(4)}
           data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
+          autoFocus
         >
           4
         </button>
@@ -358,7 +358,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
           5
         </button>
         <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected6" : "pbLobbyRackSize6"}
-          onClick={() => selectRackSize(6)} autoFocus
+          onClick={() => selectRackSize(6)}
           data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
         >
           6
@@ -587,7 +587,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     gtiles: [],
   });
   const [oppname, setOppname] = useState('');
-  const [chatmsgs, setChatmsgs] = useState([{from: 'Author', msg: 'Have fun!'}]);
+  const [chatmsgs, setChatmsgs] = useState([{from: 'Author', msg: 'email: justchrissykes@gmail.com'}]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -1611,7 +1611,7 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
       );
       return;
     }
-    let chartest = /^[A-Za-z0-9 \.,\(\)\?]$/; // Allow letter, number, space, period, comma, round brackets, question mark
+    let chartest = /^[A-Za-z0-9 \.,\(\)\?:!'"]$/; // Allow letter, number, space, period, comma, round brackets, question mark, colon, exclamation mark, quote, double quote
     if (event.key.match(chartest)) {
       let newNextmsg = nextmsg + event.key;
       setNextmsg(newNextmsg);
@@ -1624,8 +1624,8 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
 
   return (
     <div className="pbChat">
-      <span className="pbChatTitle">Chatter box</span>
-      <table>
+      <span className="pbChatTitle">Chat with opponent</span>
+      <table className="pbChatTable">
         <tbody>
           {msgs.filter((value, index) => msgs.length - index < 15).map((value, index) => (
             <tr key={`ChatMessage${index}`}>
@@ -1634,11 +1634,10 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
             </tr>
           ))}
           <tr>
-            <td className="pbChatInputPrompt">Message:</td>
-            <td>
-              <input className="pbChatInput"
-                name="nextmsg"
-                value={nextmsg}
+            <td colSpan="2">
+              <textarea className={nextmsg === "" ? "pbChatInputEmpty" : "pbChatInput"}
+                name="nextmsgInputArea"
+                value={nextmsg === "" ? "[type here then hit enter]" : nextmsg}
                 onKeyDownCapture={handleKeyDown}
               />
             </td>

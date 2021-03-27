@@ -488,30 +488,64 @@
 }
 
 .pbChat {
-    color:darkred;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.pbChatTable {
+    border-width: 3px;
+    border-color: slateblue;
+    border-left-style: solid;
 }
 .pbChatTitle {
     background-color: white;
     color: black;
+    border-radius: 50px;
+    border-width: 5px;
+    border-color: slateblue;
+    border-style: solid;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .pbChatFrom {
     background-color: black;
     color: white;
     padding-right: 5px;
+    vertical-align: top;
+}
+.pbChatFrom::before {
+    content: ">";
+    color: slateblue;
+}
+.pbChatFrom::after {
+    content: ":";
+    color: yellow;
+    font-size: larger;
+    padding-left: 1px;
 }
 .pbChatMsg {
     padding-left: 5px;
-    border-style: groove;
-    border-width: 2px;
     font-style: italic;
     color:whitesmoke;
     background-color: black;
+    padding-top:1px;
 }
 .pbChatInput {
-    font-family: 'Courier New', Courier, monospace;
+    font-style: italic;
+    color:whitesmoke;
+    background-color: darkblue;
     width: 100%;
 }
+.pbChatInputEmpty {
+    font-style: italic;
+    color:gainsboro;
+    background-color: gray;
+    width: 100%;
+    max-block-size: 30px;
+    cursor: grab;
+}
 .pbChatInputPrompt {
-    background-color: white;
-    color: black;
+    background-color: darkslateblue;
+    color: whitesmoke;
 }
