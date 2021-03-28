@@ -1,3 +1,10 @@
+:root {
+    --squareSide: 40px;
+    --cellBlockSide: 40px;
+    --cellBlockSelectedHeight: 45px;
+    --selectedColor: #2196F3;
+    --lobbyFontSize: 20px;
+}
 .prisonbreak {
     background-color: grey;
     background-image: url("../../public/prisonbars.png");
@@ -16,6 +23,8 @@
     color: black;
     font-family: fantasy;
     text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 .pbtitle {
     background-color: grey;
@@ -43,47 +52,46 @@
     border-color: black;
 }
 .pbSquare1 {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
-    /* background-image: url("../../public/prisonbars-square.png");
-    background-color: grey; */
     background-color: black;
     background-size: cover;
     color: black;
     text-align: center;
-    width: 40px;
 }
 .pbSquare1:focus {
     outline: none;
 }
 .pbSquare2 {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
     background-color: darkgrey;
     color: darkgrey;
     text-align: center;
-    width: 40px;
 }
 .pbSquare2:focus {
     outline: none;
 }
 .pbSquareCenterSquare {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     padding-top: 3px;
     border-style: none;
     background-color: darkslateblue;
     color: cornsilk;
     font-size: x-large;
-    width: 40px;
 }
 .pbSquareCenterSquare:focus {
     outline: none;
 }
 .pbSquareEscapeHatch {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     padding-top: 3px;
     border-style: solid;
@@ -92,33 +100,32 @@
     background-color: darkslateblue;
     color: cornsilk;
     text-align: center;
-    width: 40px;
 }
 .pbSquareEscapeHatch:focus {
     outline: none;
 }
 .pbSquareUsedByPrisoners {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
     background-color: orangered;
     color:whitesmoke;
     font-weight: bolder;
     text-align: center;
-    width: 40px;
 }
 .pbSquareUsedByPrisoners:focus {
     outline: none;
 }
 .pbSquareUsedByGuards {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
     background-color: orangered;
     color: black;
     font-weight: bolder;
     text-align: center;
-    width: 40px;
 }
 .pbSquareUsedByGuards:focus {
     outline: none;
@@ -128,24 +135,24 @@
     font-size: small;
 }
 .pbSquareRightArrow {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
     background-color: grey;
     color: cyan;
     font-weight: bolder;
     text-align: center;
-    width: 40px;
 }
 .pbSquareDownArrow {
-    height: 40px;
+    height: var(--squareSide);
+    width: var(--squareSide);
     padding: 0%;
     border-style: none;
     background-color: grey;
     color: cyan;
     font-weight: bolder;
     text-align: center;
-    width: 40px;
 }
 .pbRow {
     padding: 0%;
@@ -174,11 +181,6 @@
     text-align: left;
     color: whitesmoke;
     font-family: monospace;
-    /* padding-top: 3px;
-    padding-bottom: 3px;
-    padding-left: 5px;
-    padding-right: 5px; */
-    /* width: 165px; */
 }
 .pbTilepoolDivider {
     height: 2px;
@@ -278,7 +280,7 @@
 }
 .pbLobbyGamesHeader {
     font-weight: bolder;
-    font-size: larger;
+    font-size: var(--lobbyFontSize);
     background-color: darkslateblue;
     color: whitesmoke;
     text-align: center;
@@ -298,6 +300,157 @@
 .pbGamesInProgressRow:last-child {
     border-bottom-style: double;
 }
+.pbLobbyCommonInfoSection {
+    padding-left: 50px;
+    padding-top: 5px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size:var(--lobbyFontSize);
+}
+.pbLobbyNicknamePrompt {
+    font-weight: bold;
+}
+.pbLobbyNicknamePrompt::after {
+    content: ":";
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.pbLobbyNicknameInput {
+    vertical-align: middle;
+    width: 300px;
+}
+/* Customize the label (the container) */
+.pbLobbyUpsidedownContainer {
+    display: flexbox;
+    position: relative;
+    padding-left: 35px; /* This positions the checkbox label to the right of the checkbox */
+    vertical-align: top;
+    margin-left: 10px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+/* Hide the browser's default checkbox */
+.pbLobbyUpsidedownContainer input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+/* Create a custom checkbox */
+.pbLobbyUpsidedownCheckmark {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+}
+/* On mouse-over, add a grey background color */
+.pbLobbyUpsidedownContainer:hover input ~ .pbLobbyUpsidedownCheckmark {
+    background-color: #ccc;
+}
+  
+/* When the checkbox is checked, add a blue background */
+.pbLobbyUpsidedownContainer input:checked ~ .pbLobbyUpsidedownCheckmark {
+    background-color:var(--selectedColor);
+}
+  
+/* Create the checkmark/indicator (hidden when not checked) */
+.pbLobbyUpsidedownCheckmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+  
+/* Show the checkmark when checked */
+.pbLobbyUpsidedownContainer input:checked ~ .pbLobbyUpsidedownCheckmark:after {
+    display: block;
+}
+  
+/* Style the checkmark/indicator
+     It is drawing 2 of the border sides angled 45 degrees to look like a checkmark
+ */
+.pbLobbyUpsidedownContainer .pbLobbyUpsidedownCheckmark:after {
+    left: 8px;
+    top: 2px;
+    width: 8px;
+    height: 17px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    border-radius: 25%; /* round the checkmark bottom a little */
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.pbLobbyPrisonerSection {
+    padding-left: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.pbLobbyGameIdPrompt {
+    margin-left: 5px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.pbLobbyGameIdPrompt::after {
+    content: ":";
+    padding-left: 3px;
+}
+.pbLobbyGameIdInput {
+    vertical-align: middle;
+    width: 300px;
+}
+.pbLobbyRackSizePrompt {
+    margin-left: 5px;
+    margin-right: 20px;
+}
+.pbLobbyRackSizePrompt:before {
+    content: "Cell Block";
+}
+.pbLobbyRackSizePrompt::after {
+    content: ":";
+    padding-left: 2px;
+}
+.pbLobbyRackSize {
+    background-image: url("../../public/prisonbars-square.png");
+    vertical-align: middle;
+    background-size: var(--cellBlockSide);
+    background-color: grey;
+    color: whitesmoke;
+    width: var(--cellBlockSide);
+    height: var(--cellBlockSide);
+    margin-right:20px;
+    align-content: center;
+}
+.pbLobbyRackSizeSelected {
+    vertical-align: middle;
+    background-image: url("../../public/prisonbars-square.png");
+    background-size: var(--cellBlockSide);
+    background-color: grey;
+    color: whitesmoke;
+    width: var(--cellBlockSide);
+    height: var(--cellBlockSelectedHeight);
+    margin-right:20px;
+    border-width: 5px;
+    border-color: var(--selectedColor);
+    border-style: solid;
+}
+.pbLobbyRackSizeSelected:focus {
+    outline: none;
+}
+.pbLobbyCellBlockInfo {
+    padding-left: 5px;
+}
+.pbLobbyGuardSection {
+    padding-top: 5px;
+    padding-left: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.pbGuardInfo {
+    padding-left: 5px;
+}
 .pbLobbyGamesHeaderCol {
     padding-left: 10px;
     padding-right: 10px;
@@ -308,11 +461,9 @@
 .pbLobbyGameid {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bolder;
-    font-size: larger;
 }
 .pbLobbyGameRacksize {
     font-style: italic;
-    font-size: larger;
     padding-left: 5px;
     border-left-style: solid;
     border-color: whitesmoke;
@@ -320,7 +471,6 @@
 }
 .pbLobbyGameStatus {
     font-style: italic;
-    font-size: larger;
     padding-left: 5px;
     border-left-style: solid;
     border-color: whitesmoke;
@@ -334,154 +484,12 @@
 .pbLobbyActionButton {
     background-color: lightsteelblue;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    /* font-size: 30px; */
-    /* height: 43px; */
     margin-left: 10px;
     width: 180px;
-    /* vertical-align: middle; */
 }
 .pbLobbyActionNone {
-    /* height: 43px; */
     width: 200px;
     text-align: center;
-}
-.pbNicknameInput {
-    vertical-align: middle;
-    width: 200px;
-    width: 300px;
-}
-.pbGameIdPrompt {
-    margin-left: 15px;
-    margin-right: 25px;
-    vertical-align: middle;
-}
-.pbGameIdInput {
-    vertical-align: middle;
-    width: 300px;
-}
-.pbRackSizePrompt {
-    margin-left: 15px;
-    margin-right: 20px;
-}
-.pbRackSizePrompt:before {
-    content: "Cell Block:";
-}
-.pbLobbyRackSize4 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 50px;
-    margin-right:20px;
-    margin-top:5px;
-}
-.pbLobbyRackSizeSelected4 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 55px;
-    margin-right:20px;
-    margin-top:5px;
-    border-width: 5px;
-    border-color: whitesmoke;
-    border-style: solid;
-}
-.pbLobbyRackSize5 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 50px;
-    margin-right:20px;
-    margin-top:5px;
-}
-.pbLobbyRackSizeSelected5 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 55px;
-    margin-right:20px;
-    margin-top:5px;
-    border-width: 5px;
-    border-color: whitesmoke;
-    border-style: solid;
-}
-.pbLobbyRackSize6 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 50px;
-    margin-right:20px;
-    margin-top:5px;
-}
-.pbLobbyRackSizeSelected6 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 55px;
-    margin-right:20px;
-    margin-top:5px;
-    border-width: 5px;
-    border-color: whitesmoke;
-    border-style: solid;
-}
-.pbLobbyRackSize7 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 50px;
-    margin-right:20px;
-    margin-top:5px;
-}
-.pbLobbyRackSizeSelected7 {
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: 50px;
-    background-color: grey;
-    font-size: xx-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: whitesmoke;
-    width: 50px;
-    height: 55px;
-    margin-right:20px;
-    margin-top:5px;
-    border-width: 5px;
-    border-color: whitesmoke;
-    border-style: solid;
-}
-.pbLobbyRackSizeSelected5:focus {
-    outline: none;
-}
-.pbLobbyRackSizeSelected6:focus {
-    outline: none;
-}
-.pbLobbyRackSizeSelected7:focus {
-    outline: none;
 }
 .upsidedown {
     transform: rotate(180deg);

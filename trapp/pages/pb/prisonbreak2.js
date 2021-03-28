@@ -288,41 +288,63 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
         </Link>
       </div>
     </div>
-    <div className="row">
-      <div className="col-10 offset-1">
-        <label className="h2">*Nickname:&nbsp;</label>
-        <input className="h2 pbNicknameInput"
+    <div className="row pbLobbyCommonInfoSection">
+      <div className="col">
+        <label className="pbLobbyNicknamePrompt">Nickname</label>
+        <input className="pbLobbyNicknameInput"
               name="nickname"
               value={nickname}
               onChange={(e) => {
                 setNickname(e.target.value);
               } } />
-        <span className="h2">&nbsp;(*required)</span>
-      </div>
-      <div class="custom-control custom-checkbox h3 col offset-2">
-        <input type="checkbox" id="upsidedownModeCheckbox" className="custom-control-input"
-          value={upsidedownMode}
-          onChange={() => togglerUpsidedownMode()}
-        />
-        <label className="custom-control-label" for="upsidedownModeCheckbox">&nbsp;Upside board on opponents turn</label>
-      </div>
-    </div>
-    <div className="row">
-      <div className="col-7 offset-1">
-        <hr></hr>
-        <span className="pbPlayerTitle h2">&nbsp;PRISONERS&nbsp;</span><span className="h3">&nbsp;&nbsp;Enter a game id, select a cell block, and then click "Start Game".</span>
+        <label className="pbLobbyUpsidedownContainer">
+          Upside board on opponents turn
+          <input type="checkbox" id="upsidedownModeCheckbox"
+            value={upsidedownMode}
+            onChange={() => togglerUpsidedownMode()}
+          />
+          <span className="pbLobbyUpsidedownCheckmark"></span>
+        </label>
       </div>
     </div>
-    <div className="row">
-      <div className="col-7 offset-1">
-        <span className="h2 pbGameIdPrompt">Game ID:</span>
-        <input className="h2 pbGameIdInput"
+    <div className="row pbLobbyPrisonerSection">
+      <div className="col">
+        <span className="pbPlayerTitle">PRISONERS</span>
+        <span className="pbLobbyGameIdPrompt">Game ID</span>
+        <input className="pbLobbyGameIdInput"
           name="gameid"
           value={gameid}
           onChange={(e) => {
             setGameid(e.target.value);
           } } />
-        <button id="startgame" className="pbLobbyActionButton h2"
+        <span className="pbLobbyRackSizePrompt"></span>
+        <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(4)}
+          data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
+          autoFocus
+        >
+          4
+        </button>
+        <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(5)}
+          data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
+        >
+          5
+        </button>
+        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(6)}
+          data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
+        >
+          6
+        </button>
+        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+          onClick={() => selectRackSize(7)}
+          data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
+        >
+          7
+        </button>
+        <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
+        <button id="startgame" className="pbLobbyActionButton"
           onClick={function () {
             if (nickname.length === 0) {
               window.alert("Please enter nickname before starting a game");
@@ -341,52 +363,19 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
         </button>
       </div>
     </div>
-    <div className="row">
-      <div className="col offset-1">
-        <span className="h2 pbRackSizePrompt"></span>
-        <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected4" : "pbLobbyRackSize4"}
-          onClick={() => selectRackSize(4)}
-          data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
-          autoFocus
-        >
-          4
-        </button>
-        <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected5" : "pbLobbyRackSize5"}
-          onClick={() => selectRackSize(5)}
-          data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
-        >
-          5
-        </button>
-        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected6" : "pbLobbyRackSize6"}
-          onClick={() => selectRackSize(6)}
-          data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
-        >
-          6
-        </button>
-        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected7" : "pbLobbyRackSize7"}
-          onClick={() => selectRackSize(7)}
-          data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
-        >
-          7
-        </button>
-        <span className="h2">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
-      </div>
-    </div>
-    <div className="row">
-      <div className="col-7 offset-1">
-        <hr></hr>
-        <span className="pbPlayerTitle h2"><i className="material-icons">security</i>GUARDS<i className="material-icons">security</i></span><span className="h3">&nbsp;&nbsp;Find and click the "Join Game" button for your game.</span>
-        <hr></hr>
-        <h3>If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+    <div className="row pbLobbyGuardSection">
+      <div className="col">
+        <span className="pbPlayerTitle">GUARDS</span><span className="pbGuardInfo">Find and click the "Join Game" button for your game.</span>
+        <p>If you lost connection, find and click the "Reconnect" button for your game id.</p>
       </div>
     </div>
     <div className="row">
       <div className="col offset-1">
-        <h1>Game list:</h1>
+        <h2>Game list:</h2>
       </div>
     </div>
     <div className="row">
-      <div className="col offset-2">
+      <div className="col offset-1">
         <table>
           <thead>
             <tr className="pbLobbyGamesHeader">
@@ -1503,7 +1492,7 @@ const Prisoners = (props) => {
 
   return (
     <div>
-      <p className="pbPlayerTitle"><i className="material-icons">run_circle run_circle run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle run_circle run_circle</i></p>
+      <p className="pbPlayerTitle"><i className="material-icons">run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle</i></p>
       <p className="pbTilerack">
         {props.ptiles.map((t, ti) =>
           renderTile(
@@ -1533,7 +1522,7 @@ const Guards = (props) => {
 
   return (
     <div>
-      <p className="pbPlayerTitle"><i className="material-icons">security security security</i>&nbsp;GUARDS&nbsp;<i className="material-icons">security security security</i></p>
+      <p className="pbPlayerTitle"><i className="material-icons">security</i>&nbsp;GUARDS&nbsp;<i className="material-icons">security</i></p>
       <p className="pbTilerack">
         {props.gtiles.map((t, ti) =>
           renderTile(
