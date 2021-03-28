@@ -4,6 +4,9 @@
     --cellBlockSelectedHeight: 45px;
     --selectedColor: #2196F3;
     --lobbyFontSize: 20px;
+    --commonBorderColour: blue; /*darkslateblue*/
+    --commonTextBackgroundColour: black;
+    --commonTextColour: whitesmoke;
 }
 .prisonbreak {
     background-color: grey;
@@ -14,8 +17,11 @@
     color:lightgrey;
 }
 .pbGameid {
-    background-color: grey;
-    color:black;
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
+    border-color: var(--commonBorderColour);
+    border-width: 0 0 3px 3px;
+    border-style: solid;
 }
 .pbPlayerTitle {
     border-style: solid;
@@ -35,9 +41,12 @@
     color:black;
 }
 .pbhomelink {
-    background-color: grey;
-    color: black;
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
     text-align: right;
+    border-color: var(--commonBorderColour);
+    border-width: 0 3px 3px 0;
+    border-style: solid;
 }
 .pbPrisoners {
     font-size: x-large;
@@ -82,7 +91,7 @@
     padding: 0%;
     padding-top: 3px;
     border-style: none;
-    background-color: darkslateblue;
+    background-color: var(--commonBorderColour);
     color: cornsilk;
     font-size: x-large;
 }
@@ -95,9 +104,9 @@
     padding: 0%;
     padding-top: 3px;
     border-style: solid;
-    border-color: darkslateblue;
+    border-color: var(--commonBorderColour);
     border-width: thin;
-    background-color: darkslateblue;
+    background-color: darkblue;
     color: cornsilk;
     text-align: center;
 }
@@ -164,22 +173,28 @@
     justify-content: flex-start;
 }
 .pbBoard {
-    background-color: grey;
     border-style: solid;
     border-width: 5px;
-    border-color: darkslateblue;
+    border-color: var(--commonBorderColour);
 }
 .pbUnderboard {
     margin-top: 10px;
     border-style: solid;
-    border-color: cornsilk;
-    background-color: darkslateblue;
+    border-color: var(--commonBorderColour);
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
     padding-left: 10px;
     padding-right: 10px;
 }
 .pbTilepool {
+    padding-left: 3px;
     text-align: left;
-    color: whitesmoke;
+    border-width: 3px 0 0 3px;
+    /* opacity: 75%; */
+    border-style: solid;
+    border-color: var(--commonBorderColour);
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
     font-family: monospace;
 }
 .pbTilepoolDivider {
@@ -188,13 +203,12 @@
 .pbTilepoolTitle {
     font-size: 150%;
     letter-spacing: 3px;
-    background-color: darkslateblue;
+    border-bottom-style: solid;
 }
 .pbTilepoolTile {
     font-size: large;
     padding-left: 2px;
     padding-right: 2px;
-    background-color: darkslateblue;
 }
 .pbTilerack {
     margin-top: 5px;
@@ -241,10 +255,18 @@
     text-align: center;
     padding: 5px;
 }
-.pbBreakfree {
-    vertical-align: middle;
-    width: 50px;
-    height: 50px;
+.pbRescuesMade {
+    background-color: var(--commonTextBackgroundColour);
+    color:var(--commonTextColour);
+    border-color: var(--commonBorderColour);
+    border-width: 3px;
+    border-style: solid;
+    padding-left: 3px;
+}
+.pbRescuee {
+    padding: 2px;
+    width: 85px;
+    height: 85px;
 }
 .pbActionButtonDiv {
     margin-left: 7px;
@@ -254,10 +276,10 @@
     margin-left: 5px;
     border-radius: 35px;
     border-width: 3px;
-    border-color: whitesmoke;
+    border-color: var(--commonBorderColour);
     border-style: solid;
-    background-color: black;
-    color: whitesmoke;
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
     font-family: cursive;
     width: 200px;
     word-spacing: 3px;
@@ -266,22 +288,10 @@
     margin-left: 5px;
     margin-right: 15px;
 }
-.pbPassPlay {
-    margin-left: 5px;
-    border-radius: 35%;
-    border-width: 3px;
-    border-color: whitesmoke;
-    border-style: solid;
-    background-color: black;
-    color: whitesmoke;
-    font-family: cursive;
-    height: 40px;
-    /* width: 150px; */
-}
 .pbLobbyGamesHeader {
     font-weight: bolder;
     font-size: var(--lobbyFontSize);
-    background-color: darkslateblue;
+    background-color: var(--commonBorderColour);
     color: whitesmoke;
     text-align: center;
 }
@@ -448,7 +458,7 @@
     padding-left: 50px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
-.pbGuardInfo {
+.pbLobbyGuardInfo {
     padding-left: 5px;
 }
 .pbLobbyGamesHeaderCol {
@@ -496,25 +506,27 @@
 }
 
 .pbChat {
-    align-items: center;
+    align-items: left;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 }
 .pbChatTable {
     border-width: 3px;
-    border-color: slateblue;
+    border-color: var(--commonBorderColour);
     border-left-style: solid;
 }
 .pbChatTitle {
-    background-color: white;
-    color: black;
-    border-radius: 50px;
-    border-width: 5px;
-    border-color: slateblue;
-    border-style: solid;
-    padding-left: 10px;
-    padding-right: 10px;
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
+    border-width: 3px;
+    border-color: var(--commonBorderColour);
+    border-style: none none dotted solid;
+    padding-left: 5px;
+}
+.pbChatTitle::after {
+    content: ":";
+    padding-left: 2px;
 }
 .pbChatFrom {
     background-color: black;
@@ -524,7 +536,7 @@
 }
 .pbChatFrom::before {
     content: ">";
-    color: slateblue;
+    color: var(--commonBorderColour);
 }
 .pbChatFrom::after {
     content: ":";
@@ -542,7 +554,7 @@
 .pbChatInput {
     font-style: italic;
     color:whitesmoke;
-    background-color: darkblue;
+    background-color: var(--commonBorderColour);
     width: 100%;
 }
 .pbChatInputEmpty {
@@ -552,8 +564,4 @@
     width: 100%;
     max-block-size: 30px;
     cursor: grab;
-}
-.pbChatInputPrompt {
-    background-color: darkslateblue;
-    color: whitesmoke;
 }

@@ -365,7 +365,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     </div>
     <div className="row pbLobbyGuardSection">
       <div className="col">
-        <span className="pbPlayerTitle">GUARDS</span><span className="pbGuardInfo">Find and click the "Join Game" button for your game.</span>
+        <span className="pbPlayerTitle">GUARDS</span><span className="pbLobbyGuardInfo">Find and click the "Join Game" button for your game.</span>
         <p>If you lost connection, find and click the "Reconnect" button for your game id.</p>
       </div>
     </div>
@@ -1480,12 +1480,10 @@ const Prisoners = (props) => {
     let dumb = Array(count).fill("nonsense");
     return dumb.map((value, index) => (
       <span key={value + String(index)} data-toggle="tooltip" title="I'm free! I'm free!">
-        <img
+        <img className="pbRescuee"
           src="/breakfree.png"
           alt="I'm free! I'm free!"
-          width="100"
-          height="100"
-        />
+          />
       </span>
     ));
   };
@@ -1508,7 +1506,7 @@ const Prisoners = (props) => {
         showActionButtons(props)
       : <></>
       }
-      <p>
+      <p className="pbRescuesMade">
         Rescues made: {props.rescues}
         <br></br>
         {renderFreedPrisoners(props.rescues)}
