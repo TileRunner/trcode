@@ -7,11 +7,13 @@
     --commonBorderColour: blue; /*darkslateblue*/
     --commonTextBackgroundColour: black;
     --commonTextColour: whitesmoke;
+    --tileBackgroundColour: orangered;
+    --prisonersTileColour: whitesmoke;
+    --guardsTileColour: black;
 }
 .prisonbreak {
     background-color: grey;
     background-image: url("../../public/prisonbars.png");
-    /* background-repeat: repeat; */
     background-size: cover;
     background-blend-mode: normal;
     color:lightgrey;
@@ -22,15 +24,6 @@
     border-color: var(--commonBorderColour);
     border-width: 0 0 3px 3px;
     border-style: solid;
-}
-.pbPlayerTitle {
-    border-style: solid;
-    background-color: whitesmoke;
-    color: black;
-    font-family: fantasy;
-    text-align: center;
-    padding-left: 2px;
-    padding-right: 2px;
 }
 .pbtitle {
     background-color: grey;
@@ -48,11 +41,30 @@
     border-width: 0 3px 3px 0;
     border-style: solid;
 }
-.pbPrisoners {
+.pbPlayerOuterSection {
+    width: 200px;
+    /* I did this temporarily to see where the area was
+    border-style: inset;
+    border-color: orangered;
+    border-width: 1px;
+     */
+    padding-top: 3px;
+}
+.pbPlayerInnerSection {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     font-size: x-large;
 }
-.pbGuards {
-    font-size: x-large;
+.pbPlayerTitle {
+    border-style: solid;
+    background-color: whitesmoke;
+    color: black;
+    font-family: fantasy;
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 .pbSquare {
     padding: 0%;
@@ -118,8 +130,8 @@
     width: var(--squareSide);
     padding: 0%;
     border-style: none;
-    background-color: orangered;
-    color:whitesmoke;
+    background-color: var(--tileBackgroundColour);
+    color: var(--prisonersTileColour);
     font-weight: bolder;
     text-align: center;
 }
@@ -131,8 +143,8 @@
     width: var(--squareSide);
     padding: 0%;
     border-style: none;
-    background-color: orangered;
-    color: black;
+    background-color: var(--tileBackgroundColour);
+    color: var(--guardsTileColour);
     font-weight: bolder;
     text-align: center;
 }
@@ -211,49 +223,33 @@
     padding-right: 2px;
 }
 .pbTilerack {
-    margin-top: 5px;
+    padding-top: 2px;
+    padding-bottom: 5px;
+    display: flex;
+    flex-direction: row;
 }
-.pbTileOnRackP {
-    background-color: orangered;
+.pbTileOnRack {
+    background-color: var(--tileBackgroundColour);
+    width: var(--squareSide);
+    height: var(--squareSide);
+    font-weight: bolder;
+    text-align: center;
+}
+.pbTileOnRack.Unselected {
     border-style: solid;
     border-width: thin;
     border-color: black;
-    width: 40px;
-    color: whitesmoke;
-    font-weight: bolder;
-    text-align: center;
-    padding: 5px;
 }
-.pbTileOnRackSelectedP {
-    background-color: orangered;
-    border: white;
+.pbTileOnRack.Selected {
     border-style: inset;
-    width: 40px;
-    color: rgb(157, 198, 231);
-    font-weight: bolder;
-    text-align: center;
-    padding: 5px;
+    border-width: normal;
+    border-color: white;
 }
-.pbTileOnRackG {
-    background-color: orangered;
-    border-color: black;
-    border-width: thin;
-    border-style: solid;
-    width: 40px;
-    color: black;
-    font-weight: bolder;
-    text-align: center;
-    padding: 5px;
+.pbTileOnRack.P {
+    color: var(--prisonersTileColour);
 }
-.pbTileOnRackSelectedG {
-    background-color: orangered;
-    border: white;
-    border-style: inset;
-    width: 40px;
-    color: whitesmoke;
-    font-weight: bolder;
-    text-align: center;
-    padding: 5px;
+.pbTileOnRack.G {
+    color: var(--guardsTileColour);
 }
 .pbRescuesMade {
     background-color: var(--commonTextBackgroundColour);

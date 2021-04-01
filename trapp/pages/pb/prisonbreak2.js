@@ -1325,7 +1325,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         </div>
       </div>
       <div className="row">
-        <div className="col-2 pbPrisoners">
+        <div className="col pbPlayerOuterSection">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -1380,7 +1380,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             }
           </div>
         </div>
-        <div className="col-2 pbGuards">
+        <div className="col pbPlayerOuterSection">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -1435,9 +1435,9 @@ const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles
 
 const RackTile = (props) => {
   return (
-    <span className={props.tileclass} onClick={props.onClick}>
+    <div className={props.tileclass} onClick={props.onClick}>
       {props.tilevalue}
-    </span>
+    </div>
   );
 };
 
@@ -1489,28 +1489,28 @@ const Prisoners = (props) => {
   };
 
   return (
-    <div>
-      <p className="pbPlayerTitle"><i className="material-icons">run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle</i></p>
-      <p className="pbTilerack">
+    <div className="pbPlayerInnerSection">
+      <div className="pbPlayerTitle"><i className="material-icons">run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle</i></div>
+      <div className="pbTilerack">
         {props.ptiles.map((t, ti) =>
           renderTile(
             props.whoseturn === "P" && props.selection === ti
-            ? t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRackSelectedP u" : "pbTileOnRackSelectedP"
-            : t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRackP u" :  "pbTileOnRackP",
+            ? t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRack Selected P u" : "pbTileOnRack Selected P"
+            : t === "Q" && props.prisonersOrGuards === "P" ? "pbTileOnRack Unselected P u" :  "pbTileOnRack Unselected P",
             ti,
             props.prisonersOrGuards === "P" ? t : "*"
           )
         )}
-      </p>
+      </div>
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? 
         showActionButtons(props)
       : <></>
       }
-      <p className="pbRescuesMade">
+      <div className="pbRescuesMade">
         Rescues made: {props.rescues}
         <br></br>
         {renderFreedPrisoners(props.rescues)}
-      </p>
+      </div>
     </div>
   );
 };
@@ -1519,19 +1519,19 @@ const Guards = (props) => {
   const renderTile = renderPlayerTile(props);
 
   return (
-    <div>
-      <p className="pbPlayerTitle"><i className="material-icons">security</i>&nbsp;GUARDS&nbsp;<i className="material-icons">security</i></p>
-      <p className="pbTilerack">
+    <div className="pbPlayerInnerSection">
+      <div className="pbPlayerTitle"><i className="material-icons">security</i>&nbsp;GUARDS&nbsp;<i className="material-icons">security</i></div>
+      <div className="pbTilerack">
         {props.gtiles.map((t, ti) =>
           renderTile(
             props.whoseturn === "G" && props.selection === ti
-              ? t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRackSelectedG u" : "pbTileOnRackSelectedG"
-              : t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRackG u" :  "pbTileOnRackG",
+              ? t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRack Selected G u" : "pbTileOnRack Selected G"
+              : t === "Q" && props.prisonersOrGuards === "G" ? "pbTileOnRack Unselected G u" :  "pbTileOnRack Unselected G",
             ti,
             props.prisonersOrGuards === "G" ? t : "*"
           )
         )}
-      </p>
+      </div>
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? 
         showActionButtons(props)
       : <></>
