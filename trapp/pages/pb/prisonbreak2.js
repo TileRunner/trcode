@@ -472,42 +472,33 @@ const Square = (props) => {
   // need racksize to determine centre and board aarry edge positions
   const edge = (props.racksize * 2);
   const middle = props.racksize;
-  const addu = props.c === "Q" ? " u" : "";
-  const usedbyclass =
-    props.squareusedby === "P"
-      ? "pbSquareUsedByPrisoners" + addu
-      : "pbSquareUsedByGuards" + addu;
-  const tdclass = 
+  const tdclass =
     props.c !== squareunused
-      ? usedbyclass
+      ? "pbSquareInner " + props.squareusedby + (props.c === "Q" ? " u" : "")
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
-      ? "pbSquareRightArrow"
+      ? "pbSquareInner RightArrow"
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
-      ? "pbSquareDownArrow"
+      ? "pbSquareInner DownArrow"
       : props.ri === middle && props.ci === middle
-      ? "pbSquareCenterSquare"
+      ? "pbSquareInner CenterSquare"
       : (props.ri === 0 || props.ri === middle || props.ri === edge) &&
         (props.ci === 0 || props.ci === middle || props.ci === edge)
-      ? "pbSquareEscapeHatch"
+      ? "pbSquareInner EscapeHatch"
       : props.ri % 2 === props.ci % 2
-      ? "pbSquare1"
-      : "pbSquare2";
+      ? "pbSquareInner style1" : "pbSquareInner style2"; // Alternating square styles
   const tdvalue =
     props.c !== squareunused
       ? props.c
-      : tdclass === "pbSquareRightArrow"
+      : tdclass.indexOf("RightArrow") > -1
       ? "➡"
-      : tdclass === "pbSquareDownArrow"
+      : tdclass.indexOf("DownArrow") > -1
       ? "⬇"
-      : tdclass === "pbSquareCenterSquare"
+      : tdclass.indexOf("CenterSquare") > -1
       ? <i className="material-icons">stars</i>
-      : tdclass === "pbSquareEscapeHatch"
-      ? "ꐕ" //💫
-      : props.ri % 2 === props.ci % 2
-      ? "."// Display truly mucked up if I use empty string
-      : ".";// Ditto. The dot blends in with the background image.
+      : "." /* If I put empty string or &nbsp; then it affects the display oddly  */
+  console.log(tdclass);
   return (
-    tdclass === "pbSquareEscapeHatch" ?
+    tdclass.indexOf("EscapeHatch") > -1 ?
     <button className={tdclass} onClick={props.onClick}>
       <span className="material-icons">run_circle</span>
     </button>
@@ -521,7 +512,7 @@ const Square = (props) => {
 const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
-      <td key={`Square${ri}-${ci}`} className="pbSquare">
+      <td key={`Square${ri}-${ci}`} className="pbSquareOuter">
         <Square
           c={c}
           ci={ci}
@@ -828,7 +819,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   const handlePrisonerTileClick = (tileindex) => {
     // the index of ptiles
     if (whoseturn === "P") {
-      setSelection(tileindex);
+      let newSelection = selection === tileindex ? -1 : tileindex;
+      setSelection(newSelection);
     } else {
       alert("It is not your turn");
     }
@@ -837,7 +829,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   const handleGuardTileClick = (tileindex) => {
     // the index of gtiles
     if (whoseturn === "G") {
-      setSelection(tileindex);
+      let newSelection = selection === tileindex ? -1 : tileindex;
+      setSelection(newSelection);
     } else {
       alert("It is not your turn");
     }
@@ -1626,6 +1619,7 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
                 name="nextmsgInputArea"
                 value={nextmsg === "" ? "[type here then hit enter]" : nextmsg}
                 onKeyDownCapture={handleKeyDown}
+                readOnly
               />
             </td>
           </tr>

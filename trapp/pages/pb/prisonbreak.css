@@ -66,54 +66,37 @@
     padding-left: 2px;
     padding-right: 2px;
 }
-.pbSquare {
-    padding: 0%;
+.pbSquareOuter { /* Thin black border around each board square */
     border: solid;
     border-width: thin;
     border-color: black;
+    border-style: solid;
+    padding: 0px; /* So nothing appears between the squares - keep them flush */
 }
-.pbSquare1 {
+.pbSquareInner { /* Common board square properties */
     height: var(--squareSide);
     width: var(--squareSide);
-    padding: 0%;
     border-style: none;
-    background-color: black;
-    background-size: cover;
-    color: black;
-    text-align: center;
 }
-.pbSquare1:focus {
+.pbSquareInner:focus { /* No outline when in focus */
     outline: none;
 }
-.pbSquare2 {
-    height: var(--squareSide);
-    width: var(--squareSide);
-    padding: 0%;
-    border-style: none;
+.pbSquareInner.style1 { /* Alternating square style 1 */
+    background-color: black;
+    color: black;
+}
+.pbSquareInner.style2 { /* Alternating square style 2 */
     background-color: darkgrey;
     color: darkgrey;
-    text-align: center;
 }
-.pbSquare2:focus {
-    outline: none;
-}
-.pbSquareCenterSquare {
-    height: var(--squareSide);
-    width: var(--squareSide);
-    padding: 0%;
+.pbSquareInner.CenterSquare { /* Centre square */
     padding-top: 3px;
     border-style: none;
-    background-color: var(--commonBorderColour);
+    background-color: var(--commonTextBackgroundColour);
     color: cornsilk;
     font-size: x-large;
 }
-.pbSquareCenterSquare:focus {
-    outline: none;
-}
-.pbSquareEscapeHatch {
-    height: var(--squareSide);
-    width: var(--squareSide);
-    padding: 0%;
+.pbSquareInner.EscapeHatch { /* Escape hatch square */
     padding-top: 3px;
     border-style: solid;
     border-color: var(--commonBorderColour);
@@ -122,42 +105,23 @@
     color: cornsilk;
     text-align: center;
 }
-.pbSquareEscapeHatch:focus {
-    outline: none;
-}
-.pbSquareUsedByPrisoners {
-    height: var(--squareSide);
-    width: var(--squareSide);
-    padding: 0%;
-    border-style: none;
+.pbSquareInner.P { /* Prisoners have a tile on the square */
     background-color: var(--tileBackgroundColour);
     color: var(--prisonersTileColour);
     font-weight: bolder;
     text-align: center;
 }
-.pbSquareUsedByPrisoners:focus {
-    outline: none;
-}
-.pbSquareUsedByGuards {
-    height: var(--squareSide);
-    width: var(--squareSide);
-    padding: 0%;
-    border-style: none;
+.pbSquareInner.G { /* Guards have a tile on the square */
     background-color: var(--tileBackgroundColour);
     color: var(--guardsTileColour);
     font-weight: bolder;
     text-align: center;
 }
-.pbSquareUsedByGuards:focus {
-    outline: none;
-}
 .u::after {
     content: "u";
     font-size: small;
 }
-.pbSquareRightArrow {
-    height: var(--squareSide);
-    width: var(--squareSide);
+.pbSquareInner.RightArrow { /* Right arrow word direction indicator */
     padding: 0%;
     border-style: none;
     background-color: grey;
@@ -165,9 +129,7 @@
     font-weight: bolder;
     text-align: center;
 }
-.pbSquareDownArrow {
-    height: var(--squareSide);
-    width: var(--squareSide);
+.pbSquareInner.DownArrow { /* Down arrow word direction indicator */
     padding: 0%;
     border-style: none;
     background-color: grey;
@@ -242,7 +204,7 @@
 }
 .pbTileOnRack.Selected {
     border-style: inset;
-    border-width: normal;
+    border-width: thick;
     border-color: white;
 }
 .pbTileOnRack.P {
