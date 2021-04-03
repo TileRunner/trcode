@@ -160,29 +160,88 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+.pbTileAndMovesOuter {
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    max-width: 250px;
+}
 .pbTilepool {
-    padding-left: 3px;
     text-align: left;
-    border-width: 3px 0 0 3px;
-    /* opacity: 75%; */
+    border-width: 3px;
+    border-style: solid solid none solid;
+    border-color: var(--commonBorderColour);
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
+    font-family: monospace;
+    font-size: xx-small;
+    word-wrap: break-word;
+}
+.pbTilepoolDivider {
+    width: 2px;
+    vertical-align: top;
+    font-size: larger;
+}
+.pbTilepoolDivider::after {
+    content: ".";
+}
+.pbTilepoolTitle {
+    font-size: 150%;
+    letter-spacing: 3px;
+    border-bottom-style: dotted;
+    border-color: var(--commonBorderColour);
+}
+.pbTilepoolTile {
+    font-size: small;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+.pbMoves {
+    text-align: left;
+    border-width: 3px;
     border-style: solid;
     border-color: var(--commonBorderColour);
     background-color: var(--commonTextBackgroundColour);
     color: var(--commonTextColour);
     font-family: monospace;
+    font-size: xx-small;
 }
-.pbTilepoolDivider {
-    height: 2px;
-}
-.pbTilepoolTitle {
+.pbMovesTitle {
     font-size: 150%;
     letter-spacing: 3px;
-    border-bottom-style: solid;
+    border-bottom-style: dotted;
+    border-color: var(--commonBorderColour);
 }
-.pbTilepoolTile {
-    font-size: large;
+.pbMovesScrollable {
+    max-height: 550px;
+    /* max-width: 250px; */
+    overflow-x: scroll;
+    overflow-y: scroll;
+    scroll-behavior: auto;
+}
+.pbMove {
+    font-size: small;
     padding-left: 2px;
     padding-right: 2px;
+}
+.pbMove.by {
+    color: yellow;
+}
+.pbMove.SWAP {
+    color: cyan;
+}
+.pbMove.SWAP::after {
+    content: "Swap tiles";
+}
+.pbMove.PASS {
+    color: red;
+}
+.pbMove.PASS::after {
+    content: "Pass turn";
+}
+.pbMove.PLAY {
+    color: var(--commonTextColour);
 }
 .pbTilerack {
     padding-top: 2px;
@@ -468,23 +527,21 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    border-width: 3px;
+    border-style: none solid none solid;
+    border-color: var(--commonBorderColour);
 }
 .pbChatTable {
-    border-width: 3px;
     border-color: var(--commonBorderColour);
-    border-left-style: solid;
 }
 .pbChatTitle {
     background-color: var(--commonTextBackgroundColour);
     color: var(--commonTextColour);
-    border-width: 3px;
     border-color: var(--commonBorderColour);
-    border-style: none none dotted solid;
+    border-style: none none dotted none;
     padding-left: 5px;
-}
-.pbChatTitle::after {
-    content: ":";
-    padding-left: 2px;
+    letter-spacing: 3px;
+    font-size: smaller;
 }
 .pbChatFrom {
     background-color: black;
@@ -494,7 +551,7 @@
 }
 .pbChatFrom::before {
     content: ">";
-    color: var(--commonBorderColour);
+    color: yellow;
 }
 .pbChatFrom::after {
     content: ":";
@@ -507,7 +564,7 @@
     font-style: italic;
     color:whitesmoke;
     background-color: black;
-    padding-top:1px;
+    padding-top:2px;
 }
 .pbChatInput {
     font-style: italic;
@@ -516,10 +573,8 @@
     width: 100%;
 }
 .pbChatInputEmpty {
-    font-style: italic;
-    color:gainsboro;
-    background-color: gray;
+    background-color: whitesmoke;
     width: 100%;
     max-block-size: 30px;
-    cursor: grab;
+    cursor: text;
 }

@@ -496,7 +496,6 @@ const Square = (props) => {
       : tdclass.indexOf("CenterSquare") > -1
       ? <i className="material-icons">stars</i>
       : "." /* If I put empty string or &nbsp; then it affects the display oddly  */
-  console.log(tdclass);
   return (
     tdclass.indexOf("EscapeHatch") > -1 ?
     <button className={tdclass} onClick={props.onClick}>
@@ -560,6 +559,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   const [rescues, setRescues] = useState(0);
   const [rcd, setRcd] = useState([-1,-1,nodirection]);
   const [passed, setPassed] = useState(false); // true when opponent just passed; if both pass the game ends
+  const [moves, setMoves] = useState([]); // move history, each element is the array is a json object of info about the move
   const [snapshot, setSnapshot] = useState({
     squares: [...initialsquares],
     usedby: [...initialusedby],
@@ -567,7 +567,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     gtiles: [],
   });
   const [oppname, setOppname] = useState('');
-  const [chatmsgs, setChatmsgs] = useState([{from: 'Author', msg: 'email: justchrissykes@gmail.com'}]);
+  const [chatmsgs, setChatmsgs] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -637,6 +637,9 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let msg = wsmessage;
     if (msg !== '') processGameMessage(msg);      
   },[wsmessage])
+  useEffect(() => {
+    scrollToBottom("ScrollableMoves");
+  },[moves])
 
   function processGameMessage(message) {
     let messageData = JSON.parse(message);
@@ -676,6 +679,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             currentcoords: currentcoords,
             snapshot: snapshot,
             passed: passed,
+            moves: moves,
             rescues: rescues,
             racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
           })
@@ -693,6 +697,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setCurrentcoords(messageData.currentcoords);
         setSnapshot(messageData.snapshot);
         setPassed(messageData.passed);
+        setMoves(messageData.moves);
         setRescues(messageData.rescues);
       }
       if (messageData.func === "ept") { // end prisoners turn
@@ -705,13 +710,14 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setPtiles(messageData.ptiles);
         setTiles(messageData.tiles);
         setPassed(messageData.passed);
+        setMoves(messageData.moves);
         setRescues(messageData.rescues);
         setSnapshot({
           squares: [...messageData.squares],
           usedby: [...messageData.usedby],
           ptiles: [...messageData.ptiles],
           gtiles: [...gtiles],
-        });       
+        });
       }
       if (messageData.func === "egt") { // end guards turn
         setWhoseturn(messageData.whoseturn);
@@ -723,6 +729,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setGtiles(messageData.gtiles);
         setTiles(messageData.tiles);
         setPassed(messageData.passed);
+        setMoves(messageData.moves);
         setSnapshot({
           squares: [...messageData.squares],
           usedby: [...messageData.usedby],
@@ -875,12 +882,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         usedby[edge][edge]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
+    let playinfo = getPlayInfo();
+    let newMove = {by: "P", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords};
+    let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
     setCurrentcoords([]);
     setPtiles(newPtiles);
     setTiles(newTiles);
     setPassed(false);
+    setMoves(newMoves);
     setRescues(newRescues);
     setSnapshot({
       squares: [...squares],
@@ -903,6 +914,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         whoseturn: newWhoseturn, // may have ended the game (whoseturn=X)
         racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         passed: false, // did not just pass
+        moves: newMoves, // a move was made
         rescues: newRescues // may have rescued another prisoner
       })
     );
@@ -935,12 +947,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         usedby[edge][edge]   !== usedbynoone) {
       newWhoseturn = "X"; // No escape hatches left
     }
+    let playinfo = getPlayInfo();
+    let newMove = {by: "G", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords};
+    let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
     setCurrentcoords([]);
     setGtiles(newGtiles);
     setTiles(newTiles);
     setPassed(false);
+    setMoves(newMoves);
     setSnapshot({
       squares: snapsquares,
       usedby: snapusedby,
@@ -960,6 +976,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         gtiles: newGtiles, // we picked new tiles for guards rack
         tiles: newTiles, // we picked new tiles so tile pool changed
         passed: false, // did not just pass
+        moves: newMoves, // a move was made
         whoseturn: newWhoseturn, // may have ended the game (whoseturn=X)
         racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
         })
@@ -981,6 +998,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newPtiles.sort();
     newTiles = [...newTiles, ...snapshot.ptiles];
     newTiles.sort();
+    let newMove = {by: "P", type: "SWAP"};
+    let newMoves = [...moves, newMove];
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
     setWhoseturn("G");
@@ -989,6 +1008,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setPtiles(newPtiles);
     setTiles(newTiles);
     setPassed(false);
+    setMoves(newMoves);
     setSnapshot({
       squares: [...snapshot.squares],
       usedby: [...snapshot.usedby],
@@ -1010,6 +1030,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         ptiles: newPtiles, // we picked new tiles for prisoners rack
         tiles: newTiles, // we picked new tiles so tile pool changed
         passed: false, // did not just pass
+        moves: newMoves, // a move was made
         rescues: rescues // no rescues on an exchange
       })
     );
@@ -1031,6 +1052,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newGtiles.sort();
     newTiles = [...newTiles, ...snapshot.gtiles];
     newTiles.sort();
+    let newMove = {by: "G", type: "SWAP"};
+    let newMoves = [...moves, newMove];
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
     setWhoseturn("P");
@@ -1039,6 +1062,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setGtiles(newGtiles);
     setTiles(newTiles);
     setPassed(false);
+    setMoves(newMoves);
     setSnapshot({
       squares: [...snapshot.squares],
       usedby: [...snapshot.usedby],
@@ -1059,7 +1083,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         usedby: snapshot.usedby, // revert to start of turn used by
         gtiles: newGtiles, // we picked new tiles for prisoners rack
         tiles: newTiles, // we picked new tiles so tile pool changed
-        passed: false // did not just pass
+        passed: false, // did not just pass
+        moves: newMoves // a move was made
       })
     );
 
@@ -1134,6 +1159,108 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     return true;
   }
 
+  function getPlayInfo() {
+    let playinfo = {};
+    let mainword = "";
+    let extrawords = [];
+    let numrows = edge+1;
+    let numcols = edge+1;
+    let lowrow = numrows;
+    let highrow = -1;
+    let lowcol = numcols;
+    let highcol = -1;
+    let numcoords = currentcoords.length;
+    for (var coord=0; coord < numcoords; ++coord) {
+      let row = parseInt(currentcoords[coord].split("-")[0]);
+      let col = parseInt(currentcoords[coord].split("-")[1]);
+      if (row < lowrow) {
+        lowrow = row;
+      }
+      if (row > highrow) {
+        highrow = row;
+      }
+      if (col < lowcol) {
+        lowcol = col;
+      }
+      if (col > highcol) {
+        highcol = col;
+      }
+    }
+    if (lowrow < highrow) { // tiles placed on difference rows so play is vertical
+      let col = lowcol; // lowcol and highcol will have the same value
+      // find the lowest row number of the main word, which may be lower than that of the first played tile
+      let lowestrow = lowrow;
+      while (lowestrow > 0 && squares[lowestrow-1][col] !== squareunused) {
+        lowestrow = lowestrow - 1;
+      }
+      // find the highest row number of the main word, which may be higher than that of the last played tile
+      let highestrow = highrow;
+      while (highestrow < edge && squares[highestrow+1][col] !== squareunused) {
+        highestrow = highestrow + 1;
+      }
+      for (var row = lowestrow; row <= highestrow; ++row) {
+        mainword = mainword + squares[row][col];
+        let coord = row + "-" + col;
+        if (currentcoords.indexOf(coord) > -1) { // This tile was played, check for hooks
+          let lowestcol = col;
+          while (lowestcol > 0 && squares[row][lowestcol-1] !== squareunused) {
+            lowestcol = lowestcol - 1;
+          }
+          let highestcol = col;
+          while (highestcol < edge && squares[row][highestcol+1] !== squareunused) {
+            highestcol = highestcol + 1;
+          }
+          if (lowestcol < highestcol) { // hook was made
+            let extraword = "";
+            for (var c = lowestcol; c <= highestcol; ++c) {
+              extraword = extraword + squares[row][c];
+            }
+            extrawords = [...extrawords, extraword];
+          }
+        }
+      }
+    } else { // Horizontal play or single tile drop
+      let row = lowrow; // lowrow and highrow will have the same value
+      // find the lowest col number of the main word, which may be lower than that of the first played tile
+      let lowestcol = lowcol;
+      while (lowestcol > 0 && squares[row][lowestcol-1] !== squareunused) {
+        lowestcol = lowestcol - 1;
+      }
+      // find the highest col number of the main word, which may be higher than that of the last played tile
+      let highestcol = highcol;
+      while (highestcol < edge && squares[row][highestcol+1] !== squareunused) {
+        highestcol = highestcol + 1;
+      }
+      for (var col = lowestcol; col <= highestcol; ++col) {
+        mainword = mainword + squares[row][col];
+        let coord = row + "-" + col;
+        if (currentcoords.indexOf(coord) > -1) { // This tile was played, check for hooks
+          let lowestrow = row;
+          while (lowestrow > 0 && squares[lowestrow-1][col] !== squareunused) {
+            lowestrow = lowestrow - 1;
+          }
+          let highestrow = row;
+          while (highestrow < edge && squares[highestrow+1][col] !== squareunused) {
+            highestrow = highestrow + 1;
+          }
+          if (lowestrow < highestrow) { // hook was made
+            let extraword = "";
+            for (var r = lowestrow; r <= highestrow; ++r) {
+              extraword = extraword + squares[r][col];
+            }
+            extrawords = [...extrawords, extraword];
+          }
+        }
+      }
+    }
+    if (mainword.length === 1) { // They played one tile and we guessed wrong direction
+      mainword = extrawords[0];
+      extrawords = extrawords.splice(1,1);
+    }
+    playinfo = {mainword: mainword, extrawords: extrawords};
+    return playinfo;
+  }
+
   const recallTiles = () => {
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
@@ -1148,6 +1275,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newWhoseturn = passed ? "X" : "G"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
+    let newMove = {by: "P", type: "PASS"};
+    let newMoves = [...moves, newMove];
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
@@ -1162,6 +1291,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         whoseturn: newWhoseturn, // may have ended the game
         racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
         passed: true,
+        moves: newMoves, // a move was made
         rescues: rescues // no rescues on a pass
       })
     );
@@ -1172,6 +1302,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newWhoseturn = passed ? "X" : "P"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
+    let newMove = {by: "G", type: "PASS"};
+    let newMoves = [...moves, newMove];
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
@@ -1185,7 +1317,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         tiles: tiles, // tile pool did not change
         whoseturn: newWhoseturn, // may have ended the game
         racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-        passed: true
+        passed: true,
+        moves: newMoves // a move was made
       })
     );
   }
@@ -1386,10 +1519,11 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col-1">
+        <div className="col pbTileAndMovesOuter">
           <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
+          <ShowMoves moves={moves}/>
         </div>
-        <div className="col-3">
+        <div className="col">
           <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
         </div>
       </div>
@@ -1399,6 +1533,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
 
 const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles on other players rack
   let unseenTiles = [...props.tiles, ...props.othertiles];
+  // Sort the tiles then put the blanks at the end
   unseenTiles.sort();
   if (unseenTiles[0] === "?") {
       unseenTiles.splice(0,1)
@@ -1410,12 +1545,11 @@ const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles
   }
   return (
     <div className="pbTilepool">
-      <span className="pbTilepoolTitle">TILES</span>
-      <div className="pbTilepoolDivider"></div>
+      <div className="pbTilepoolTitle">TILES</div>
       {unseenTiles.map((t, ti) => (
         <span key={`tile${ti}`}>
           {ti > 0 && t !== unseenTiles[ti - 1] ? (
-            <div className="pbTilepoolDivider"></div>
+            <span className="pbTilepoolDivider"></span>
           ) : (
             <></>
           )}
@@ -1426,6 +1560,35 @@ const ShowUnseenTiles = (props) => { // tiles = tiles in bag, othertiles = tiles
   );
 };
 
+const ShowMoves = (props) => { // show moves made
+  return (
+    <div className="pbMoves">
+      <div className="pbMovesTitle">MOVES</div>
+      <div className="pbMovesScrollable" id="ScrollableMoves">
+        {props.moves.map((m, mi) => (
+          <div key={`move${mi}`} className="pbMove">
+            <span className="pbMove by">{m.by}</span>
+            :
+            <span className={`pbMove ${m.type}`}>
+              {m.type === "PLAY" ?
+                <>{m.mainword.replace("Q","Qu")}
+                  {m.extrawords?.map((w) => (
+                    <>
+                      ,&nbsp;
+                      {w.replace("Q","Qu")}
+                    </>
+                  ))}
+                </>
+              :
+                <></>
+              }
+            </span>
+          </div>
+          ))}
+      </div>
+    </div>
+  )
+}
 const RackTile = (props) => {
   return (
     <div className={props.tileclass} onClick={props.onClick}>
@@ -1573,8 +1736,8 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
   const [nextmsg, setNextmsg] = useState('');
  
   const handleKeyDown = (event) => {
-    event.preventDefault();
     if (event.key === "Enter" && nextmsg.length > 0) {
+      event.preventDefault();
       let newMsgs = [...msgs, {from: nickname, msg: nextmsg}]
       let sendmsg = nextmsg;
       setMsgs(newMsgs);
@@ -1591,12 +1754,13 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
       );
       return;
     }
-    let chartest = /^[A-Za-z0-9 \.,\(\)\?:!'"]$/; // Allow letter, number, space, period, comma, round brackets, question mark, colon, exclamation mark, quote, double quote
-    if (event.key.match(chartest)) {
-      let newNextmsg = nextmsg + event.key;
-      setNextmsg(newNextmsg);
-    }
+    // let chartest = /^[A-Za-z0-9 \.,\(\)\?:!'"]$/; // Allow letter, number, space, period, comma, round brackets, question mark, colon, exclamation mark, quote, double quote
+    // if (event.key.match(chartest)) {
+    //   let newNextmsg = nextmsg + event.key;
+    //   setNextmsg(newNextmsg);
+    // }
     if (event.key === "Backspace" && nextmsg.length > 0) {
+      event.preventDefault();
       let newNextmsg = nextmsg.slice(0,nextmsg.length-1);
       setNextmsg(newNextmsg);
     }
@@ -1604,7 +1768,7 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
 
   return (
     <div className="pbChat">
-      <span className="pbChatTitle">Chat with opponent</span>
+      <span className="pbChatTitle">CHAT</span>
       <table className="pbChatTable">
         <tbody>
           {msgs.filter((value, index) => msgs.length - index < 15).map((value, index) => (
@@ -1617,9 +1781,9 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
             <td colSpan="2">
               <textarea className={nextmsg === "" ? "pbChatInputEmpty" : "pbChatInput"}
                 name="nextmsgInputArea"
-                value={nextmsg === "" ? "[type here then hit enter]" : nextmsg}
+                value={nextmsg}
+                onChange={(e) => {setNextmsg(e.target.value);}}
                 onKeyDownCapture={handleKeyDown}
-                readOnly
               />
             </td>
           </tr>
@@ -1627,4 +1791,9 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
       </table>
    </div>
   )
+}
+
+const scrollToBottom = (elementid) => {
+  const theElement = document.getElementById(elementid);
+  theElement.scrollTop = theElement.scrollHeight;
 }
