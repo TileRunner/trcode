@@ -151,6 +151,40 @@
     border-width: 5px;
     border-color: var(--commonBorderColour);
 }
+.pbBoardColumnHeaderRow {
+    text-align: center;
+    line-height: var(--cellBlockSide);
+}
+.pbBoardColumnHeader {
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+.pbBoardRowHeader {
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+.pbBoardHeaderTopLeft {
+    background-image: url('../../public/boardHeaderCorner.png');
+    background-size: cover;
+}
+.pbBoardHeaderTopRight {
+    background-image: url('../../public/boardHeaderCorner.png');
+    background-size: cover;
+}
+.pbBoardHeaderBottomLeft {
+    min-width: var(--cellBlockSide);
+    min-height: var(--cellBlockSide);
+    background-image: url('../../public/boardHeaderCorner.png');
+    background-size: cover;
+}
+.pbBoardHeaderBottomRight {
+    min-width: var(--cellBlockSide);
+    min-height: var(--cellBlockSide);
+    background-image: url('../../public/boardHeaderCorner.png');
+    background-size: cover;
+}
 .pbUnderboard {
     margin-top: 10px;
     border-style: solid;
@@ -289,15 +323,17 @@
     margin-left: 7px;
 }
 .pbActionButton {
+    background-image: url('../../public/actionButton.png');
     padding: 2px 2px 2px 2px;
     margin-left: 5px;
     border-radius: 35px;
-    border-width: 3px;
+    border-width: 0px;
     border-color: var(--commonBorderColour);
     border-style: solid;
     background-color: var(--commonTextBackgroundColour);
     color: var(--commonTextColour);
-    font-family: cursive;
+    font-style: bolder;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     width: 200px;
     word-spacing: 3px;
 }

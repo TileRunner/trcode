@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
+const boardColumnHeaders = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
+const boardRowHeaders = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
 const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
 const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
@@ -527,14 +529,40 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   const renderRow = (ri) => {
     return (
       <tr key={`BoardRow${ri}`} className="pbRow">
+        <td className="pbBoardColumnHeader" id="BoardHeaderLeft">
+          {boardRowHeaders[ri]}
+        </td>
         {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
+        <td className="pbBoardColumnHeader" id="BoardHeaderRight">
+          {boardRowHeaders[ri]}
+        </td>
       </tr>
     );
   };
 
   return (
     <table className="pbBoard">
-      <tbody>{squares.map((r, ri) => renderRow(ri))}</tbody>
+      <tbody>
+        <tr className="pbBoardColumnHeaderRow" id="BoardHeaderTop">
+          <td className="pbBoardHeaderTopLeft">&nbsp;</td>
+          {squares.map((_$,i) => (
+            <td className="pbBoardColumnHeader" key={`ColHeader${i}`}>
+              {boardColumnHeaders[i]}
+            </td>
+          ))}
+          <td className="pbBoardHeaderTopRight">&nbsp;</td>
+        </tr>
+        {squares.map((r, ri) => renderRow(ri))}
+        <tr className="pbBoardColumnHeaderRow" id="BoardHeaderBottom">
+          <td className="pbBoardHeaderBottomLeft">&nbsp;</td>
+          {squares.map((_$,i) => (
+            <td className="pbBoardColumnHeader" key={`ColHeader${i}`}>
+              {boardColumnHeaders[i]}
+            </td>
+          ))}
+          <td className="pbBoardHeaderBottomRight">&nbsp;</td>
+        </tr>
+      </tbody>
     </table>
   );
 };
@@ -883,7 +911,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       newWhoseturn = "X"; // No escape hatches left
     }
     let playinfo = getPlayInfo();
-    let newMove = {by: "P", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords};
+    let newMove = {by: "P", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
@@ -948,7 +976,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       newWhoseturn = "X"; // No escape hatches left
     }
     let playinfo = getPlayInfo();
-    let newMove = {by: "G", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords};
+    let newMove = {by: "G", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
@@ -1163,6 +1191,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let playinfo = {};
     let mainword = "";
     let extrawords = [];
+    let wordstartcoord = "";
     let numrows = edge+1;
     let numcols = edge+1;
     let lowrow = numrows;
@@ -1186,7 +1215,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         highcol = col;
       }
     }
-    if (lowrow < highrow) { // tiles placed on difference rows so play is vertical
+    if (lowrow < highrow || numcoords === 1) { // tiles placed on difference rows so play is vertical, or single tile played
       let col = lowcol; // lowcol and highcol will have the same value
       // find the lowest row number of the main word, which may be lower than that of the first played tile
       let lowestrow = lowrow;
@@ -1198,6 +1227,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       while (highestrow < edge && squares[highestrow+1][col] !== squareunused) {
         highestrow = highestrow + 1;
       }
+      wordstartcoord = boardColumnHeaders[col] + boardRowHeaders[lowestrow]; // vertical play coords start with col header
       for (var row = lowestrow; row <= highestrow; ++row) {
         mainword = mainword + squares[row][col];
         let coord = row + "-" + col;
@@ -1219,7 +1249,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           }
         }
       }
-    } else { // Horizontal play or single tile drop
+    }
+    if (mainword.length < 2) { // Horizontal play or single tile drop that cannot be a vertical play
       let row = lowrow; // lowrow and highrow will have the same value
       // find the lowest col number of the main word, which may be lower than that of the first played tile
       let lowestcol = lowcol;
@@ -1231,6 +1262,9 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       while (highestcol < edge && squares[row][highestcol+1] !== squareunused) {
         highestcol = highestcol + 1;
       }
+      wordstartcoord = boardRowHeaders[row] + boardColumnHeaders[lowestcol]; // horizontal play coords start with row header
+      mainword = ""; // In case we got a 1 letter mainword in the previous block
+      extrawords = []; // Ditto
       for (var col = lowestcol; col <= highestcol; ++col) {
         mainword = mainword + squares[row][col];
         let coord = row + "-" + col;
@@ -1253,11 +1287,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         }
       }
     }
-    if (mainword.length === 1) { // They played one tile and we guessed wrong direction
-      mainword = extrawords[0];
-      extrawords = extrawords.splice(1,1);
-    }
-    playinfo = {mainword: mainword, extrawords: extrawords};
+    playinfo = {mainword: mainword, extrawords: extrawords, pos: wordstartcoord};
     return playinfo;
   }
 
@@ -1342,6 +1372,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     if (prisonersOrGuards !== whoseturn) {return;}
     if (event.key === "Enter") {
       whoseturn === "P" ? endPrisonersTurn() : endGuardsTurn();
+      return;
+    }
+    if (event.key === "Escape") {
+      recallTiles();
       return;
     }
     let lettertest = /^[A-Za-z\?]$/; // single letter or question mark key pressed
@@ -1571,7 +1605,7 @@ const ShowMoves = (props) => { // show moves made
             :
             <span className={`pbMove ${m.type}`}>
               {m.type === "PLAY" ?
-                <>{m.mainword.replace("Q","Qu")}
+                <>{m.pos} {m.mainword.replace("Q","Qu")}
                   {m.extrawords?.map((w) => (
                     <>
                       ,&nbsp;
