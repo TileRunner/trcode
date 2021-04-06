@@ -58,13 +58,18 @@
     font-size: x-large;
 }
 .pbPlayerTitle {
-    border-style: solid;
+    background-image: url('../../public/actionButton.png');
+    background-size: contain;
+    border-style: none;
+    border-radius: 35px;
     background-color: whitesmoke;
-    color: black;
+    color: whitesmoke;
+    letter-spacing: 2px;
     font-family: fantasy;
+    font-weight: lighter;
     text-align: center;
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 .pbSquareOuter { /* Thin black border around each board square */
     border: solid;
@@ -151,6 +156,16 @@
     border-width: 5px;
     border-color: var(--commonBorderColour);
 }
+.pbBoardTurret1 {
+    background-image: url('../../public/turretMiddleHoled.png');
+    background-size: cover;
+    line-height: var(--cellBlockSide);
+}
+.pbBoardTurret2 {
+    background-image: url('../../public/turretMiddle.png');
+    background-size: cover;
+    line-height: var(--cellBlockSide);
+}
 .pbBoardColumnHeaderRow {
     text-align: center;
     line-height: var(--cellBlockSide);
@@ -161,7 +176,9 @@
     text-align: center;
 }
 .pbBoardRowHeader {
-    background-color: black;
+    background-image: url('../../public/boardRowHeader.png');
+    background-size: contain;
+    background-repeat: repeat;
     color: white;
     text-align: center;
 }

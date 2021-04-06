@@ -529,11 +529,11 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   const renderRow = (ri) => {
     return (
       <tr key={`BoardRow${ri}`} className="pbRow">
-        <td className="pbBoardColumnHeader" id="BoardHeaderLeft">
+        <td className="pbBoardRowHeader" id="BoardHeaderLeft">
           {boardRowHeaders[ri]}
         </td>
         {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
-        <td className="pbBoardColumnHeader" id="BoardHeaderRight">
+        <td className="pbBoardRowHeader" id="BoardHeaderRight">
           {boardRowHeaders[ri]}
         </td>
       </tr>
@@ -543,10 +543,10 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   return (
     <table className="pbBoard">
       <tbody>
-        <tr className="pbBoardColumnHeaderRow" id="BoardHeaderTop">
+        <tr>
           <td className="pbBoardHeaderTopLeft">&nbsp;</td>
           {squares.map((_$,i) => (
-            <td className="pbBoardColumnHeader" key={`ColHeader${i}`}>
+            <td className={`pbBoardColumnHeader pbBoardTurret${i % 2 === 0 ? '1' : '2'}`} key={`Turret${i}`}>
               {boardColumnHeaders[i]}
             </td>
           ))}
