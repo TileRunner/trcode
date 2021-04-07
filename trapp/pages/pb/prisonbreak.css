@@ -49,6 +49,9 @@
     border-width: 1px;
      */
     padding-top: 3px;
+    background-image: url("../../public/BarbedWire.png");
+    background-repeat: repeat;
+    background-size: 100%;
 }
 .pbPlayerInnerSection {
     align-items: center;
