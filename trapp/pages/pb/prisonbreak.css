@@ -13,9 +13,9 @@
 }
 .prisonbreak {
     background-color: grey;
-    background-image: url("../../public/prisonbars.png");
-    background-size: cover;
-    background-blend-mode: normal;
+    background-image: url("../../public/NightLandscape.jpg");
+    background-size: 59%;
+    /* background-blend-mode: normal; */
     color:lightgrey;
 }
 .pbGameid {
