@@ -12,11 +12,15 @@
     --guardsTileColour: black;
 }
 .prisonbreak {
-    background-color: grey;
-    background-image: url("../../public/NightLandscape.jpg");
-    background-size: 59%;
+    background-color: blue;
     /* background-blend-mode: normal; */
     color:lightgrey;
+}
+.pbTilesMovesChatOuter {
+    background-image: url("../../public/NightLandscape.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-y: bottom;
 }
 .pbGameid {
     background-color: var(--commonTextBackgroundColour);
@@ -42,12 +46,12 @@
     border-style: solid;
 }
 .pbPlayerOuterSection {
-    width: 200px;
     /* I did this temporarily to see where the area was
     border-style: inset;
     border-color: orangered;
     border-width: 1px;
      */
+    width: 360px;
     padding-top: 3px;
     background-image: url("../../public/BarbedWire.png");
     background-repeat: repeat;
@@ -197,11 +201,11 @@
     text-align: center;
 }
 .pbBoardHeaderTopLeft {
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/turretMiddle.png');
     background-size: cover;
 }
 .pbBoardHeaderTopRight {
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/turretMiddle.png');
     background-size: cover;
 }
 .pbBoardHeaderBottomLeft {
@@ -414,73 +418,6 @@
     vertical-align: middle;
     width: 300px;
 }
-/* Customize the label (the container) */
-.pbLobbyUpsidedownContainer {
-    display: flexbox;
-    position: relative;
-    padding-left: 35px; /* This positions the checkbox label to the right of the checkbox */
-    vertical-align: top;
-    margin-left: 10px;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-/* Hide the browser's default checkbox */
-.pbLobbyUpsidedownContainer input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-/* Create a custom checkbox */
-.pbLobbyUpsidedownCheckmark {
-    position: absolute;
-    top: 2px;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #eee;
-}
-/* On mouse-over, add a grey background color */
-.pbLobbyUpsidedownContainer:hover input ~ .pbLobbyUpsidedownCheckmark {
-    background-color: #ccc;
-}
-  
-/* When the checkbox is checked, add a blue background */
-.pbLobbyUpsidedownContainer input:checked ~ .pbLobbyUpsidedownCheckmark {
-    background-color:var(--selectedColor);
-}
-  
-/* Create the checkmark/indicator (hidden when not checked) */
-.pbLobbyUpsidedownCheckmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-  
-/* Show the checkmark when checked */
-.pbLobbyUpsidedownContainer input:checked ~ .pbLobbyUpsidedownCheckmark:after {
-    display: block;
-}
-  
-/* Style the checkmark/indicator
-     It is drawing 2 of the border sides angled 45 degrees to look like a checkmark
- */
-.pbLobbyUpsidedownContainer .pbLobbyUpsidedownCheckmark:after {
-    left: 8px;
-    top: 2px;
-    width: 8px;
-    height: 17px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    border-radius: 25%; /* round the checkmark bottom a little */
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-}
 .pbLobbyPrisonerSection {
     padding-left: 50px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -554,6 +491,14 @@
     border-right-style: solid;
     border-top-style: double;
 }
+.pbLobbyGameList {
+    background-image: url('../../public/NightLandscape.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-x: 100px;
+    width: 1000px;
+    height: 500px;
+}
 .pbLobbyGameid {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bolder;
@@ -586,9 +531,6 @@
 .pbLobbyActionNone {
     width: 200px;
     text-align: center;
-}
-.upsidedown {
-    transform: rotate(180deg);
 }
 
 .pbChat {
@@ -646,7 +588,4 @@
     width: 100%;
     max-block-size: 30px;
     cursor: text;
-}
-.middle {
-    vertical-align: middle;
 }

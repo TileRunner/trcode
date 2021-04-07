@@ -137,7 +137,6 @@ export default function PrisonBreak() {
   const [nickname, setNickname] = useState('')
   const [prisonersOrGuards, setPrisonersOrGuards] = useState('')
   const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
-  const [upsidedownMode, setUpsidedownMode] = useState(false);
   const [racksize, setRacksize] = useState(4); // Default to 4 letter racks
   let host = process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000';
   const acceptMessage = (message) => {
@@ -159,8 +158,6 @@ export default function PrisonBreak() {
         nickname={nickname}
         setNickname={setNickname}
         setPrisonersOrGuards={setPrisonersOrGuards}
-        upsidedownMode={upsidedownMode}
-        setUpsidedownMode={setUpsidedownMode}
         racksize={racksize}
         setRacksize={setRacksize}
       />
@@ -172,14 +169,12 @@ export default function PrisonBreak() {
         nickname={nickname}
         wsmessage={wsmessage}
         client={client}
-        upsidedownMode={upsidedownMode}
         racksize={racksize}
       />
   )
 }
 
 const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards
-  , upsidedownMode, setUpsidedownMode // Option for upside down mode
   , racksize, setRacksize // Option for rack size
   }) => {
   const [gamelist, setGamelist] = useState([]) // Game info by game id
@@ -272,9 +267,6 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     if (gd.nicknameG === nickname) { return availableActionReconnect; }
     return availableActionNone;
   }
-  function togglerUpsidedownMode() {
-    setUpsidedownMode((curr) => !curr);
-  }
   function selectRackSize(newRacksize) {
     setRacksize(newRacksize);
   }
@@ -294,19 +286,11 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
       <div className="col">
         <label className="pbLobbyNicknamePrompt">Nickname</label>
         <input className="pbLobbyNicknameInput"
-              name="nickname"
-              value={nickname}
-              onChange={(e) => {
-                setNickname(e.target.value);
-              } } />
-        <label className="pbLobbyUpsidedownContainer">
-          Upside board on opponents turn
-          <input type="checkbox" id="upsidedownModeCheckbox"
-            value={upsidedownMode}
-            onChange={() => togglerUpsidedownMode()}
-          />
-          <span className="pbLobbyUpsidedownCheckmark"></span>
-        </label>
+          name="nickname"
+          value={nickname}
+          onChange={(e) => {
+            setNickname(e.target.value);
+          } } />
       </div>
     </div>
     <div className="row pbLobbyPrisonerSection">
@@ -376,7 +360,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
         <h2>Game list:</h2>
       </div>
     </div>
-    <div className="row">
+    <div className="row pbLobbyGameList">
       <div className="col offset-1">
         <table>
           <thead>
@@ -568,7 +552,6 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
 };
 
 const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
-  , upsidedownMode // Option for upside down mode
   , racksize // Option for rack size
   }) => {
   const middle = racksize; // Middle element in row or column array
@@ -1485,7 +1468,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         </div>
       </div>
       <div className="row">
-        <div className="col pbPlayerOuterSection">
+        <div className="pbPlayerOuterSection">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -1511,26 +1494,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
               />
             </div>
           :
-            whoseturn === "X" || !upsidedownMode ?
-              <div className="row">
-                <Board
-                  squares={squares}
-                  usedby={usedby}
-                  rcd={rcd}
-                  onClick={() => {}}
-                  racksize={racksize}
-                />
-              </div>
-            :
-              <div className="row upsidedown">
-                <Board
-                  squares={squares}
-                  usedby={usedby}
-                  rcd={rcd}
-                  onClick={() => {}}
-                  racksize={racksize}
-                />
-              </div>
+            <div className="row">
+              <Board
+                squares={squares}
+                usedby={usedby}
+                rcd={rcd}
+                onClick={() => {}}
+                racksize={racksize}
+              />
+            </div>
           }
           <div className="pbUnderboard">
             {whoseturn === "X" ?
@@ -1540,7 +1512,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             }
           </div>
         </div>
-        <div className="col pbPlayerOuterSection">
+        <div className="pbPlayerOuterSection">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -1553,12 +1525,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             prisonersOrGuards={prisonersOrGuards}
           />
         </div>
-        <div className="col pbTileAndMovesOuter">
-          <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
-          <ShowMoves moves={moves}/>
-        </div>
-        <div className="col">
-          <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
+        <div className="col pbTilesMovesChatOuter">
+          <div className="row">
+            <div className="col pbTileAndMovesOuter">
+              <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
+              <ShowMoves moves={moves}/>
+            </div>
+            <div className="col">
+              <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
