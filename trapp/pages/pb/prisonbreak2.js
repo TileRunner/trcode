@@ -1680,7 +1680,7 @@ const Prisoners = (props) => {
 
   return (
     <div className="pbPlayerInnerSection">
-      <div className="pbPlayerTitle"><i className="material-icons">run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle</i></div>
+      <div className={`pbPlayerTitle ${props.prisonersOrGuards}`}><i className="material-icons">run_circle</i>&nbsp;PRISONERS&nbsp;<i className="material-icons">run_circle</i></div>
       <div className="pbTilerack">
         {props.ptiles.map((t, ti) =>
           renderTile(

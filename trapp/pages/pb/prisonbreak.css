@@ -61,18 +61,25 @@
     font-size: x-large;
 }
 .pbPlayerTitle {
-    background-image: url('../../public/actionButton.png');
-    background-size: contain;
-    border-style: none;
+    background-image: url('../../public/playertitle.png');
+    background-repeat: repeat;
     border-radius: 35px;
     background-color: whitesmoke;
     color: whitesmoke;
     letter-spacing: 2px;
-    font-family: fantasy;
+    font-family: cursive;
     font-weight: lighter;
     text-align: center;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 6px;
+    padding-right: 5px;
+    border-style: inset;
+    border-width: 2px;
+}
+.pbPlayerTitle.P {
+    font-size: inherit;   
+}
+.pbPlayerTitle.G {
+    font-size: inherit;    
 }
 .pbSquareOuter { /* Thin black border around each board square */
     border: solid;
@@ -114,12 +121,16 @@
     text-align: center;
 }
 .pbSquareInner.P { /* Prisoners have a tile on the square */
+    background-image: url('../../public/tile.png');
+    background-size: cover;
     background-color: var(--tileBackgroundColour);
     color: var(--prisonersTileColour);
     font-weight: bolder;
     text-align: center;
 }
 .pbSquareInner.G { /* Guards have a tile on the square */
+    background-image: url('../../public/tile.png');
+    background-size: cover;
     background-color: var(--tileBackgroundColour);
     color: var(--guardsTileColour);
     font-weight: bolder;
@@ -304,6 +315,8 @@
     flex-direction: row;
 }
 .pbTileOnRack {
+    background-image: url('../../public/tile.png');
+    background-size: cover;
     background-color: var(--tileBackgroundColour);
     width: var(--squareSide);
     height: var(--squareSide);
@@ -633,4 +646,7 @@
     width: 100%;
     max-block-size: 30px;
     cursor: text;
+}
+.middle {
+    vertical-align: middle;
 }
