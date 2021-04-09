@@ -748,6 +748,22 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           gtiles: [...messageData.gtiles],
         });       
       }
+      if (messageData.func === "undoturn" && messageData.sender !== prisonersOrGuards) { 
+        // opponent undid their last turn
+        setTiles(messageData.tiles);
+        setPtiles(messageData.ptiles);
+        setGtiles(messageData.gtiles);
+        setSquares(messageData.squares);
+        setUsedby(messageData.usedby);
+        setSelection(messageData.selection);
+        setWhoseturn(messageData.whoseturn);
+        setCurrentcoords(messageData.currentcoords);
+        setRescues(messageData.rescues);
+        setRcd(messageData.rcd);
+        setPassed(messageData.passed);
+        setMoves(messageData.moves);
+        setSnapshot(messageData.snapshot);
+      }
       if (messageData.func === "chat" && messageData.sender != prisonersOrGuards) { // Opponent chat message
         let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
         setChatmsgs(newChatmsgs);
@@ -858,6 +874,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     if (!isPlayValid()) {
       return;
     }
+    let rewindInfo = getRewindInfo();
     let newRescues = rescues;
     let escapehatches = [
       "0-0",
@@ -894,7 +911,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       newWhoseturn = "X"; // No escape hatches left
     }
     let playinfo = getPlayInfo();
-    let newMove = {by: "P", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
+    let newMove = {by: "P", type: "PLAY", rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
@@ -935,6 +952,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     if (!isPlayValid()) {
       return;
     }
+    let rewindInfo = getRewindInfo();
     let newGtiles = [...gtiles];
     let newTiles = [...tiles];
     while (newGtiles.length < racksize && newTiles.length > 0) {
@@ -959,7 +977,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       newWhoseturn = "X"; // No escape hatches left
     }
     let playinfo = getPlayInfo();
-    let newMove = {by: "G", type: "PLAY", mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
+    let newMove = {by: "G", type: "PLAY", rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
@@ -999,6 +1017,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       window.alert("Need " + racksize + " tiles in the bag to exchange")
       return;
     }
+    let rewindInfo = getRewindInfo();
     let newPtiles = [];
     let newTiles = [...tiles];
     while (newPtiles.length < racksize && newTiles.length > 0) {
@@ -1009,7 +1028,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newPtiles.sort();
     newTiles = [...newTiles, ...snapshot.ptiles];
     newTiles.sort();
-    let newMove = {by: "P", type: "SWAP"};
+    let newMove = {by: "P", type: "SWAP", rewindInfo: rewindInfo};
     let newMoves = [...moves, newMove];
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
@@ -1053,6 +1072,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       window.alert("Need " + racksize + " tiles in the bag to exchange")
       return;
     }
+    let rewindInfo = getRewindInfo();
     let newGtiles = [];
     let newTiles = [...tiles];
     while (newGtiles.length < racksize && newTiles.length > 0) {
@@ -1063,7 +1083,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newGtiles.sort();
     newTiles = [...newTiles, ...snapshot.gtiles];
     newTiles.sort();
-    let newMove = {by: "G", type: "SWAP"};
+    let newMove = {by: "G", type: "SWAP", rewindInfo: rewindInfo};
     let newMoves = [...moves, newMove];
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
@@ -1274,6 +1294,88 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     return playinfo;
   }
 
+  function getRewindInfo() { // Must be called before you start setting new values for stuff
+    /* Rewind info is everything you need to reverse the move that we do not already have in the new move variable:
+        squares: says what tile is on what square
+        usedby: says who played what tile on what square (affects styling)
+        rack: players rack before move was made 
+        tiles: tile pool before picking new tiles
+        rescues: rescue count
+        passed: whether previous play was a pass
+    */
+    let rewindInfo = {
+      squares: [...snapshot.squares],
+      usedby: [...snapshot.usedby],
+      rack: whoseturn === "G" ? [...snapshot.gtiles]: [...snapshot.ptiles],
+      tiles: [...tiles],
+      rescues: rescues,
+      passed: passed
+    };
+    return rewindInfo;
+  }
+
+  function performRewind() {
+    /* Rewind the last move and take it off the end of the move list */
+    let numMoves = moves.length;
+    let lastMove = moves[moves.length-1];
+    let newSquares = [...lastMove.rewindInfo.squares];
+    let newUsedby = [...lastMove.rewindInfo.usedby];
+    let newTiles = [...lastMove.rewindInfo.tiles];
+    let newPtiles = lastMove.by === "P" ? [...lastMove.rewindInfo.rack] : [...ptiles];
+    let newGtiles = lastMove.by === "G" ? [...lastMove.rewindInfo.rack] : [...gtiles];
+    let newRescues = lastMove.rewindInfo.rescues;
+    let newSelection = -1;
+    let newWhoseturn = lastMove.by; // Back to their turn
+    let newCurrentcoords = [];
+    let newRcd = [-1,-1,nodirection];
+    let newMoves = [...moves];
+    newMoves.splice(numMoves-1,1);
+    let newSnapshot = {
+      squares: [...newSquares],
+      usedby: [...newUsedby],
+      gtiles: [...newGtiles],
+      ptiles: [...newPtiles]
+    };
+    let newPassed = lastMove.passed;
+    setTiles(newTiles);
+    setPtiles(newPtiles);
+    setGtiles(newGtiles);
+    setSquares(newSquares);
+    setUsedby(newUsedby);
+    setSelection(newSelection);
+    setWhoseturn(newWhoseturn);
+    setCurrentcoords(newCurrentcoords);
+    setRescues(newRescues);
+    setRcd(newRcd);
+    setPassed(newPassed);
+    setMoves(newMoves);
+    setSnapshot(newSnapshot);
+    // Just send everything even though some could be hard coded in processMessage by opponent
+    client.send(
+      JSON.stringify({
+        gameid: gameid, // the id for the game
+        nickname: nickname, // player nickname
+        type: "pb", // prisonbreak
+        func: "undoturn", // undo last turn
+        racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
+        sender: prisonersOrGuards,
+        tiles: newTiles, // tile pool
+        ptiles: newPtiles, // prisoners rack
+        gtiles: newGtiles, // guards rack
+        squares: newSquares, // revert to start of turn squares
+        usedby: newUsedby, // revert to start of turn used by
+        selection: newSelection, // selected tile on rack
+        whoseturn: newWhoseturn, // swap never ends the game so go to opponent
+        currentcoords: newCurrentcoords, // coors of tiles place on board during move
+        rescues: newRescues, // rescue count
+        rcd: newRcd, // row col direction for the arrow on the board
+        passed: newPassed, // whether previous play was a pass
+        moves: newMoves, // a move was made
+        snapshot: newSnapshot
+      })
+    );
+  }
+
   const recallTiles = () => {
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
@@ -1478,8 +1580,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             onClickTileRecall={() => recallTiles()}
             onClickTileExchange={() => swapPrisonersTiles()}
             onClickPassPlay={() => prisonerPass()}
+            onClickUndoLastPlay={() => performRewind()}
             rescues={rescues}
             prisonersOrGuards={prisonersOrGuards}
+            moves={moves}
           />
         </div>
         <div className="col pbBoardPlusUnderboard">
@@ -1522,7 +1626,9 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             onClickTileRecall={() => recallTiles()}
             onClickTileExchange={() => swapGuardsTiles()}
             onClickPassPlay={() => guardsPass()}
+            onClickUndoLastPlay={() => performRewind()}
             prisonersOrGuards={prisonersOrGuards}
+            moves={moves}
           />
         </div>
         <div className="col pbTilesMovesChatOuter">
@@ -1639,6 +1745,16 @@ const PassPlayButton = (props) => {
   );
 };
 
+const UndoLastPlay = (props) => {
+  return (
+    <button className="pbActionButtonSevere" onClick={props.onClick}>
+      <span className="pbActionButtonSevereText"><i className="material-icons">delete_forever</i>
+        &nbsp;Undo My Turn
+        <span className="pbActionButtonSevereText2">Ask opponent first, please</span>
+      </span>
+    </button>
+  )
+}
 const Prisoners = (props) => {
   const renderTile = renderPlayerTile(props);
 
@@ -1670,7 +1786,11 @@ const Prisoners = (props) => {
       </div>
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? 
         showActionButtons(props)
-      : <></>
+      :
+        props.whoseturn === "G" && props.prisonersOrGuards === "P" && props.moves.length > 0 ?
+          showActionButtonUndoLastPlay(props)
+        :
+          <></>
       }
       <div className="pbRescuesMade">
         Rescues made: {props.rescues}
@@ -1700,7 +1820,11 @@ const Guards = (props) => {
       </div>
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? 
         showActionButtons(props)
-      : <></>
+      :
+        props.whoseturn === "P" && props.prisonersOrGuards === "G" && props.moves.length > 0 ?
+          showActionButtonUndoLastPlay(props)
+        :
+          <></>
       }
     </div>
   );
@@ -1741,7 +1865,13 @@ function showActionButtons(props) {
     </p>
   </div>;
 }
-
+function showActionButtonUndoLastPlay(props) {
+  return <div className="pbActionButtonDiv">
+    <p>
+      <UndoLastPlay onClick={() => props.onClickUndoLastPlay()} />
+    </p>
+  </div>
+}
 const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
   const [nextmsg, setNextmsg] = useState('');
  

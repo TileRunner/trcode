@@ -378,6 +378,19 @@
     margin-left: 5px;
     margin-right: 15px;
 }
+.pbActionButtonSevere {
+    background-color: red;
+    border: none;
+}
+.pbActionButtonSevereText {
+    color: black;
+}
+.pbActionButtonSevereText2 {
+    color: whitesmoke;
+    font-size: small;
+    display: table; /* This makes it go on the next line */
+    margin: auto; /* This is the only way I could centre it! */
+}
 .pbLobbyGamesHeader {
     font-weight: bolder;
     font-size: var(--lobbyFontSize);
