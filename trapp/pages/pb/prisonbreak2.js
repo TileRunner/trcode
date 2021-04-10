@@ -460,7 +460,7 @@ const Square = (props) => {
   const middle = props.racksize;
   const tdclass =
     props.c !== squareunused
-      ? "pbSquareInner " + props.squareusedby + (props.c === "Q" ? " u" : "")
+      ? "pbSquareInner PlayerTile"
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
       ? "pbSquareInner RightArrow"
       : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
@@ -487,10 +487,14 @@ const Square = (props) => {
     <button className={tdclass} onClick={props.onClick}>
       <span className="material-icons">run_circle</span>
     </button>
-    :
-    <button className={tdclass} onClick={props.onClick}>
-      {tdvalue}
-    </button>
+    : props.c === squareunused ?
+      <button className={tdclass} onClick={props.onClick}>
+        {tdvalue}
+      </button>
+      :
+      <button className={tdclass} onClick={props.onClick}>
+        <div className={`pbSquareTileText ${props.squareusedby + (props.c === "Q" ? " u" : "")}`}>{tdvalue}</div>
+      </button>
 );
 };
 
@@ -527,10 +531,10 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   return (
     <table className="pbBoard">
       <tbody>
-        <tr>
+        <tr className="pbBoardColumnHeaderRow">
           <td className="pbBoardHeaderTopLeft">&nbsp;</td>
           {squares.map((_$,i) => (
-            <td className={`pbBoardColumnHeader pbBoardTurret${i % 2 === 0 ? '1' : '2'}`} key={`Turret${i}`}>
+            <td className="pbBoardColumnHeader" key={`TopColumnHeader${i}`}>
               {boardColumnHeaders[i]}
             </td>
           ))}
@@ -540,7 +544,7 @@ const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
         <tr className="pbBoardColumnHeaderRow" id="BoardHeaderBottom">
           <td className="pbBoardHeaderBottomLeft">&nbsp;</td>
           {squares.map((_$,i) => (
-            <td className="pbBoardColumnHeader" key={`ColHeader${i}`}>
+            <td className="pbBoardColumnHeader" key={`BottomColumnHeader${i}`}>
               {boardColumnHeaders[i]}
             </td>
           ))}
@@ -577,6 +581,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     ptiles: [],
     gtiles: [],
   });
+  const [allowRewind, setAllowRewind] = useState(false);
   const [oppname, setOppname] = useState('');
   const [chatmsgs, setChatmsgs] = useState([]);
 
@@ -692,7 +697,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             passed: passed,
             moves: moves,
             rescues: rescues,
-            racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
+            racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
+            allowRewind: allowRewind
           })
         );
       }
@@ -710,10 +716,12 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setPassed(messageData.passed);
         setMoves(messageData.moves);
         setRescues(messageData.rescues);
+        setAllowRewind(messageData.allowRewind);
       }
-      if (messageData.func === "ept") { // end prisoners turn
+      if (messageData.func === "ept" && prisonersOrGuards === "G") { // Prisoners sent end prisoners turn, Guards pick it up
         setWhoseturn(messageData.whoseturn);
         setSelection(-1);
+        setAllowRewind(false);
         setRcd(-1,-1,nodirection);
         setCurrentcoords([]);
         setSquares(messageData.squares);
@@ -730,9 +738,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           gtiles: [...gtiles],
         });
       }
-      if (messageData.func === "egt") { // end guards turn
+      if (messageData.func === "egt" && prisonersOrGuards === "P") { // Guards sent end guards turn, Prisoners pick it up
         setWhoseturn(messageData.whoseturn);
         setSelection(-1);
+        setAllowRewind(false);
         setRcd(-1,-1,nodirection);
         setCurrentcoords([]);
         setSquares(messageData.squares);
@@ -763,6 +772,11 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setPassed(messageData.passed);
         setMoves(messageData.moves);
         setSnapshot(messageData.snapshot);
+        setAllowRewind(false);
+      }
+      if (messageData.func === "allowundo" && messageData.sender !== prisonersOrGuards) {
+        // Opponent clicked button to allow undo turn
+        setAllowRewind(true);
       }
       if (messageData.func === "chat" && messageData.sender != prisonersOrGuards) { // Opponent chat message
         let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
@@ -915,6 +929,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
+    setAllowRewind(false);
     setCurrentcoords([]);
     setPtiles(newPtiles);
     setTiles(newTiles);
@@ -981,6 +996,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newMoves = [...moves, newMove];
     setWhoseturn(newWhoseturn);
     setSelection(-1);
+    setAllowRewind(false);
     setCurrentcoords([]);
     setGtiles(newGtiles);
     setTiles(newTiles);
@@ -1034,6 +1050,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setUsedby([...snapshot.usedby]);
     setWhoseturn("G");
     setSelection(-1);
+    setAllowRewind(false);
     setCurrentcoords([]);
     setPtiles(newPtiles);
     setTiles(newTiles);
@@ -1089,6 +1106,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setUsedby([...snapshot.usedby]);
     setWhoseturn("P");
     setSelection(-1);
+    setAllowRewind(false);
     setCurrentcoords([]);
     setGtiles(newGtiles);
     setTiles(newTiles);
@@ -1313,6 +1331,21 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     };
     return rewindInfo;
   }
+  function allowUndoLastTurn() {
+    if (!allowRewind) {
+      setAllowRewind(true);
+      client.send(
+        JSON.stringify({
+          gameid: gameid, // the id for the game
+          nickname: nickname, // player nickname
+          type: "pb", // prisonbreak
+          func: "allowundo", // allow undo last turn
+          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
+          sender: prisonersOrGuards // who is allowing it
+          })
+      );
+    }
+  }
 
   function performRewind() {
     /* Rewind the last move and take it off the end of the move list */
@@ -1350,6 +1383,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setPassed(newPassed);
     setMoves(newMoves);
     setSnapshot(newSnapshot);
+    setAllowRewind(false);
     // Just send everything even though some could be hard coded in processMessage by opponent
     client.send(
       JSON.stringify({
@@ -1390,6 +1424,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newWhoseturn = passed ? "X" : "G"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
+    setAllowRewind(false);
     let newMove = {by: "P", type: "PASS"};
     let newMoves = [...moves, newMove];
     client.send(
@@ -1417,6 +1452,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newWhoseturn = passed ? "X" : "P"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
+    setAllowRewind(false);
     let newMove = {by: "G", type: "PASS"};
     let newMoves = [...moves, newMove];
     client.send(
@@ -1581,9 +1617,11 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             onClickTileExchange={() => swapPrisonersTiles()}
             onClickPassPlay={() => prisonerPass()}
             onClickUndoLastPlay={() => performRewind()}
+            onClickAllowUndo={() => allowUndoLastTurn()}
             rescues={rescues}
             prisonersOrGuards={prisonersOrGuards}
             moves={moves}
+            allowRewind={allowRewind}
           />
         </div>
         <div className="col pbBoardPlusUnderboard">
@@ -1627,8 +1665,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             onClickTileExchange={() => swapGuardsTiles()}
             onClickPassPlay={() => guardsPass()}
             onClickUndoLastPlay={() => performRewind()}
+            onClickAllowUndo={() => allowUndoLastTurn()}
             prisonersOrGuards={prisonersOrGuards}
             moves={moves}
+            allowRewind={allowRewind}
           />
         </div>
         <div className="col pbTilesMovesChatOuter">
@@ -1745,16 +1785,32 @@ const PassPlayButton = (props) => {
   );
 };
 
+const AllowUndoLastPlay = (props) => {
+  return (
+    <button className="pbActionButtonSevere" onClick={props.onClick}>
+      <span className="pbActionButtonSevereText"><i className="material-icons">report_problem</i>
+        &nbsp;Allow Undo Turn
+        {props.alreadyAllowed ?
+          <span className="pbActionButtonSevereText2">Allow undo is now enabled</span>
+        :
+          <span className="pbActionButtonSevereText2">Click to let opponent undo</span>
+        }
+      </span>
+    </button>
+  )
+}
+
 const UndoLastPlay = (props) => {
   return (
     <button className="pbActionButtonSevere" onClick={props.onClick}>
       <span className="pbActionButtonSevereText"><i className="material-icons">delete_forever</i>
         &nbsp;Undo My Turn
-        <span className="pbActionButtonSevereText2">Ask opponent first, please</span>
+        <span className="pbActionButtonSevereText2">Opponent has allowed undo</span>
       </span>
     </button>
   )
 }
+
 const Prisoners = (props) => {
   const renderTile = renderPlayerTile(props);
 
@@ -1787,7 +1843,7 @@ const Prisoners = (props) => {
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? 
         showActionButtons(props)
       :
-        props.whoseturn === "G" && props.prisonersOrGuards === "P" && props.moves.length > 0 ?
+        props.whoseturn === "G" && props.prisonersOrGuards === "P" && props.moves.length > 0 && props.allowRewind ?
           showActionButtonUndoLastPlay(props)
         :
           <></>
@@ -1821,7 +1877,7 @@ const Guards = (props) => {
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? 
         showActionButtons(props)
       :
-        props.whoseturn === "P" && props.prisonersOrGuards === "G" && props.moves.length > 0 ?
+        props.whoseturn === "P" && props.prisonersOrGuards === "G" && props.moves.length > 0 && props.allowRewind  ?
           showActionButtonUndoLastPlay(props)
         :
           <></>
@@ -1863,7 +1919,19 @@ function showActionButtons(props) {
     <p>
       <PassPlayButton onClick={() => props.onClickPassPlay()} />
     </p>
+    {props.moves.length > 0 ?
+          showActionButtonAllowUndo(props)
+        :
+          <></>
+    }
   </div>;
+}
+function showActionButtonAllowUndo(props) {
+  return <div className="pbActionButtonDiv">
+    <p>
+      <AllowUndoLastPlay onClick={() => props.onClickAllowUndo()} alreadyAllowed={props.allowRewind}/>
+    </p>
+  </div>
 }
 function showActionButtonUndoLastPlay(props) {
   return <div className="pbActionButtonDiv">

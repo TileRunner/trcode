@@ -124,21 +124,27 @@
     color: cornsilk;
     text-align: center;
 }
-.pbSquareInner.P { /* Prisoners have a tile on the square */
+.pbSquareInner.PlayerTile { /* Player tile image on the square */
     background-image: url('../../public/tile.png');
     background-size: cover;
     background-color: var(--tileBackgroundColour);
-    color: var(--prisonersTileColour);
-    font-weight: bolder;
-    text-align: center;
+    position: relative;
 }
-.pbSquareInner.G { /* Guards have a tile on the square */
-    background-image: url('../../public/tile.png');
-    background-size: cover;
-    background-color: var(--tileBackgroundColour);
-    color: var(--guardsTileColour);
+.pbSquareTileText { /* The tile played on the board */
+    position: absolute;
+    bottom: 3px;
+    left: 12px;
+    font-family: monospace;
     font-weight: bolder;
     text-align: center;
+    text-shadow: 2px 2px  grey;
+    font-size: xx-large;
+}
+.pbSquareTileText.P { /* Prisoners tile color */
+    color: var(--prisonersTileColour);
+}
+.pbSquareTileText.G { /* Guards tile color */
+    color: var(--guardsTileColour);
 }
 .u::after {
     content: "u";
@@ -174,38 +180,35 @@
     border-width: 5px;
     border-color: var(--commonBorderColour);
 }
-.pbBoardTurret1 {
-    background-image: url('../../public/turretMiddleHoled.png');
-    background-size: cover;
-    line-height: var(--cellBlockSide);
-}
-.pbBoardTurret2 {
-    background-image: url('../../public/turretMiddle.png');
-    background-size: cover;
-    line-height: var(--cellBlockSide);
-}
 .pbBoardColumnHeaderRow {
     text-align: center;
     line-height: var(--cellBlockSide);
 }
 .pbBoardColumnHeader {
+    background-image: url('../../public/BarbedWireRotated.png');
+    background-size: cover;
+    background-repeat: repeat;
     background-color: black;
     color: white;
     text-align: center;
 }
 .pbBoardRowHeader {
-    background-image: url('../../public/boardRowHeader.png');
-    background-size: contain;
+    background-image: url('../../public/BarbedWire.png');
+    background-size: cover;
     background-repeat: repeat;
     color: white;
     text-align: center;
 }
 .pbBoardHeaderTopLeft {
-    background-image: url('../../public/turretMiddle.png');
+    min-width: var(--cellBlockSide);
+    min-height: var(--cellBlockSide);
+    background-image: url('../../public/boardHeaderCorner.png');
     background-size: cover;
 }
 .pbBoardHeaderTopRight {
-    background-image: url('../../public/turretMiddle.png');
+    min-width: var(--cellBlockSide);
+    min-height: var(--cellBlockSide);
+    background-image: url('../../public/boardHeaderCorner.png');
     background-size: cover;
 }
 .pbBoardHeaderBottomLeft {
