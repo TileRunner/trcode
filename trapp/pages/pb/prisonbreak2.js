@@ -657,6 +657,13 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     scrollToBottom("ScrollableMoves");
   },[moves])
 
+  function putAtMoveStart() {
+    setSelection(-1);
+    setAllowRewind(false);
+    setRcd(-1,-1,nodirection);
+    setCurrentcoords([]);
+  }
+
   function processGameMessage(message) {
     let messageData = JSON.parse(message);
     if (messageData.type === "announce") {
@@ -691,8 +698,6 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             gtiles: gtiles,
             usedby: usedby,
             whoseturn: whoseturn,
-            selection: selection,
-            currentcoords: currentcoords,
             snapshot: snapshot,
             passed: passed,
             moves: moves,
@@ -710,8 +715,6 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setGtiles(messageData.gtiles);
         setUsedby(messageData.usedby);
         setWhoseturn(messageData.whoseturn);
-        setSelection(messageData.selection);
-        setCurrentcoords(messageData.currentcoords);
         setSnapshot(messageData.snapshot);
         setPassed(messageData.passed);
         setMoves(messageData.moves);
@@ -719,11 +722,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         setAllowRewind(messageData.allowRewind);
       }
       if (messageData.func === "ept" && prisonersOrGuards === "G") { // Prisoners sent end prisoners turn, Guards pick it up
+        putAtMoveStart();
         setWhoseturn(messageData.whoseturn);
-        setSelection(-1);
-        setAllowRewind(false);
-        setRcd(-1,-1,nodirection);
-        setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
         setPtiles(messageData.ptiles);
@@ -739,11 +739,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         });
       }
       if (messageData.func === "egt" && prisonersOrGuards === "P") { // Guards sent end guards turn, Prisoners pick it up
+        putAtMoveStart();
         setWhoseturn(messageData.whoseturn);
-        setSelection(-1);
-        setAllowRewind(false);
-        setRcd(-1,-1,nodirection);
-        setCurrentcoords([]);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
         setGtiles(messageData.gtiles);
@@ -759,20 +756,17 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       }
       if (messageData.func === "undoturn" && messageData.sender !== prisonersOrGuards) { 
         // opponent undid their last turn
+        putAtMoveStart();
         setTiles(messageData.tiles);
         setPtiles(messageData.ptiles);
         setGtiles(messageData.gtiles);
         setSquares(messageData.squares);
         setUsedby(messageData.usedby);
-        setSelection(messageData.selection);
         setWhoseturn(messageData.whoseturn);
-        setCurrentcoords(messageData.currentcoords);
         setRescues(messageData.rescues);
-        setRcd(messageData.rcd);
         setPassed(messageData.passed);
         setMoves(messageData.moves);
         setSnapshot(messageData.snapshot);
-        setAllowRewind(false);
       }
       if (messageData.func === "allowundo" && messageData.sender !== prisonersOrGuards) {
         // Opponent clicked button to allow undo turn
@@ -927,10 +921,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let playinfo = getPlayInfo();
     let newMove = {by: "P", type: "PLAY", rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
+    putAtMoveStart();
     setWhoseturn(newWhoseturn);
-    setSelection(-1);
-    setAllowRewind(false);
-    setCurrentcoords([]);
     setPtiles(newPtiles);
     setTiles(newTiles);
     setPassed(false);
@@ -994,10 +986,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let playinfo = getPlayInfo();
     let newMove = {by: "G", type: "PLAY", rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
     let newMoves = [...moves, newMove];
+    putAtMoveStart();
     setWhoseturn(newWhoseturn);
-    setSelection(-1);
-    setAllowRewind(false);
-    setCurrentcoords([]);
     setGtiles(newGtiles);
     setTiles(newTiles);
     setPassed(false);
@@ -1046,12 +1036,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newTiles.sort();
     let newMove = {by: "P", type: "SWAP", rewindInfo: rewindInfo};
     let newMoves = [...moves, newMove];
+    putAtMoveStart();
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
     setWhoseturn("G");
-    setSelection(-1);
-    setAllowRewind(false);
-    setCurrentcoords([]);
     setPtiles(newPtiles);
     setTiles(newTiles);
     setPassed(false);
@@ -1102,12 +1090,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     newTiles.sort();
     let newMove = {by: "G", type: "SWAP", rewindInfo: rewindInfo};
     let newMoves = [...moves, newMove];
+    putAtMoveStart();
     setSquares([...snapshot.squares]);
     setUsedby([...snapshot.usedby]);
     setWhoseturn("P");
-    setSelection(-1);
-    setAllowRewind(false);
-    setCurrentcoords([]);
     setGtiles(newGtiles);
     setTiles(newTiles);
     setPassed(false);
@@ -1357,10 +1343,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     let newPtiles = lastMove.by === "P" ? [...lastMove.rewindInfo.rack] : [...ptiles];
     let newGtiles = lastMove.by === "G" ? [...lastMove.rewindInfo.rack] : [...gtiles];
     let newRescues = lastMove.rewindInfo.rescues;
-    let newSelection = -1;
     let newWhoseturn = lastMove.by; // Back to their turn
-    let newCurrentcoords = [];
-    let newRcd = [-1,-1,nodirection];
     let newMoves = [...moves];
     newMoves.splice(numMoves-1,1);
     let newSnapshot = {
@@ -1370,20 +1353,17 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       ptiles: [...newPtiles]
     };
     let newPassed = lastMove.passed;
+    putAtMoveStart();
     setTiles(newTiles);
     setPtiles(newPtiles);
     setGtiles(newGtiles);
     setSquares(newSquares);
     setUsedby(newUsedby);
-    setSelection(newSelection);
     setWhoseturn(newWhoseturn);
-    setCurrentcoords(newCurrentcoords);
     setRescues(newRescues);
-    setRcd(newRcd);
     setPassed(newPassed);
     setMoves(newMoves);
     setSnapshot(newSnapshot);
-    setAllowRewind(false);
     // Just send everything even though some could be hard coded in processMessage by opponent
     client.send(
       JSON.stringify({
@@ -1398,11 +1378,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
         gtiles: newGtiles, // guards rack
         squares: newSquares, // revert to start of turn squares
         usedby: newUsedby, // revert to start of turn used by
-        selection: newSelection, // selected tile on rack
         whoseturn: newWhoseturn, // swap never ends the game so go to opponent
-        currentcoords: newCurrentcoords, // coors of tiles place on board during move
         rescues: newRescues, // rescue count
-        rcd: newRcd, // row col direction for the arrow on the board
         passed: newPassed, // whether previous play was a pass
         moves: newMoves, // a move was made
         snapshot: newSnapshot
@@ -1417,14 +1394,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     setGtiles([...snapshot.gtiles]);
     setSelection(-1);
     setCurrentcoords([]);
+    setRcd([-1,-1,nodirection]);
   };
 
   const prisonerPass = () => {
     recallTiles(); // In case they put some tiles on the board before clicking Pass
+    putAtMoveStart();
     let newWhoseturn = passed ? "X" : "G"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
-    setAllowRewind(false);
     let newMove = {by: "P", type: "PASS"};
     let newMoves = [...moves, newMove];
     client.send(
@@ -1449,10 +1427,10 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
 
   const guardsPass = () => {
     recallTiles(); // In case they put some tiles on the board before clicking Pass
+    putAtMoveStart();
     let newWhoseturn = passed ? "X" : "P"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
-    setAllowRewind(false);
     let newMove = {by: "G", type: "PASS"};
     let newMoves = [...moves, newMove];
     client.send(

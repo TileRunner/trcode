@@ -53,9 +53,12 @@
      */
     width: 360px;
     padding-top: 3px;
-    background-image: url("../../public/WallAndRope.png");
+    background-image: url("../../public/Wall.png");
     background-repeat: repeat;
     background-size: 150px;
+}
+.pbPlayerOuterSection:hover {
+    background-image: url("../../public/WallAndRope.png");
 }
 .pbPlayerInnerSection {
     align-items: center;
