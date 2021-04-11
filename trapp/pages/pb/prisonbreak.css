@@ -53,13 +53,14 @@
      */
     width: 360px;
     padding-top: 3px;
-    background-image: url("../../public/Wall.png");
+    background-image: url("../../public/Wall.jpg");
     background-repeat: repeat;
-    background-size: 150px;
+    background-size: cover;
 }
-.pbPlayerOuterSection:hover {
-    background-image: url("../../public/WallAndRope.png");
-}
+/* .pbPlayerOuterSection:hover {
+    background-image: url("../../public/Escapee.jpg");
+    opacity: 75%;
+} */
 .pbPlayerInnerSection {
     align-items: center;
     display: flex;
