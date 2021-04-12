@@ -27,12 +27,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="row">
-        <h1>Menu</h1>
+        <h1 className="myHeadingFont">Menu</h1>
       </div>
-      <div className="row">
+      <div className="row myTextFont">
         <Link href={`/wm/mastermind`}>
           <a>
-            <h2>Word Mastermind
+            <h2 className="myHeadingFont">Word Mastermind
               <span className="material-icons">psychology</span>
             </h2>
           </a>
@@ -45,7 +45,7 @@ export default function Home() {
           {descWm ?
             <div className="container">
               <div className="row myinfo">
-                <h1>Word Mastermind Information</h1>
+                <h1 className="myHeadingFont">Word Mastermind Information</h1>
               </div>
               <div className="row myinfo">
                 <p>Word Mastermind is a single player code cracking game.</p>
@@ -67,10 +67,10 @@ export default function Home() {
             <></>
           }
       </div>
-      <div className="row">
+      <div className="row myTextFont">
         <Link href={`/wi/wordinfo`}>
           <a>
-            <h2>Word Info
+            <h2 className="myHeadingFont">Word Info
               <span className="material-icons">biotech</span>
             </h2>
           </a>
@@ -83,7 +83,7 @@ export default function Home() {
           {descWi ?
             <div className="container">
               <div className="row myinfo">
-                <h1>Word Info Information</h1>
+                <h1 className="myHeadingFont">Word Info Information</h1>
               </div>
               <div className="row myinfo">
                 <p>Enter search criteria and get information on the matching words.</p>
@@ -103,10 +103,10 @@ export default function Home() {
           }
       </div>
       <BrowserView>
-        <div className="row">
+        <div className="row myTextFont">
           <Link href={`/pb/prisonbreak2`}>
             <a>
-              <h2>
+              <h2 className="myHeadingFont">
                 Prison Break
                 <span className="material-icons">run_circle</span>
               </h2>
@@ -120,7 +120,7 @@ export default function Home() {
           {descPb ?
             <div className="container">
               <div className="row myinfo">
-                <h1>Prison Break Information</h1>
+                <h1 className="myHeadingFont">Prison Break Information</h1>
               </div>
               <div className="row myinfo">
                 <p>Prison Break is a two player crossword style game.</p>

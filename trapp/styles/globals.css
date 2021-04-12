@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
+
 html,
 body {
   background-color: darkgrey;
@@ -15,6 +17,13 @@ a {
 
 * {
   box-sizing: border-box;
+}
+.myHeadingFont {
+  font-family: Merriweather;
+}
+.myTextFont {
+  font-family: 'Open Sans', sans-serif;
+  font-style: italic;
 }
 .mybutton {
   background-color: cadetblue;

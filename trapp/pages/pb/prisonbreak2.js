@@ -301,7 +301,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     <div className="row pbLobbyPrisonerSection">
       <div className="col">
         <span className="pbPlayerTitle">PRISONERS</span>
-        <span className="pbLobbyGameIdPrompt">Game ID</span>
+        <label className="pbLobbyGameIdPrompt">Game ID</label>
         <input className="pbLobbyGameIdInput"
           name="gameid"
           value={gameid}
@@ -361,8 +361,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
       </div>
     </div>
     <div className="row">
-      <div className="col offset-1">
-        <h2>Game list:</h2>
+      <div className="col">
+        <h2 className="pbLobbyGameListTitle">Game list:</h2>
       </div>
     </div>
     <div className="row pbLobbyGameList">

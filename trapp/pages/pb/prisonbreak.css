@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Sofia|Open Sans");
+@import url("https://fonts.googleapis.com/css?family=Sofia|Open Sans|Merriweather");
 
 :root {
     --squareSide: 40px;
@@ -9,12 +9,14 @@
     --commonBorderColour: blue; /*darkslateblue*/
     --commonTextBackgroundColour: black;
     --commonTextColour: whitesmoke;
+    --commonHeaderFontFamily: Merriweather, sans-serif;
+    --commonFontFamily: 'Open Sans', sans-serif;
     --tileBackgroundColour: orangered;
     --prisonersTileColour: whitesmoke;
     --guardsTileColour: black;
 }
 .formalinfo {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--commonFontFamily);
     letter-spacing: 1px;
 }
 .prisonbreak {
@@ -39,8 +41,8 @@
     background-color: grey;
     font-size: 2.8em;
     text-align: center;
-    font-family: Sofia;
-    font-style: italic;
+    font-family: Merriweather;
+    /* font-style: italic; */
     color:black;
 }
 .pbhomelink {
@@ -78,7 +80,7 @@
     font-size: x-large;
 }
 .pbPlayerTitle {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--commonFontFamily);
     background-image: url('../../public/playertitle.png');
     background-repeat: repeat;
     border-radius: 35px;
@@ -196,6 +198,7 @@
     border-color: var(--commonBorderColour);
 }
 .pbBoardColumnHeaderRow {
+    font-family: var(--commonHeaderFontFamily);
     text-align: center;
     line-height: var(--cellBlockSide);
 }
@@ -208,6 +211,7 @@
     text-align: center;
 }
 .pbBoardRowHeader {
+    font-family: var(--commonHeaderFontFamily);
     background-image: url('../../public/BarbedWire.png');
     background-size: cover;
     background-repeat: repeat;
@@ -368,7 +372,7 @@
     border-width: 3px;
     border-style: solid;
     padding-left: 3px;
-    font-family: 'Open Sans' ,sans-serif;
+    font-family: var(--commonFontFamily);
 }
 .pbRescuee {
     padding: 2px;
@@ -389,7 +393,7 @@
     background-color: var(--commonTextBackgroundColour);
     color: var(--commonTextColour);
     font-style: bolder;
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--commonFontFamily);
     width: 200px;
     word-spacing: 3px;
 }
@@ -435,10 +439,11 @@
 .pbLobbyCommonInfoSection {
     padding-left: 50px;
     padding-top: 5px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: var(--commonFontFamily);
     font-size:var(--lobbyFontSize);
 }
 .pbLobbyNicknamePrompt {
+    font-family: var(--commonHeaderFontFamily);
     font-weight: bold;
 }
 .pbLobbyNicknamePrompt::after {
@@ -452,12 +457,14 @@
 }
 .pbLobbyPrisonerSection {
     padding-left: 50px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: var(--commonFontFamily);
+    font-size:var(--lobbyFontSize);
 }
 .pbLobbyGameIdPrompt {
-    margin-left: 5px;
+    margin-left: 15px;
     margin-right: 5px;
-    vertical-align: middle;
+    font-family: var(--commonHeaderFontFamily);
+    font-weight: bold;
 }
 .pbLobbyGameIdPrompt::after {
     content: ":";
@@ -468,8 +475,10 @@
     width: 300px;
 }
 .pbLobbyRackSizePrompt {
-    margin-left: 5px;
+    margin-left: 15px;
     margin-right: 20px;
+    font-family: var(--commonHeaderFontFamily);
+    font-weight: bold;
 }
 .pbLobbyRackSizePrompt:before {
     content: "Cell Block";
@@ -506,15 +515,22 @@
     outline: none;
 }
 .pbLobbyCellBlockInfo {
+    font-family: var(--commonFontFamily);
+    font-style: italic;
     padding-left: 5px;
 }
 .pbLobbyGuardSection {
     padding-top: 5px;
     padding-left: 50px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: var(--commonFontFamily);
+    font-size:var(--lobbyFontSize);
 }
 .pbLobbyGuardInfo {
-    padding-left: 5px;
+    padding-left: 15px;
+}
+.pbLobbyGameListTitle {
+    font-family: var(--commonHeaderFontFamily);
+    margin-left: 80px;
 }
 .pbLobbyGamesHeaderCol {
     padding-left: 10px;
@@ -522,6 +538,7 @@
     border-left-style: solid;
     border-right-style: solid;
     border-top-style: double;
+    font-family: var(--commonHeaderFontFamily);
 }
 .pbLobbyGameList {
     background-image: url('../../public/NightLandscape.jpg');
@@ -530,9 +547,10 @@
     background-position-x: 100px;
     width: 1000px;
     height: 500px;
+    font-family: var(--commonFontFamily);
 }
 .pbLobbyGameid {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: var(--commonFontFamily);
     font-weight: bolder;
 }
 .pbLobbyGameRacksize {
@@ -556,7 +574,7 @@
 }
 .pbLobbyActionButton {
     background-color: lightsteelblue;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: var(--commonFontFamily);
     margin-left: 10px;
     width: 180px;
 }
