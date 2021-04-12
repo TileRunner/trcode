@@ -51,6 +51,9 @@
     border-color: orangered;
     border-width: 1px;
      */
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-top: 2px solid black;
     width: 360px;
     padding-top: 3px;
     background-image: url("../../public/Wall.jpg");
@@ -58,7 +61,7 @@
     background-size: cover;
 }
 /* .pbPlayerOuterSection:hover {
-    background-image: url("../../public/Escapee.jpg");
+    background-image: url("../../public/Escapee.png");
     opacity: 75%;
 } */
 .pbPlayerInnerSection {
@@ -174,6 +177,8 @@
     padding: 0%;
 }
 .pbBoardPlusUnderboard {
+    background-image: url('../../public/Wall.jpg');
+    background-size: contain;
     align-items: center;
     display: flex;
     flex-direction: column;

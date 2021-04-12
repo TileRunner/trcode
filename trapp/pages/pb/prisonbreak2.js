@@ -4,9 +4,14 @@ import CustomSocket from "../../ws";
 const boardColumnHeaders = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
 const boardRowHeaders = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
-const joke = 'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"';
-const joke2 = "Two peanuts were walking down a back alley. One was a salted.";
-const jokes = [joke, joke2];
+const jokes = [
+  'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"',
+  'Two peanuts were walking down a back alley. One was a salted.',
+  "The psychic dwarf escaped! There's a small medium at large!",
+  'What do you call a vegetable who has escaped prison? An escapea!',
+  "The prisoners fave punctuation is a period. It marks the end of a sentence!",
+  "Prison is only one word, but to robbers it's a whole sentence."
+];
 const initialtiles4 = [
   "A",  "A",  "A",
   "B",
@@ -581,11 +586,17 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     ptiles: [],
     gtiles: [],
   });
+  const [jokeindex, setJokeindex] = useState(0);
   const [allowRewind, setAllowRewind] = useState(false);
   const [oppname, setOppname] = useState('');
   const [chatmsgs, setChatmsgs] = useState([]);
 
   useEffect(() => {
+    let newji = jokeindex + 1;
+    if (newji >= jokes.length) {
+      newji = 0;
+    }
+    setJokeindex(newji);
     const interval = setInterval(() => {
       // If it is not my turn && the game has not ended
       if (prisonersOrGuards !== whoseturn && whoseturn !== "X") {
@@ -1398,13 +1409,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   };
 
   const prisonerPass = () => {
+    let rewindInfo = getRewindInfo();
+    let newWhoseturn = passed ? "X" : "G"; // If both players pass then end the game by using "X"
+    let newMove = {by: "P", type: "PASS", rewindInfo: rewindInfo};
+    let newMoves = [...moves, newMove];
     recallTiles(); // In case they put some tiles on the board before clicking Pass
     putAtMoveStart();
-    let newWhoseturn = passed ? "X" : "G"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
-    let newMove = {by: "P", type: "PASS"};
-    let newMoves = [...moves, newMove];
+    setMoves(newMoves);
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
@@ -1426,13 +1439,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   }
 
   const guardsPass = () => {
+    let rewindInfo = getRewindInfo();
+    let newWhoseturn = passed ? "X" : "P"; // If both players pass then end the game by using "X"
+    let newMove = {by: "G", type: "PASS", rewindInfo: rewindInfo};
+    let newMoves = [...moves, newMove];
     recallTiles(); // In case they put some tiles on the board before clicking Pass
     putAtMoveStart();
-    let newWhoseturn = passed ? "X" : "P"; // If both players pass then end the game by using "X"
     setWhoseturn(newWhoseturn);
     setPassed(true);
-    let newMove = {by: "G", type: "PASS"};
-    let newMoves = [...moves, newMove];
+    setMoves(newMoves);
     client.send(
       JSON.stringify({
         gameid: gameid, // the id for the game
@@ -1628,7 +1643,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             {whoseturn === "X" ?
               <h1>Game Over!</h1>
             :
-              <p>{whoseturn === "P" ? jokes[0] : jokes[1]}</p>
+              <p>{jokes[jokeindex]}</p>
             }
           </div>
         </div>
@@ -1820,11 +1835,15 @@ const Prisoners = (props) => {
       </div>
       {props.whoseturn === "P" && props.prisonersOrGuards === "P" ? 
         showActionButtons(props)
-      :
-        props.whoseturn === "G" && props.prisonersOrGuards === "P" && props.moves.length > 0 && props.allowRewind ?
-          showActionButtonUndoLastPlay(props)
+        : props.prisonersOrGuards === "P" && props.moves.length > 0 && props.allowRewind && props.moves[props.moves.length-1].by === "P" ?
+        showActionButtonUndoLastPlay(props)
         :
-          <></>
+        <></>
+      }
+      {props.prisonersOrGuards === "P" && props.moves.length > 0 && props.moves[props.moves.length-1].by === "G" ?
+        showActionButtonAllowUndo(props)
+        :
+        <></>
       }
       <div className="pbRescuesMade">
         Rescues made: {props.rescues}
@@ -1854,11 +1873,15 @@ const Guards = (props) => {
       </div>
       {props.whoseturn === "G" && props.prisonersOrGuards === "G" ? 
         showActionButtons(props)
-      :
-        props.whoseturn === "P" && props.prisonersOrGuards === "G" && props.moves.length > 0 && props.allowRewind  ?
-          showActionButtonUndoLastPlay(props)
+        : props.prisonersOrGuards === "G" && props.moves.length > 0 && props.allowRewind && props.moves[props.moves.length-1].by === "G" ?
+        showActionButtonUndoLastPlay(props)
         :
-          <></>
+        <></>
+      }
+      {props.prisonersOrGuards === "G" && props.moves.length > 0 && props.moves[props.moves.length-1].by === "P" ?
+        showActionButtonAllowUndo(props)
+        :
+        <></>
       }
     </div>
   );
@@ -1897,11 +1920,6 @@ function showActionButtons(props) {
     <p>
       <PassPlayButton onClick={() => props.onClickPassPlay()} />
     </p>
-    {props.moves.length > 0 ?
-          showActionButtonAllowUndo(props)
-        :
-          <></>
-    }
   </div>;
 }
 function showActionButtonAllowUndo(props) {
