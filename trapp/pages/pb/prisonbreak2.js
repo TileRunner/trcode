@@ -277,7 +277,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
   }
   return <div className="container-fluid">
     <div className="row">
-      <div className="col-10 pbtitle">
+      <div className="col-10 pbtitle font-effect-fire">
         Prison Break Lobby
         <span className="material-icons">run_circle</span>
       </div>
@@ -1582,15 +1582,15 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   return (
     <div className="container-fluid prisonbreak">
       <div className="row">
-        <div className="col-2 pbGameid">
+        <div className="col-2 pbGameid formalinfo">
           Game id: {gameid}<br></br>
           Nickname: {nickname}
         </div>
-        <div className="col-8 pbtitle">
+        <div className="col-8 pbtitle font-effect-fire">
           Prison Break
           <span className="material-icons">run_circle</span>
         </div>
-        <div className="col-2 pbhomelink">
+        <div className="col-2 pbhomelink formalinfo">
           <Link href={"../../"}>
             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Sofia|Open Sans");
+
 :root {
     --squareSide: 40px;
     --cellBlockSide: 40px;
@@ -10,6 +12,10 @@
     --tileBackgroundColour: orangered;
     --prisonersTileColour: whitesmoke;
     --guardsTileColour: black;
+}
+.formalinfo {
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 1px;
 }
 .prisonbreak {
     background-color: blue;
@@ -33,7 +39,7 @@
     background-color: grey;
     font-size: 2.8em;
     text-align: center;
-    font-family: cursive;
+    font-family: Sofia;
     font-style: italic;
     color:black;
 }
@@ -72,13 +78,13 @@
     font-size: x-large;
 }
 .pbPlayerTitle {
+    font-family: 'Open Sans', sans-serif;
     background-image: url('../../public/playertitle.png');
     background-repeat: repeat;
     border-radius: 35px;
     background-color: whitesmoke;
     color: whitesmoke;
     letter-spacing: 2px;
-    font-family: cursive;
     font-weight: lighter;
     text-align: center;
     padding-left: 6px;
@@ -138,13 +144,13 @@
     position: relative;
 }
 .pbSquareTileText { /* The tile played on the board */
-    position: absolute;
+    position: absolute;   
     bottom: 3px;
-    left: 12px;
-    font-family: monospace;
+    left: 12px; 
     font-weight: bolder;
     text-align: center;
     text-shadow: 2px 2px  grey;
+    font-family: monospace;
     font-size: xx-large;
 }
 .pbSquareTileText.P { /* Prisoners tile color */
@@ -362,6 +368,7 @@
     border-width: 3px;
     border-style: solid;
     padding-left: 3px;
+    font-family: 'Open Sans' ,sans-serif;
 }
 .pbRescuee {
     padding: 2px;
@@ -372,7 +379,7 @@
     margin-left: 7px;
 }
 .pbActionButton {
-    background-image: url('../../public/actionButton.png');
+    /* background-image: url('../../public/actionButton.png'); */
     padding: 2px 2px 2px 2px;
     margin-left: 5px;
     border-radius: 35px;
@@ -382,7 +389,7 @@
     background-color: var(--commonTextBackgroundColour);
     color: var(--commonTextColour);
     font-style: bolder;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     width: 200px;
     word-spacing: 3px;
 }
