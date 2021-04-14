@@ -6,7 +6,7 @@
     --cellBlockSelectedHeight: 45px;
     --selectedColor: #2196F3;
     --lobbyFontSize: 20px;
-    --commonBorderColour: blue; /*darkslateblue*/
+    --commonBorderColour: grey;/* blue; /*darkslateblue*/
     --commonTextBackgroundColour: black;
     --commonTextColour: whitesmoke;
     --commonHeaderFontFamily: Merriweather, sans-serif;
@@ -25,12 +25,6 @@
     background-size: cover;
     background-color: blue;
     color:lightgrey;
-}
-.pbTilesMovesChatOuter {
-    /* background-image: url("../../public/NightLandscape.jpg");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position-y: bottom; */
 }
 .pbGameid {
     background-color: var(--commonTextBackgroundColour);
@@ -191,7 +185,7 @@
 }
 .pbBoard {
     border-style: solid;
-    border-width: 5px;
+    border-width: 0px;
     border-color: var(--commonBorderColour);
 }
 .pbBoardColumnHeaderRow {
@@ -536,19 +530,22 @@
     border-right-style: solid;
     border-top-style: double;
     font-family: var(--commonHeaderFontFamily);
+    background-color: var(--commonTextBackgroundColour);
+    color: var(--commonTextColour);
 }
 .pbLobbyGameList {
-    background-image: url('../../public/NightLandscape.jpg');
+    /* background-image: url('../../public/NightLandscape.jpg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position-x: 100px;
     width: 1000px;
-    height: 500px;
+    height: 500px; */
     font-family: var(--commonFontFamily);
 }
 .pbLobbyGameid {
     font-family: var(--commonFontFamily);
     font-weight: bolder;
+    padding-left: 3px;
 }
 .pbLobbyGameRacksize {
     font-style: italic;

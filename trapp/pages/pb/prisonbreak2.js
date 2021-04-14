@@ -1664,7 +1664,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             allowRewind={allowRewind}
           />
         </div>
-        <div className="col pbTilesMovesChatOuter">
+        <div className="col">
           <div className="row">
             <div className="col pbTileAndMovesOuter">
               <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
