@@ -30,7 +30,7 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia&effect=fire|Open Sans|Merriweather"/>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans|Merriweather"/>
                 {/* <script
                     // for some reason these fontawesome icons are sometimish about whether to show up or not.
                     // I switched to material-icons instead.

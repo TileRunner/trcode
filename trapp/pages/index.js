@@ -29,84 +29,84 @@ export default function Home() {
       <div className="row">
         <h1 className="myHeadingFont">Menu</h1>
       </div>
-      <div className="row myTextFont">
+      <div className="row">
         <Link href={`/wm/mastermind`}>
           <a>
-            <h2 className="myHeadingFont">Word Mastermind
+            <h2 className="mySubHeadingFont">Word Mastermind
               <span className="material-icons">psychology</span>
             </h2>
           </a>
         </Link>
-          <button id="toggleDescribeWm" className={descWm ? "mybutton" : "mymaterialicon"}
-            onClick={() => toggleDescWm()}
-          >
-            {descWm ? "Hide info" : <i className="material-icons">help_outline</i>}
-          </button>
-          {descWm ?
-            <div className="container">
-              <div className="row myinfo">
-                <h1 className="myHeadingFont">Word Mastermind Information</h1>
-              </div>
-              <div className="row myinfo">
-                <p>Word Mastermind is a single player code cracking game.</p>
-              </div>
-              <div className="row myinfo">
-                <ul>
-                  <li>The computer picks a random word.</li>
-                  <li>You enter guesses until you guess correctly.</li>
-                  <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
-                  <BrowserView>
-                    <li>The computer shows you word info for guessed words.</li>
-                  </BrowserView>
-                  <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
-                  <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
-                </ul>
-              </div>
+        <button id="toggleDescribeWm" className={descWm ? "mybutton" : "mymaterialicon"}
+          onClick={() => toggleDescWm()}
+        >
+          {descWm ? "Hide info" : <i className="material-icons">help_outline</i>}
+        </button>
+        {descWm ?
+          <div className="container">
+            <div className="row myinfo">
+              <h1 className="myHeadingFont">Word Mastermind Information</h1>
             </div>
-          :
-            <></>
-          }
+            <div className="row myinfo">
+              <p>Word Mastermind is a single player code cracking game.</p>
+            </div>
+            <div className="row myinfo">
+              <ul>
+                <li>The computer picks a random word.</li>
+                <li>You enter guesses until you guess correctly.</li>
+                <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
+                <BrowserView>
+                  <li>The computer shows you word info for guessed words.</li>
+                </BrowserView>
+                <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
+                <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
+              </ul>
+            </div>
+          </div>
+        :
+          <></>
+        }
       </div>
-      <div className="row myTextFont">
+      <div className="row">
         <Link href={`/wi/wordinfo`}>
           <a>
-            <h2 className="myHeadingFont">Word Info
+            <h2 className="mySubHeadingFont">Word Info
               <span className="material-icons">biotech</span>
             </h2>
           </a>
         </Link>
-          <button id="toggleDescribeWi" className={descWi ? "mybutton" : "mymaterialicon"}
-            onClick={() => toggleDescWi()}
-          >
-            {descWi ? "Hide info" : <i className="material-icons">help_outline</i>}
-          </button>
-          {descWi ?
-            <div className="container">
-              <div className="row myinfo">
-                <h1 className="myHeadingFont">Word Info Information</h1>
-              </div>
-              <div className="row myinfo">
-                <p>Enter search criteria and get information on the matching words.</p>
-              </div>
-              <div className="row myinfo">
-                <ul>
-                  <li>Anagrams - words that use the exact same letters.</li>
-                  <li>Inserts - words that can be made by inserting a single letter.</li>
-                  <li>Drops - words that can be made by dropping a single letter.</li>
-                  <li>Swaps - words that can be made by swapping a single letter.</li>
-                  <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
-                </ul>
-              </div>
+        <button id="toggleDescribeWi" className={descWi ? "mybutton" : "mymaterialicon"}
+          onClick={() => toggleDescWi()}
+        >
+          {descWi ? "Hide info" : <i className="material-icons">help_outline</i>}
+        </button>
+        {descWi ?
+          <div className="container">
+            <div className="row myinfo">
+              <h1 className="myHeadingFont">Word Info Information</h1>
             </div>
-          :
-            <></>
-          }
+            <div className="row myinfo">
+              <p>Enter search criteria and get information on the matching words.</p>
+            </div>
+            <div className="row myinfo">
+              <ul>
+                <li>Anagrams - words that use the exact same letters.</li>
+                <li>Inserts - words that can be made by inserting a single letter.</li>
+                <li>Drops - words that can be made by dropping a single letter.</li>
+                <li>Swaps - words that can be made by swapping a single letter.</li>
+                <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
+              </ul>
+            </div>
+          </div>
+        :
+          <></>
+        }
       </div>
       <BrowserView>
-        <div className="row myTextFont">
+        <div className="row">
           <Link href={`/pb/prisonbreak2`}>
             <a>
-              <h2 className="myHeadingFont">
+              <h2 className="mySubHeadingFont">
                 Prison Break
                 <span className="material-icons">run_circle</span>
               </h2>

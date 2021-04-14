@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Sofia|Open Sans|Merriweather");
+@import url("https://fonts.googleapis.com/css?family=Open Sans|Merriweather");
 
 :root {
     --squareSide: 40px;
@@ -20,15 +20,17 @@
     letter-spacing: 1px;
 }
 .prisonbreak {
+    background-image: url("../../public/Wall.jpg");
+    background-repeat: repeat;
+    background-size: cover;
     background-color: blue;
-    /* background-blend-mode: normal; */
     color:lightgrey;
 }
 .pbTilesMovesChatOuter {
-    background-image: url("../../public/NightLandscape.jpg");
+    /* background-image: url("../../public/NightLandscape.jpg");
     background-size: contain;
     background-repeat: no-repeat;
-    background-position-y: bottom;
+    background-position-y: bottom; */
 }
 .pbGameid {
     background-color: var(--commonTextBackgroundColour);
@@ -54,19 +56,14 @@
     border-style: solid;
 }
 .pbPlayerOuterSection {
-    /* I did this temporarily to see where the area was
-    border-style: inset;
-    border-color: orangered;
-    border-width: 1px;
-     */
-    border-left: 2px solid black;
+    /* border-left: 2px solid black;
     border-right: 2px solid black;
-    border-top: 2px solid black;
+    border-top: 2px solid black; */
     width: 360px;
     padding-top: 3px;
-    background-image: url("../../public/Wall.jpg");
+    /* background-image: url("../../public/Wall.jpg");
     background-repeat: repeat;
-    background-size: cover;
+    background-size: cover; */
 }
 /* .pbPlayerOuterSection:hover {
     background-image: url("../../public/Escapee.png");
@@ -185,8 +182,8 @@
     padding: 0%;
 }
 .pbBoardPlusUnderboard {
-    background-image: url('../../public/Wall.jpg');
-    background-size: contain;
+    /* background-image: url('../../public/Wall.jpg');
+    background-size: contain; */
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -221,25 +218,25 @@
 .pbBoardHeaderTopLeft {
     min-width: var(--cellBlockSide);
     min-height: var(--cellBlockSide);
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/BarbedWireRotated.png');
     background-size: cover;
 }
 .pbBoardHeaderTopRight {
     min-width: var(--cellBlockSide);
     min-height: var(--cellBlockSide);
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/BarbedWire.png');
     background-size: cover;
 }
 .pbBoardHeaderBottomLeft {
     min-width: var(--cellBlockSide);
     min-height: var(--cellBlockSide);
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/BarbedWire.png');
     background-size: cover;
 }
 .pbBoardHeaderBottomRight {
     min-width: var(--cellBlockSide);
     min-height: var(--cellBlockSide);
-    background-image: url('../../public/boardHeaderCorner.png');
+    background-image: url('../../public/BarbedWireRotated.png');
     background-size: cover;
 }
 .pbUnderboard {
