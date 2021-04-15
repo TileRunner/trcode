@@ -14,7 +14,7 @@ function MyApp({Component,pageProps}) {
                     href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
                     crossOrigin="anonymous"
                     />
-                <link
+                <link /* I added material icons */
                     href="https://fonts.googleapis.com/icon?family=Material+Icons"
                     rel="stylesheet"
                     />
@@ -30,7 +30,10 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans|Merriweather"/>
+                <link /* I added GoogleFonts using Font Pairings mentioned as popular on W3CSchools */
+                    rel="stylesheet"
+                    href="https://fonts.googleapis.com/css?family=Open Sans|Merriweather"
+                    />
                 {/* <script
                     // for some reason these fontawesome icons are sometimish about whether to show up or not.
                     // I switched to material-icons instead.

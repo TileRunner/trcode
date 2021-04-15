@@ -1741,7 +1741,7 @@ const ShowMoves = (props) => { // show moves made
 const RackTile = (props) => {
   return (
     <div className={props.tileclass} onClick={props.onClick}>
-      {props.tilevalue}
+      <div className="pbTileOnRackText">{props.tilevalue}</div>
     </div>
   );
 };

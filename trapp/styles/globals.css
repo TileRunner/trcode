@@ -1,5 +1,17 @@
 @import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
-
+:root {
+  --commonBorderColour: grey;/* blue; /*darkslateblue*/
+  --commonTextBackgroundColour: black;
+  --commonTextColour: whitesmoke;
+  --commonHeaderFontFamily: Merriweather;
+  --commonFontFamily: 'Open Sans', sans-serif;
+}
+.commonHeaderFontFamily {
+  font-family: var(--commonHeaderFontFamily);
+}
+.commonFontFamily {
+  font-family: var(--commonFontFamily);
+}
 html,
 body {
   background-color: darkgrey;
@@ -18,9 +30,6 @@ a {
 * {
   box-sizing: border-box;
 }
-.myMenuHeader {
-  margin-left: 20px;
-}
 .myHeadingFont {
   font-family: Merriweather;
   font-size: 50px;
@@ -29,46 +38,13 @@ a {
   font-family: Merriweather;
   font-size: 40px;
 }
-.mybutton {
-  background-color: cadetblue;
-  color: burlywood;
-  border-color: burlywood;
-  border-style: solid;
-  border-width: 3px;
-  border-radius: 25%;
-  width: fit-content;
-}
-.mybutton:focus {
-  outline: none;
-}
-.myinfo {
-  background-color: cadetblue;
-  color: burlywood;
-  font-family: 'Open Sans';
-  font-style: italic;
-  width: fit-content;
-}
-.desc {
-  font-size: 30px;
-  margin-left: 10px;
-}
-.bullet {
-  font-size: 20px;
-}
 .mymaterialicon {
-  background-color: darkgrey;
   border-style: none;
   outline: none;
 }
 .mymaterialicon:focus {
   outline: none;
   }
-.myMenuTable {
-  margin-left: 50px;
-}
-.myMenuTd {
-  vertical-align: middle;
-}
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
