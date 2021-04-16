@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import CustomSocket from "../../ws";
+const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
 const boardColumnHeaders = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
 const boardRowHeaders = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
 const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
@@ -291,7 +292,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
             <h2><b>Nickname:</b></h2>
           </div>
           <div className="w3-bar-item">
-            <input className="w3-input w3-border myCommonFont" type="text" placeholder="Required"
+            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
               name="nickname"
               value={nickname}
               onChange={(e) => {
@@ -309,9 +310,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               <h2><b>Game ID:</b></h2>
             </div>
             <div className="w3-bar-item">
-              <input className="w3-input w3-border myCommonFont"
+              <input className="w3-input w3-border w3-blue myCommonFont"
                 type="text"
-                placeholder="Prisoners enter game id"
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
@@ -350,7 +350,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
               <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
               </div>
             <div className="w3-bar-item">
-              <button id="startgame" className="w3-button w3-border w3-blue w3-hover-black"
+              <button id="startgame" className={buttonClassName}
                 onClick={function () {
                   if (nickname.length === 0) {
                     window.alert("Please enter nickname before starting a game");
@@ -396,26 +396,25 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
             <h2 className="myCommonFont"><b>Game list:</b></h2>
           </div>
           <div className="w3-bar-item">
-            <table>
+            <table class="w3-table-all w3-card-4">
               <thead>
-                <tr className="pbLobbyGamesHeader">
-                  <th className="pbLobbyGamesHeaderCol">Game ID</th>
-                  <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
-                  <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
-                  <th className="pbLobbyGamesHeaderCol">Cell Block</th>
-                  <th className="pbLobbyGamesHeaderCol">Game Status</th>
+                <tr className="w3-blue h4 myCommonFont">
+                  <th className="w3-border-right">Game ID</th>
+                  <th className="w3-border-right">Prisoners</th>
+                  <th className="w3-border-right">Guards</th>
+                  <th className="w3-border-right">Rack Size</th>
+                  <th>Game Status</th>
                 </tr>
               </thead>
               <tbody>
                 {gamelist.map((value, index) => (
-                  <tr key={`OtherGame${index}`} className="pbGamesInProgressRow">
-                    <td className="pbLobbyGameid">{value.gameid}</td>
-                    <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingP ? "check_circle" : "cancel"}</span></td>
+                  <tr key={`OtherGame${index}`} className="myCommonFont w3-hover-green">
+                    <td className="w3-border-right"><b>{value.gameid}</b></td>
                     {availableActionP(value) === availableActionNone ?
-                      <td className="pbLobbyActionNone">No action available</td>
+                      <td id={`PrisonersNoAction${index}`} className="w3-border-right">No action available</td>
                     : availableActionP(value) === availableActionReconnect ?
-                      <td id={`PrisonersRejoin${index}`}>
-                        <button className="pbLobbyActionButton"
+                      <td id={`PrisonersRejoin${index}`} className="w3-border-right">
+                        <button className="w3-button w3-red w3-round w3-hover-black"
                           onClick={function () {
                             setIsrejoin(true);
                             setGameid(value.gameid);
@@ -427,8 +426,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         </button>
                       </td>
                       :
-                      <td id={`PrisonersStart${index}`}>
-                        <button className="pbLobbyActionButton"
+                      <td id={`PrisonersStart${index}`} className="w3-border-right">
+                        <button className={buttonClassName}
                           onClick={function () {
                             setGameid(value.gameid);
                             setPrisonersOrGuards('P');
@@ -438,12 +437,11 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         </button>
                       </td>
                     }
-                    <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingG ? "check_circle" : "cancel"}</span></td>
                     {availableActionG(value) === availableActionNone ?
-                      <td className="pbLobbyActionNone">No action available</td>
+                      <td id={`GuardsNoAction${index}`} className="w3-border-right">No action available</td>
                     : availableActionG(value) === availableActionReconnect ?
-                      <td id={`GuardsRejoin${index}`}>
-                        <button className="pbLobbyActionButton"
+                      <td id={`GuardsRejoin${index}`} className="w3-border-right">
+                        <button className={buttonClassName}
                           onClick={function () {
                             setIsrejoin(true);
                             setGameid(value.gameid);
@@ -455,8 +453,8 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         </button>
                       </td>
                       :
-                      <td id={`GuardsJoin${index}`}>
-                        <button className="pbLobbyActionButton"
+                      <td id={`GuardsJoin${index}`} className="w3-border-right">
+                        <button className={buttonClassName}
                           onClick={function () {
                             setGameid(value.gameid);
                             setPrisonersOrGuards('G');
@@ -467,10 +465,10 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                         </button>
                       </td>
                     }
-                    <td className="pbLobbyGameRacksize">
+                    <td id={`RackSize${index}`} className="w3-center w3-border-right">
                       {value.racksize}
                     </td>
-                    <td className="pbLobbyGameStatus">
+                    <td id={`GameStatus${index}`}>
                       {value.gamestatus}
                     </td>
                   </tr>
