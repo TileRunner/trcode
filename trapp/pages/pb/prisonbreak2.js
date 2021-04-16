@@ -275,182 +275,216 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
   function selectRackSize(newRacksize) {
     setRacksize(newRacksize);
   }
-  return <div className="container-fluid">
-    <div className="row">
-      <div className="col-10 pbtitle">
-        Prison Break Lobby
-        <span className="material-icons">run_circle</span>
+  return (
+    <div>
+      <div className="w3-container w3-teal w3-bar">
+        <h1 className="w3-bar-item w3-centre myHeadingFont">Prison Break Lobby</h1>
+        <div className="w3-bar-item w3-right">
+          <Link href={"../../"}>
+            <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
+          </Link>
+        </div>
       </div>
-      <div className="col-2 pbhomelink">
-        <Link href={"../../"}>
-          <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-        </Link>
+      <div className="w3-container">
+        <div className="w3-bar">
+          <div className="w3-bar-item">
+            <h2><b>Nickname:</b></h2>
+          </div>
+          <div className="w3-bar-item">
+            <input className="w3-input w3-border myCommonFont" type="text" placeholder="Required"
+              name="nickname"
+              value={nickname}
+              onChange={(e) => {
+                setNickname(e.target.value);
+              } } />
+          </div>
+        </div>
+      </div>
+      <div className="w3-container">
+        <div className="w3-bar">
+            <div className="w3-bar-item">
+              <h2><span className="pbPlayerTitle">PRISONERS<i className="material-icons">arrow_right</i></span></h2>
+            </div>
+            <div className="w3-bar-item">
+              <h2><b>Game ID:</b></h2>
+            </div>
+            <div className="w3-bar-item">
+              <input className="w3-input w3-border myCommonFont"
+                type="text"
+                placeholder="Prisoners enter game id"
+                name="gameid"
+                value={gameid}
+                onChange={(e) => {
+                  setGameid(e.target.value);
+                } } />
+            </div>
+            <div className="w3-bar-item">
+              <h2><b>Rack Size:</b></h2>
+            </div>
+            <div className="w3-bar-item">
+              <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                onClick={() => selectRackSize(4)}
+                data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
+                autoFocus
+              >
+                4
+              </button>
+              <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                onClick={() => selectRackSize(5)}
+                data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
+              >
+                5
+              </button>
+              <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                onClick={() => selectRackSize(6)}
+                data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
+              >
+                6
+              </button>
+              <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                onClick={() => selectRackSize(7)}
+                data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
+              >
+                7
+              </button>
+              <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
+              </div>
+            <div className="w3-bar-item">
+              <button id="startgame" className="w3-button w3-border w3-blue w3-hover-black"
+                onClick={function () {
+                  if (nickname.length === 0) {
+                    window.alert("Please enter nickname before starting a game");
+                  } else if (gameid.length > 0) {
+                    if (isPlayingP(gameid)) {
+                      window.alert("Prisoners already playing that game");
+                    } else {
+                      setPrisonersOrGuards('P');
+                    }
+                  } else {
+                    window.alert("Please enter Game ID before starting a game");
+                  }
+                } }
+              >
+                Start Game
+              </button>
+            </div>
+        </div>
+      </div>
+      <div className="w3-container">
+        <div className="w3-bar">
+          <div className="w3-bar-item">
+            <h2><span className="pbPlayerTitle">GUARDS<i className="material-icons">arrow_right</i></span></h2>
+          </div>
+          <div className="w3-bar-item">
+            <span className="myCommonFont"><h2>Find and click the "Join Game" button for your game.</h2></span>
+          </div>
+        </div>
+      </div>
+      <div className="w3-container">
+        <div className="w3-bar">
+          <div className="w3-bar-item">
+            <h1><i className="material-icons w3-right">report_problem</i></h1>
+          </div>
+          <div className="w3-bar-item">
+            <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+          </div>
+        </div>
+      </div>
+      <div className="w3-container">
+        <div className="w3-bar">
+          <div className="w3-bar-item">
+            <h2 className="myCommonFont"><b>Game list:</b></h2>
+          </div>
+          <div className="w3-bar-item">
+            <table>
+              <thead>
+                <tr className="pbLobbyGamesHeader">
+                  <th className="pbLobbyGamesHeaderCol">Game ID</th>
+                  <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
+                  <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
+                  <th className="pbLobbyGamesHeaderCol">Cell Block</th>
+                  <th className="pbLobbyGamesHeaderCol">Game Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gamelist.map((value, index) => (
+                  <tr key={`OtherGame${index}`} className="pbGamesInProgressRow">
+                    <td className="pbLobbyGameid">{value.gameid}</td>
+                    <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingP ? "check_circle" : "cancel"}</span></td>
+                    {availableActionP(value) === availableActionNone ?
+                      <td className="pbLobbyActionNone">No action available</td>
+                    : availableActionP(value) === availableActionReconnect ?
+                      <td id={`PrisonersRejoin${index}`}>
+                        <button className="pbLobbyActionButton"
+                          onClick={function () {
+                            setIsrejoin(true);
+                            setGameid(value.gameid);
+                            setPrisonersOrGuards('P');
+                            setRacksize(value.racksize);
+                          } }
+                        >
+                          Reconnect
+                        </button>
+                      </td>
+                      :
+                      <td id={`PrisonersStart${index}`}>
+                        <button className="pbLobbyActionButton"
+                          onClick={function () {
+                            setGameid(value.gameid);
+                            setPrisonersOrGuards('P');
+                          } }
+                        >
+                          Start Game
+                        </button>
+                      </td>
+                    }
+                    <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingG ? "check_circle" : "cancel"}</span></td>
+                    {availableActionG(value) === availableActionNone ?
+                      <td className="pbLobbyActionNone">No action available</td>
+                    : availableActionG(value) === availableActionReconnect ?
+                      <td id={`GuardsRejoin${index}`}>
+                        <button className="pbLobbyActionButton"
+                          onClick={function () {
+                            setIsrejoin(true);
+                            setGameid(value.gameid);
+                            setPrisonersOrGuards('G');
+                            setRacksize(value.racksize);
+                          } }
+                        >
+                          Reconnect
+                        </button>
+                      </td>
+                      :
+                      <td id={`GuardsJoin${index}`}>
+                        <button className="pbLobbyActionButton"
+                          onClick={function () {
+                            setGameid(value.gameid);
+                            setPrisonersOrGuards('G');
+                            setRacksize(value.racksize);
+                          } }
+                        >
+                          Join Game
+                        </button>
+                      </td>
+                    }
+                    <td className="pbLobbyGameRacksize">
+                      {value.racksize}
+                    </td>
+                    <td className="pbLobbyGameStatus">
+                      {value.gamestatus}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div className="w3-container w3-teal">
+        <h1>Have fun!</h1>
       </div>
     </div>
-    <div className="row pbLobbyCommonInfoSection">
-      <div className="col">
-        <label className="pbLobbyNicknamePrompt">Nickname</label>
-        <input className="pbLobbyNicknameInput"
-          name="nickname"
-          value={nickname}
-          onChange={(e) => {
-            setNickname(e.target.value);
-          } } />
-      </div>
-    </div>
-    <div className="row pbLobbyPrisonerSection">
-      <div className="col">
-        <span className="pbPlayerTitle">PRISONERS</span>
-        <label className="pbLobbyGameIdPrompt">Game ID</label>
-        <input className="pbLobbyGameIdInput"
-          name="gameid"
-          value={gameid}
-          onChange={(e) => {
-            setGameid(e.target.value);
-          } } />
-        <span className="pbLobbyRackSizePrompt"></span>
-        <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-          onClick={() => selectRackSize(4)}
-          data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
-          autoFocus
-        >
-          4
-        </button>
-        <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-          onClick={() => selectRackSize(5)}
-          data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
-        >
-          5
-        </button>
-        <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-          onClick={() => selectRackSize(6)}
-          data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
-        >
-          6
-        </button>
-        <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-          onClick={() => selectRackSize(7)}
-          data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
-        >
-          7
-        </button>
-        <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
-        <button id="startgame" className="pbLobbyActionButton"
-          onClick={function () {
-            if (nickname.length === 0) {
-              window.alert("Please enter nickname before starting a game");
-            } else if (gameid.length > 0) {
-              if (isPlayingP(gameid)) {
-                window.alert("Prisoners already playing that game");
-              } else {
-                setPrisonersOrGuards('P');
-              }
-            } else {
-              window.alert("Please enter Game ID before starting a game");
-            }
-          } }
-        >
-          Start Game
-        </button>
-      </div>
-    </div>
-    <div className="row pbLobbyGuardSection">
-      <div className="col">
-        <span className="pbPlayerTitle">GUARDS</span><span className="pbLobbyGuardInfo">Find and click the "Join Game" button for your game.</span>
-        <p>If you lost connection, find and click the "Reconnect" button for your game id.</p>
-      </div>
-    </div>
-    <div className="row">
-      <div className="col">
-        <h2 className="pbLobbyGameListTitle">Game list:</h2>
-      </div>
-    </div>
-    <div className="row pbLobbyGameList">
-      <div className="col offset-1">
-        <table>
-          <thead>
-            <tr className="pbLobbyGamesHeader">
-              <th className="pbLobbyGamesHeaderCol">Game ID</th>
-              <th className="pbLobbyGamesHeaderCol" colSpan="2">Prisoners</th>
-              <th className="pbLobbyGamesHeaderCol" colSpan="2">Guards</th>
-              <th className="pbLobbyGamesHeaderCol">Cell Block</th>
-              <th className="pbLobbyGamesHeaderCol">Game Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {gamelist.map((value, index) => (
-              <tr key={`OtherGame${index}`} className="pbGamesInProgressRow">
-                <td className="pbLobbyGameid">{value.gameid}</td>
-                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingP ? "check_circle" : "cancel"}</span></td>
-                {availableActionP(value) === availableActionNone ?
-                  <td className="pbLobbyActionNone">No action available</td>
-                : availableActionP(value) === availableActionReconnect ?
-                  <td id={`PrisonersRejoin${index}`}>
-                    <button className="pbLobbyActionButton"
-                      onClick={function () {
-                        setIsrejoin(true);
-                        setGameid(value.gameid);
-                        setPrisonersOrGuards('P');
-                        setRacksize(value.racksize);
-                      } }
-                    >
-                      Reconnect
-                    </button>
-                  </td>
-                  :
-                  <td id={`PrisonersStart${index}`}>
-                    <button className="pbLobbyActionButton"
-                      onClick={function () {
-                        setGameid(value.gameid);
-                        setPrisonersOrGuards('P');
-                      } }
-                    >
-                      Start Game
-                    </button>
-                  </td>
-                }
-                <td className="pbLobbyPlayerIndicator"><span className="material-icons">{value.playingG ? "check_circle" : "cancel"}</span></td>
-                {availableActionG(value) === availableActionNone ?
-                  <td className="pbLobbyActionNone">No action available</td>
-                : availableActionG(value) === availableActionReconnect ?
-                  <td id={`GuardsRejoin${index}`}>
-                    <button className="pbLobbyActionButton"
-                      onClick={function () {
-                        setIsrejoin(true);
-                        setGameid(value.gameid);
-                        setPrisonersOrGuards('G');
-                        setRacksize(value.racksize);
-                      } }
-                    >
-                      Reconnect
-                    </button>
-                  </td>
-                  :
-                  <td id={`GuardsJoin${index}`}>
-                    <button className="pbLobbyActionButton"
-                      onClick={function () {
-                        setGameid(value.gameid);
-                        setPrisonersOrGuards('G');
-                        setRacksize(value.racksize);
-                      } }
-                    >
-                      Join Game
-                    </button>
-                  </td>
-                }
-                <td className="pbLobbyGameRacksize">
-                  {value.racksize}
-                </td>
-                <td className="pbLobbyGameStatus">
-                  {value.gamestatus}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>;
+  )
 }
 
 const Square = (props) => {

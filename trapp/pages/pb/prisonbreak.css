@@ -1,8 +1,8 @@
 :root {
     --squareSide: 40px;
     --cellBlockSide: 40px;
-    --cellBlockSelectedHeight: 45px;
-    --selectedColor: #2196F3;
+    --cellBlockSelectedHeight: 42px;
+    --selectedColor: hsl(207, 90%, 56%);
     --lobbyFontSize: 20px;
     --tileBackgroundColour: orangered;
     --prisonersTileColour: whitesmoke;
@@ -490,15 +490,15 @@
 }
 .pbLobbyRackSizeSelected {
     vertical-align: middle;
-    background-image: url("../../public/prisonbars-square.png");
-    background-size: var(--cellBlockSide);
-    background-color: grey;
-    color: whitesmoke;
+    /* background-image: url("../../public/prisonbars-square.png");
+    background-size: var(--cellBlockSide); */
+    background-color: var(--selectedColor);
+    color: white;
     width: var(--cellBlockSide);
     height: var(--cellBlockSelectedHeight);
     margin-right:20px;
-    border-width: 5px;
-    border-color: var(--selectedColor);
+    border-width: 1px;
+    border-color: lightgrey;
     border-style: solid;
 }
 .pbLobbyRackSizeSelected:focus {

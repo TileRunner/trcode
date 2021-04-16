@@ -31,12 +31,13 @@ a {
   box-sizing: border-box;
 }
 .myHeadingFont {
-  font-family: Merriweather;
-  font-size: 50px;
+  font-family: var(--commonHeaderFontFamily);
 }
 .mySubHeadingFont {
-  font-family: Merriweather;
-  font-size: 40px;
+  font-family: var(--commonFontFamily);
+}
+.myCommonFont {
+  font-family: var(--commonFontFamily);
 }
 .mymaterialicon {
   border-style: none;

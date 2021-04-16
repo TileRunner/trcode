@@ -4,9 +4,9 @@ import Link from 'next/link'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { useState } from 'react';
 
-const hideButtonClassName = "w3-button w3-green w3-hover-black w3-border w3-animate-left";
-const showButtonClassName = "w3-right mymaterialicon w3-green";
-const menuItemWidthNormal = '500px';
+const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
+const showButtonClassName = 'w3-right mymaterialicon w3-green';
+const menuItemWidthNormal = '320px';
 const descriptionCard = 'w3-card-4 w3-green w3-cell w3-animate-right';
 
 export default function Home() {
@@ -19,10 +19,6 @@ export default function Home() {
       <Head>
         <title>Tile Runner App</title>
         <link rel="icon" href="/favicon.ico" />
-        <link /* I added w3.css */
-                    rel="stylesheet"
-                    href="https://www.w3schools.com/w3css/4/w3.css"
-                    />
       </Head>
       <div className="w3-container w3-teal">
         <h1 className="myHeadingFont">Menu</h1>
@@ -51,9 +47,7 @@ const WMOption = (props) => {
       <div className="w3-cell">
         <Link href={`/wm/mastermind`}>
           <a>
-            <h2 className="mySubHeadingFont">Word Mastermind
-              <span className="material-icons">psychology</span>
-            </h2>
+            <h2 className="mySubHeadingFont">Word Mastermind</h2>
           </a>
         </Link>
       </div>
@@ -95,9 +89,7 @@ const WIOption = (props) => {
       <div className="w3-cell">
         <Link href={`/wi/wordinfo`}>
           <a>
-            <h2 className="mySubHeadingFont">Word Info
-              <span className="material-icons">biotech</span>
-            </h2>
+            <h2 className="mySubHeadingFont">Word Info</h2>
           </a>
         </Link>
       </div>
@@ -136,10 +128,7 @@ const PBOption = (props) => {
       <div className="w3-cell">
         <Link href={`/pb/prisonbreak2`}>
           <a>
-            <h2 className="mySubHeadingFont">
-              Prison Break
-              <span className="material-icons">run_circle</span>
-            </h2>
+            <h2 className="mySubHeadingFont">Prison Break</h2>
           </a>
         </Link>
       </div>

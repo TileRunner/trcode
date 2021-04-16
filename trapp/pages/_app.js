@@ -34,6 +34,10 @@ function MyApp({Component,pageProps}) {
                     rel="stylesheet"
                     href="https://fonts.googleapis.com/css?family=Open Sans|Merriweather"
                     />
+                <link /* I added w3.css */
+                    rel="stylesheet"
+                    href="https://www.w3schools.com/w3css/4/w3.css"
+                    />
                 {/* <script
                     // for some reason these fontawesome icons are sometimish about whether to show up or not.
                     // I switched to material-icons instead.
