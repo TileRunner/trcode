@@ -699,6 +699,9 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   useEffect(() => {
     scrollToBottom("ScrollableMoves");
   },[moves])
+  useEffect(() => {
+    scrollToBottom("ScrollableChat");
+  },[chatmsgs])
 
   function putAtMoveStart() {
     setSelection(-1);
@@ -1612,26 +1615,32 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
     }
   }
   return (
-    <div className="container-fluid prisonbreak">
-      <div className="row">
-        <div className="col-2 pbGameid formalinfo">
-          Game id: {gameid}<br></br>
-          Nickname: {nickname}
+    <div className="prisonbreak">
+      <div className="w3-display-container w3-teal topBarHeight">
+        <div className="w3-display-middle">
+          <h1 className="myHeadingFont">Prison Break</h1>
         </div>
-        <div className="col-8 pbtitle">
-          Prison Break
-          <span className="material-icons">run_circle</span>
+        <div className="w3-display-topleft w3-black topBarCorner commonFontFamily">
+          Game id: {gameid}
         </div>
-        <div className="col-2 pbhomelink formalinfo">
+        <div className="w3-display-bottomleft w3-orange topBarCorner commonFontFamily">
+          Prisoners: {prisonersOrGuards === "P" ? nickname : oppname}
+        </div>
+        <div className="w3-display-topright w3-black topBarCorner commonFontFamily">
           <Link href={"../../"}>
             <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
           </Link>
-          <br></br>
-          Opponent: {oppname}
+        </div>
+        <div className="w3-display-bottomright w3-orange topBarCorner commonFontFamily">
+          Guards: {prisonersOrGuards === "P" ? oppname : nickname}
         </div>
       </div>
       <div className="row">
-        <div className="pbPlayerOuterSection">
+        <div className="col pbTileAndMovesOuter">
+            <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
+            <ShowMoves moves={moves}/>
+        </div>
+        <div className="col pbPlayerOuterSection">
           <Prisoners
             ptiles={ptiles}
             whoseturn={whoseturn}
@@ -1649,7 +1658,7 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             allowRewind={allowRewind}
           />
         </div>
-        <div className="col pbBoardPlusUnderboard">
+        <div className="col">
           {prisonersOrGuards === whoseturn ?
             <div className="row" onKeyDownCapture={handleKeyDown}>
               <Board
@@ -1671,15 +1680,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
               />
             </div>
           }
-          <div className="pbUnderboard">
-            {whoseturn === "X" ?
-              <h1>Game Over!</h1>
-            :
-              <p>{jokes[jokeindex]}</p>
-            }
-          </div>
         </div>
-        <div className="pbPlayerOuterSection">
+        <div className="col pbPlayerOuterSection">
           <Guards
             gtiles={gtiles}
             whoseturn={whoseturn}
@@ -1697,15 +1699,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           />
         </div>
         <div className="col">
-          <div className="row">
-            <div className="col pbTileAndMovesOuter">
-              <ShowUnseenTiles tiles={tiles} othertiles={prisonersOrGuards === "P" ? gtiles : ptiles}/>
-              <ShowMoves moves={moves}/>
-            </div>
-            <div className="col">
-              <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
-            </div>
-          </div>
+          <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
+        </div>
+      </div>
+      <div className="w3-display-container w3-teal topBarHeight">
+        <div className="w3-display-middle commonFontFamily">
+          {whoseturn === "X" ?
+            <h1>Game Over!</h1>
+          :
+            <p>{jokes[jokeindex]}</p>
+          }
         </div>
       </div>
     </div>
@@ -2003,11 +2006,11 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
   }
 
   return (
-    <div className="pbChat">
+    <div id="ScrollableChat" className="pbChat">
       <span className="pbChatTitle">CHAT</span>
       <table className="pbChatTable">
         <tbody>
-          {msgs.filter((value, index) => msgs.length - index < 15).map((value, index) => (
+          {msgs.map((value, index) => (
             <tr key={`ChatMessage${index}`}>
               <td className="pbChatFrom">{value.from}</td>
               <td className="pbChatMsg">{value.msg}</td>
@@ -2020,6 +2023,7 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
                 value={nextmsg}
                 onChange={(e) => {setNextmsg(e.target.value);}}
                 onKeyDownCapture={handleKeyDown}
+                placeholder="chat..."
               />
             </td>
           </tr>

@@ -8,6 +8,18 @@
     --prisonersTileColour: whitesmoke;
     --guardsTileColour: black;
 }
+.topBarHeight {
+    height: 60px;
+}
+.topBarCorner {
+    width: 20%;
+    height: 50%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.fullWidth {
+    width: 100%;
+}
 .formalinfo {
     font-family: var(--commonFontFamily);
     letter-spacing: 1px;
@@ -43,7 +55,7 @@
     /* border-left: 2px solid black;
     border-right: 2px solid black;
     border-top: 2px solid black; */
-    width: 360px;
+    /* width: 360px; */
     padding-top: 3px;
     /* background-image: url("../../public/Wall.jpg");
     background-repeat: repeat;
@@ -457,6 +469,8 @@
     border-width: 3px;
     border-style: none solid none solid;
     border-color: var(--commonBorderColour);
+    max-height: 550px;
+    overflow-y: scroll;
 }
 .pbChatTable {
     border-color: var(--commonBorderColour);
