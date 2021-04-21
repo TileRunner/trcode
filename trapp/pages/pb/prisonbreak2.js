@@ -1641,22 +1641,39 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             <ShowMoves moves={moves}/>
         </div>
         <div className="col pbPlayerOuterSection">
-          <Prisoners
-            ptiles={ptiles}
-            whoseturn={whoseturn}
-            selection={selection}
-            onClick={(ti) => handlePrisonerTileClick(ti)}
-            onClickFinishTurn={() => endPrisonersTurn()}
-            onClickTileRecall={() => recallTiles()}
-            onClickTileExchange={() => swapPrisonersTiles()}
-            onClickPassPlay={() => prisonerPass()}
-            onClickUndoLastPlay={() => performRewind()}
-            onClickAllowUndo={() => allowUndoLastTurn()}
-            rescues={rescues}
-            prisonersOrGuards={prisonersOrGuards}
-            moves={moves}
-            allowRewind={allowRewind}
-          />
+          {prisonersOrGuards === "P" ?
+            <Prisoners
+              ptiles={ptiles}
+              whoseturn={whoseturn}
+              selection={selection}
+              onClick={(ti) => handlePrisonerTileClick(ti)}
+              onClickFinishTurn={() => endPrisonersTurn()}
+              onClickTileRecall={() => recallTiles()}
+              onClickTileExchange={() => swapPrisonersTiles()}
+              onClickPassPlay={() => prisonerPass()}
+              onClickUndoLastPlay={() => performRewind()}
+              onClickAllowUndo={() => allowUndoLastTurn()}
+              prisonersOrGuards={prisonersOrGuards}
+              moves={moves}
+              allowRewind={allowRewind}
+            />
+          :
+            <Guards
+              gtiles={gtiles}
+              whoseturn={whoseturn}
+              selection={selection}
+              onClick={(ti) => handleGuardTileClick(ti)}
+              onClickFinishTurn={() => endGuardsTurn()}
+              onClickTileRecall={() => recallTiles()}
+              onClickTileExchange={() => swapGuardsTiles()}
+              onClickPassPlay={() => guardsPass()}
+              onClickUndoLastPlay={() => performRewind()}
+              onClickAllowUndo={() => allowUndoLastTurn()}
+              prisonersOrGuards={prisonersOrGuards}
+              moves={moves}
+              allowRewind={allowRewind}
+            />
+          }
         </div>
         <div className="col">
           {prisonersOrGuards === whoseturn ?
@@ -1681,24 +1698,8 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
             </div>
           }
         </div>
-        <div className="col pbPlayerOuterSection">
-          <Guards
-            gtiles={gtiles}
-            whoseturn={whoseturn}
-            selection={selection}
-            onClick={(ti) => handleGuardTileClick(ti)}
-            onClickFinishTurn={() => endGuardsTurn()}
-            onClickTileRecall={() => recallTiles()}
-            onClickTileExchange={() => swapGuardsTiles()}
-            onClickPassPlay={() => guardsPass()}
-            onClickUndoLastPlay={() => performRewind()}
-            onClickAllowUndo={() => allowUndoLastTurn()}
-            prisonersOrGuards={prisonersOrGuards}
-            moves={moves}
-            allowRewind={allowRewind}
-          />
-        </div>
         <div className="col">
+          <ShowRescues rescues={rescues} />
           <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} prisonersOrGuards={prisonersOrGuards}/>
         </div>
       </div>
@@ -1839,20 +1840,16 @@ const UndoLastPlay = (props) => {
   )
 }
 
+const ShowRescues = (props) => {
+  return (
+    <div className="pbRescuesMade">
+      Rescues made: {props.rescues}
+    </div>
+  );
+}
+
 const Prisoners = (props) => {
   const renderTile = renderPlayerTile(props);
-
-  const renderFreedPrisoners = (count) => {
-    let dumb = Array(count).fill("nonsense");
-    return dumb.map((value, index) => (
-      <span key={value + String(index)} data-toggle="tooltip" title="I'm free! I'm free!">
-        <img className="pbRescuee"
-          src="/breakfree.png"
-          alt="I'm free! I'm free!"
-          />
-      </span>
-    ));
-  };
 
   return (
     <div className="pbPlayerInnerSection">
@@ -1880,11 +1877,6 @@ const Prisoners = (props) => {
         :
         <></>
       }
-      <div className="pbRescuesMade">
-        Rescues made: {props.rescues}
-        <br></br>
-        {renderFreedPrisoners(props.rescues)}
-      </div>
     </div>
   );
 };
@@ -2007,7 +1999,6 @@ const Chat = ({gameid, client, nickname, msgs, setMsgs, prisonersOrGuards}) => {
 
   return (
     <div id="ScrollableChat" className="pbChat">
-      <span className="pbChatTitle">CHAT</span>
       <table className="pbChatTable">
         <tbody>
           {msgs.map((value, index) => (
