@@ -342,14 +342,14 @@
     position: relative;
 }
 .pbTileOnRack.Unselected {
-    border-style: solid;
-    border-width: thin;
-    border-color: black;
+    border: none;
 }
 .pbTileOnRack.Selected {
     border-style: inset;
-    border-width: thick;
+    border-width: thin;
     border-color: white;
+    transform: rotate(10deg);
+    margin: 4px;
 }
 .pbTileOnRackText {
     position: absolute;   

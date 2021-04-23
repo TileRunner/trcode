@@ -126,7 +126,7 @@ const PBOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descPb ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <Link href={`/pb/prisonbreak2`}>
+        <Link href={`/pb/prisonbreak`}>
           <a>
             <h2 className="mySubHeadingFont">Prison Break</h2>
           </a>
