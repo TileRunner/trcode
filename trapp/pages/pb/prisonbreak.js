@@ -624,7 +624,12 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   const [allowRewind, setAllowRewind] = useState(false);
   const [oppname, setOppname] = useState('');
   const [chatmsgs, setChatmsgs] = useState([]);
-
+  const rescueSound = new Audio("https://tilerunner.github.io/yippee.m4a");//"https://assets.coderrocketfuel.com/pomodoro-times-up.mp3");
+  useEffect(() => {
+    if (rescues > 0) {
+      rescueSound.play()
+    }
+  }, [rescues]); // Play a sound when a rescue is made
   useEffect(() => {
     let newji = jokeindex + 1;
     if (newji >= jokes.length) {
@@ -907,8 +912,25 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
   };
 
   const handleRackTileClick = (tileindex) => {
-    let newSelection = selection === tileindex ? -1 : tileindex;
-    setSelection(newSelection);
+    // If no tile is selected already then set the selection
+    if (selection === -1) {
+      setSelection(tileindex);
+      return;
+    }
+    // If the same tile is already selected then unselect
+    if (selection === tileindex) {
+      setSelection(-1);
+      return;
+    }
+    // A tile was already selected and they clicked another tile - move the tile
+    let newrack = prisonersOrGuards === "P" ? [...ptiles] : [...gtiles];
+    let movedtile = newrack[selection];
+    for (var i = selection; i >= tileindex; i--) {
+      newrack[i] = newrack[i - 1];
+    }
+    newrack[tileindex] = movedtile;
+    prisonersOrGuards === "P" ? setPtiles(newrack) : setGtiles(newrack);
+    setSelection(-1);
   }
 
   const endPrisonersTurn = () => {

@@ -23,16 +23,14 @@ const PlayerSection = (props) => {
         {/* I have to check props.moves so the Build does not fail on 'length' undefined */}
         {props.whoseturn === props.prisonersOrGuards ? 
           showActionButtons(props)
-          : props.prisonersOrGuards !== props.prisonersOrGuards && props.moves && props.moves.length > 0 && props.allowRewind && props.moves[props.moves.length-1].by === props.prisonersOrGuards ?
+        : props.prisonersOrGuards !== props.prisonersOrGuards &&
+          props.moves && props.moves.length > 0 && props.allowRewind &&
+          props.moves[props.moves.length-1].by === props.prisonersOrGuards &&
           showActionButtonUndoLastPlay(props)
-          :
-          <></>
         }
         {/* I have to check props.moves so the Build does not fail on 'length' undefined */}
-        {props.moves && props.moves.length > 0 && props.moves[props.moves.length-1].by !== props.prisonersOrGuards ?
+        {props.moves && props.moves.length > 0 && props.moves[props.moves.length-1].by !== props.prisonersOrGuards &&
           showActionButtonAllowUndo(props)
-          :
-          <></>
         }
       </div>
     );
@@ -88,16 +86,20 @@ const PassPlayButton = (props) => {
 
 const AllowUndoLastPlay = (props) => {
     return (
-        <button className="pbActionButtonSevere" onClick={props.onClick}>
-            <span className="pbActionButtonSevereText"><i className="material-icons">report_problem</i>
-                &nbsp;Allow Undo Turn
-                {props.alreadyAllowed ?
-                    <span className="pbActionButtonSevereText2">Allow undo is now enabled</span>
-                :
+        props.alreadyAllowed ?
+            <div className="pbActionButtonSevere">
+                <span className="pbActionButtonSevereText"><i className="material-icons">report</i>
+                    &nbsp;ENABLED
+                    <span className="pbActionButtonSevereText2">&nbsp;Allow undo is now enabled</span>
+                </span>
+            </div>
+        :
+            <button className="pbActionButtonSevere" onClick={props.onClick}>
+                <span className="pbActionButtonSevereText"><i className="material-icons">report_problem</i>
+                    &nbsp;Allow Undo Turn
                     <span className="pbActionButtonSevereText2">Click to let opponent undo</span>
-                }
-            </span>
-        </button>
+                </span>
+            </button>
     );
 };
 
