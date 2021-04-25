@@ -11,6 +11,7 @@ const PlayerSection = (props) => {
             {/* I have to check props.racktiles so the Build does not fail on 'map' undefined */}
             {props.racktiles && props.racktiles.map((t, ti) =>
                 <RackTile
+                    key={`RackTile${ti}`}
                     whoseturn={props.whoseturn}
                     prisonersOrGuards={props.prisonersOrGuards}
                     selection={props.selection}

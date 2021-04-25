@@ -3,6 +3,7 @@ import Link from "next/link";
 import CustomSocket from "../../ws";
 import PlayerSection from '../pb/playerSection';
 import Lobby from '../pb/lobby';
+import Square from '../pb/square';
 
 const boardColumnHeaders = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
 const boardRowHeaders = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
@@ -178,56 +179,6 @@ export default function PrisonBreak() {
   )
 }
 
-const Square = (props) => {
-  // squareusedby, ri, ci, c, onClick
-  // need squareusedby to pick css className corresponding to who played the tile on the square
-  // need ri, ci to display alternating backgrounds on unused squares
-  // need c to represent which tile is on the square, if any
-  // need onClick to handle square click at a higher level
-  // need rcd to display selected direction arrow when appropriate
-  // need racksize to determine centre and board aarry edge positions
-  const edge = (props.racksize * 2);
-  const middle = props.racksize;
-  const tdclass =
-    props.c !== squareunused
-      ? "pbSquareInner PlayerTile"
-      : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
-      ? "pbSquareInner RightArrow"
-      : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
-      ? "pbSquareInner DownArrow"
-      : props.ri === middle && props.ci === middle
-      ? "pbSquareInner CenterSquare"
-      : (props.ri === 0 || props.ri === middle || props.ri === edge) &&
-        (props.ci === 0 || props.ci === middle || props.ci === edge)
-      ? "pbSquareInner EscapeHatch"
-      : props.ri % 2 === props.ci % 2
-      ? "pbSquareInner style1" : "pbSquareInner style2"; // Alternating square styles
-  const tdvalue =
-    props.c !== squareunused
-      ? props.c
-      : tdclass.indexOf("RightArrow") > -1
-      ? "➡"
-      : tdclass.indexOf("DownArrow") > -1
-      ? "⬇"
-      : tdclass.indexOf("CenterSquare") > -1
-      ? <i className="material-icons">stars</i>
-      : "." /* If I put empty string or &nbsp; then it affects the display oddly  */
-  return (
-    tdclass.indexOf("EscapeHatch") > -1 ?
-    <button className={tdclass} onClick={props.onClick}>
-      <span className="material-icons">run_circle</span>
-    </button>
-    : props.c === squareunused ?
-      <button className={tdclass} onClick={props.onClick}>
-        {tdvalue}
-      </button>
-      :
-      <button className={tdclass} onClick={props.onClick}>
-        <div className={`pbSquareTileText ${props.squareusedby + (props.c === "Q" ? " u" : "")}`}>{tdvalue}</div>
-      </button>
-);
-};
-
 const Board = ({ onClick, squares, usedby, rcd, racksize }) => {
   const renderSquare = (ri, ci, c, squareusedby) => {
     return (
@@ -339,7 +290,6 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
       // If it is not my turn && the game has not ended
       if (prisonersOrGuards !== whoseturn && whoseturn !== "X") {
         // I am waiting for opponent move to come through but sometimes it gets missed (no idea why)
-        console.log("Interval: prisonersOrGuards=" + prisonersOrGuards + " whoseturn=" + whoseturn + " at " + Date().toLocaleString());
         requestGameData(); // Send a request for game data in case opponent moved and we missed the update
       }
     }, movewaittime); // this many milliseconds between above code block executions
@@ -459,11 +409,16 @@ const Game = ({isrejoin, prisonersOrGuards, gameid, nickname, wsmessage, client
           })
         );
       }
-      if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards && whoseturn !== prisonersOrGuards && whoseturn !== "X") { 
-        // opponent provided game data but do we need it?
+      if (messageData.func === "providegamedata" && messageData.sender !== prisonersOrGuards) { 
+        // Opponent provided game data but do we need it?
         // If they have a different move count then we need it (they may have undone a move)
-        // If the have a different tile bag count then we need it (no moves made but tiles are picked)
-        if (messageData.moves.length !== moves.length || messageData.tiles.length !== tiles.length) {
+        // If they have same move count but a different tile bag count then we need it (no moves made but tiles are picked)
+        // If guards join after prisoners made a move then guards have no tiles ("ept" got processed which leaves gtiles alone)
+        if (messageData.moves.length !== moves.length
+           || messageData.tiles.length !== tiles.length
+           || (prisonersOrGuards === "G" && gtiles.length === 0 && currentcoords.length === 0)
+           || (prisonersOrGuards === "P" && ptiles.length === 0 && currentcoords.length === 0) // Not sure I need it but...
+           ) {
           setTiles(messageData.tiles);
           setSquares(messageData.squares);
           setPtiles(messageData.ptiles);
