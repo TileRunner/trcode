@@ -1,32 +1,31 @@
 const squareunused = ".";
 
-const Square = (props) => {
-    // squareusedby, ri, ci, c, onClick
-    // need squareusedby to pick css className corresponding to who played the tile on the square
-    // need ri, ci to display alternating backgrounds on unused squares
+const Square = ({c, ci, ri, squareusedby, rcd, onClick, racksize}) => {
     // need c to represent which tile is on the square, if any
-    // need onClick to handle square click at a higher level
+    // need ri, ci to display alternating backgrounds on unused squares
+    // need squareusedby to pick css className corresponding to who played the tile on the square
     // need rcd to display selected direction arrow when appropriate
+    // need onClick to handle square click at a higher level
     // need racksize to determine centre and board array edge positions
-    const edge = (props.racksize * 2);
-    const middle = props.racksize;
+    const edge = (racksize * 2);
+    const middle = racksize;
     const tdclass =
-      props.c !== squareunused
+      c !== squareunused
         ? "pbSquareInner PlayerTile"
-        : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "r"
+        : rcd[0] === ri && rcd[1] === ci && rcd[2] === "r"
         ? "pbSquareInner RightArrow"
-        : props.rcd[0] === props.ri && props.rcd[1] === props.ci && props.rcd[2] === "d"
+        : rcd[0] === ri && rcd[1] === ci && rcd[2] === "d"
         ? "pbSquareInner DownArrow"
-        : props.ri === middle && props.ci === middle
+        : ri === middle && ci === middle
         ? "pbSquareInner CenterSquare"
-        : (props.ri === 0 || props.ri === middle || props.ri === edge) &&
-          (props.ci === 0 || props.ci === middle || props.ci === edge)
+        : (ri === 0 || ri === middle || ri === edge) &&
+          (ci === 0 || ci === middle || ci === edge)
         ? "pbSquareInner EscapeHatch"
-        : props.ri % 2 === props.ci % 2
+        : ri % 2 === ci % 2
         ? "pbSquareInner style1" : "pbSquareInner style2"; // Alternating square styles
     const tdvalue =
-      props.c !== squareunused
-        ? props.c
+      c !== squareunused
+        ? c
         : tdclass.indexOf("RightArrow") > -1
         ? "➡"
         : tdclass.indexOf("DownArrow") > -1
@@ -36,16 +35,16 @@ const Square = (props) => {
         : "." /* If I put empty string or &nbsp; then it affects the display oddly  */
     return (
       tdclass.indexOf("EscapeHatch") > -1 ?
-      <button className={tdclass} onClick={props.onClick}>
-        <span className="material-icons">run_circle</span>
-      </button>
-      : props.c === squareunused ?
-        <button className={tdclass} onClick={props.onClick}>
+        <button className={tdclass} onClick={onClick}>
+          <span className="material-icons">run_circle</span>
+        </button>
+      : c === squareunused ?
+        <button className={tdclass} onClick={onClick}>
           {tdvalue}
         </button>
-        :
-        <button className={tdclass} onClick={props.onClick}>
-          <div className={`pbSquareTileText ${props.squareusedby + (props.c === "Q" ? " u" : "")}`}>{tdvalue}</div>
+      :
+        <button className={tdclass} onClick={onClick}>
+          <div className={`pbSquareTileText ${squareusedby + (c === "Q" ? " u" : "")}`}>{tdvalue}</div>
         </button>
     );
 };
