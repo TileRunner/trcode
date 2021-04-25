@@ -23,9 +23,7 @@ const PlayerSection = (props) => {
         {/* I have to check props.moves so the Build does not fail on 'length' undefined */}
         {props.whoseturn === props.prisonersOrGuards ? 
           showActionButtons(props)
-        : props.prisonersOrGuards !== props.prisonersOrGuards &&
-          props.moves && props.moves.length > 0 && props.allowRewind &&
-          props.moves[props.moves.length-1].by === props.prisonersOrGuards &&
+        : props.allowRewind &&
           showActionButtonUndoLastPlay(props)
         }
         {/* I have to check props.moves so the Build does not fail on 'length' undefined */}
