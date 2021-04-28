@@ -1,14 +1,13 @@
-import Square from '../pb/square';
-const boardColumnHeaders = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
-const boardRowHeaders = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
+import Square from './square';
+import * as c from '../../lib/pbconstants';
 
 // Here I used default squares=[] so the npm run build always has squares defined
 const Board = ({ onClick, squares=[], usedby, rcd, racksize }) => {
-    const renderSquare = (ri, ci, c, squareusedby) => {
+    const renderSquare = (ri, ci, letter, squareusedby) => {
       return (
         <td key={`Square${ri}-${ci}`} className="pbSquareOuter">
           <Square
-            c={c}
+            letter={letter}
             ci={ci}
             ri={ri}
             squareusedby={squareusedby}
@@ -23,11 +22,11 @@ const Board = ({ onClick, squares=[], usedby, rcd, racksize }) => {
       return (
         <tr key={`BoardRow${ri}`} className="pbRow">
           <td className="pbBoardRowHeader" id="BoardHeaderLeft">
-            {boardRowHeaders[ri]}
+            {c.BOARD_ROW_HEADERS[ri]}
           </td>
-          {squares[ri].map((c, ci) => renderSquare(ri, ci, c, usedby[ri][ci]))}
+          {squares[ri].map((letter, ci) => renderSquare(ri, ci, letter, usedby[ri][ci]))}
           <td className="pbBoardRowHeader" id="BoardHeaderRight">
-            {boardRowHeaders[ri]}
+            {c.BOARD_ROW_HEADERS[ri]}
           </td>
         </tr>
       );
@@ -40,7 +39,7 @@ const Board = ({ onClick, squares=[], usedby, rcd, racksize }) => {
             <td className="pbBoardHeaderTopLeft">&nbsp;</td>
             {squares && squares.map((_$,i) => (
               <td className="pbBoardColumnHeader" key={`TopColumnHeader${i}`}>
-                {boardColumnHeaders[i]}
+                {c.BOARD_COL_HEADERS[i]}
               </td>
             ))}
             <td className="pbBoardHeaderTopRight">&nbsp;</td>
@@ -50,7 +49,7 @@ const Board = ({ onClick, squares=[], usedby, rcd, racksize }) => {
             <td className="pbBoardHeaderBottomLeft">&nbsp;</td>
             {squares.map((_$,i) => (
               <td className="pbBoardColumnHeader" key={`BottomColumnHeader${i}`}>
-                {boardColumnHeaders[i]}
+                {c.BOARD_COL_HEADERS[i]}
               </td>
             ))}
             <td className="pbBoardHeaderBottomRight">&nbsp;</td>

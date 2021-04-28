@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import * as c from '../../lib/pbconstants';
 
 const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
 const availableActionNone = 0;
@@ -7,7 +8,7 @@ const availableActionStart = 1;
 const availableActionJoin = 2;
 const availableActionReconnect = 3;
 
-const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setPrisonersOrGuards
+const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
     , racksize, setRacksize // Option for rack size
     }) => {
     const [gamelist, setGamelist] = useState([]) // Game info by game id
@@ -29,23 +30,23 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
           let senderPG = messageData.sender;
           let newGamelist = [...gamelist];
           let gi = getGamelistIndex(sendergameid);
-          let newPlayingP = senderPG === "P" ? true : gi > -1 ? gamelist[gi].playingP : false;
-          let newPlayingG = senderPG === "G" ? true : gi > -1 ? gamelist[gi].playingG : false;
+          let newPlayingP = senderPG === c.PARTY_TYPE_PRISONERS ? true : gi > -1 ? gamelist[gi].playingP : false;
+          let newPlayingG = senderPG === c.PARTY_TYPE_GUARDS ? true : gi > -1 ? gamelist[gi].playingG : false;
           let newRacksize = rs;
   
           let newgamestatus = "Unknown";
-          if (wt === "X") {
+          if (wt === c.WHOSE_TURN_GAMEOVER) {
             newgamestatus = "Game over";
-          } else if (wt === "P") {
+          } else if (wt === c.WHOSE_TURN_PRISONERS) {
             newgamestatus = "Prisoners turn";
-          } else if (wt === "G") {
+          } else if (wt === c.WHOSE_TURN_GUARDS) {
             newgamestatus = "Guards turn";
           }
   
           let newgamedata = {
             gameid: sendergameid,
-            nicknameP: senderPG === "P" ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
-            nicknameG: senderPG === "G" ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
+            nicknameP: senderPG === c.PARTY_TYPE_PRISONERS ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
+            nicknameG: senderPG === c.PARTY_TYPE_GUARDS ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
             gamestatus: newgamestatus,
             playingP: newPlayingP,
             playingG: newPlayingG,
@@ -185,7 +186,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                       if (isPlayingP(gameid)) {
                         window.alert("Prisoners already playing that game");
                       } else {
-                        setPrisonersOrGuards('P');
+                        setParticipant(c.PARTY_TYPE_PRISONERS);
                       }
                     } else {
                       window.alert("Please enter Game ID before starting a game");
@@ -245,7 +246,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                             onClick={function () {
                               setIsrejoin(true);
                               setGameid(value.gameid);
-                              setPrisonersOrGuards('P');
+                              setParticipant(c.PARTY_TYPE_PRISONERS);
                               setRacksize(value.racksize);
                             } }
                           >
@@ -257,7 +258,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                           <button className={buttonClassName}
                             onClick={function () {
                               setGameid(value.gameid);
-                              setPrisonersOrGuards('P');
+                              setParticipant(c.PARTY_TYPE_PRISONERS);
                             } }
                           >
                             Start Game
@@ -272,7 +273,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                             onClick={function () {
                               setIsrejoin(true);
                               setGameid(value.gameid);
-                              setPrisonersOrGuards('G');
+                              setParticipant(c.PARTY_TYPE_GUARDS);
                               setRacksize(value.racksize);
                             } }
                           >
@@ -284,7 +285,7 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
                           <button className={buttonClassName}
                             onClick={function () {
                               setGameid(value.gameid);
-                              setPrisonersOrGuards('G');
+                              setParticipant(c.PARTY_TYPE_GUARDS);
                               setRacksize(value.racksize);
                             } }
                           >

@@ -1,3 +1,5 @@
+import * as c from '../../lib/pbconstants';
+
 const ShowMoves = ({moves}) => { // show moves made
     return (
       <div className="pbMoves">
@@ -8,7 +10,7 @@ const ShowMoves = ({moves}) => { // show moves made
               <span className="pbMove by">{m.by}</span>
               :
               <span className={`pbMove ${m.type}`}>
-                {m.type === "PLAY" ?
+                {m.type === c.MOVE_TYPE_PLAY ?
                   <>{m.pos} {m.mainword.replace("Q","Qu")}
                     {m.extrawords?.map((w) => (
                       <>

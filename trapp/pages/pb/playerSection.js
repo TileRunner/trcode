@@ -1,8 +1,8 @@
-import React from 'react';
+import * as c from '../../lib/pbconstants';
 
 const PlayerSection = (props) => {
-    const playerIcon = props.prisonersOrGuards === "P" ? "run_circle" : "security";
-    const playerTitle = props.prisonersOrGuards === "P" ? "PRISONERS" : "GUARDS";
+    const playerIcon = props.participant === c.PARTY_TYPE_PRISONERS ? c.PARTY_ICON_PRISONERS : c.PARTY_ICON_GUARDS;
+    const playerTitle = props.participant === c.PARTY_TYPE_PRISONERS ? c.PARTY_TITLE_PRISONERS : c.PARTY_TITLE_GUARDS;
   
     return (
       <div className="pbPlayerInnerSection">
@@ -13,7 +13,7 @@ const PlayerSection = (props) => {
                 <RackTile
                     key={`RackTile${ti}`}
                     whoseturn={props.whoseturn}
-                    prisonersOrGuards={props.prisonersOrGuards}
+                    participant={props.participant}
                     selection={props.selection}
                     tileindex={ti}
                     tilevalue={t}
@@ -21,15 +21,15 @@ const PlayerSection = (props) => {
                 />
             )}
         </div>
-        {props.whoseturn === props.prisonersOrGuards ? 
+        {props.whoseturn === props.participant ? 
           showActionButtons(props)
         : props.allowRewind &&
           props.moves && // protect against undefined
           props.moves.length > 0 &&
-          props.moves[props.moves.length-1].by === props.prisonersOrGuards &&
+          props.moves[props.moves.length-1].by === props.participant &&
           showActionButtonUndoLastPlay(props)
         }
-        {props.moves && props.moves.length > 0 && props.moves[props.moves.length-1].by !== props.prisonersOrGuards &&
+        {props.moves && props.moves.length > 0 && props.moves[props.moves.length-1].by !== props.participant &&
           showActionButtonAllowUndo(props)
         }
       </div>
@@ -39,7 +39,7 @@ const PlayerSection = (props) => {
 const RackTile = (props) => {
     const selectedUnselected = props.selection === props.tileindex ? "Selected " : "Unselected ";
     const uNotU = props.tilevalue === "Q" ? "u " : "";
-    const tileclass = "pbTileOnRack " + selectedUnselected + uNotU + props.prisonersOrGuards;
+    const tileclass = "pbTileOnRack " + selectedUnselected + uNotU + props.participant;
     const tileindex = props.tileindex;
     return (
         <div
