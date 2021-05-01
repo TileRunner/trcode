@@ -28,3 +28,155 @@ export const DIR_NONE = '';
 export const USED_BY_PRISONERS = PARTY_TYPE_PRISONERS;
 export const USED_BY_GUARDS = PARTY_TYPE_GUARDS;
 export const USED_BY_NONE = '';
+// Jokes about prison
+export const JOKE_ARRAY = [
+    'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"',
+    'Two peanuts were walking down a back alley. One was a salted.',
+    "The psychic dwarf escaped! There's a small medium at large!",
+    'What do you call a vegetable who has escaped prison? An escapea!',
+    "The prisoners fave punctuation is a period. It marks the end of a sentence!",
+    "Prison is only one word, but to robbers it's a whole sentence."
+  ];
+export const PING_INTERVAL = 20000; // when waiting for opponent ping every this many milliseconds
+export const TILEBAG4 = [
+    "A",  "A",  "A",
+    "B",
+    "C",
+    "D",
+    "E",  "E",  "E",  "E",
+    "F",
+    "G",
+    "H",
+    "I",  "I",  "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",  "N",
+    "O",  "O",  "O",
+    "P",
+    "Q",
+    "R",  "R",
+    "S",
+    "T",  "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "?",  "?",
+  ]; // initial tile pool for 4 letter rack mode
+  export const TILEBAG5 = [
+    "A",  "A",  "A",  "A",  "A",
+    "B",
+    "C",
+    "D",  "D",
+    "E",  "E",  "E",  "E",  "E",  "E",
+    "F",
+    "G",
+    "H",
+    "I",  "I",  "I",  "I",  "I",
+    "J",
+    "K",
+    "L",  "L",
+    "M",
+    "N",  "N",  "N",
+    "O",  "O",  "O",  "O",
+    "P",
+    "Q",
+    "R",  "R",  "R",
+    "S",  "S",
+    "T",  "T",  "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "?",  "?",
+  ]; // initial tile pool for 5 letter rack mode
+  export const TILEBAG6 = [
+    "A",  "A",  "A",  "A",  "A",  "A",  "A",
+    "B",  "B",
+    "C",  "C",
+    "D",  "D",  "D",
+    "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
+    "F",
+    "G",  "G",
+    "H",  "H",
+    "I",  "I",  "I",  "I",  "I",  "I",  "I",
+    "J",
+    "K",
+    "L",  "L",  "L",
+    "M",  "M",
+    "N",  "N",  "N",  "N",
+    "O",  "O",  "O",  "O",  "O",  "O",
+    "P",  "P",
+    "Q",
+    "R",  "R",  "R",  "R",  "R",
+    "S",  "S",  "S",
+    "T",  "T",  "T",  "T",
+    "U",  "U",  "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "?",  "?",
+  ]; // initial tile pool for 6 letter rack mode
+  export const TILEBAG7 = [
+    "A",  "A",  "A",  "A",  "A",  "A",  "A",  "A",  "A",
+    "B",  "B",
+    "C",  "C",
+    "D",  "D",  "D",  "D",
+    "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
+    "F",  "F",
+    "G",  "G",  "G",
+    "H",  "H",
+    "I",  "I",  "I",  "I",  "I",  "I",  "I",  "I",  "I",
+    "J",
+    "K",
+    "L",  "L",  "L",  "L",
+    "M",  "M",
+    "N",  "N",  "N",  "N",  "N",  "N",
+    "O",  "O",  "O",  "O",  "O",  "O",  "O",  "O",
+    "P",  "P",
+    "Q",
+    "R",  "R",  "R",  "R",  "R",  "R",
+    "S",  "S",  "S",  "S",
+    "T",  "T",  "T",  "T",  "T",  "T",
+    "U",  "U",  "U",  "U",
+    "V",  "V",
+    "W",  "W",
+    "X",
+    "Y",  "Y",
+    "Z",
+    "?",  "?",
+  ]; // initial tile pool for 7 letter rack mode
+// Types of square. These match css class names.
+export const SQUARE_TYPE_ESCAPE_HATCH = 'EscapeHatch'; // One of the escape hatch squares
+export const SQUARE_TYPE_CENTRE = 'CenterSquare'; // The centre square
+export const SQUARE_TYPE_STYLE1 = 'style1'; // The unused non-special squares alternate style
+export const SQUARE_TYPE_STYLE2 = 'style2'; // The unused non-special squares alternate style
+export const LETTER_NONE = ''; // No letter
+export function InitialSquareArray(racksize) {
+    let size = (racksize * 2) + 1;
+    let sqa = Array(size);
+    for (var row = 0; row < size; ++row) {
+        let newrow = Array(size);
+        for (var col = 0; col < size; ++col) {
+            let newcol = {row: row, col: col, type: SQUARE_TYPE_STYLE2, usedby: USED_BY_NONE, letter: LETTER_NONE};
+            if ((row === racksize) && (col === racksize)) {
+                newcol.type = SQUARE_TYPE_CENTRE;
+            } else if ((row % racksize === 0) && (col % racksize === 0)) {
+                newcol.type = SQUARE_TYPE_ESCAPE_HATCH;
+            } else if (row % 2 === col % 2) {
+                newcol.type = SQUARE_TYPE_STYLE1;
+            }
+            newrow[col] = newcol;
+        }
+        sqa[row] = [...newrow];
+    }
+    return sqa;
+}

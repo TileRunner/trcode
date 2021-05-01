@@ -6,134 +6,8 @@ import ShowUnseenTiles from '../pb/unseenTilesSection';
 import ShowMoves from '../pb/movesSection';
 import * as c from '../../lib/pbconstants';
 
-const movewaittime = 20000; // when waiting for opponent ping every this many milliseconds
-const jokes = [
-  'Escapee: "I' + "'m free! I'm free!" + '". Little kid: "I'+ "'m four! I'm four!" + '"',
-  'Two peanuts were walking down a back alley. One was a salted.',
-  "The psychic dwarf escaped! There's a small medium at large!",
-  'What do you call a vegetable who has escaped prison? An escapea!',
-  "The prisoners fave punctuation is a period. It marks the end of a sentence!",
-  "Prison is only one word, but to robbers it's a whole sentence."
-];
-const initialtiles4 = [
-  "A",  "A",  "A",
-  "B",
-  "C",
-  "D",
-  "E",  "E",  "E",  "E",
-  "F",
-  "G",
-  "H",
-  "I",  "I",  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",  "N",
-  "O",  "O",  "O",
-  "P",
-  "Q",
-  "R",  "R",
-  "S",
-  "T",  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-  "?",  "?",
-]; // initial tile pool for 4 letter rack mode
-const initialtiles5 = [
-  "A",  "A",  "A",  "A",  "A",
-  "B",
-  "C",
-  "D",  "D",
-  "E",  "E",  "E",  "E",  "E",  "E",
-  "F",
-  "G",
-  "H",
-  "I",  "I",  "I",  "I",  "I",
-  "J",
-  "K",
-  "L",  "L",
-  "M",
-  "N",  "N",  "N",
-  "O",  "O",  "O",  "O",
-  "P",
-  "Q",
-  "R",  "R",  "R",
-  "S",  "S",
-  "T",  "T",  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-  "?",  "?",
-]; // initial tile pool for 5 letter rack mode
-const initialtiles6 = [
-  "A",  "A",  "A",  "A",  "A",  "A",  "A",
-  "B",  "B",
-  "C",  "C",
-  "D",  "D",  "D",
-  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
-  "F",
-  "G",  "G",
-  "H",  "H",
-  "I",  "I",  "I",  "I",  "I",  "I",  "I",
-  "J",
-  "K",
-  "L",  "L",  "L",
-  "M",  "M",
-  "N",  "N",  "N",  "N",
-  "O",  "O",  "O",  "O",  "O",  "O",
-  "P",  "P",
-  "Q",
-  "R",  "R",  "R",  "R",  "R",
-  "S",  "S",  "S",
-  "T",  "T",  "T",  "T",
-  "U",  "U",  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-  "?",  "?",
-]; // initial tile pool for 6 letter rack mode
-const initialtiles7 = [
-  "A",  "A",  "A",  "A",  "A",  "A",  "A",  "A",  "A",
-  "B",  "B",
-  "C",  "C",
-  "D",  "D",  "D",  "D",
-  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",  "E",
-  "F",  "F",
-  "G",  "G",  "G",
-  "H",  "H",
-  "I",  "I",  "I",  "I",  "I",  "I",  "I",  "I",  "I",
-  "J",
-  "K",
-  "L",  "L",  "L",  "L",
-  "M",  "M",
-  "N",  "N",  "N",  "N",  "N",  "N",
-  "O",  "O",  "O",  "O",  "O",  "O",  "O",  "O",
-  "P",  "P",
-  "Q",
-  "R",  "R",  "R",  "R",  "R",  "R",
-  "S",  "S",  "S",  "S",
-  "T",  "T",  "T",  "T",  "T",  "T",
-  "U",  "U",  "U",  "U",
-  "V",  "V",
-  "W",  "W",
-  "X",
-  "Y",  "Y",
-  "Z",
-  "?",  "?",
-]; // initial tile pool for 7 letter rack mode
-
 const Game = ({isrejoin
-    , participant // Prisoners, Guards, or Observer
+    , participant // Prisoners, Guards, or Observer (not implemented)
     , gameid
     , nickname
     , wsmessage
@@ -142,14 +16,11 @@ const Game = ({isrejoin
     }) => {
     const middle = racksize; // Middle element in row or column array
     const edge = racksize * 2; // Last element in row or column array
-    const initialtiles = racksize === 6 ? initialtiles6 : racksize === 7 ? initialtiles7 : racksize === 5 ? initialtiles5 : initialtiles4;
-    const initialsquares = Array(edge+1).fill(Array(edge+1).fill(c.SQUARE_UNUSED));
-    const initialusedby = Array(edge+1).fill(Array(edge+1).fill(c.USED_BY_NONE));
+    const initialtiles = racksize === 6 ? c.TILEBAG6 : racksize === 7 ? c.TILEBAG7 : racksize === 5 ? c.TILEBAG5 : c.TILEBAG4;
     const [tiles, setTiles] = useState([...initialtiles]);
     const [ptiles, setPtiles] = useState([]);
     const [gtiles, setGtiles] = useState([]);
-    const [squares, setSquares] = useState([...initialsquares]);
-    const [usedby, setUsedby] = useState([...initialusedby]);
+    const [squareArray, setSquareArray] = useState([]);
     const [selection, setSelection] = useState(-1); // relative to rack of player making a play
     const [whoseturn, setWhoseturn] = useState(c.WHOSE_TURN_PRISONERS); // game starts with prisoners play
     const [currentcoords, setCurrentcoords] = useState([]);
@@ -157,8 +28,7 @@ const Game = ({isrejoin
     const [rcd, setRcd] = useState([-1,-1,c.DIR_NONE]);
     const [moves, setMoves] = useState([]); // move history, each element is the array is a json object of info about the move
     const [snapshot, setSnapshot] = useState({
-      squares: [...initialsquares],
-      usedby: [...initialusedby],
+      squareArray: [],
       ptiles: [],
       gtiles: [],
     });
@@ -166,7 +36,6 @@ const Game = ({isrejoin
     const [allowRewind, setAllowRewind] = useState(false);
     const [oppname, setOppname] = useState('');
     const [chatmsgs, setChatmsgs] = useState([]);
-    // const rescueSound = new Audio("https://tilerunner.github.io/yippee.m4a"); // I couldn't get the syntax right to read it from pb folder
     const prevRescues = usePrevious(rescues);
     function usePrevious(value) {
       const ref = useRef();
@@ -178,14 +47,14 @@ const Game = ({isrejoin
     useEffect(() => {
       if (rescues > prevRescues) {
           var myaudio = document.createElement('audio');
-          myaudio.src = "https://tilerunner.github.io/yippee.m4a";
+          myaudio.src = participant === c.PARTY_TYPE_GUARDS ? "https://tilerunner.github.io/OneGotAway.m4a" : "https://tilerunner.github.io/yippee.m4a";
           myaudio.play();
         // rescueSound.play()
       }
     }, [rescues]); // Play a sound when a rescue is made
     useEffect(() => {
       let newji = jokeindex + 1;
-      if (newji >= jokes.length) {
+      if (newji >= c.JOKE_ARRAY.length) {
         newji = 0;
       }
       setJokeindex(newji);
@@ -195,11 +64,13 @@ const Game = ({isrejoin
           // I am waiting for opponent move to come through but sometimes it gets missed (no idea why)
           requestGameData(); // Send a request for game data in case opponent moved and we missed the update
         }
-      }, movewaittime); // this many milliseconds between above code block executions
+      }, c.PING_INTERVAL); // this many milliseconds between above code block executions
       return () => clearInterval(interval);
     }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
   
     useEffect(() => { // This code executes first time Game is used only
+      let firstSquareArray = c.InitialSquareArray(racksize);
+      setSquareArray([...firstSquareArray]);
       if (!isrejoin && participant === c.PARTY_TYPE_PRISONERS) { // Prisoner is starting the game so pick racks
         let tempPTiles = [];
         let tempGTiles = [];
@@ -218,8 +89,7 @@ const Game = ({isrejoin
         setPtiles(tempPTiles);
         setTiles(tempTiles);
         setSnapshot({
-          squares: [...initialsquares],
-          usedby: [...initialusedby],
+          squareArray: [...firstSquareArray],
           ptiles: [...tempPTiles],
           gtiles: [...tempGTiles]    
         });
@@ -238,17 +108,14 @@ const Game = ({isrejoin
       else
       {
         // Prisoner rejoin or guard join or guard rejoin
-        try {
-          client.send(
-            JSON.stringify({
-              gameid: gameid, // the id for the game
-              nickname: nickname, // player nickname
-              type: "pb", // prisonbreak
-              func: "requestgamedata", // request game data
-              sender: participant
-          }));
-        }
-        catch {}
+        client.send(
+          JSON.stringify({
+            gameid: gameid, // the id for the game
+            nickname: nickname, // player nickname
+            type: "pb", // prisonbreak
+            func: "requestgamedata", // request game data
+            sender: participant
+        }));
       }
     }, []);
     useEffect(() => {
@@ -261,7 +128,6 @@ const Game = ({isrejoin
     useEffect(() => {
       scrollToBottom("ScrollableChat");
     },[chatmsgs])
-  
     function putAtMoveStart() {
       setSelection(-1);
       setAllowRewind(false);
@@ -298,10 +164,9 @@ const Game = ({isrejoin
               func: "providegamedata", // provide game data
               sender: participant,
               tiles: tiles,
-              squares: squares,
+              squareArray: squareArray,
               ptiles: ptiles,
               gtiles: gtiles,
-              usedby: usedby,
               whoseturn: whoseturn,
               snapshot: snapshot,
               moves: moves,
@@ -322,10 +187,9 @@ const Game = ({isrejoin
              || (participant === c.PARTY_TYPE_PRISONERS && ptiles.length === 0 && currentcoords.length === 0) // Not sure I need it but...
              ) {
             setTiles(messageData.tiles);
-            setSquares(messageData.squares);
+            setSquareArray(messageData.squareArray);
             setPtiles(messageData.ptiles);
             setGtiles(messageData.gtiles);
-            setUsedby(messageData.usedby);
             setWhoseturn(messageData.whoseturn);
             setSnapshot(messageData.snapshot);
             setMoves(messageData.moves);
@@ -336,15 +200,13 @@ const Game = ({isrejoin
         if (messageData.func === "ept" && participant === c.PARTY_TYPE_GUARDS) { // Prisoners sent end prisoners turn, Guards pick it up
           putAtMoveStart();
           setWhoseturn(messageData.whoseturn);
-          setSquares(messageData.squares);
-          setUsedby(messageData.usedby);
+          setSquareArray(messageData.squareArray);
           setPtiles(messageData.ptiles);
           setTiles(messageData.tiles);
           setMoves(messageData.moves);
           setRescues(messageData.rescues);
           setSnapshot({
-            squares: [...messageData.squares],
-            usedby: [...messageData.usedby],
+            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)),
             ptiles: [...messageData.ptiles],
             gtiles: [...gtiles],
           });
@@ -352,14 +214,12 @@ const Game = ({isrejoin
         if (messageData.func === "egt" && participant === c.PARTY_TYPE_PRISONERS) { // Guards sent end guards turn, Prisoners pick it up
           putAtMoveStart();
           setWhoseturn(messageData.whoseturn);
-          setSquares(messageData.squares);
-          setUsedby(messageData.usedby);
+          setSquareArray(messageData.squareArray);
           setGtiles(messageData.gtiles);
           setTiles(messageData.tiles);
           setMoves(messageData.moves);
           setSnapshot({
-            squares: [...messageData.squares],
-            usedby: [...messageData.usedby],
+            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)),
             ptiles: [...ptiles],
             gtiles: [...messageData.gtiles],
           });       
@@ -370,8 +230,7 @@ const Game = ({isrejoin
           setTiles(messageData.tiles);
           setPtiles(messageData.ptiles);
           setGtiles(messageData.gtiles);
-          setSquares(messageData.squares);
-          setUsedby(messageData.usedby);
+          setSquareArray(messageData.squareArray);
           setWhoseturn(messageData.whoseturn);
           setRescues(messageData.rescues);
           setMoves(messageData.moves);
@@ -392,12 +251,11 @@ const Game = ({isrejoin
     // So I pass newSelection when I want to also set it, otherwise I pass -1 to instruct it to use current value of selection
     // Also passing newRcd
     const handleBoardSquareClick = (ri, ci, newSelection, newRcd) => {
-      let newSquares = [...squares];
-      let newUsedby = [...usedby];
+      let newSquareArray = JSON.parse(JSON.stringify(squareArray));
+      let newSquareArrayRow = [...newSquareArray[ri]]; // The row of squares they clicked on
+      let newSquareArrayCell = newSquareArrayRow[ci]; // The square in the row they clicked on
       let newPtiles = [...ptiles];
       let newGtiles = [...gtiles];
-      let newRow = [...squares[ri]];
-      let squarevalue = squares[ri][ci];
       let newCurrentcoords = [...currentcoords];
       let coord = String(ri) + "-" + String(ci);
       let cci = currentcoords.indexOf(coord);
@@ -405,16 +263,15 @@ const Game = ({isrejoin
         newSelection = selection;
         newRcd = rcd;
       }
-      if (newSelection > -1 && squarevalue === c.SQUARE_UNUSED) { // tile is selected from rack and clicked square is not used yet
-        newRow[ci] =
-          whoseturn === c.WHOSE_TURN_PRISONERS ? newPtiles[newSelection] : newGtiles[newSelection];
-        newSquares[ri] = [...newRow];
+      if (newSelection > -1 && newSquareArrayCell.usedby === c.USED_BY_NONE) { // tile is selected from rack and clicked square is not used yet
+        let selectedTile = whoseturn === c.WHOSE_TURN_PRISONERS ? newPtiles[newSelection] : newGtiles[newSelection];
+        newSquareArrayCell.letter = selectedTile;
+        newSquareArrayCell.usedby = whoseturn;
+        newSquareArrayRow[ci] = newSquareArrayCell;
+        newSquareArray[ri] = [...newSquareArrayRow];
         whoseturn === c.WHOSE_TURN_PRISONERS
           ? newPtiles.splice(newSelection, 1)
           : newGtiles.splice(newSelection, 1);
-        let newUsedbyRow = [...newUsedby[ri]];
-        newUsedbyRow[ci] = whoseturn;
-        newUsedby[ri] = [...newUsedbyRow];
         if (whoseturn === c.WHOSE_TURN_PRISONERS && newSelection === newPtiles.length) { 
           newSelection = newSelection - 1
         }
@@ -422,31 +279,26 @@ const Game = ({isrejoin
           newSelection = newSelection - 1
         }
         setSelection(newSelection);
-        setSquares(newSquares);
-        setUsedby(newUsedby);
+        setSquareArray([...newSquareArray]);
         setPtiles(newPtiles);
         setGtiles(newGtiles);
         setCurrentcoords([...currentcoords, coord]);
         setRcd(newRcd); // key down handler figured it out
         return;
       }
-      if (cci > -1) { // clicked square has a tile on it from the current move in progress
+      if (cci > -1) { // clicked square has a tile on it from the current move in progress, so put it back on the player rack
         whoseturn === c.WHOSE_TURN_PRISONERS
-          ? newPtiles.push(squarevalue)
-          : newGtiles.push(squarevalue);
-        let newRow = [...newSquares[ri]];
-        newRow[ci] = c.SQUARE_UNUSED;
-        newSquares[ri] = [...newRow];
-        let newUsedbyRow = [...newUsedby[ri]];
-        newUsedbyRow[ci] = c.USED_BY_NONE;
-        newUsedby[ri] = [...newUsedbyRow];
+          ? newPtiles.push(newSquareArrayCell.letter)
+          : newGtiles.push(newSquareArrayCell.letter);
+        newSquareArrayCell.usedby = c.USED_BY_NONE;
+        newSquareArrayCell.letter = c.LETTER_NONE;
+        newSquareArrayRow[ci] = newSquareArrayCell;
+        newSquareArray[ri] = [...newSquareArrayRow];
         setSelection(
           whoseturn === c.WHOSE_TURN_PRISONERS ? newPtiles.length - 1 : newGtiles.length - 1
         );
         newCurrentcoords.splice(cci, 1);
-  
-        setSquares(newSquares);
-        setUsedby(newUsedby);
+        setSquareArray([...newSquareArray]);
         setPtiles(newPtiles);
         setGtiles(newGtiles);
         setCurrentcoords(newCurrentcoords);
@@ -455,7 +307,7 @@ const Game = ({isrejoin
       }
       // They didn't click a square to place a selected tile there
       // They didn't click a square to remove an existing tile
-      if (squares[ri][ci] === c.SQUARE_UNUSED) {
+      if (newSquareArrayCell.usedby === c.USED_BY_NONE) {
         // There is nothing on the square so they are picking where to place the next tile via keyboard
         let newDirection = rcd[0] !== ri || rcd[1] !== ci ? c.DIR_RIGHT : //click new square, start with right
          rcd[2] === c.DIR_RIGHT ? c.DIR_DOWN : //click same square that was right, change to down
@@ -519,14 +371,14 @@ const Game = ({isrejoin
       }
       newPtiles.sort();
       let newWhoseturn = newPtiles.length > 0 ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_GAMEOVER;
-      if (usedby[0][0]         !== c.USED_BY_NONE &&
-          usedby[0][middle]    !== c.USED_BY_NONE &&
-          usedby[0][edge]      !== c.USED_BY_NONE &&
-          usedby[middle][0]    !== c.USED_BY_NONE &&
-          usedby[middle][edge] !== c.USED_BY_NONE &&
-          usedby[edge][0]      !== c.USED_BY_NONE &&
-          usedby[edge][middle] !== c.USED_BY_NONE &&
-          usedby[edge][edge]   !== c.USED_BY_NONE) {
+      if (squareArray[0][0].usedby         !== c.USED_BY_NONE &&
+          squareArray[0][middle].usedby    !== c.USED_BY_NONE &&
+          squareArray[0][edge].usedby      !== c.USED_BY_NONE &&
+          squareArray[middle][0].usedby    !== c.USED_BY_NONE &&
+          squareArray[middle][edge].usedby !== c.USED_BY_NONE &&
+          squareArray[edge][0].usedby      !== c.USED_BY_NONE &&
+          squareArray[edge][middle].usedby !== c.USED_BY_NONE &&
+          squareArray[edge][edge].usedby   !== c.USED_BY_NONE) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
@@ -539,8 +391,7 @@ const Game = ({isrejoin
       setMoves(newMoves);
       setRescues(newRescues);
       setSnapshot({
-        squares: [...squares],
-        usedby: [...usedby],
+        squareArray: JSON.parse(JSON.stringify(squareArray)),
         ptiles: [...newPtiles],
         gtiles: [...gtiles],
       });
@@ -552,8 +403,7 @@ const Game = ({isrejoin
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
           sender: participant,
-          squares: squares, // this was being changed as the tiles were being played
-          usedby: usedby, // this was being changed as the tiles were being played
+          squareArray: squareArray, // this was being changed as the tiles were being played
           ptiles: newPtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           whoseturn: newWhoseturn, // may have ended the game
@@ -577,19 +427,18 @@ const Game = ({isrejoin
         newTiles.splice(rand, 1);
       }
       newGtiles.sort();
-      let snapsquares = [...squares];
-      let snapusedby = [...usedby];
+      let snapsquarearray = JSON.parse(JSON.stringify(squareArray));
       let snapptiles = [...ptiles];
       let snapgtiles = [...gtiles];
       let newWhoseturn = newGtiles.length > 0 ? c.WHOSE_TURN_PRISONERS : c.WHOSE_TURN_GAMEOVER;
-      if (usedby[0][0]         !== c.USED_BY_NONE &&
-          usedby[0][middle]    !== c.USED_BY_NONE &&
-          usedby[0][edge]      !== c.USED_BY_NONE &&
-          usedby[middle][0]    !== c.USED_BY_NONE &&
-          usedby[middle][edge] !== c.USED_BY_NONE &&
-          usedby[edge][0]      !== c.USED_BY_NONE &&
-          usedby[edge][middle] !== c.USED_BY_NONE &&
-          usedby[edge][edge]   !== c.USED_BY_NONE) {
+      if (squareArray[0][0].usedby         !== c.USED_BY_NONE &&
+          squareArray[0][middle].usedby    !== c.USED_BY_NONE &&
+          squareArray[0][edge].usedby      !== c.USED_BY_NONE &&
+          squareArray[middle][0].usedby    !== c.USED_BY_NONE &&
+          squareArray[middle][edge].usedby !== c.USED_BY_NONE &&
+          squareArray[edge][0].usedby      !== c.USED_BY_NONE &&
+          squareArray[edge][middle].usedby !== c.USED_BY_NONE &&
+          squareArray[edge][edge].usedby   !== c.USED_BY_NONE) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
@@ -601,8 +450,7 @@ const Game = ({isrejoin
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squares: snapsquares,
-        usedby: snapusedby,
+        squareArray: snapsquarearray,
         ptiles: snapptiles,
         gtiles: snapgtiles,
       });
@@ -614,8 +462,7 @@ const Game = ({isrejoin
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
           sender: participant,
-          squares: squares, // this was being changed as the tiles were being played
-          usedby: usedby, // this was being changed as the tiles were being played
+          squareArray: squareArray, // this was being changed as the tiles were being played
           gtiles: newGtiles, // we picked new tiles for guards rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           moves: newMoves, // a move was made
@@ -644,15 +491,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquares([...snapshot.squares]);
-      setUsedby([...snapshot.usedby]);
+      setSquareArray([...snapshot.squareArray]);
       setWhoseturn(c.WHOSE_TURN_GUARDS);
       setPtiles(newPtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squares: [...snapshot.squares],
-        usedby: [...snapshot.usedby],
+        squareArray: [...snapshot.squareArray],
         ptiles: [...newPtiles],
         gtiles: [...gtiles],
       });
@@ -666,8 +511,7 @@ const Game = ({isrejoin
           sender: participant,
           whoseturn: c.WHOSE_TURN_GUARDS, // swap never ends the game so go to opponent
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          squares: snapshot.squares, // revert to start of turn squares
-          usedby: snapshot.usedby, // revert to start of turn used by
+          squareArray: snapshot.squareArray, // revert to start of turn squares
           ptiles: newPtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           moves: newMoves, // a move was made
@@ -696,15 +540,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquares([...snapshot.squares]);
-      setUsedby([...snapshot.usedby]);
+      setSquareArray([...snapshot.squareArray]);
       setWhoseturn(c.WHOSE_TURN_PRISONERS);
       setGtiles(newGtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squares: [...snapshot.squares],
-        usedby: [...snapshot.usedby],
+        squareArray: [...snapshot.squareArray],
         ptiles: [...ptiles],
         gtiles: [...newGtiles],
       });
@@ -718,8 +560,7 @@ const Game = ({isrejoin
           sender: participant,
           whoseturn: c.WHOSE_TURN_PRISONERS, // swap never ends the game so go to opponent
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          squares: snapshot.squares, // revert to start of turn squares
-          usedby: snapshot.usedby, // revert to start of turn used by
+          squareArray: snapshot.squareArray, // revert to start of turn squares
           gtiles: newGtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           moves: newMoves // a move was made
@@ -729,7 +570,7 @@ const Game = ({isrejoin
     }
   
     function isPlayValid() {
-      if (squares[middle][middle] === c.SQUARE_UNUSED) {
+      if (squareArray[middle][middle].usedby === c.USED_BY_NONE) {
         window.alert("First play must hit center square");
         return false;
       }
@@ -741,16 +582,16 @@ const Game = ({isrejoin
       let highcol = -1;
       for (var temprow=0; temprow < numrows; ++temprow) {
         for (var tempcol=0; tempcol < numcols; ++tempcol) {
-          if (squares[temprow][tempcol] !== c.SQUARE_UNUSED) {
-            if (!(temprow > 0 && squares[temprow-1][tempcol] !== c.SQUARE_UNUSED) &&
-             !(tempcol > 0 && squares[temprow][tempcol-1] !== c.SQUARE_UNUSED) &&
-             !(temprow < edge && squares[temprow+1][tempcol] !== c.SQUARE_UNUSED) &&
-             !(tempcol < edge && squares[temprow][tempcol+1] !== c.SQUARE_UNUSED)
+          if (squareArray[temprow][tempcol].usedby !== c.USED_BY_NONE) {
+            if (!(temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) &&
+             !(tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) &&
+             !(temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) &&
+             !(tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE)
              ) {
               window.alert("Each played tile must be part of a word");
               return false;
              }
-             if (snapshot.squares[temprow][tempcol] === c.SQUARE_UNUSED) {
+             if (snapshot.squareArray[temprow][tempcol].usedby === c.USED_BY_NONE) {
                // This square was played on this turn
                if (temprow < lowrow) { lowrow = temprow;}
                if (temprow > highrow) { highrow = temprow;}
@@ -772,25 +613,25 @@ const Game = ({isrejoin
       let hookmade = false;
       for (var temprow = lowrow; temprow <= highrow; ++temprow) {
         for (var tempcol = lowcol; tempcol <= highcol; ++tempcol) {
-          if (squares[temprow][tempcol] === c.SQUARE_UNUSED) {
+          if (squareArray[temprow][tempcol].usedby === c.USED_BY_NONE) {
             window.alert("There is a gap in your word");
             return false;
           }
-          if (snapshot.squares[temprow][tempcol] !== c.SQUARE_UNUSED) {
+          if (snapshot.squareArray[temprow][tempcol].usedby !== c.USED_BY_NONE) {
             playthru = true;
           }
-          if (lowrow === highrow && temprow > 0 && squares[temprow-1][tempcol] !== c.SQUARE_UNUSED) { hookmade = true; }
-          if (lowrow === highrow && temprow < edge && squares[temprow+1][tempcol] !== c.SQUARE_UNUSED) { hookmade = true; }
-          if (lowcol === highcol && tempcol > 0 && squares[temprow][tempcol-1] !== c.SQUARE_UNUSED) { hookmade = true; }
-          if (lowcol === highcol && tempcol < edge && squares[temprow][tempcol+1] !== c.SQUARE_UNUSED) { hookmade = true; }
+          if (lowrow === highrow && temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
+          if (lowrow === highrow && temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
+          if (lowcol === highcol && tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) { hookmade = true; }
+          if (lowcol === highcol && tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE) { hookmade = true; }
         }
       }
       // Check play to or from a tile (play through but not either side)
-      if (lowrow === highrow && lowcol > 0 && snapshot.squares[lowrow][lowcol-1] !== c.SQUARE_UNUSED) { playthru = true; }
-      if (lowrow === highrow && highcol < edge && snapshot.squares[lowrow][highcol+1] !== c.SQUARE_UNUSED) { playthru = true; }
-      if (lowcol === highcol && lowrow > 0 && snapshot.squares[lowrow-1][lowcol] !== c.SQUARE_UNUSED) { playthru = true; }
-      if (lowcol === highcol && highrow < edge && snapshot.squares[highrow+1][lowcol] !== c.SQUARE_UNUSED) { playthru = true; }
-      if (!playthru && !hookmade && snapshot.squares[middle][middle] !== c.SQUARE_UNUSED) {
+      if (lowrow === highrow && lowcol > 0 && snapshot.squareArray[lowrow][lowcol-1].usedby !== c.USED_BY_NONE) { playthru = true; }
+      if (lowrow === highrow && highcol < edge && snapshot.squareArray[lowrow][highcol+1].usedby !== c.USED_BY_NONE) { playthru = true; }
+      if (lowcol === highcol && lowrow > 0 && snapshot.squareArray[lowrow-1][lowcol] !== c.USED_BY_NONE) { playthru = true; }
+      if (lowcol === highcol && highrow < edge && snapshot.squareArray[highrow+1][lowcol].usedby !== c.USED_BY_NONE) { playthru = true; }
+      if (!playthru && !hookmade && snapshot.squareArray[middle][middle].usedby !== c.USED_BY_NONE) {
         window.alert("Words must be connected");
         return false;
       }
@@ -829,31 +670,31 @@ const Game = ({isrejoin
         let col = lowcol; // lowcol and highcol will have the same value
         // find the lowest row number of the main word, which may be lower than that of the first played tile
         let lowestrow = lowrow;
-        while (lowestrow > 0 && squares[lowestrow-1][col] !== c.SQUARE_UNUSED) {
+        while (lowestrow > 0 && squareArray[lowestrow-1][col].usedby !== c.USED_BY_NONE) {
           lowestrow = lowestrow - 1;
         }
         // find the highest row number of the main word, which may be higher than that of the last played tile
         let highestrow = highrow;
-        while (highestrow < edge && squares[highestrow+1][col] !== c.SQUARE_UNUSED) {
+        while (highestrow < edge && squareArray[highestrow+1][col].usedby !== c.USED_BY_NONE) {
           highestrow = highestrow + 1;
         }
         wordstartcoord = c.BOARD_COL_HEADERS[col] + c.BOARD_ROW_HEADERS[lowestrow]; // vertical play coords start with col header
         for (var row = lowestrow; row <= highestrow; ++row) {
-          mainword = mainword + squares[row][col];
+          mainword = mainword + squareArray[row][col].letter;
           let coord = row + "-" + col;
           if (currentcoords.indexOf(coord) > -1) { // This tile was played, check for hooks
             let lowestcol = col;
-            while (lowestcol > 0 && squares[row][lowestcol-1] !== c.SQUARE_UNUSED) {
+            while (lowestcol > 0 && squareArray[row][lowestcol-1].usedby !== c.USED_BY_NONE) {
               lowestcol = lowestcol - 1;
             }
             let highestcol = col;
-            while (highestcol < edge && squares[row][highestcol+1] !== c.SQUARE_UNUSED) {
+            while (highestcol < edge && squareArray[row][highestcol+1].usedby !== c.USED_BY_NONE) {
               highestcol = highestcol + 1;
             }
             if (lowestcol < highestcol) { // hook was made
               let extraword = "";
               for (var tempcol = lowestcol; tempcol <= highestcol; ++tempcol) {
-                extraword = extraword + squares[row][tempcol];
+                extraword = extraword + squareArray[row][tempcol].letter;
               }
               extrawords = [...extrawords, extraword];
             }
@@ -864,33 +705,33 @@ const Game = ({isrejoin
         let row = lowrow; // lowrow and highrow will have the same value
         // find the lowest col number of the main word, which may be lower than that of the first played tile
         let lowestcol = lowcol;
-        while (lowestcol > 0 && squares[row][lowestcol-1] !== c.SQUARE_UNUSED) {
+        while (lowestcol > 0 && squareArray[row][lowestcol-1].usedby !== c.USED_BY_NONE) {
           lowestcol = lowestcol - 1;
         }
         // find the highest col number of the main word, which may be higher than that of the last played tile
         let highestcol = highcol;
-        while (highestcol < edge && squares[row][highestcol+1] !== c.SQUARE_UNUSED) {
+        while (highestcol < edge && squareArray[row][highestcol+1].usedby !== c.USED_BY_NONE) {
           highestcol = highestcol + 1;
         }
         wordstartcoord = c.BOARD_ROW_HEADERS[row] + c.BOARD_COL_HEADERS[lowestcol]; // horizontal play coords start with row header
         mainword = ""; // In case we got a 1 letter mainword in the previous block
         extrawords = []; // Ditto
         for (var col = lowestcol; col <= highestcol; ++col) {
-          mainword = mainword + squares[row][col];
+          mainword = mainword + squareArray[row][col].letter;
           let coord = row + "-" + col;
           if (currentcoords.indexOf(coord) > -1) { // This tile was played, check for hooks
             let lowestrow = row;
-            while (lowestrow > 0 && squares[lowestrow-1][col] !== c.SQUARE_UNUSED) {
+            while (lowestrow > 0 && squareArray[lowestrow-1][col].usedby !== c.USED_BY_NONE) {
               lowestrow = lowestrow - 1;
             }
             let highestrow = row;
-            while (highestrow < edge && squares[highestrow+1][col] !== c.SQUARE_UNUSED) {
+            while (highestrow < edge && squareArray[highestrow+1][col].usedby !== c.USED_BY_NONE) {
               highestrow = highestrow + 1;
             }
             if (lowestrow < highestrow) { // hook was made
               let extraword = "";
               for (var temprow = lowestrow; temprow <= highestrow; ++temprow) {
-                extraword = extraword + squares[temprow][col];
+                extraword = extraword + squareArray[temprow][col].letter;
               }
               extrawords = [...extrawords, extraword];
             }
@@ -903,15 +744,13 @@ const Game = ({isrejoin
   
     function getRewindInfo() { // Must be called before you start setting new values for stuff
       /* Rewind info is everything you need to reverse the move that we do not already have in the new move variable:
-          squares: says what tile is on what square
-          usedby: says who played what tile on what square (affects styling)
+          squareArray: says what tile is on what square and who played it and what the row and col are
           rack: players rack before move was made 
           tiles: tile pool before picking new tiles
           rescues: rescue count
       */
       let rewindInfo = {
-        squares: [...snapshot.squares],
-        usedby: [...snapshot.usedby],
+        squareArray: [...snapshot.squareArray],
         rack: whoseturn === c.WHOSE_TURN_GUARDS ? [...snapshot.gtiles]: [...snapshot.ptiles],
         tiles: [...tiles],
         rescues: rescues
@@ -938,8 +777,7 @@ const Game = ({isrejoin
       /* Rewind the last move and take it off the end of the move list */
       let numMoves = moves.length;
       let lastMove = moves[moves.length-1];
-      let newSquares = [...lastMove.rewindInfo.squares];
-      let newUsedby = [...lastMove.rewindInfo.usedby];
+      let newSquareArray = [...lastMove.rewindInfo.squareArray];
       let newTiles = [...lastMove.rewindInfo.tiles];
       let newPtiles = lastMove.by === c.PARTY_TYPE_PRISONERS ? [...lastMove.rewindInfo.rack] : [...ptiles];
       let newGtiles = lastMove.by === c.PARTY_TYPE_GUARDS ? [...lastMove.rewindInfo.rack] : [...gtiles];
@@ -948,8 +786,7 @@ const Game = ({isrejoin
       let newMoves = [...moves];
       newMoves.splice(numMoves-1,1);
       let newSnapshot = {
-        squares: [...newSquares],
-        usedby: [...newUsedby],
+        squareArray: [...newSquareArray],
         gtiles: [...newGtiles],
         ptiles: [...newPtiles]
       };
@@ -957,8 +794,7 @@ const Game = ({isrejoin
       setTiles(newTiles);
       setPtiles(newPtiles);
       setGtiles(newGtiles);
-      setSquares(newSquares);
-      setUsedby(newUsedby);
+      setSquareArray([...newSquareArray]);
       setWhoseturn(newWhoseturn);
       setRescues(newRescues);
       setMoves(newMoves);
@@ -975,8 +811,7 @@ const Game = ({isrejoin
           tiles: newTiles, // tile pool
           ptiles: newPtiles, // prisoners rack
           gtiles: newGtiles, // guards rack
-          squares: newSquares, // revert to start of turn squares
-          usedby: newUsedby, // revert to start of turn used by
+          squareArray: newSquareArray, // revert to start of turn squares
           whoseturn: newWhoseturn, // swap never ends the game so go to opponent
           rescues: newRescues, // rescue count
           moves: newMoves, // a move was made
@@ -986,8 +821,7 @@ const Game = ({isrejoin
     }
   
     const recallTiles = () => {
-      setSquares([...snapshot.squares]);
-      setUsedby([...snapshot.usedby]);
+      setSquareArray([...snapshot.squareArray]);
       setPtiles([...snapshot.ptiles]);
       setGtiles([...snapshot.gtiles]);
       setSelection(-1);
@@ -1011,8 +845,7 @@ const Game = ({isrejoin
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
           sender: participant,
-          squares: snapshot.squares, // revert to start of turn squares
-          usedby: snapshot.usedby, // revert to start of turn used by
+          squareArray: snapshot.squareArray, // revert to start of turn squares
           ptiles: snapshot.ptiles, // prisoners rack did not change
           tiles: tiles, // tile pool did not change
           whoseturn: newWhoseturn, // may have ended the game
@@ -1039,8 +872,7 @@ const Game = ({isrejoin
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
           sender: participant,
-          squares: snapshot.squares, // revert to start of turn squares
-          usedby: snapshot.usedby, // revert to start of turn used by
+          squareArray: snapshot.squareArray, // revert to start of turn squares
           gtiles: snapshot.gtiles, // guards rack did not change
           tiles: tiles, // tile pool did not change
           whoseturn: newWhoseturn, // may have ended the game
@@ -1101,7 +933,9 @@ const Game = ({isrejoin
             if (dir === c.DIR_RIGHT) { // playing rightwards
               let newc = -1;
               for (var tempcol = col + 1; tempcol < edge + 1 && newc === -1; tempcol++) {
-                if (squares[row][tempcol] === c.SQUARE_UNUSED) {newc = tempcol;}
+                if (squareArray[row][tempcol].usedby === c.USED_BY_NONE) {
+                  newc = tempcol;
+                }
               }
               if (newc === -1) {
                 newRcd = [-1,-1,c.DIR_NONE];
@@ -1116,7 +950,9 @@ const Game = ({isrejoin
               let newr = -1;
               let numrows = (racksize*2)+1;
               for (var temprow = row + 1; temprow < numrows && newr === -1; temprow++) {
-                if (squares[temprow][col] === c.SQUARE_UNUSED) {newr = temprow;}
+                if (squareArray[temprow][col].usedby === c.USED_BY_NONE) {
+                  newr = temprow;
+                }
               }
               if (newr === -1) {
                 newRcd = [-1,-1,c.DIR_NONE];
@@ -1135,17 +971,18 @@ const Game = ({isrejoin
         // Same as clicking on a played-this-move tile in terms of returning the tile to the rack
         // However we also want to set up rcd so they can press the key they meant and continue
         let coord = currentcoords[currentcoords.length - 1]; // tile to return to rack
+        let row = parseInt(coord.split("-")[0]);
+        let col = parseInt(coord.split("-")[1]);
         let newCurrentcoords = [...currentcoords];
         let newPtiles = [...ptiles];
         let newGtiles = [...gtiles];
-        let newUsedby = [...usedby];
-        let newSquares = [...squares];
+        let newSquareArray = JSON.parse(JSON.stringify(squareArray));
+        let newSquareArrayRow = newSquareArray[row];
+        let newSquareArrayCell = newSquareArrayRow[col];
         let newRcd = [-1,-1,c.DIR_NONE];
         let newSelection = selection;
         newCurrentcoords.splice(currentcoords.length-1,1);
-        let row = parseInt(coord.split("-")[0]);
-        let col = parseInt(coord.split("-")[1]);
-        let returnedTile = squares[row][col];
+        let returnedTile = squareArray[row][col].letter;
         if (whoseturn === c.WHOSE_TURN_PRISONERS) {
           newPtiles.push(returnedTile);
           newSelection = newPtiles.length-1;
@@ -1153,8 +990,10 @@ const Game = ({isrejoin
           newGtiles.push(returnedTile);
           newSelection = newGtiles.length-1;
         }
-        newUsedby[row][col] = c.USED_BY_NONE;
-        newSquares[row][col] = c.SQUARE_UNUSED;
+        newSquareArrayCell.usedby = c.USED_BY_NONE;
+        newSquareArrayCell.letter = c.LETTER_NONE;
+        newSquareArrayRow[col] = newSquareArrayCell;
+        newSquareArray[row] = [...newSquareArrayRow];
         let dir = rcd[2];
         if (dir !== c.DIR_NONE) {
           // direction was set so keep it
@@ -1166,8 +1005,7 @@ const Game = ({isrejoin
         setCurrentcoords(newCurrentcoords);
         setGtiles(newGtiles);
         setPtiles(newPtiles);
-        setSquares(newSquares);
-        setUsedby(newUsedby);
+        setSquareArray([...newSquareArray]);
         setRcd(newRcd);
         setSelection(newSelection);
       }
@@ -1237,21 +1075,17 @@ const Game = ({isrejoin
             {participant === whoseturn ?
               <div className="row" onKeyDownCapture={handleKeyDown}>
                 <Board
-                  squares={squares}
-                  usedby={usedby}
+                  squareArray={squareArray}
                   rcd={rcd}
                   onClick={(ri, ci) => handleBoardSquareClick(ri, ci, -1,null)}
-                  racksize={racksize}
                 />
               </div>
             :
               <div className="row">
                 <Board
-                  squares={squares}
-                  usedby={usedby}
+                  squareArray={squareArray}
                   rcd={rcd}
                   onClick={() => {}}
-                  racksize={racksize}
                 />
               </div>
             }
@@ -1266,7 +1100,7 @@ const Game = ({isrejoin
             {whoseturn === c.WHOSE_TURN_GAMEOVER ?
               <h1>Game Over!</h1>
             :
-              <p>{jokes[jokeindex]}</p>
+              <p>{c.JOKE_ARRAY[jokeindex]}</p>
             }
           </div>
         </div>

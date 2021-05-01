@@ -132,9 +132,9 @@ function showActionButtons(props) {
 }
 function showActionButtonAllowUndo(props) {
     return <div className="pbActionButtonDiv">
-        <p>
+        <div>
             <AllowUndoLastPlay onClick={() => props.onClickAllowUndo()} alreadyAllowed={props.allowRewind}/>
-        </p>
+        </div>
     </div>
 }
 function showActionButtonUndoLastPlay(props) {

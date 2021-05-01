@@ -19,63 +19,59 @@ const Lobby = ({setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname
     },[wsmessage])
   
     function processLobbyMessage(message) {
-      try {
-        let messageData = JSON.parse(message);
-        let sendergameid = messageData.gameid;
-        let sendernickname = messageData.nickname;
-        let wt = messageData.whoseturn;
-        let rs = messageData.racksize;
-        if (sendergameid && sendergameid.length > 0 && rs && wt && wt.length > 0) {
-          let anyUpdates = false;
-          let senderPG = messageData.sender;
-          let newGamelist = [...gamelist];
-          let gi = getGamelistIndex(sendergameid);
-          let newPlayingP = senderPG === c.PARTY_TYPE_PRISONERS ? true : gi > -1 ? gamelist[gi].playingP : false;
-          let newPlayingG = senderPG === c.PARTY_TYPE_GUARDS ? true : gi > -1 ? gamelist[gi].playingG : false;
-          let newRacksize = rs;
-  
-          let newgamestatus = "Unknown";
-          if (wt === c.WHOSE_TURN_GAMEOVER) {
-            newgamestatus = "Game over";
-          } else if (wt === c.WHOSE_TURN_PRISONERS) {
-            newgamestatus = "Prisoners turn";
-          } else if (wt === c.WHOSE_TURN_GUARDS) {
-            newgamestatus = "Guards turn";
-          }
-  
-          let newgamedata = {
-            gameid: sendergameid,
-            nicknameP: senderPG === c.PARTY_TYPE_PRISONERS ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
-            nicknameG: senderPG === c.PARTY_TYPE_GUARDS ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
-            gamestatus: newgamestatus,
-            playingP: newPlayingP,
-            playingG: newPlayingG,
-            racksize: newRacksize
-          }
-          if (gi < 0) { // Game not in list yet, put it in the list
-            anyUpdates = true;
-            newGamelist = [...newGamelist, newgamedata];
-          }
-          else { // Game is in the list, check for needed updates
-            let oldgamedata = gamelist[gi];
-            if (oldgamedata.nicknameP !== newgamedata.nicknameP ||
-                oldgamedata.nicknameG !== newgamedata.nicknameG ||
-                oldgamedata.gamestatus !== newgamedata.gamestatus ||
-                oldgamedata.playingP !== newgamedata.playingP ||
-                oldgamedata.playingG !== newgamedata.playingG ||
-                oldgamedata.racksize !== newgamedata.racksize
-              ) {
-                anyUpdates = true;
-                newGamelist[gi] = newgamedata;
-              }
-          }
-          if (anyUpdates) {
-            setGamelist(newGamelist);
-          }
-        }  
-      } catch {
-        window.alert("Error processing lobby message");
-      }
+      let messageData = JSON.parse(message);
+      let sendergameid = messageData.gameid;
+      let sendernickname = messageData.nickname;
+      let wt = messageData.whoseturn;
+      let rs = messageData.racksize;
+      if (sendergameid && sendergameid.length > 0 && rs && wt && wt.length > 0) {
+        let anyUpdates = false;
+        let senderPG = messageData.sender;
+        let newGamelist = [...gamelist];
+        let gi = getGamelistIndex(sendergameid);
+        let newPlayingP = senderPG === c.PARTY_TYPE_PRISONERS ? true : gi > -1 ? gamelist[gi].playingP : false;
+        let newPlayingG = senderPG === c.PARTY_TYPE_GUARDS ? true : gi > -1 ? gamelist[gi].playingG : false;
+        let newRacksize = rs;
+
+        let newgamestatus = "Unknown";
+        if (wt === c.WHOSE_TURN_GAMEOVER) {
+          newgamestatus = "Game over";
+        } else if (wt === c.WHOSE_TURN_PRISONERS) {
+          newgamestatus = "Prisoners turn";
+        } else if (wt === c.WHOSE_TURN_GUARDS) {
+          newgamestatus = "Guards turn";
+        }
+
+        let newgamedata = {
+          gameid: sendergameid,
+          nicknameP: senderPG === c.PARTY_TYPE_PRISONERS ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
+          nicknameG: senderPG === c.PARTY_TYPE_GUARDS ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
+          gamestatus: newgamestatus,
+          playingP: newPlayingP,
+          playingG: newPlayingG,
+          racksize: newRacksize
+        }
+        if (gi < 0) { // Game not in list yet, put it in the list
+          anyUpdates = true;
+          newGamelist = [...newGamelist, newgamedata];
+        }
+        else { // Game is in the list, check for needed updates
+          let oldgamedata = gamelist[gi];
+          if (oldgamedata.nicknameP !== newgamedata.nicknameP ||
+              oldgamedata.nicknameG !== newgamedata.nicknameG ||
+              oldgamedata.gamestatus !== newgamedata.gamestatus ||
+              oldgamedata.playingP !== newgamedata.playingP ||
+              oldgamedata.playingG !== newgamedata.playingG ||
+              oldgamedata.racksize !== newgamedata.racksize
+            ) {
+              anyUpdates = true;
+              newGamelist[gi] = newgamedata;
+            }
+        }
+        if (anyUpdates) {
+          setGamelist(newGamelist);
+        }
+      }  
     }
     function getGamelistIndex(gid) {
       for (var i = 0; i < gamelist.length; ++i) {

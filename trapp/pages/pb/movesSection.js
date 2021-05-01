@@ -12,11 +12,11 @@ const ShowMoves = ({moves}) => { // show moves made
               <span className={`pbMove ${m.type}`}>
                 {m.type === c.MOVE_TYPE_PLAY ?
                   <>{m.pos} {m.mainword.replace("Q","Qu")}
-                    {m.extrawords?.map((w) => (
-                      <>
+                    {m.extrawords?.map((w, wi) => (
+                      <span key={`extraword${wi}`}>
                         ,&nbsp;
                         {w.replace("Q","Qu")}
-                      </>
+                      </span>
                     ))}
                   </>
                 :
