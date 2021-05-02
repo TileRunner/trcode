@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Chat = ({gameid, client, nickname, msgs=[], setMsgs, participant}) => {
+const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) => {
     const [nextmsg, setNextmsg] = useState('');
    
     const handleKeyDown = (event) => {
@@ -46,13 +46,17 @@ const Chat = ({gameid, client, nickname, msgs=[], setMsgs, participant}) => {
             ))}
             <tr>
               <td colSpan="2">
-                <textarea className={nextmsg === "" ? "pbChatInputEmpty" : "pbChatInput"}
-                  name="nextmsgInputArea"
-                  value={nextmsg}
-                  onChange={(e) => {setNextmsg(e.target.value);}}
-                  onKeyDownCapture={handleKeyDown}
-                  placeholder="chat..."
-                />
+                {nickname === "" ?
+                  <span>Please enter nickname to use chat</span>
+                :
+                  <textarea className={nextmsg === "" ? "pbChatInputEmpty" : "pbChatInput"}
+                    name="nextmsgInputArea"
+                    value={nextmsg}
+                    onChange={(e) => {setNextmsg(e.target.value);}}
+                    onKeyDownCapture={handleKeyDown}
+                    placeholder="chat..."
+                  />
+                }
               </td>
             </tr>
           </tbody>

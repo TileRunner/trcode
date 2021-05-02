@@ -23,6 +23,7 @@ export default function PrisonBreak() {
   return (
     participant === c.PARTY_TYPE_UNDETERMINED ?
       <Lobby
+        client={client}
         setIsrejoin={setIsrejoin}
         wsmessage={wsmessage}
         // client={client}
