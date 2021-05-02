@@ -95,7 +95,7 @@ const Game = ({isrejoin
           gtiles: [...tempGTiles]    
         });
         client.send(
-          JSON.stringify({
+          {
             type: "pb",
             func: "hello",
             sender: participant,
@@ -103,20 +103,21 @@ const Game = ({isrejoin
             nickname: nickname, // player nickname
             whoseturn: whoseturn,
             racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
-          })
+          }
         );
       }
       else
       {
         // Prisoner rejoin or guard join or guard rejoin
         client.send(
-          JSON.stringify({
+          {
             gameid: gameid, // the id for the game
             nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "requestgamedata", // request game data
             sender: participant
-        }));
+          }
+        );
       }
     }, []);
     useEffect(() => {
@@ -140,7 +141,7 @@ const Game = ({isrejoin
       let messageData = JSON.parse(message);
       if (messageData.type === "announce") {
         client.send(
-          JSON.stringify({
+          {
             type: "pb",
             func: "hello",
             sender: participant,
@@ -148,7 +149,7 @@ const Game = ({isrejoin
             nickname: nickname, // player nickname
             whoseturn: whoseturn,
             racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
-          })
+          }
         );
       }
       else if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
@@ -158,7 +159,7 @@ const Game = ({isrejoin
         }
         if (messageData.func === "requestgamedata" && messageData.sender !== participant) { // Opponent requested game info
           client.send(
-            JSON.stringify({
+            {
               gameid: gameid, // the id for the game
               nickname: nickname, // player nickname
               type: "pb", // prisonbreak
@@ -174,7 +175,7 @@ const Game = ({isrejoin
               rescues: rescues,
               racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
               allowRewind: allowRewind
-            })
+            }
           );
         }
         if (messageData.func === "providegamedata" && messageData.sender !== participant) { 
@@ -398,7 +399,7 @@ const Game = ({isrejoin
       });
   
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -411,7 +412,7 @@ const Game = ({isrejoin
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
           moves: newMoves, // a move was made
           rescues: newRescues // may have rescued another prisoner
-        })
+        }
       );
     };
   
@@ -457,7 +458,7 @@ const Game = ({isrejoin
       });
   
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -469,7 +470,7 @@ const Game = ({isrejoin
           moves: newMoves, // a move was made
           whoseturn: newWhoseturn, // may have ended the game
           racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
-          })
+          }
         );
       };
   
@@ -504,7 +505,7 @@ const Game = ({isrejoin
       });
   
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -517,7 +518,7 @@ const Game = ({isrejoin
           tiles: newTiles, // we picked new tiles so tile pool changed
           moves: newMoves, // a move was made
           rescues: rescues // no rescues on an exchange
-        })
+        }
       );
   
     }
@@ -553,7 +554,7 @@ const Game = ({isrejoin
       });
   
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -565,7 +566,7 @@ const Game = ({isrejoin
           gtiles: newGtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           moves: newMoves // a move was made
-        })
+        }
       );
   
     }
@@ -762,14 +763,14 @@ const Game = ({isrejoin
       if (!allowRewind) {
         setAllowRewind(true);
         client.send(
-          JSON.stringify({
+          {
             gameid: gameid, // the id for the game
             nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "allowundo", // allow undo last turn
             racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
             sender: participant // who is allowing it
-            })
+          }
         );
       }
     }
@@ -802,7 +803,7 @@ const Game = ({isrejoin
       setSnapshot(newSnapshot);
       // Just send everything even though some could be hard coded in processMessage by opponent
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -817,7 +818,7 @@ const Game = ({isrejoin
           rescues: newRescues, // rescue count
           moves: newMoves, // a move was made
           snapshot: newSnapshot
-        })
+        }
       );
     }
   
@@ -840,7 +841,7 @@ const Game = ({isrejoin
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -853,7 +854,7 @@ const Game = ({isrejoin
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
           moves: newMoves, // a move was made
           rescues: rescues // no rescues on a pass
-        })
+        }
       );
     }
   
@@ -867,7 +868,7 @@ const Game = ({isrejoin
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -879,7 +880,7 @@ const Game = ({isrejoin
           whoseturn: newWhoseturn, // may have ended the game
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
           moves: newMoves // a move was made
-        })
+        }
       );
     }
   
@@ -893,7 +894,7 @@ const Game = ({isrejoin
 
     const requestGameData = () => {
       client.send(
-        JSON.stringify({
+        {
           gameid: gameid, // the id for the game
           nickname: nickname, // player nickname
           type: "pb", // prisonbreak
@@ -901,7 +902,7 @@ const Game = ({isrejoin
           whoseturn: whoseturn, // for lobby to pick up this message
           racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
           func: "requestgamedata" // request game data
-        })
+        }
       )
     }
   

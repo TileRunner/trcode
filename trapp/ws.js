@@ -21,9 +21,10 @@ class Timer {
 }
 export default class CustomSocket {
     // Constructor which takes socket URL as parameter
-    constructor(url, messageFunction) {
+    constructor(url, messageFunction, clientType) {
         this.customSocket = null;
         this.socketUrl = url;
+        this.clientType = clientType;
         this.reconnectTimer = new Timer(() => {
             this.disconnect();
             this.connect();
@@ -68,6 +69,6 @@ export default class CustomSocket {
         this.customSocket.close();
     }
     send(message) {
-        this.customSocket.send(JSON.stringify(message));
+        this.customSocket.send(JSON.stringify(message)); // Has to be a string going across the wire, not an object
     }
 }

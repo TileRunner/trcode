@@ -11,14 +11,14 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
         setMsgs(newMsgs);
         setNextmsg('');
         client.send(
-          JSON.stringify({
+          {
             gameid: gameid, // the id for the game
             nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "chat", // send chat message
             sender: participant, // who sent it
             sendmsg: sendmsg // the message typed in the chat
-          })
+          }
         );
         return;
       }
