@@ -6,7 +6,7 @@ import ShowUnseenTiles from '../pb/unseenTilesSection';
 import ShowMoves from '../pb/movesSection';
 import ShowRescues from '../pb/rescuesSection';
 import Chat from '../pb/chatSection';
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 const Game = ({isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
@@ -373,14 +373,7 @@ const Game = ({isrejoin
       }
       newPtiles.sort();
       let newWhoseturn = newPtiles.length > 0 ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_GAMEOVER;
-      if (squareArray[0][0].usedby         !== c.USED_BY_NONE &&
-          squareArray[0][middle].usedby    !== c.USED_BY_NONE &&
-          squareArray[0][edge].usedby      !== c.USED_BY_NONE &&
-          squareArray[middle][0].usedby    !== c.USED_BY_NONE &&
-          squareArray[middle][edge].usedby !== c.USED_BY_NONE &&
-          squareArray[edge][0].usedby      !== c.USED_BY_NONE &&
-          squareArray[edge][middle].usedby !== c.USED_BY_NONE &&
-          squareArray[edge][edge].usedby   !== c.USED_BY_NONE) {
+      if (!c.AnyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
@@ -433,14 +426,7 @@ const Game = ({isrejoin
       let snapptiles = [...ptiles];
       let snapgtiles = [...gtiles];
       let newWhoseturn = newGtiles.length > 0 ? c.WHOSE_TURN_PRISONERS : c.WHOSE_TURN_GAMEOVER;
-      if (squareArray[0][0].usedby         !== c.USED_BY_NONE &&
-          squareArray[0][middle].usedby    !== c.USED_BY_NONE &&
-          squareArray[0][edge].usedby      !== c.USED_BY_NONE &&
-          squareArray[middle][0].usedby    !== c.USED_BY_NONE &&
-          squareArray[middle][edge].usedby !== c.USED_BY_NONE &&
-          squareArray[edge][0].usedby      !== c.USED_BY_NONE &&
-          squareArray[edge][middle].usedby !== c.USED_BY_NONE &&
-          squareArray[edge][edge].usedby   !== c.USED_BY_NONE) {
+      if (!c.AnyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
@@ -493,13 +479,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquareArray([...snapshot.squareArray]);
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
       setWhoseturn(c.WHOSE_TURN_GUARDS);
       setPtiles(newPtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squareArray: [...snapshot.squareArray],
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
         ptiles: [...newPtiles],
         gtiles: [...gtiles],
       });
@@ -542,13 +528,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquareArray([...snapshot.squareArray]);
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
       setWhoseturn(c.WHOSE_TURN_PRISONERS);
       setGtiles(newGtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squareArray: [...snapshot.squareArray],
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
         ptiles: [...ptiles],
         gtiles: [...newGtiles],
       });
@@ -572,70 +558,93 @@ const Game = ({isrejoin
     }
   
     function isPlayValid() {
-      if (squareArray[middle][middle].usedby === c.USED_BY_NONE) {
+      // Check if this is the first word since it affects the validity rules
+      let firstWord = true;
+      let nummoves = moves.length;
+      for (var moveindex = 0; firstWord && (moveindex < nummoves); ++moveindex) {
+        if (moves[moveindex].type === c.MOVE_TYPE_PLAY) {
+          firstWord = false;
+        }
+      }
+      // First word must hit center square
+      if (firstWord && squareArray[middle][middle].usedby === c.USED_BY_NONE) {
         window.alert("First play must hit center square");
         return false;
       }
-      let numrows = edge+1;
-      let numcols = edge+1;
-      let lowrow = numrows;
-      let highrow = -1;
-      let lowcol = numcols;
-      let highcol = -1;
-      for (var temprow=0; temprow < numrows; ++temprow) {
-        for (var tempcol=0; tempcol < numcols; ++tempcol) {
-          if (squareArray[temprow][tempcol].usedby !== c.USED_BY_NONE) {
-            if (!(temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) &&
-             !(tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) &&
-             !(temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) &&
-             !(tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE)
-             ) {
-              window.alert("Each played tile must be part of a word");
-              return false;
-             }
-             if (snapshot.squareArray[temprow][tempcol].usedby === c.USED_BY_NONE) {
-               // This square was played on this turn
-               if (temprow < lowrow) { lowrow = temprow;}
-               if (temprow > highrow) { highrow = temprow;}
-               if (tempcol < lowcol) { lowcol = tempcol;}
-               if (tempcol > highcol) { highcol = tempcol;}
-             }
-          }
-        }
-      }
-      if (lowrow === numrows) {
+      // At least 1 tile must be played
+      if (currentcoords.length === 0) {
         window.alert("You didn't play any tiles");
         return false;
       }
+      /* Go through each played tile
+          Make sure it is not isolated from all the other tiles
+          Determine the lowest and highest row and column numbers of tiles played this move
+      */
+      let numcoords = currentcoords.length;
+      let lowrow = edge+1;
+      let highrow = -1;
+      let lowcol = edge+1;
+      let highcol = -1;
+      for (var coord=0; coord < numcoords; ++coord) { // Each tile played this move
+        let temprow = parseInt(currentcoords[coord].split("-")[0]);
+        let tempcol = parseInt(currentcoords[coord].split("-")[1]);
+        if (temprow < lowrow) { lowrow = temprow;}
+        if (temprow > highrow) { highrow = temprow;}
+        if (tempcol < lowcol) { lowcol = tempcol;}
+        if (tempcol > highcol) { highcol = tempcol;}
+        // Make sure there is another tile immediately above, below, left, or right (not isolated)
+        if (!(temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) &&
+          !(tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) &&
+          !(temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) &&
+          !(tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE)
+          ) {
+            window.alert("Each played tile must be part of a word");
+            return false;
+          }
+      }
+      // Using the high and low values, check if the play is in a straight line
       if (lowrow !== highrow && lowcol !== highcol) {
         window.alert("Tiles played must be in a straight line");
         return false;
       }
       let playthru = false;
       let hookmade = false;
+      /* Traverse from first played tile to last player tile
+          Make sure there are no unused squares inbetween (gaps in the played word)
+          Check if we played through existing tiles
+          Check if we hooked existing tiles/words
+      */
       for (var temprow = lowrow; temprow <= highrow; ++temprow) {
         for (var tempcol = lowcol; tempcol <= highcol; ++tempcol) {
           if (squareArray[temprow][tempcol].usedby === c.USED_BY_NONE) {
             window.alert("There is a gap in your word");
             return false;
           }
-          if (snapshot.squareArray[temprow][tempcol].usedby !== c.USED_BY_NONE) {
-            playthru = true;
+          if (!firstWord) { // Play through and hook not possible on first move
+            let tempcoord = temprow + "-" + tempcol;
+            if (currentcoords.indexOf(tempcoord) < 0) { // Tile was not played this move (was already on the board)
+              playthru = true;
+            }
+            if (lowrow === highrow && temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
+            if (lowrow === highrow && temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
+            if (lowcol === highcol && tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) { hookmade = true; }
+            if (lowcol === highcol && tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE) { hookmade = true; }  
           }
-          if (lowrow === highrow && temprow > 0 && squareArray[temprow-1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
-          if (lowrow === highrow && temprow < edge && squareArray[temprow+1][tempcol].usedby !== c.USED_BY_NONE) { hookmade = true; }
-          if (lowcol === highcol && tempcol > 0 && squareArray[temprow][tempcol-1].usedby !== c.USED_BY_NONE) { hookmade = true; }
-          if (lowcol === highcol && tempcol < edge && squareArray[temprow][tempcol+1].usedby !== c.USED_BY_NONE) { hookmade = true; }
         }
       }
-      // Check play to or from a tile (play through but not either side)
-      if (lowrow === highrow && lowcol > 0 && snapshot.squareArray[lowrow][lowcol-1].usedby !== c.USED_BY_NONE) { playthru = true; }
-      if (lowrow === highrow && highcol < edge && snapshot.squareArray[lowrow][highcol+1].usedby !== c.USED_BY_NONE) { playthru = true; }
-      if (lowcol === highcol && lowrow > 0 && snapshot.squareArray[lowrow-1][lowcol] !== c.USED_BY_NONE) { playthru = true; }
-      if (lowcol === highcol && highrow < edge && snapshot.squareArray[highrow+1][lowcol].usedby !== c.USED_BY_NONE) { playthru = true; }
-      if (!playthru && !hookmade && snapshot.squareArray[middle][middle].usedby !== c.USED_BY_NONE) {
-        window.alert("Words must be connected");
-        return false;
+      if (!firstWord) {
+        // We already found play through a tile between first and last played tile
+        // Now check if played word has a tile before first or after last played tile
+        if (lowrow === highrow && lowcol > 0 && squareArray[lowrow][lowcol-1].usedby !== c.USED_BY_NONE) { playthru = true; }
+        if (lowrow === highrow && highcol < edge && squareArray[lowrow][highcol+1].usedby !== c.USED_BY_NONE) { playthru = true; }
+        if (lowcol === highcol && lowrow > 0 && squareArray[lowrow-1][lowcol] !== c.USED_BY_NONE) { playthru = true; }
+        if (lowcol === highcol && highrow < edge && squareArray[highrow+1][lowcol].usedby !== c.USED_BY_NONE) { playthru = true; }
+        // Now we have fully identified play through we can make sure they played through or made a hook
+        // This in mandatory since it is not the first move
+        if (!playthru && !hookmade) {
+          window.alert("New words must extend an existing word and/or hook existing words or tiles");
+          return false;
+        }
       }
       return true;
     }
@@ -752,7 +761,7 @@ const Game = ({isrejoin
           rescues: rescue count
       */
       let rewindInfo = {
-        squareArray: [...snapshot.squareArray],
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
         rack: whoseturn === c.WHOSE_TURN_GUARDS ? [...snapshot.gtiles]: [...snapshot.ptiles],
         tiles: [...tiles],
         rescues: rescues
@@ -823,7 +832,7 @@ const Game = ({isrejoin
     }
   
     const recallTiles = () => {
-      setSquareArray([...snapshot.squareArray]);
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
       setPtiles([...snapshot.ptiles]);
       setGtiles([...snapshot.gtiles]);
       setSelection(-1);

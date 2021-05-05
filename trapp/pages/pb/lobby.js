@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Chat from '../pb/chatSection';
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
 const availableActionNone = 0;

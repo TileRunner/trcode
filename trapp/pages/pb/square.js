@@ -1,4 +1,4 @@
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 const Square = ({usedby, type, letter, ri, ci, rcd, onClick}) => {
     // need ri and ci and rcd to display selected direction arrow when appropriate

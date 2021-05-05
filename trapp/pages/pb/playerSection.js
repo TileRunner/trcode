@@ -1,4 +1,4 @@
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 const PlayerSection = (props) => {
     const playerIcon = props.participant === c.PARTY_TYPE_PRISONERS ? c.PARTY_ICON_PRISONERS : c.PARTY_ICON_GUARDS;

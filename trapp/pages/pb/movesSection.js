@@ -1,4 +1,4 @@
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 const ShowMoves = ({moves}) => { // show moves made
     return (

@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
-import * as c from '../../lib/pbconstants';
+import * as c from '../../lib/pbcommon';
 
 export default function PrisonBreak() {
   const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins

@@ -160,7 +160,7 @@ export const SQUARE_TYPE_CENTRE = 'CenterSquare'; // The centre square
 export const SQUARE_TYPE_STYLE1 = 'style1'; // The unused non-special squares alternate style
 export const SQUARE_TYPE_STYLE2 = 'style2'; // The unused non-special squares alternate style
 export const LETTER_NONE = ''; // No letter
-export function InitialSquareArray(racksize) {
+export function InitialSquareArray(racksize) { // Initial square array for given rack size
     let size = (racksize * 2) + 1;
     let sqa = Array(size);
     for (var row = 0; row < size; ++row) {
@@ -179,4 +179,21 @@ export function InitialSquareArray(racksize) {
         sqa[row] = [...newrow];
     }
     return sqa;
+}
+export function AnyUnusedEscapeHatches(squareArray=[]) { // Used to check for game over due to no more escapes possible
+  let racksize = squareArray.length;
+  let edge = racksize * 2;
+  let middle = racksize;
+  let anyLeft = true;
+  if (squareArray[0][0].usedby       !== USED_BY_NONE &&
+    squareArray[0][middle].usedby    !== USED_BY_NONE &&
+    squareArray[0][edge].usedby      !== USED_BY_NONE &&
+    squareArray[middle][0].usedby    !== USED_BY_NONE &&
+    squareArray[middle][edge].usedby !== USED_BY_NONE &&
+    squareArray[edge][0].usedby      !== USED_BY_NONE &&
+    squareArray[edge][middle].usedby !== USED_BY_NONE &&
+    squareArray[edge][edge].usedby   !== USED_BY_NONE) {
+      anyLeft = false;; // No escape hatches left
+  }
+  return anyLeft;
 }
