@@ -23,6 +23,10 @@ wss.on("connection", (ws) => {
 // merely bounce the message from one client back to all clients
 const processMessage = (message) => {
     wss.clients.forEach((client) => {
+        /* client.clientType is undefined here; it does not matter that CustomSocket has it
+           wss.clients is not a list of CustomSocket instances so it cannot see clientType
+           I was hoping to use clientType to only send messages to clients in the same type of game
+        */
         client.send(message);
     });
 }

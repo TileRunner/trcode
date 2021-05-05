@@ -25,7 +25,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
   
     function processLobbyMessage(message) {
       let messageData = JSON.parse(message);
-      if (messageData.func === "chat" && !messageData.gameid && messageData.nickname !== nickname) {
+      if (messageData.type === "pb" && messageData.func === "chat" && !messageData.gameid && messageData.nickname !== nickname) {
         let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
         setChatmsgs(newChatmsgs);
         return;

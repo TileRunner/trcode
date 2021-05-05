@@ -139,7 +139,7 @@ const Game = ({isrejoin
   
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
-      if (messageData.type === "announce") {
+      if (messageData.type === "pb" && messageData.func === "announce") {
         client.send(
           {
             type: "pb",

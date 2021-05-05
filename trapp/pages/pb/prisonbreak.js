@@ -16,7 +16,7 @@ export default function PrisonBreak() {
     // If I reference participant here it will always be the initial value.
     setWsmessage(message.data)
   }
-  const [client] = useState(new CustomSocket(host, acceptMessage));
+  const [client] = useState(new CustomSocket(host, acceptMessage, "pb"));
   useEffect(() => (
     client.connect()
   ),[]);
