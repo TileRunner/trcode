@@ -120,202 +120,211 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
             </Link>
           </div>
         </div>
-        <div className="w3-container w3-cell">
-          <div className="w3-container">
-            <div className="w3-bar">
-              <div className="w3-bar-item">
-                <h2><b>Nickname:</b></h2>
-              </div>
-              <div className="w3-bar-item">
-                <input className="w3-input w3-border w3-blue myCommonFont" type="text"
-                  name="nickname"
-                  value={nickname}
-                  onChange={(e) => {
-                    setNickname(e.target.value);
-                  } } />
-              </div>
-            </div>
-          </div>
-          <div className="w3-container">
-            <div className="w3-bar">
+        <div className="w3-row">
+          <div className="w3-col s9">
+            <div className="w3-container">
+              <div className="w3-bar">
                 <div className="w3-bar-item">
-                  <h2><span className="pbPlayerTitle">PRISONERS<i className="material-icons">arrow_right</i></span></h2>
+                  <h3><span className="pbPlayerTitle">All Participants ~</span></h3>
                 </div>
                 <div className="w3-bar-item">
-                  <h2><b>Game ID:</b></h2>
+                  <h3><b>Nickname:</b></h3>
                 </div>
                 <div className="w3-bar-item">
-                  <input className="w3-input w3-border w3-blue myCommonFont"
-                    type="text"
-                    name="gameid"
-                    value={gameid}
+                  <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+                    name="nickname"
+                    value={nickname}
                     onChange={(e) => {
-                      setGameid(e.target.value);
+                      setNickname(e.target.value);
                     } } />
                 </div>
-                <div className="w3-bar-item">
-                  <h2><b>Rack Size:</b></h2>
-                </div>
-                <div className="w3-bar-item">
-                  <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-                    onClick={() => selectRackSize(4)}
-                    data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
-                    autoFocus
-                  >
-                    4
-                  </button>
-                  <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-                    onClick={() => selectRackSize(5)}
-                    data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
-                  >
-                    5
-                  </button>
-                  <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-                    onClick={() => selectRackSize(6)}
-                    data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
-                  >
-                    6
-                  </button>
-                  <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
-                    onClick={() => selectRackSize(7)}
-                    data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
-                  >
-                    7
-                  </button>
-                  <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
+              </div>
+            </div>
+            <div className="w3-container">
+              <div className="w3-bar">
+                  <div className="w3-bar-item">
+                    <h3><span className="pbPlayerTitle">Prisoners ~</span></h3>
                   </div>
-                <div className="w3-bar-item">
-                  <button id="startgame" className={buttonClassName}
-                    onClick={function () {
-                      if (nickname.length === 0) {
-                        window.alert("Please enter nickname before starting a game");
-                      } else if (gameid.length > 0) {
-                        if (isPlayingP(gameid)) {
-                          window.alert("Prisoners already playing that game");
+                  <div className="w3-bar-item">
+                    <h3><b>Game ID:</b></h3>
+                  </div>
+                  <div className="w3-bar-item">
+                    <input className="w3-input w3-border w3-blue myCommonFont"
+                      type="text"
+                      name="gameid"
+                      value={gameid}
+                      onChange={(e) => {
+                        setGameid(e.target.value);
+                      } } />
+                  </div>
+                  <div className="w3-bar-item">
+                    <h3><b>Rack Size:</b></h3>
+                  </div>
+                  <div className="w3-bar-item">
+                    <div className="w3-row">
+                      <button id="selectracksize4" className={racksize === 4 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                        onClick={() => selectRackSize(4)}
+                        data-toggle="tooltip" title="4 letter racks, 9 x 9 board"
+                        autoFocus
+                      >
+                        4
+                      </button>
+                      <button id="selectracksize5" className={racksize === 5 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                        onClick={() => selectRackSize(5)}
+                        data-toggle="tooltip" title="5 letter racks, 11 x 11 board"
+                      >
+                        5
+                      </button>
+                      <button id="selectracksize6" className={racksize === 6 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                        onClick={() => selectRackSize(6)}
+                        data-toggle="tooltip" title="6 letter racks, 13 x 13 board"
+                      >
+                        6
+                      </button>
+                      <button id="selectracksize7" className={racksize === 7 ? "pbLobbyRackSizeSelected" : "pbLobbyRackSize"}
+                        onClick={() => selectRackSize(7)}
+                        data-toggle="tooltip" title="7 letter racks, 15 x 15 board"
+                      >
+                        7
+                      </button>
+                    </div>
+                    <div class="w3-row">
+                      <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
+                    </div>
+                    </div>
+                  <div className="w3-bar-item">
+                    <button id="startgame" className={buttonClassName}
+                      onClick={function () {
+                        if (nickname.length === 0) {
+                          window.alert("Please enter nickname before starting a game");
+                        } else if (gameid.length > 0) {
+                          if (isPlayingP(gameid)) {
+                            window.alert("Prisoners already playing that game");
+                          } else {
+                            setParticipant(c.PARTY_TYPE_PRISONERS);
+                          }
                         } else {
-                          setParticipant(c.PARTY_TYPE_PRISONERS);
+                          window.alert("Please enter Game ID before starting a game");
                         }
-                      } else {
-                        window.alert("Please enter Game ID before starting a game");
-                      }
-                    } }
-                  >
-                    Start Game
-                  </button>
+                      } }
+                    >
+                      Start Game
+                    </button>
+                  </div>
+              </div>
+            </div>
+            <div className="w3-container">
+              <div className="w3-bar">
+                <div className="w3-bar-item">
+                  <h3><span className="pbPlayerTitle">Guards ~</span></h3>
                 </div>
-            </div>
-          </div>
-          <div className="w3-container">
-            <div className="w3-bar">
-              <div className="w3-bar-item">
-                <h2><span className="pbPlayerTitle">GUARDS<i className="material-icons">arrow_right</i></span></h2>
-              </div>
-              <div className="w3-bar-item">
-                <span className="myCommonFont"><h2>Find and click the "Join Game" button for your game.</h2></span>
+                <div className="w3-bar-item">
+                  <span className="myCommonFont"><h2>Find and click the "Join Game" button for your game.</h2></span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w3-container">
-            <div className="w3-bar">
-              <div className="w3-bar-item">
-                <h1><i className="material-icons w3-right">report_problem</i></h1>
-              </div>
-              <div className="w3-bar-item">
-                <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+            <div className="w3-container">
+              <div className="w3-bar">
+                <div className="w3-bar-item">
+                  <h1><i className="material-icons w3-right">report_problem</i></h1>
+                </div>
+                <div className="w3-bar-item">
+                  <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w3-container">
-            <div className="w3-bar">
-              <div className="w3-bar-item">
-                <h2 className="myCommonFont"><b>Game list:</b></h2>
-              </div>
-              <div className="w3-bar-item">
-                <table className="w3-table-all w3-card-4">
-                  <thead>
-                    <tr className="w3-blue h4 myCommonFont">
-                      <th className="w3-border-right">Game ID</th>
-                      <th className="w3-border-right">Prisoners</th>
-                      <th className="w3-border-right">Guards</th>
-                      <th className="w3-border-right">Rack Size</th>
-                      <th>Game Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {gamelist.map((value, index) => (
-                      <tr key={`OtherGame${index}`} className="myCommonFont w3-hover-green">
-                        <td className="w3-border-right"><b>{value.gameid}</b></td>
-                        {availableActionP(value) === availableActionNone ?
-                          <td id={`PrisonersNoAction${index}`} className="w3-border-right">No action available</td>
-                        : availableActionP(value) === availableActionReconnect ?
-                          <td id={`PrisonersRejoin${index}`} className="w3-border-right">
-                            <button className="w3-button w3-red w3-round w3-hover-black"
-                              onClick={function () {
-                                setIsrejoin(true);
-                                setGameid(value.gameid);
-                                setParticipant(c.PARTY_TYPE_PRISONERS);
-                                setRacksize(value.racksize);
-                              } }
-                            >
-                              Reconnect
-                            </button>
-                          </td>
-                          :
-                          <td id={`PrisonersStart${index}`} className="w3-border-right">
-                            <button className={buttonClassName}
-                              onClick={function () {
-                                setGameid(value.gameid);
-                                setParticipant(c.PARTY_TYPE_PRISONERS);
-                              } }
-                            >
-                              Start Game
-                            </button>
-                          </td>
-                        }
-                        {availableActionG(value) === availableActionNone ?
-                          <td id={`GuardsNoAction${index}`} className="w3-border-right">No action available</td>
-                        : availableActionG(value) === availableActionReconnect ?
-                          <td id={`GuardsRejoin${index}`} className="w3-border-right">
-                            <button className={buttonClassName}
-                              onClick={function () {
-                                setIsrejoin(true);
-                                setGameid(value.gameid);
-                                setParticipant(c.PARTY_TYPE_GUARDS);
-                                setRacksize(value.racksize);
-                              } }
-                            >
-                              Reconnect
-                            </button>
-                          </td>
-                          :
-                          <td id={`GuardsJoin${index}`} className="w3-border-right">
-                            <button className={buttonClassName}
-                              onClick={function () {
-                                setGameid(value.gameid);
-                                setParticipant(c.PARTY_TYPE_GUARDS);
-                                setRacksize(value.racksize);
-                              } }
-                            >
-                              Join Game
-                            </button>
-                          </td>
-                        }
-                        <td id={`RackSize${index}`} className="w3-center w3-border-right">
-                          {value.racksize}
-                        </td>
-                        <td id={`GameStatus${index}`}>
-                          {value.gamestatus}
-                        </td>
+            <div className="w3-container">
+              <div className="w3-bar">
+                <div className="w3-bar-item">
+                  <h3 className="myCommonFont"><b>Game list:</b></h3>
+                </div>
+                <div className="w3-bar-item">
+                  <table className="w3-table-all w3-card-4">
+                    <thead>
+                      <tr className="w3-blue h4 myCommonFont">
+                        <th className="w3-border-right">Game ID</th>
+                        <th className="w3-border-right">Prisoners</th>
+                        <th className="w3-border-right">Guards</th>
+                        <th className="w3-border-right">Rack Size</th>
+                        <th>Game Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {gamelist.map((value, index) => (
+                        <tr key={`OtherGame${index}`} className="myCommonFont w3-hover-green">
+                          <td className="w3-border-right"><b>{value.gameid}</b></td>
+                          {availableActionP(value) === availableActionNone ?
+                            <td id={`PrisonersNoAction${index}`} className="w3-border-right">No action available</td>
+                          : availableActionP(value) === availableActionReconnect ?
+                            <td id={`PrisonersRejoin${index}`} className="w3-border-right">
+                              <button className="w3-button w3-red w3-round w3-hover-black"
+                                onClick={function () {
+                                  setIsrejoin(true);
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_PRISONERS);
+                                  setRacksize(value.racksize);
+                                } }
+                              >
+                                Reconnect
+                              </button>
+                            </td>
+                            :
+                            <td id={`PrisonersStart${index}`} className="w3-border-right">
+                              <button className={buttonClassName}
+                                onClick={function () {
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_PRISONERS);
+                                } }
+                              >
+                                Start Game
+                              </button>
+                            </td>
+                          }
+                          {availableActionG(value) === availableActionNone ?
+                            <td id={`GuardsNoAction${index}`} className="w3-border-right">No action available</td>
+                          : availableActionG(value) === availableActionReconnect ?
+                            <td id={`GuardsRejoin${index}`} className="w3-border-right">
+                              <button className={buttonClassName}
+                                onClick={function () {
+                                  setIsrejoin(true);
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_GUARDS);
+                                  setRacksize(value.racksize);
+                                } }
+                              >
+                                Reconnect
+                              </button>
+                            </td>
+                            :
+                            <td id={`GuardsJoin${index}`} className="w3-border-right">
+                              <button className={buttonClassName}
+                                onClick={function () {
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_GUARDS);
+                                  setRacksize(value.racksize);
+                                } }
+                              >
+                                Join Game
+                              </button>
+                            </td>
+                          }
+                          <td id={`RackSize${index}`} className="w3-center w3-border-right">
+                            {value.racksize}
+                          </td>
+                          <td id={`GameStatus${index}`}>
+                            {value.gamestatus}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="w3-container w3-cell">
-          <Chat client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs}/>
+          <div className="w3-col s3">
+            <Chat client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs}/>
+          </div>
         </div>
         <div className="w3-container w3-teal">
           <h1>Have fun!</h1>
