@@ -21,10 +21,11 @@ class Timer {
 }
 export default class CustomSocket {
     // Constructor which takes socket URL as parameter
-    constructor(url, messageFunction, clientType) {
+    constructor(url, messageFunction, clientType, thisisme) {
         this.customSocket = null;
         this.socketUrl = url;
         this.clientType = clientType;
+        this.thisisme = thisisme;
         this.reconnectTimer = new Timer(() => {
             this.disconnect();
             this.connect();
@@ -76,6 +77,8 @@ export default class CustomSocket {
         this.customSocket.close();
     }
     send(message) {
+        message.thisisme = this.thisisme; // Include client identifier
+        message.clienttype = this.clientType; // Include client type (pb=Prison Break)
         this.customSocket.send(JSON.stringify(message)); // Has to be a string going across the wire, not an object
     }
 }

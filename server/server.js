@@ -10,8 +10,15 @@ const server = express()
 
 const wss = new Server({ server });
 
-wss.on("connection", (ws) => {
-    console.log("Client connected");
+wss.on("connection", (ws, req) => {
+    console.log("web socket url=" + req.url);
+    let urlParams = new URLSearchParams(req.url);
+    let clienttype= urlParams.get('clienttype'); // pb=Prison Break
+    console.log("clienttype=" + clienttype);
+    let thisisme = urlParams.get('thisisme');
+    console.log("thisisme=" + thisisme);
+    ws.thisisme = thisisme;
+    ws.clienttype = clienttype;
 
     ws.on("close", () => console.log("Client disconnected"));
 
@@ -20,13 +27,18 @@ wss.on("connection", (ws) => {
     });
 });
 
-// merely bounce the message from one client back to all clients
+// merely bounce the message from one client back to all clients except the sender
 const processMessage = (message) => {
+    console.log("Process message in server");
+    let parsedMessage = JSON.parse(message);
+    let senderid = parsedMessage.thisisme;
+    let clienttype = parsedMessage.clienttype;
+    console.log("Sender is " + senderid);
     wss.clients.forEach((client) => {
-        /* client.clientType is undefined here; it does not matter that CustomSocket has it
-           wss.clients is not a list of CustomSocket instances so it cannot see clientType
-           I was hoping to use clientType to only send messages to clients in the same type of game
-        */
-        client.send(message);
+        if (client.thisisme === senderid) {
+            console.log("Not sending " + clienttype + " message to self: " + senderid);
+        } else {
+            client.send(message);
+        }
     });
 }

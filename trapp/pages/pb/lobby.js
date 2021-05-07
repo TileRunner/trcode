@@ -188,7 +188,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                         7
                       </button>
                     </div>
-                    <div class="w3-row">
+                    <div className="w3-row">
                       <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
                     </div>
                     </div>
