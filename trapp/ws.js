@@ -45,7 +45,7 @@ export default class CustomSocket {
 
         // onopen - called when connection is open and ready to send and receive data.
         this.customSocket.onopen = (event) => {
-            console.log("client type " + this.clientType + " connected to " + this.socketUrl);
+            // console.log("client type " + this.clientType + " connected to " + this.socketUrl);
             /* This is the idea behind "announce":
                 Players 1,2,3,...N-1 are each in a game already
                 Player N goes to lobby, connects, and sends "announce"

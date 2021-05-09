@@ -11,12 +11,10 @@ const server = express()
 const wss = new Server({ server });
 
 wss.on("connection", (ws, req) => {
-    console.log("web socket url=" + req.url);
-    let urlParams = new URLSearchParams(req.url);
+    let urlParams = new URLSearchParams(req.url.slice(1)); // Need to remove leading /
     let clienttype= urlParams.get('clienttype'); // pb=Prison Break
-    console.log("clienttype=" + clienttype);
     let thisisme = urlParams.get('thisisme');
-    console.log("thisisme=" + thisisme);
+    // console.log(`Connected ${clienttype} > ${thisisme}`);
     ws.thisisme = thisisme;
     ws.clienttype = clienttype;
 
@@ -29,16 +27,36 @@ wss.on("connection", (ws, req) => {
 
 // merely bounce the message from one client back to all clients except the sender
 const processMessage = (message) => {
-    console.log("Process message in server");
     let parsedMessage = JSON.parse(message);
     let senderid = parsedMessage.thisisme;
     let clienttype = parsedMessage.clienttype;
-    console.log("Sender is " + senderid);
+    let gameid = parsedMessage.gameid;
+    let func = parsedMessage.func;
+    // console.log(`\nServer processMessage ${clienttype} ${senderid} ${func} ${gameid}`);
     wss.clients.forEach((client) => {
         if (client.thisisme === senderid) {
-            console.log("Not sending " + clienttype + " message to self: " + senderid);
-        } else {
-            client.send(message);
+            // console.log("Not sending " + clienttype + " message to self: " + senderid);
+            if (gameid && !client.gameid) {
+                // console.log(`Client type ${client.clienttype}, id ${client.thisisme}, now has gameid ${gameid}`);
+                client.gameid = gameid;
+            }
+        } else if (gameid) { // Sent from within a game, not from lobby
+            if (!client.gameid) { // Client is in lobby
+                // console.log(`Sending from game to lobby client ${client.thisisme}`); // Lobby needs to list games
+                client.send(message);
+            } else if (gameid !== client.gameid) { // Different game
+                // console.log(`Not sending from game to different game ${client.gameid}`);
+            } else { // Same game, send it
+                // console.log(`Sending to game participant ${client.thisisme}`);
+                client.send(message);
+            }
+        } else { // Sent from lobby, not within a game
+            if (client.gameid) { // Client is in a game
+                // console.log(`Not sending from lobby to client ${client.thisisme} in game ${client.gameid}`);
+            } else {
+                // console.log(`Sending from lobby to client ${client.thisisme} in lobby`);
+                client.send(message);
+            }
         }
     });
 }

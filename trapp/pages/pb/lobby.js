@@ -4,10 +4,10 @@ import Chat from '../pb/chatSection';
 import * as c from '../../lib/pbcommon';
 
 const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
+// There is no availableActionStart because there is a specific Start button in the Prisoners row
 const availableActionNone = 0;
-const availableActionStart = 1;
-const availableActionJoin = 2;
-const availableActionReconnect = 3;
+const availableActionJoin = 1;
+const availableActionReconnect = 2;
 
 const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
     , racksize, setRacksize // Option for rack size
@@ -96,9 +96,11 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
       return gi < 0 ? false : gamelist[gi].playingP;
     }
     function availableActionP(gd) {
+      // When a browser tab is not in focus it seems that web socket communication is delayed
+      // This means the game data could be a bit behind
+      // I am relying on users to only join their own game that they agreen to with their opponent
       if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
-      if (!gd.playingP) { return availableActionStart; }
-      if (gd.nicknameP === nickname) { return availableActionReconnect; }
+      if (!gd.playingP && gd.nicknameP === nickname) { return availableActionReconnect; }
       return availableActionNone;
     }
     function availableActionG(gd) {
@@ -253,9 +255,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                       {gamelist.map((value, index) => (
                         <tr key={`OtherGame${index}`} className="myCommonFont w3-hover-green">
                           <td className="w3-border-right"><b>{value.gameid}</b></td>
-                          {availableActionP(value) === availableActionNone ?
-                            <td id={`PrisonersNoAction${index}`} className="w3-border-right">No action available</td>
-                          : availableActionP(value) === availableActionReconnect ?
+                          {availableActionP(value) === availableActionReconnect ?
                             <td id={`PrisonersRejoin${index}`} className="w3-border-right">
                               <button className="w3-button w3-red w3-round w3-hover-black"
                                 onClick={function () {
@@ -268,21 +268,10 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                                 Reconnect
                               </button>
                             </td>
-                            :
-                            <td id={`PrisonersStart${index}`} className="w3-border-right">
-                              <button className={buttonClassName}
-                                onClick={function () {
-                                  setGameid(value.gameid);
-                                  setParticipant(c.PARTY_TYPE_PRISONERS);
-                                } }
-                              >
-                                Start Game
-                              </button>
-                            </td>
+                          :
+                            <td id={`PrisonersNoAction${index}`} className="w3-border-right">No action available</td>
                           }
-                          {availableActionG(value) === availableActionNone ?
-                            <td id={`GuardsNoAction${index}`} className="w3-border-right">No action available</td>
-                          : availableActionG(value) === availableActionReconnect ?
+                          {availableActionG(value) === availableActionReconnect ?
                             <td id={`GuardsRejoin${index}`} className="w3-border-right">
                               <button className={buttonClassName}
                                 onClick={function () {
@@ -295,7 +284,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                                 Reconnect
                               </button>
                             </td>
-                            :
+                          : availableActionG(value) === availableActionJoin ?
                             <td id={`GuardsJoin${index}`} className="w3-border-right">
                               <button className={buttonClassName}
                                 onClick={function () {
@@ -307,6 +296,8 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                                 Join Game
                               </button>
                             </td>
+                          : 
+                            <td id={`GuardsNoAction${index}`} className="w3-border-right">No action available</td>
                           }
                           <td id={`RackSize${index}`} className="w3-center w3-border-right">
                             {value.racksize}
