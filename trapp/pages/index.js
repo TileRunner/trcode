@@ -22,6 +22,7 @@ export default function Home() {
       </Head>
       <div className="w3-container w3-teal">
         <h1 className="myHeadingFont">Menu</h1>
+        <h2>Message from the coder: {process.env.NEXT_PUBLIC_CODER_MESSAGE}</h2>
       </div>
       <div className="w3-container w3-margin-left">
         <WMOption descWm={descWm} setDescWm={setDescWm}/>
