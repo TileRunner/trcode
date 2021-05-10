@@ -1,12 +1,10 @@
-import { Console } from 'console';
-
 var fs = require('fs');
 var path = require('path');
 
 export default (req, res) => {
   res.statusCode = 200
   res.setHeader('Content-Type', 'application/json')
-  if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
+  if (!process.env.NODE_ENV || process.env.NODE_ENV !== 'development') {
     res.statusCode = 405
     res.send('Not allowed')
   } else {

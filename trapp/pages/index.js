@@ -2,7 +2,7 @@ import Head from 'next/head'
 // import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
 const showButtonClassName = 'w3-right mymaterialicon w3-green';
@@ -13,8 +13,17 @@ export default function Home() {
   const [descWm, setDescWm] = useState(false); // describe word mastermind
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
-
-  return (
+  const [evtest, setEvtest] = useState('Loading');
+  useEffect(() => {
+    let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+    'http://localhost:3000/api/evtest' 
+    :
+    'https://tilerunner.herokuapp.com/api/evtest'
+    fetch(url).then(res => res.text()).then(text => {
+        setEvtest(text);
+    })
+  },[])
+return (
     <div>
       <Head>
         <title>Tile Runner App</title>
@@ -22,7 +31,7 @@ export default function Home() {
       </Head>
       <div className="w3-container w3-teal">
         <h1 className="myHeadingFont">Menu</h1>
-        <h2>Message from the coder: {process.env.NEXT_PUBLIC_CODER_MESSAGE}</h2>
+        <h2>Message from the coder: {evtest}</h2>
       </div>
       <div className="w3-container w3-margin-left">
         <WMOption descWm={descWm} setDescWm={setDescWm}/>
