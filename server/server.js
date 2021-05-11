@@ -9,6 +9,8 @@ const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
     .get("/evtest", (req, res) => {
         let evtest = process.env.NEXT_PUBLIC_CODER_MESSAGE; // On developers local computer environment variables and heroku config settings
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json({test: 'value', evtest: evtest});
     })
     .listen(PORT, () => console.log(`Listening on ${PORT}`));

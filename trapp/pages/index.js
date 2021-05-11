@@ -13,7 +13,18 @@ export default function Home() {
   const [descWm, setDescWm] = useState(false); // describe word mastermind
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
-return (
+  const [coderMsg, setCoderMsg] = useState('Loading');
+  const getCoderMsg = async () => {
+    let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/evtest' : 'https://tilerunner.herokuapp.com/evtest'
+    const res = await fetch(url);
+    const jres = await res.json();
+    setCoderMsg(jres.evtest);
+  }
+  useEffect(() => {
+    getCoderMsg();
+  },[])
+
+  return (
     <div>
       <Head>
         <title>Tile Runner App</title>
@@ -21,6 +32,7 @@ return (
       </Head>
       <div className="w3-container w3-teal">
         <h1 className="myHeadingFont">Menu</h1>
+        <h2>{coderMsg}</h2>
       </div>
       <div className="w3-container w3-margin-left">
         <WMOption descWm={descWm} setDescWm={setDescWm}/>
