@@ -181,7 +181,7 @@ export function InitialSquareArray(racksize) { // Initial square array for given
     return sqa;
 }
 export function AnyUnusedEscapeHatches(squareArray=[]) { // Used to check for game over due to no more escapes possible
-  let racksize = squareArray.length;
+  let racksize = (squareArray.length - 1) / 2;
   let edge = racksize * 2;
   let middle = racksize;
   let anyLeft = true;

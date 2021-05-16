@@ -14,7 +14,7 @@ export default function PrisonBreak() {
   const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
   const [racksize, setRacksize] = useState(4); // Default to 4 letter racks
   let host = (process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000')
-   + '/?clienttype=pb&thisisme=' + thisisme; // I threw in x=x because URLSearchParams in server.js is missing the first param
+   + '/?clientType=pb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
   const acceptMessage = (message) => {
     // If I reference participant here it will always be the initial value.
     setWsmessage(message.data)

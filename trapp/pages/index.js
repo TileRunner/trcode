@@ -18,7 +18,7 @@ export default function Home() {
     let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/evtest' : 'https://tilerunner.herokuapp.com/evtest'
     const res = await fetch(url);
     const jres = await res.json();
-    setCoderMsg(jres.evtest);
+    setCoderMsg(`${jres.evtest}`);
   }
   useEffect(() => {
     getCoderMsg();

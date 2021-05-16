@@ -1,15 +1,16 @@
-const cors = require('cors');
+const _ = require('cors');
 const express = require("express");
 const { Server } = require("ws");
 const path = require("path");
 const PORT = process.env.PORT || 5000;
-require('dotenv').config(); // For reading environment variabeles
+require('dotenv').config(); // For reading environment variables
+const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
 
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
     .get("/evtest", (req, res) => {
         let evtest = process.env.NEXT_PUBLIC_CODER_MESSAGE; // On developers local computer environment variables and heroku config settings
-        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json({test: 'value', evtest: evtest});
     })
@@ -19,11 +20,10 @@ const wss = new Server({ server });
 
 wss.on("connection", (ws, req) => {
     let urlParams = new URLSearchParams(req.url.slice(1)); // Need to remove leading /
-    let clienttype= urlParams.get('clienttype'); // pb=Prison Break
+    let clientType= urlParams.get('clientType'); // pb=Prison Break
     let thisisme = urlParams.get('thisisme');
-    // console.log(`Connected ${clienttype} > ${thisisme}`);
     ws.thisisme = thisisme;
-    ws.clienttype = clienttype;
+    ws.clientType = clientType;
 
     ws.on("close", () => console.log("Client disconnected"));
 
@@ -32,37 +32,40 @@ wss.on("connection", (ws, req) => {
     });
 });
 
-// merely bounce the message from one client back to all clients except the sender
+/* Send the message to clients that may need it
+   Keep track of gameid for clients to enable the logic
+   Overall rule - only send message to clients with the same client type (e.g. 'pb' for Prison Break)
+
+   Message from Client loc  Action      Rule                                                    Reason
+   ------------ ----------  ------      ----                                                    ------
+   lobby        lobby       send        Client is not the sender                                Support lobby chat messages
+   lobby        game        send        Must be the announce function                           New client in lobby needs game list
+   game         lobby       send                                                                Support lobby game list
+   game         game        send        Client is not the sender and has same gameid as sender  Support game play and game chat
+*/
 const processMessage = (message) => {
-    let parsedMessage = JSON.parse(message);
-    let senderid = parsedMessage.thisisme;
-    let clienttype = parsedMessage.clienttype;
-    let gameid = parsedMessage.gameid;
-    let func = parsedMessage.func;
-    // console.log(`\nServer processMessage ${clienttype} ${senderid} ${func} ${gameid}`);
+    let pm = JSON.parse(message);
+    // console.log(`Message: type=${pm.type}, func=${pm.func}, gameid=${pm.gameid}, senderid=${pm.senderid}`);
     wss.clients.forEach((client) => {
-        if (client.thisisme === senderid) {
-            // console.log("Not sending " + clienttype + " message to self: " + senderid);
-            if (gameid && !client.gameid) {
-                // console.log(`Client type ${client.clienttype}, id ${client.thisisme}, now has gameid ${gameid}`);
-                client.gameid = gameid;
-            }
-        } else if (gameid) { // Sent from within a game, not from lobby
-            if (!client.gameid) { // Client is in lobby
-                // console.log(`Sending from game to lobby client ${client.thisisme}`); // Lobby needs to list games
-                client.send(message);
-            } else if (gameid !== client.gameid) { // Different game
-                // console.log(`Not sending from game to different game ${client.gameid}`);
-            } else { // Same game, send it
-                // console.log(`Sending to game participant ${client.thisisme}`);
-                client.send(message);
-            }
-        } else { // Sent from lobby, not within a game
-            if (client.gameid) { // Client is in a game
-                // console.log(`Not sending from lobby to client ${client.thisisme} in game ${client.gameid}`);
-            } else {
-                // console.log(`Sending from lobby to client ${client.thisisme} in lobby`);
-                client.send(message);
+        // console.log(`Client: clientType=${client.clientType}, gameid=${client.gameid}, thisisme=${client.thisisme}`);
+        if (client.clientType === pm.type) { // Same type of game
+            if (client.thisisme === pm.senderid) { // This is the client that sent the message
+                // Update client gameid if needed
+                if (pm.gameid && !client.gameid) {
+                    client.gameid = pm.gameid;
+                }
+            } else if (pm.gameid) { // Sent from within a game, not from lobby
+                if (!client.gameid) { // Client is in lobby - send message from game so client lobby can update game list
+                    client.send(message);
+                } else if (pm.gameid === client.gameid) { // Client is in same game as sender - send the message
+                    client.send(message);
+                }
+            } else { // Sent from lobby, not within a game
+                if (!client.gameid) { // Client is in lobby - send message from lobby
+                    client.send(message);
+                } else if (pm.func === "announce") { // Client is in game and sender is a new client needing game data
+                    client.send(message);
+                }
             }
         }
     });

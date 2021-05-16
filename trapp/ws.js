@@ -53,7 +53,7 @@ export default class CustomSocket {
                 Player N sees "hi" from each player and adds each game to game list
                NOTE: If I ever move to a data store then I will not need to ping the players like this.
             */
-            this.send({type:this.clientType, func:"announce"});
+            this.send({type:this.clientType, func:"announce", senderid:this.thisisme});
         };
 
         // onclose - called when the connection's closes.
@@ -78,7 +78,7 @@ export default class CustomSocket {
     }
     send(message) {
         message.thisisme = this.thisisme; // Include client identifier
-        message.clienttype = this.clientType; // Include client type (pb=Prison Break)
+        message.clientType = this.clientType; // Include client type (pb=Prison Break)
         this.customSocket.send(JSON.stringify(message)); // Has to be a string going across the wire, not an object
     }
 }
