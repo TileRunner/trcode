@@ -97,12 +97,17 @@ const Game = ({isrejoin
         client.send(
           {
             type: "pb",
-            func: "hello",
-            sender: participant,
-            gameid: gameid,
-            nickname: nickname, // player nickname
-            whoseturn: whoseturn,
-            racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
+            func: "startgame",
+            sender: participant, // this will be prisoners since prisoners start the game
+            gameid: gameid, // game id
+            nickname: nickname, // this will be the prisoners nickname since prisoners are sending this
+            whoseturn: whoseturn, // this will be prisoners since prisoners always go first
+            racksize: racksize, // rack size option
+            tiles: tempTiles, // tile bag after first racks selected
+            ptiles: tempPTiles, // prisoners first rack
+            gtiles: tempGTiles, // guards first rack
+            rescues: rescues, // this will be 0 since no moves have been made yet
+            squareArray: firstSquareArray // this will be the initial square array since no moves have been made yet
           }
         );
       }

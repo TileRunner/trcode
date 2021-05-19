@@ -45,6 +45,11 @@ wss.on("connection", (ws, req) => {
 */
 const processMessage = (message) => {
     let pm = JSON.parse(message);
+    if (pm.clientType === "pb") {
+        if (pm.func === "startgame" || pm.func === "ept" || pm.func === "egt" || pm.func === "undoturn") {
+            console.log(`Update the database here for ${pm.clientType} gameid=${pm.gameid} func=${pm.func}`); // This is where we need a database update
+        }    
+    }
     // console.log(`Message: type=${pm.type}, func=${pm.func}, gameid=${pm.gameid}, senderid=${pm.senderid}`);
     wss.clients.forEach((client) => {
         // console.log(`Client: clientType=${client.clientType}, gameid=${client.gameid}, thisisme=${client.thisisme}`);
