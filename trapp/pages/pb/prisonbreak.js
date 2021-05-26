@@ -3,10 +3,10 @@ import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
 import * as c from '../../lib/pbcommon';
-import { uuid } from 'uuidv4';
+import { v4 as uuid_v4 } from 'uuid';
 
 export default function PrisonBreak() {
-  const [thisisme] = useState(uuid()); // Generate an id for this participant and send it on web socket messages
+  const [thisisme] = useState(uuid_v4()); // Generate an id for this participant and send it on web socket messages
   const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins
   const [gameid, setGameid] = useState('')
   const [nickname, setNickname] = useState('')

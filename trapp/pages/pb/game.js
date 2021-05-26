@@ -68,62 +68,67 @@ const Game = ({isrejoin
       }, c.PING_INTERVAL); // this many milliseconds between above code block executions
       return () => clearInterval(interval);
     }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
-  
-    useEffect(() => { // This code executes first time Game is used only
+
+    const initializeRoutine = () => {
       let firstSquareArray = c.InitialSquareArray(racksize);
-      setSquareArray([...firstSquareArray]);
-      if (!isrejoin && participant === c.PARTY_TYPE_PRISONERS) { // Prisoner is starting the game so pick racks
-        let tempPTiles = [];
-        let tempGTiles = [];
-        let tempTiles = [...initialtiles];
-        while (tempPTiles.length < racksize) {
-          let rand = Math.floor(Math.random() * tempTiles.length);
-          tempPTiles.push(tempTiles[rand]);
-          tempTiles.splice(rand, 1);
-          rand = Math.floor(Math.random() * tempTiles.length);
-          tempGTiles.push(tempTiles[rand]);
-          tempTiles.splice(rand, 1);
+      setSquareArray(firstSquareArray);
+      if (!isrejoin && participant === c.PARTY_TYPE_PRISONERS) {
+        startGame(firstSquareArray); // Prisoner is starting the game so pick racks
+      } else {
+        joinGame(); // Prisoner rejoin or guard join or guard rejoin
+      }
+    }
+    const startGame = (firstSquareArray) => {
+      let tempPTiles = [];
+      let tempGTiles = [];
+      let tempTiles = [...initialtiles];
+      while (tempPTiles.length < racksize) {
+        let rand = Math.floor(Math.random() * tempTiles.length);
+        tempPTiles.push(tempTiles[rand]);
+        tempTiles.splice(rand, 1);
+        rand = Math.floor(Math.random() * tempTiles.length);
+        tempGTiles.push(tempTiles[rand]);
+        tempTiles.splice(rand, 1);
+      }
+      tempPTiles.sort();
+      tempGTiles.sort();
+      setGtiles(tempGTiles);
+      setPtiles(tempPTiles);
+      setTiles(tempTiles);
+      setSnapshot({
+        squareArray: firstSquareArray,
+        ptiles: [...tempPTiles],
+        gtiles: [...tempGTiles]    
+      });
+      client.send(
+        {
+          type: "pb",
+          func: "startgame",
+          gameid: gameid, // Game id
+          racksize: racksize, // Rack size option
+          sender: participant, // This will be prisoners since prisoners start the game
+          nickname: nickname, // This will be the prisoners nickname since prisoners are sending this
+          squareArray: firstSquareArray,  // This will be the initial square array since no moves have been made yet
+          tiles: tempTiles, // Tile bag after first racks selected
+          ptiles: tempPTiles, // Prisoners first rack
+          gtiles: tempGTiles // Guards first rack
         }
-        tempPTiles.sort();
-        tempGTiles.sort();
-        setGtiles(tempGTiles);
-        setPtiles(tempPTiles);
-        setTiles(tempTiles);
-        setSnapshot({
-          squareArray: [...firstSquareArray],
-          ptiles: [...tempPTiles],
-          gtiles: [...tempGTiles]    
-        });
-        client.send(
-          {
-            type: "pb",
-            func: "startgame",
-            sender: participant, // this will be prisoners since prisoners start the game
-            gameid: gameid, // game id
-            nickname: nickname, // this will be the prisoners nickname since prisoners are sending this
-            whoseturn: whoseturn, // this will be prisoners since prisoners always go first
-            racksize: racksize, // rack size option
-            tiles: tempTiles, // tile bag after first racks selected
-            ptiles: tempPTiles, // prisoners first rack
-            gtiles: tempGTiles, // guards first rack
-            rescues: rescues, // this will be 0 since no moves have been made yet
-            squareArray: firstSquareArray // this will be the initial square array since no moves have been made yet
-          }
-        );
-      }
-      else
-      {
-        // Prisoner rejoin or guard join or guard rejoin
-        client.send(
-          {
-            gameid: gameid, // the id for the game
-            nickname: nickname, // player nickname
-            type: "pb", // prisonbreak
-            func: "requestgamedata", // request game data
-            sender: participant
-          }
-        );
-      }
+      );
+    }
+    const joinGame = () => {
+      console.log(`Sending joinGame from game.js`);
+      client.send(
+        {
+          gameid: gameid, // the id for the game
+          nickname: nickname, // player nickname
+          type: "pb", // prisonbreak
+          func: "joingame", // join the game
+          sender: participant
+        }
+      );    
+    }
+    useEffect(() => { // This code executes the first time Game is used only
+      initializeRoutine();
     }, []);
     useEffect(() => {
       let msg = wsmessage;
@@ -162,7 +167,7 @@ const Game = ({isrejoin
           // Opponent sent a message including their nickname and I don't have their nickname yet
           setOppname(messageData.nickname);
         }
-        if (messageData.func === "requestgamedata" && messageData.sender !== participant) { // Opponent requested game info
+        if ((messageData.func === "requestgamedata" || messageData.func === "joingame") && messageData.sender !== participant) { // Opponent joined game or requested game info
           client.send(
             {
               gameid: gameid, // the id for the game
@@ -213,7 +218,7 @@ const Game = ({isrejoin
           setMoves(messageData.moves);
           setRescues(messageData.rescues);
           setSnapshot({
-            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)),
+            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)), // Deep copy
             ptiles: [...messageData.ptiles],
             gtiles: [...gtiles],
           });
@@ -226,12 +231,12 @@ const Game = ({isrejoin
           setTiles(messageData.tiles);
           setMoves(messageData.moves);
           setSnapshot({
-            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)),
+            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)), // Deep copy
             ptiles: [...ptiles],
             gtiles: [...messageData.gtiles],
           });       
         }
-        if (messageData.func === "undoturn" && messageData.sender !== participant) { 
+        if (messageData.func === "undoturn" && messageData.sender !== participant) {
           // opponent undid their last turn
           putAtMoveStart();
           setTiles(messageData.tiles);
@@ -258,7 +263,7 @@ const Game = ({isrejoin
     // So I pass newSelection when I want to also set it, otherwise I pass -1 to instruct it to use current value of selection
     // Also passing newRcd
     const handleBoardSquareClick = (ri, ci, newSelection, newRcd) => {
-      let newSquareArray = JSON.parse(JSON.stringify(squareArray));
+      let newSquareArray = JSON.parse(JSON.stringify(squareArray)); // Deep copy
       let newSquareArrayRow = [...newSquareArray[ri]]; // The row of squares they clicked on
       let newSquareArrayCell = newSquareArrayRow[ci]; // The square in the row they clicked on
       let newPtiles = [...ptiles];
@@ -286,7 +291,7 @@ const Game = ({isrejoin
           newSelection = newSelection - 1
         }
         setSelection(newSelection);
-        setSquareArray([...newSquareArray]);
+        setSquareArray(newSquareArray);
         setPtiles(newPtiles);
         setGtiles(newGtiles);
         setCurrentcoords([...currentcoords, coord]);
@@ -305,7 +310,7 @@ const Game = ({isrejoin
           whoseturn === c.WHOSE_TURN_PRISONERS ? newPtiles.length - 1 : newGtiles.length - 1
         );
         newCurrentcoords.splice(cci, 1);
-        setSquareArray([...newSquareArray]);
+        setSquareArray(newSquareArray);
         setPtiles(newPtiles);
         setGtiles(newGtiles);
         setCurrentcoords(newCurrentcoords);
@@ -391,7 +396,7 @@ const Game = ({isrejoin
       setMoves(newMoves);
       setRescues(newRescues);
       setSnapshot({
-        squareArray: JSON.parse(JSON.stringify(squareArray)),
+        squareArray: JSON.parse(JSON.stringify(squareArray)), // Deep copy
         ptiles: [...newPtiles],
         gtiles: [...gtiles],
       });
@@ -427,7 +432,7 @@ const Game = ({isrejoin
         newTiles.splice(rand, 1);
       }
       newGtiles.sort();
-      let snapsquarearray = JSON.parse(JSON.stringify(squareArray));
+      let snapsquarearray = JSON.parse(JSON.stringify(squareArray)); // Deep copy
       let snapptiles = [...ptiles];
       let snapgtiles = [...gtiles];
       let newWhoseturn = newGtiles.length > 0 ? c.WHOSE_TURN_PRISONERS : c.WHOSE_TURN_GAMEOVER;
@@ -484,13 +489,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
       setWhoseturn(c.WHOSE_TURN_GUARDS);
       setPtiles(newPtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
         ptiles: [...newPtiles],
         gtiles: [...gtiles],
       });
@@ -533,13 +538,13 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
-      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
       setWhoseturn(c.WHOSE_TURN_PRISONERS);
       setGtiles(newGtiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
-        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
         ptiles: [...ptiles],
         gtiles: [...newGtiles],
       });
@@ -766,7 +771,7 @@ const Game = ({isrejoin
           rescues: rescue count
       */
       let rewindInfo = {
-        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)),
+        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
         rack: whoseturn === c.WHOSE_TURN_GUARDS ? [...snapshot.gtiles]: [...snapshot.ptiles],
         tiles: [...tiles],
         rescues: rescues
@@ -793,7 +798,7 @@ const Game = ({isrejoin
       /* Rewind the last move and take it off the end of the move list */
       let numMoves = moves.length;
       let lastMove = moves[moves.length-1];
-      let newSquareArray = [...lastMove.rewindInfo.squareArray];
+      let newSquareArray = JSON.parse(JSON.stringify(lastMove.rewindInfo.squareArray)); // Deep copy
       let newTiles = [...lastMove.rewindInfo.tiles];
       let newPtiles = lastMove.by === c.PARTY_TYPE_PRISONERS ? [...lastMove.rewindInfo.rack] : [...ptiles];
       let newGtiles = lastMove.by === c.PARTY_TYPE_GUARDS ? [...lastMove.rewindInfo.rack] : [...gtiles];
@@ -802,7 +807,7 @@ const Game = ({isrejoin
       let newMoves = [...moves];
       newMoves.splice(numMoves-1,1);
       let newSnapshot = {
-        squareArray: [...newSquareArray],
+        squareArray: JSON.parse(JSON.stringify(newSquareArray)), // Deep copy
         gtiles: [...newGtiles],
         ptiles: [...newPtiles]
       };
@@ -810,7 +815,7 @@ const Game = ({isrejoin
       setTiles(newTiles);
       setPtiles(newPtiles);
       setGtiles(newGtiles);
-      setSquareArray([...newSquareArray]);
+      setSquareArray(newSquareArray);
       setWhoseturn(newWhoseturn);
       setRescues(newRescues);
       setMoves(newMoves);
@@ -837,7 +842,7 @@ const Game = ({isrejoin
     }
   
     const recallTiles = () => {
-      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray)));
+      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
       setPtiles([...snapshot.ptiles]);
       setGtiles([...snapshot.gtiles]);
       setSelection(-1);
@@ -992,7 +997,7 @@ const Game = ({isrejoin
         let newCurrentcoords = [...currentcoords];
         let newPtiles = [...ptiles];
         let newGtiles = [...gtiles];
-        let newSquareArray = JSON.parse(JSON.stringify(squareArray));
+        let newSquareArray = JSON.parse(JSON.stringify(squareArray)); // Deep copy
         let newSquareArrayRow = newSquareArray[row];
         let newSquareArrayCell = newSquareArrayRow[col];
         let newRcd = [-1,-1,c.DIR_NONE];
@@ -1021,7 +1026,7 @@ const Game = ({isrejoin
         setCurrentcoords(newCurrentcoords);
         setGtiles(newGtiles);
         setPtiles(newPtiles);
-        setSquareArray([...newSquareArray]);
+        setSquareArray(newSquareArray);
         setRcd(newRcd);
         setSelection(newSelection);
       }

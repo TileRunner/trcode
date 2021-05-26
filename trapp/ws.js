@@ -77,6 +77,7 @@ export default class CustomSocket {
         this.customSocket.close();
     }
     send(message) {
+        console.log(`ws.js send func=${message.func}`);
         message.thisisme = this.thisisme; // Include client identifier
         message.clientType = this.clientType; // Include client type (pb=Prison Break)
         this.customSocket.send(JSON.stringify(message)); // Has to be a string going across the wire, not an object

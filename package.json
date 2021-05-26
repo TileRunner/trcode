@@ -19,7 +19,8 @@
     "material-design-icons": "^3.0.1",
     "react-device-detect": "^1.15.0",
     "uuidv4": "^6.2.7",
-    "ws": "^7.4.3"
+    "ws": "^7.4.3",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "got": "^11.3.0",
