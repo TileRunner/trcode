@@ -7,6 +7,7 @@ import ShowMoves from '../pb/movesSection';
 import ShowRescues from '../pb/rescuesSection';
 import Chat from '../pb/chatSection';
 import * as c from '../../lib/pbcommon';
+import { getClientBuildManifest } from "next/dist/client/route-loader";
 
 const Game = ({isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
@@ -116,7 +117,6 @@ const Game = ({isrejoin
       );
     }
     const joinGame = () => {
-      console.log(`Sending joinGame from game.js`);
       client.send(
         {
           gameid: gameid, // the id for the game
@@ -149,6 +149,13 @@ const Game = ({isrejoin
   
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
+      // I want access to some updated values for checking missing rack tiles
+      let newPtiles = [...ptiles];
+      let newGtiles = [...gtiles];
+      let newWhoseturn = whoseturn;
+      if (messageData.sender === participant) {
+        console.log(`pm: ${messageData.func} ${messageData.sender} ptiles=${messageData.ptiles} gtiles=${messageData.gtiles}`);
+      }
       if (messageData.type === "pb" && messageData.func === "announce") {
         client.send(
           {
@@ -198,19 +205,24 @@ const Game = ({isrejoin
              || (participant === c.PARTY_TYPE_GUARDS && gtiles.length === 0 && currentcoords.length === 0)
              || (participant === c.PARTY_TYPE_PRISONERS && ptiles.length === 0 && currentcoords.length === 0) // Not sure I need it but...
              ) {
-            setTiles(messageData.tiles);
-            setSquareArray(messageData.squareArray);
-            setPtiles(messageData.ptiles);
-            setGtiles(messageData.gtiles);
-            setWhoseturn(messageData.whoseturn);
-            setSnapshot(messageData.snapshot);
-            setMoves(messageData.moves);
-            setRescues(messageData.rescues);
-            setAllowRewind(messageData.allowRewind);  
+              newPtiles = [...messageData.ptiles];
+              newGtiles = [...messageData.gtiles];
+              newWhoseturn = messageData.whoseturn;
+              setTiles(messageData.tiles);
+              setSquareArray(messageData.squareArray);
+              setPtiles(messageData.ptiles);
+              setGtiles(messageData.gtiles);
+              setWhoseturn(messageData.whoseturn);
+              setSnapshot(messageData.snapshot);
+              setMoves(messageData.moves);
+              setRescues(messageData.rescues);
+              setAllowRewind(messageData.allowRewind);  
           }
         }
         if (messageData.func === "ept" && participant === c.PARTY_TYPE_GUARDS) { // Prisoners sent end prisoners turn, Guards pick it up
           putAtMoveStart();
+          newPtiles = [...messageData.ptiles];
+          newWhoseturn = messageData.whoseturn;
           setWhoseturn(messageData.whoseturn);
           setSquareArray(messageData.squareArray);
           setPtiles(messageData.ptiles);
@@ -225,6 +237,8 @@ const Game = ({isrejoin
         }
         if (messageData.func === "egt" && participant === c.PARTY_TYPE_PRISONERS) { // Guards sent end guards turn, Prisoners pick it up
           putAtMoveStart();
+          newGtiles = [...messageData.gtiles];
+          newWhoseturn = messageData.whoseturn;
           setWhoseturn(messageData.whoseturn);
           setSquareArray(messageData.squareArray);
           setGtiles(messageData.gtiles);
@@ -239,6 +253,9 @@ const Game = ({isrejoin
         if (messageData.func === "undoturn" && messageData.sender !== participant) {
           // opponent undid their last turn
           putAtMoveStart();
+          newPtiles = [...messageData.ptiles];
+          newGtiles = [...messageData.gtiles];
+          newWhoseturn = messageData.whoseturn;
           setTiles(messageData.tiles);
           setPtiles(messageData.ptiles);
           setGtiles(messageData.gtiles);
@@ -256,6 +273,12 @@ const Game = ({isrejoin
           let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
           setChatmsgs(newChatmsgs);
         }
+      }
+      if (newPtiles.length === 0 && newWhoseturn === "P" && participant === "P") {
+        alert("Prisoners turn with no tiles! Make Guards Pass to get your tiles. Sorry!");
+      }
+      if (newGtiles.length === 0 && newWhoseturn === "G" && participant === "G") {
+        alert("Guards turn with no tiles! Make Prisoners Pass to get your tiles. Sorry!");
       }
     }
     
