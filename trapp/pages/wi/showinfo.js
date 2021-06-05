@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 export default function Showinfo( props ) {
     const [info, setInfo] = useState([])
     const [loaded, setLoaded] = useState(false)
-    console.log("NODE_ENV=" + process.env.NODE_ENV)
+    // console.log("NODE_ENV=" + process.env.NODE_ENV)
     useEffect(()=>{
         const apiCall = async ()=>{
             let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
@@ -13,7 +13,7 @@ export default function Showinfo( props ) {
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
             let response = await fetch(url + props.word)
             let data = await response.text()
-            console.log("data=" + data)
+            // console.log("data=" + data)
             let jdata = JSON.parse(data)
             setInfo(jdata)
             setLoaded(true)

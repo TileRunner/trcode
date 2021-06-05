@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef} from "react";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
@@ -11,13 +11,13 @@ export default function PrisonBreak() {
   const [gameid, setGameid] = useState('')
   const [nickname, setNickname] = useState('')
   const [participant, setParticipant] = useState(c.PARTY_TYPE_UNDETERMINED)
-  const [wsmessage, setWsmessage] = useState('') // Latest messages from the websocket
+  const [wsmessage, setWsmessage] = useState('') // Latest message from the websocket
   const [racksize, setRacksize] = useState(4); // Default to 4 letter racks
   let host = (process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000')
    + '/?clientType=pb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
   const acceptMessage = (message) => {
     // If I reference participant here it will always be the initial value.
-    setWsmessage(message.data)
+    setWsmessage(message.data);
   }
   const [client] = useState(new CustomSocket(host, acceptMessage, "pb", thisisme));
   useEffect(() => (
@@ -29,7 +29,6 @@ export default function PrisonBreak() {
         client={client}
         setIsrejoin={setIsrejoin}
         wsmessage={wsmessage}
-        // client={client}
         gameid={gameid}
         setGameid={setGameid}
         nickname={nickname}

@@ -7,7 +7,9 @@ import ShowMoves from '../pb/movesSection';
 import ShowRescues from '../pb/rescuesSection';
 import Chat from '../pb/chatSection';
 import * as c from '../../lib/pbcommon';
-import { getClientBuildManifest } from "next/dist/client/route-loader";
+import {InitialSquareArray} from '../../lib/pbInitialSquareArray';
+
+// import { getClientBuildManifest } from "next/dist/client/route-loader";
 
 const Game = ({isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
@@ -71,9 +73,11 @@ const Game = ({isrejoin
     }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
 
     const initializeRoutine = () => {
-      let firstSquareArray = c.InitialSquareArray(racksize);
+      let firstSquareArray = InitialSquareArray(racksize);
       setSquareArray(firstSquareArray);
-      if (!isrejoin && participant === c.PARTY_TYPE_PRISONERS) {
+      if (isrejoin) {
+        rejoinGame()
+      } else if (participant === c.PARTY_TYPE_PRISONERS) {
         startGame(firstSquareArray); // Prisoner is starting the game so pick racks
       } else {
         joinGame(); // Prisoner rejoin or guard join or guard rejoin
@@ -108,8 +112,7 @@ const Game = ({isrejoin
           gameid: gameid, // Game id
           racksize: racksize, // Rack size option
           sender: participant, // This will be prisoners since prisoners start the game
-          nickname: nickname, // This will be the prisoners nickname since prisoners are sending this
-          squareArray: firstSquareArray,  // This will be the initial square array since no moves have been made yet
+          pname: nickname, // This will be the prisoners nickname since prisoners are sending this
           tiles: tempTiles, // Tile bag after first racks selected
           ptiles: tempPTiles, // Prisoners first rack
           gtiles: tempGTiles // Guards first rack
@@ -120,12 +123,22 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
+          gname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "joingame", // join the game
-          sender: participant
+          sender: participant // this will eb guards
         }
-      );    
+      );
+    }
+    const rejoinGame = () => {
+      client.send(
+        {
+          gameid: gameid, // the id for the game
+          type: "pb", // prisonbreak
+          func: "rejoingame", // join the game
+          sender: participant // could be either player
+        }
+      );
     }
     useEffect(() => { // This code executes the first time Game is used only
       initializeRoutine();
@@ -150,122 +163,36 @@ const Game = ({isrejoin
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
       // I want access to some updated values for checking missing rack tiles
-      let newPtiles = [...ptiles];
-      let newGtiles = [...gtiles];
-      let newWhoseturn = whoseturn;
-      if (messageData.sender === participant) {
-        console.log(`pm: ${messageData.func} ${messageData.sender} ptiles=${messageData.ptiles} gtiles=${messageData.gtiles}`);
-      }
-      if (messageData.type === "pb" && messageData.func === "announce") {
-        client.send(
-          {
-            type: "pb",
-            func: "hello",
-            sender: participant,
-            gameid: gameid,
-            nickname: nickname, // player nickname
-            whoseturn: whoseturn,
-            racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
+      if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+        if (messageData.func === "providegamedata") { 
+          // Server providing game data
+          if (participant === c.PARTY_TYPE_PRISONERS) {
+            setOppname(messageData.gname);
+          } else {
+            setOppname(messageData.pname);
           }
-        );
-      }
-      else if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
-        if (messageData.sender != participant && oppname === "" && messageData.nickname && messageData.nickname.length > 0) {
-          // Opponent sent a message including their nickname and I don't have their nickname yet
-          setOppname(messageData.nickname);
-        }
-        if ((messageData.func === "requestgamedata" || messageData.func === "joingame") && messageData.sender !== participant) { // Opponent joined game or requested game info
-          client.send(
-            {
-              gameid: gameid, // the id for the game
-              nickname: nickname, // player nickname
-              type: "pb", // prisonbreak
-              func: "providegamedata", // provide game data
-              sender: participant,
-              tiles: tiles,
-              squareArray: squareArray,
-              ptiles: ptiles,
-              gtiles: gtiles,
-              whoseturn: whoseturn,
-              snapshot: snapshot,
-              moves: moves,
-              rescues: rescues,
-              racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-              allowRewind: allowRewind
-            }
-          );
-        }
-        if (messageData.func === "providegamedata" && messageData.sender !== participant) { 
-          // Opponent provided game data but do we need it?
-          // If they have a different move count then we need it (they may have undone a move)
-          // If they have same move count but a different tile bag count then we need it (no moves made but tiles are picked)
-          // If guards join after prisoners made a move then guards have no tiles ("ept" got processed which leaves gtiles alone)
-          if (messageData.moves.length !== moves.length
-             || messageData.tiles.length !== tiles.length
-             || (participant === c.PARTY_TYPE_GUARDS && gtiles.length === 0 && currentcoords.length === 0)
-             || (participant === c.PARTY_TYPE_PRISONERS && ptiles.length === 0 && currentcoords.length === 0) // Not sure I need it but...
-             ) {
-              newPtiles = [...messageData.ptiles];
-              newGtiles = [...messageData.gtiles];
-              newWhoseturn = messageData.whoseturn;
-              setTiles(messageData.tiles);
-              setSquareArray(messageData.squareArray);
-              setPtiles(messageData.ptiles);
-              setGtiles(messageData.gtiles);
-              setWhoseturn(messageData.whoseturn);
-              setSnapshot(messageData.snapshot);
-              setMoves(messageData.moves);
-              setRescues(messageData.rescues);
-              setAllowRewind(messageData.allowRewind);  
-          }
-        }
-        if (messageData.func === "ept" && participant === c.PARTY_TYPE_GUARDS) { // Prisoners sent end prisoners turn, Guards pick it up
-          putAtMoveStart();
-          newPtiles = [...messageData.ptiles];
-          newWhoseturn = messageData.whoseturn;
-          setWhoseturn(messageData.whoseturn);
+          setTiles(messageData.tiles);
           setSquareArray(messageData.squareArray);
           setPtiles(messageData.ptiles);
-          setTiles(messageData.tiles);
-          setMoves(messageData.moves);
-          setRescues(messageData.rescues);
-          setSnapshot({
+          setGtiles(messageData.gtiles);
+          setWhoseturn(messageData.whoseturn);
+          let newSnapshot = {
             squareArray: JSON.parse(JSON.stringify(messageData.squareArray)), // Deep copy
             ptiles: [...messageData.ptiles],
-            gtiles: [...gtiles],
-          });
-        }
-        if (messageData.func === "egt" && participant === c.PARTY_TYPE_PRISONERS) { // Guards sent end guards turn, Prisoners pick it up
-          putAtMoveStart();
-          newGtiles = [...messageData.gtiles];
-          newWhoseturn = messageData.whoseturn;
-          setWhoseturn(messageData.whoseturn);
-          setSquareArray(messageData.squareArray);
-          setGtiles(messageData.gtiles);
-          setTiles(messageData.tiles);
+            gtiles: [...messageData.gtiles]
+          };
+          setSnapshot(newSnapshot);
           setMoves(messageData.moves);
-          setSnapshot({
-            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)), // Deep copy
-            ptiles: [...ptiles],
-            gtiles: [...messageData.gtiles],
-          });       
-        }
-        if (messageData.func === "undoturn" && messageData.sender !== participant) {
-          // opponent undid their last turn
-          putAtMoveStart();
-          newPtiles = [...messageData.ptiles];
-          newGtiles = [...messageData.gtiles];
-          newWhoseturn = messageData.whoseturn;
-          setTiles(messageData.tiles);
-          setPtiles(messageData.ptiles);
-          setGtiles(messageData.gtiles);
-          setSquareArray(messageData.squareArray);
-          setWhoseturn(messageData.whoseturn);
           setRescues(messageData.rescues);
-          setMoves(messageData.moves);
-          setSnapshot(messageData.snapshot);
+          setAllowRewind(messageData.allowRewind);
+          putAtMoveStart();
         }
-        if (messageData.func === "allowundo" && messageData.sender !== participant) {
+        if (messageData.func === "providegname") {
+          if (participant === c.PARTY_TITLE_PRISONERS) {
+            setOppname(messageData.gname);
+          }
+        }
+        if (messageData.func === "allowundo") {
           // Opponent clicked button to allow undo turn
           setAllowRewind(true);
         }
@@ -273,12 +200,6 @@ const Game = ({isrejoin
           let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
           setChatmsgs(newChatmsgs);
         }
-      }
-      if (newPtiles.length === 0 && newWhoseturn === "P" && participant === "P") {
-        alert("Prisoners turn with no tiles! Make Guards Pass to get your tiles. Sorry!");
-      }
-      if (newGtiles.length === 0 && newWhoseturn === "G" && participant === "G") {
-        alert("Guards turn with no tiles! Make Prisoners Pass to get your tiles. Sorry!");
       }
     }
     
@@ -380,7 +301,6 @@ const Game = ({isrejoin
       if (!isPlayValid()) {
         return;
       }
-      let rewindInfo = getRewindInfo();
       let newRescues = rescues;
       let escapehatches = [
         "0-0",
@@ -410,7 +330,7 @@ const Game = ({isrejoin
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
+      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
       setWhoseturn(newWhoseturn);
@@ -427,16 +347,13 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
           sender: participant,
-          squareArray: squareArray, // this was being changed as the tiles were being played
           ptiles: newPtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
           whoseturn: newWhoseturn, // may have ended the game
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          moves: newMoves, // a move was made
+          move: newMove, // the move that was made
           rescues: newRescues // may have rescued another prisoner
         }
       );
@@ -446,7 +363,6 @@ const Game = ({isrejoin
       if (!isPlayValid()) {
         return;
       }
-      let rewindInfo = getRewindInfo();
       let newGtiles = [...gtiles];
       let newTiles = [...tiles];
       while (newGtiles.length < racksize && newTiles.length > 0) {
@@ -463,7 +379,7 @@ const Game = ({isrejoin
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, rewindInfo: rewindInfo, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
+      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
       setWhoseturn(newWhoseturn);
@@ -479,14 +395,12 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
           sender: participant,
-          squareArray: squareArray, // this was being changed as the tiles were being played
           gtiles: newGtiles, // we picked new tiles for guards rack
           tiles: newTiles, // we picked new tiles so tile pool changed
-          moves: newMoves, // a move was made
+          move: newMove, // the move that was made
           whoseturn: newWhoseturn, // may have ended the game
           racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
           }
@@ -498,7 +412,6 @@ const Game = ({isrejoin
         window.alert("Need " + racksize + " tiles in the bag to exchange")
         return;
       }
-      let rewindInfo = getRewindInfo();
       let newPtiles = [];
       let newTiles = [...tiles];
       while (newPtiles.length < racksize && newTiles.length > 0) {
@@ -509,7 +422,7 @@ const Game = ({isrejoin
       newPtiles.sort();
       newTiles = [...newTiles, ...snapshot.ptiles];
       newTiles.sort();
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
+      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
@@ -526,17 +439,13 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
           sender: participant,
           whoseturn: c.WHOSE_TURN_GUARDS, // swap never ends the game so go to opponent
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          squareArray: snapshot.squareArray, // revert to start of turn squares
           ptiles: newPtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
-          moves: newMoves, // a move was made
-          rescues: rescues // no rescues on an exchange
+          move: newMove // the move that was made
         }
       );
   
@@ -547,7 +456,6 @@ const Game = ({isrejoin
         window.alert("Need " + racksize + " tiles in the bag to exchange")
         return;
       }
-      let rewindInfo = getRewindInfo();
       let newGtiles = [];
       let newTiles = [...tiles];
       while (newGtiles.length < racksize && newTiles.length > 0) {
@@ -558,7 +466,7 @@ const Game = ({isrejoin
       newGtiles.sort();
       newTiles = [...newTiles, ...snapshot.gtiles];
       newTiles.sort();
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP, rewindInfo: rewindInfo};
+      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
       putAtMoveStart();
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
@@ -575,16 +483,13 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
           sender: participant,
           whoseturn: c.WHOSE_TURN_PRISONERS, // swap never ends the game so go to opponent
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          squareArray: snapshot.squareArray, // revert to start of turn squares
           gtiles: newGtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
-          moves: newMoves // a move was made
+          move: newMove // the move that was made
         }
       );
   
@@ -786,31 +691,14 @@ const Game = ({isrejoin
       return playinfo;
     }
   
-    function getRewindInfo() { // Must be called before you start setting new values for stuff
-      /* Rewind info is everything you need to reverse the move that we do not already have in the new move variable:
-          squareArray: says what tile is on what square and who played it and what the row and col are
-          rack: players rack before move was made 
-          tiles: tile pool before picking new tiles
-          rescues: rescue count
-      */
-      let rewindInfo = {
-        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
-        rack: whoseturn === c.WHOSE_TURN_GUARDS ? [...snapshot.gtiles]: [...snapshot.ptiles],
-        tiles: [...tiles],
-        rescues: rescues
-      };
-      return rewindInfo;
-    }
     function allowUndoLastTurn() {
       if (!allowRewind) {
         setAllowRewind(true);
         client.send(
           {
             gameid: gameid, // the id for the game
-            nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "allowundo", // allow undo last turn
-            racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
             sender: participant // who is allowing it
           }
         );
@@ -818,48 +706,12 @@ const Game = ({isrejoin
     }
   
     function performRewind() {
-      /* Rewind the last move and take it off the end of the move list */
-      let numMoves = moves.length;
-      let lastMove = moves[moves.length-1];
-      let newSquareArray = JSON.parse(JSON.stringify(lastMove.rewindInfo.squareArray)); // Deep copy
-      let newTiles = [...lastMove.rewindInfo.tiles];
-      let newPtiles = lastMove.by === c.PARTY_TYPE_PRISONERS ? [...lastMove.rewindInfo.rack] : [...ptiles];
-      let newGtiles = lastMove.by === c.PARTY_TYPE_GUARDS ? [...lastMove.rewindInfo.rack] : [...gtiles];
-      let newRescues = lastMove.rewindInfo.rescues;
-      let newWhoseturn = lastMove.by; // Back to their turn
-      let newMoves = [...moves];
-      newMoves.splice(numMoves-1,1);
-      let newSnapshot = {
-        squareArray: JSON.parse(JSON.stringify(newSquareArray)), // Deep copy
-        gtiles: [...newGtiles],
-        ptiles: [...newPtiles]
-      };
-      putAtMoveStart();
-      setTiles(newTiles);
-      setPtiles(newPtiles);
-      setGtiles(newGtiles);
-      setSquareArray(newSquareArray);
-      setWhoseturn(newWhoseturn);
-      setRescues(newRescues);
-      setMoves(newMoves);
-      setSnapshot(newSnapshot);
-      // Just send everything even though some could be hard coded in processMessage by opponent
+      /* Send undoturn to server and it will send the updated game data to game clients, including this one */
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
-          func: "undoturn", // undo last turn
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          sender: participant,
-          tiles: newTiles, // tile pool
-          ptiles: newPtiles, // prisoners rack
-          gtiles: newGtiles, // guards rack
-          squareArray: newSquareArray, // revert to start of turn squares
-          whoseturn: newWhoseturn, // swap never ends the game so go to opponent
-          rescues: newRescues, // rescue count
-          moves: newMoves, // a move was made
-          snapshot: newSnapshot
+          func: "undoturn" // undo last turn
         }
       );
     }
@@ -874,8 +726,7 @@ const Game = ({isrejoin
     };
   
     const prisonerPass = () => {
-      let rewindInfo = getRewindInfo();
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PASS, rewindInfo: rewindInfo};
+      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_GUARDS; // If both players pass then end the game
       recallTiles(); // In case they put some tiles on the board before clicking Pass
@@ -885,24 +736,17 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
-          sender: participant,
-          squareArray: snapshot.squareArray, // revert to start of turn squares
-          ptiles: snapshot.ptiles, // prisoners rack did not change
-          tiles: tiles, // tile pool did not change
-          whoseturn: newWhoseturn, // may have ended the game
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          moves: newMoves, // a move was made
-          rescues: rescues // no rescues on a pass
+          sender: participant, // who passed their turn
+          whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
+          move: newMove // the move that was made
         }
       );
     }
   
     const guardsPass = () => {
-      let rewindInfo = getRewindInfo();
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PASS, rewindInfo: rewindInfo};
+      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_PRISONERS; // If both players pass then end the game
       recallTiles(); // In case they put some tiles on the board before clicking Pass
@@ -912,16 +756,11 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
-          sender: participant,
-          squareArray: snapshot.squareArray, // revert to start of turn squares
-          gtiles: snapshot.gtiles, // guards rack did not change
-          tiles: tiles, // tile pool did not change
-          whoseturn: newWhoseturn, // may have ended the game
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-          moves: newMoves // a move was made
+          sender: participant, // who passed their turn
+          whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
+          move: newMove // the move that was made
         }
       );
     }
@@ -938,11 +777,8 @@ const Game = ({isrejoin
       client.send(
         {
           gameid: gameid, // the id for the game
-          nickname: nickname, // player nickname
           type: "pb", // prisonbreak
           sender: participant,
-          whoseturn: whoseturn, // for lobby to pick up this message
-          racksize: racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
           func: "requestgamedata" // request game data
         }
       )

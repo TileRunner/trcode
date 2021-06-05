@@ -12,7 +12,7 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
         setNextmsg('');
         client.send(
           {
-            gameid: gameid, // the id for the game
+            gameid: gameid, // the id for the game (blank if in lobby)
             nickname: nickname, // player nickname
             type: "pb", // prisonbreak
             func: "chat", // send chat message
@@ -22,11 +22,6 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
         );
         return;
       }
-      // let chartest = /^[A-Za-z0-9 \.,\(\)\?:!'"]$/; // Allow letter, number, space, period, comma, round brackets, question mark, colon, exclamation mark, quote, double quote
-      // if (event.key.match(chartest)) {
-      //   let newNextmsg = nextmsg + event.key;
-      //   setNextmsg(newNextmsg);
-      // }
       if (event.key === "Backspace" && nextmsg.length > 0) {
         event.preventDefault();
         let newNextmsg = nextmsg.slice(0,nextmsg.length-1);

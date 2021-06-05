@@ -47,7 +47,7 @@ export default function handler(req, res)  {
                                 :
                                 'https://words-scrabble.herokuapp.com/api/info/'
                                 fetch(url + word).then(res => res.text()).then(text => {
-                                    console.log("alphagram response data=" + text + ". NODE_ENV here is " + process.env.NODE_ENV)
+                                    // console.log("alphagram response data=" + text + ". NODE_ENV here is " + process.env.NODE_ENV)
                                     let jdata = JSON.parse(text)
                                     let newwords = []
                                     jdata.anagrams.map((w) => {
@@ -73,7 +73,7 @@ export default function handler(req, res)  {
                                     onClick={function() {
                                         let url = 'http://localhost:3000/api/words?regex='
                                         fetch(url + word).then(res => res.text()).then(text => {
-                                            console.log("regex response data=" + text)
+                                            // console.log("regex response data=" + text)
                                             let jdata = JSON.parse(text)
                                             setWord('');
                                             let newwords = []

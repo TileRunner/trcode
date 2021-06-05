@@ -30,58 +30,22 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
         setChatmsgs(newChatmsgs);
         return;
       }
-      let sendergameid = messageData.gameid;
-      let sendernickname = messageData.nickname;
-      let wt = messageData.whoseturn;
-      let rs = messageData.racksize;
-      if (sendergameid && sendergameid.length > 0 && rs && wt && wt.length > 0) {
-        let anyUpdates = false;
-        let senderPG = messageData.sender;
-        let newGamelist = [...gamelist];
-        let gi = getGamelistIndex(sendergameid);
-        let newPlayingP = senderPG === c.PARTY_TYPE_PRISONERS ? true : gi > -1 ? gamelist[gi].playingP : false;
-        let newPlayingG = senderPG === c.PARTY_TYPE_GUARDS ? true : gi > -1 ? gamelist[gi].playingG : false;
-        let newRacksize = rs;
-
-        let newgamestatus = "Unknown";
-        if (wt === c.WHOSE_TURN_GAMEOVER) {
-          newgamestatus = "Game over";
-        } else if (wt === c.WHOSE_TURN_PRISONERS) {
-          newgamestatus = "Prisoners turn";
-        } else if (wt === c.WHOSE_TURN_GUARDS) {
-          newgamestatus = "Guards turn";
-        }
-
-        let newgamedata = {
-          gameid: sendergameid,
-          nicknameP: senderPG === c.PARTY_TYPE_PRISONERS ? sendernickname : gi > -1 ? gamelist[gi].nicknameP : "",
-          nicknameG: senderPG === c.PARTY_TYPE_GUARDS ? sendernickname : gi > -1 ? gamelist[gi].nicknameG : "",
-          gamestatus: newgamestatus,
-          playingP: newPlayingP,
-          playingG: newPlayingG,
-          racksize: newRacksize
-        }
-        if (gi < 0) { // Game not in list yet, put it in the list
-          anyUpdates = true;
-          newGamelist = [...newGamelist, newgamedata];
-        }
-        else { // Game is in the list, check for needed updates
-          let oldgamedata = gamelist[gi];
-          if (oldgamedata.nicknameP !== newgamedata.nicknameP ||
-              oldgamedata.nicknameG !== newgamedata.nicknameG ||
-              oldgamedata.gamestatus !== newgamedata.gamestatus ||
-              oldgamedata.playingP !== newgamedata.playingP ||
-              oldgamedata.playingG !== newgamedata.playingG ||
-              oldgamedata.racksize !== newgamedata.racksize
-            ) {
-              anyUpdates = true;
-              newGamelist[gi] = newgamedata;
-            }
-        }
-        if (anyUpdates) {
-          setGamelist(newGamelist);
-        }
-      }  
+      if (messageData.type === "pb" && messageData.func === "gamelist") {
+        // Accept the game list from the server
+        let newGamelist = [];
+        messageData.gamelist.forEach(element => {
+          let newGameObject = {
+            gameid: element.gameid,
+            pname: element.pname,
+            gname: element.gname,
+            gamestatus: element.whoseturn === c.WHOSE_TURN_GAMEOVER ? "Game over" : "Unfinished",
+            racksize: element.racksize
+          };
+          newGamelist.push(newGameObject);
+        });
+        setGamelist([...newGamelist]);
+        return;
+      }
     }
     function getGamelistIndex(gid) {
       for (var i = 0; i < gamelist.length; ++i) {
@@ -91,22 +55,19 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
       }
       return -1;
     }
-    function isPlayingP(gid) {
+    function gameAlreadyStarted(gid) {
       let gi = getGamelistIndex(gid);
-      return gi < 0 ? false : gamelist[gi].playingP;
+      return gi > -1;
     }
     function availableActionP(gd) {
-      // When a browser tab is not in focus it seems that web socket communication is delayed
-      // This means the game data could be a bit behind
-      // I am relying on users to only join their own game that they agreen to with their opponent
-      if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
-      if (!gd.playingP && gd.nicknameP === nickname) { return availableActionReconnect; }
+      if (nickname.length === 0 || gd.whoseturn === c.WHOSE_TURN_GAMEOVER) { return availableActionNone; }
+      if (gd.pname === nickname) { return availableActionReconnect; }
       return availableActionNone;
     }
     function availableActionG(gd) {
-      if (nickname.length === 0 || gd.gamestatus === "Game over") { return availableActionNone; }
-      if (!gd.playingG) { return availableActionJoin; }
-      if (gd.nicknameG === nickname) { return availableActionReconnect; }
+      if (nickname.length === 0 || gd.whoseturn === c.WHOSE_TURN_GAMEOVER) { return availableActionNone; }
+      if (!gd.gname) { return availableActionJoin; }
+      if (gd.gname === nickname) { return availableActionReconnect; }
       return availableActionNone;
     }
     function selectRackSize(newRacksize) {
@@ -200,8 +161,8 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                         if (nickname.length === 0) {
                           window.alert("Please enter nickname before starting a game");
                         } else if (gameid.length > 0) {
-                          if (isPlayingP(gameid)) {
-                            window.alert("Prisoners already playing that game");
+                          if (gameAlreadyStarted(gameid)) {
+                            window.alert("Game already started with that id");
                           } else {
                             setParticipant(c.PARTY_TYPE_PRISONERS);
                           }
@@ -231,7 +192,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                   <h1><i className="material-icons w3-right">report_problem</i></h1>
                 </div>
                 <div className="w3-bar-item">
-                  <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your game id.</h3>
+                  <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your nickname.</h3>
                 </div>
               </div>
             </div>
@@ -273,7 +234,7 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                           }
                           {availableActionG(value) === availableActionReconnect ?
                             <td id={`GuardsRejoin${index}`} className="w3-border-right">
-                              <button className={buttonClassName}
+                              <button className="w3-button w3-red w3-round w3-hover-black"
                                 onClick={function () {
                                   setIsrejoin(true);
                                   setGameid(value.gameid);
