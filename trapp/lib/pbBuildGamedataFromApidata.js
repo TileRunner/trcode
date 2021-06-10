@@ -61,6 +61,8 @@ function BuildGamedataFromAidata(jApiGameData) {
         gname: gd.gname, // guards nickname
         type: "pb", // prisonbreak
         func: "providegamedata", // provide game data
+        syncstamp: lastEventObject.timestamp, // for data sync logic
+        makeitdifferent: new Date(), // trying to understand sent messages not getting processed
         // no sender
         tiles: tiles.split(""),
         squareArray: squareArray,

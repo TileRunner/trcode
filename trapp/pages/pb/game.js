@@ -19,6 +19,7 @@ const Game = ({isrejoin
     , client
     , racksize=4 // Option for rack size (give it a default for Build)
     }) => {
+    const [syncstamp, setSyncstamp] = useState('');
     const middle = racksize; // Middle element in row or column array
     const edge = racksize * 2; // Last element in row or column array
     const initialtiles = racksize === 6 ? c.TILEBAG6 : racksize === 7 ? c.TILEBAG7 : racksize === 5 ? c.TILEBAG5 : c.TILEBAG4;
@@ -66,7 +67,11 @@ const Game = ({isrejoin
         // If it is not my turn && the game has not ended
         if (participant !== whoseturn && whoseturn !== c.WHOSE_TURN_GAMEOVER) {
           // I am waiting for opponent move to come through but sometimes it gets missed (no idea why)
-          requestGameData(); // Send a request for game data in case opponent moved and we missed the update
+          // Send a request for the timestamp of the last event (syncstamp)
+          // Server will send func=providesyncstamp with a syncstamp value
+          // ProcessGameMessage will check syncstamp from the server to syncstamp here
+          // If different it will send func=requestgamedata, server will send us providegamedata, and we sync
+          requestSyncData(); // Send a request for sync data
         }
       }, c.PING_INTERVAL); // this many milliseconds between above code block executions
       return () => clearInterval(interval);
@@ -84,6 +89,7 @@ const Game = ({isrejoin
       }
     }
     const startGame = (firstSquareArray) => {
+      let newSyncstamp = new Date();
       let tempPTiles = [];
       let tempGTiles = [];
       let tempTiles = [...initialtiles];
@@ -97,6 +103,7 @@ const Game = ({isrejoin
       }
       tempPTiles.sort();
       tempGTiles.sort();
+      setSyncstamp(newSyncstamp);
       setGtiles(tempGTiles);
       setPtiles(tempPTiles);
       setTiles(tempTiles);
@@ -110,6 +117,7 @@ const Game = ({isrejoin
           type: "pb",
           func: "startgame",
           gameid: gameid, // Game id
+          timestamp: newSyncstamp, // For telling server my last data timestamp
           racksize: racksize, // Rack size option
           sender: participant, // This will be prisoners since prisoners start the game
           pname: nickname, // This will be the prisoners nickname since prisoners are sending this
@@ -140,6 +148,7 @@ const Game = ({isrejoin
         }
       );
     }
+
     useEffect(() => { // This code executes the first time Game is used only
       initializeRoutine();
     }, []);
@@ -162,9 +171,9 @@ const Game = ({isrejoin
   
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
-      // I want access to some updated values for checking missing rack tiles
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
-        if (messageData.func === "providegamedata") { 
+        if (messageData.func === "providegamedata") {
+          setSyncstamp(messageData.syncstamp);
           // Server providing game data
           if (participant === c.PARTY_TYPE_PRISONERS) {
             setOppname(messageData.gname);
@@ -199,6 +208,11 @@ const Game = ({isrejoin
         if (messageData.func === "chat" && messageData.sender != participant) { // Opponent chat message
           let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
           setChatmsgs(newChatmsgs);
+        }
+        if (messageData.func === "providesyncdata") {
+          if (messageData.syncstamp !== syncstamp) {
+            requestGameData();
+          }
         }
       }
     }
@@ -332,7 +346,9 @@ const Game = ({isrejoin
       let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
+      let newSyncstamp = new Date();
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setPtiles(newPtiles);
       setTiles(newTiles);
@@ -349,6 +365,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant,
           ptiles: newPtiles, // we picked new tiles for prisoners rack
           tiles: newTiles, // we picked new tiles so tile pool changed
@@ -381,7 +398,9 @@ const Game = ({isrejoin
       let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
+      let newSyncstamp = new Date();
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setGtiles(newGtiles);
       setTiles(newTiles);
@@ -397,6 +416,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant,
           gtiles: newGtiles, // we picked new tiles for guards rack
           tiles: newTiles, // we picked new tiles so tile pool changed
@@ -424,7 +444,9 @@ const Game = ({isrejoin
       newTiles.sort();
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
+      let newSyncstamp = new Date();
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
       setWhoseturn(c.WHOSE_TURN_GUARDS);
       setPtiles(newPtiles);
@@ -441,6 +463,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant,
           whoseturn: c.WHOSE_TURN_GUARDS, // swap never ends the game so go to opponent
           ptiles: newPtiles, // we picked new tiles for prisoners rack
@@ -468,7 +491,9 @@ const Game = ({isrejoin
       newTiles.sort();
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
+      let newSyncstamp = new Date();
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
       setWhoseturn(c.WHOSE_TURN_PRISONERS);
       setGtiles(newGtiles);
@@ -485,6 +510,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant,
           whoseturn: c.WHOSE_TURN_PRISONERS, // swap never ends the game so go to opponent
           gtiles: newGtiles, // we picked new tiles for prisoners rack
@@ -729,8 +755,10 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_GUARDS; // If both players pass then end the game
+      let newSyncstamp = new Date();
       recallTiles(); // In case they put some tiles on the board before clicking Pass
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
       client.send(
@@ -738,6 +766,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "ept", // end prisoners turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant, // who passed their turn
           whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
           move: newMove // the move that was made
@@ -749,8 +778,10 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_PRISONERS; // If both players pass then end the game
+      let newSyncstamp = new Date();
       recallTiles(); // In case they put some tiles on the board before clicking Pass
       putAtMoveStart();
+      setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
       client.send(
@@ -758,6 +789,7 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           func: "egt", // end guards turn
+          timestamp: newSyncstamp, // for data sync logic
           sender: participant, // who passed their turn
           whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
           move: newMove // the move that was made
@@ -779,7 +811,19 @@ const Game = ({isrejoin
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
           sender: participant,
-          func: "requestgamedata" // request game data
+          func: "requestgamedata", // request game data
+          syncstamp: prevSyncstamp // so server can decide whether I am up to date
+        }
+      )
+    }
+  
+    const requestSyncData = () => {
+      client.send(
+        {
+          gameid: gameid, // the id for the game
+          type: "pb", // prisonbreak
+          sender: participant,
+          func: "requestsyncdata" // request sync data
         }
       )
     }

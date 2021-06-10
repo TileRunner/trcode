@@ -42,11 +42,10 @@ wss.on("connection", (ws, req) => {
 
 const processMessage = (message) => {
     let pm = JSON.parse(message);
-    // console.log(`Message: type=${pm.type}, func=${pm.func}, gameid=${pm.gameid}, thisisme=${pm.thisisme}, ptiles=${pm.ptiles}, gtiles=${pm.gtiles}`);
     if (pm.type === "pb") {
         processPrisonBreakMessage(pm, message);
     }
-    if (pm.func === "chat") {
+    else if (pm.func === "chat") {
         handleChatMessages(pm, message);
     }
 }
@@ -54,6 +53,10 @@ const processMessage = (message) => {
 function processPrisonBreakMessage(pm, message) {
     if (pm.func === "announce") {
         processPbAnnounce(pm);
+    } else if (pm.func === "requestgamedata") {
+        processPbRequestGameData(pm);
+    } else if (pm.func === "requestsyncdata") {
+        processPbRequestSyncData(pm);
     } else if (pm.func === "allowundo") {
         processPbAllowUndo(pm, message);
     } else if (pm.func === "startgame") {
@@ -66,6 +69,10 @@ function processPrisonBreakMessage(pm, message) {
         processPbProvideMove(pm);
     } else if (pm.func === "undoturn") {
         processPbUndoMove(pm);
+    } else if (pm.func === "chat") {
+        handleChatMessages(pm, message);
+    } else {
+        console.log(`log: ${message}`);
     }
 }
 
@@ -76,6 +83,27 @@ function processPbAnnounce(pm) {
     }
 }
 
+function processPbRequestGameData(pm) {
+    let gameApiInfo = getGameApiInfo(pm.gameid);
+    let requestingClient = findPlayerClient(pm.gameid, pm.thisisme);
+    if (requestingClient) { // We should find the client that just asked!
+        getGameThenUpdateClients(pm.gameid, [requestingClient]);
+    }
+}
+
+function processPbRequestSyncData(pm) {
+    let gameApiInfo = getGameApiInfo(pm.gameid);
+    let requestingClient = findPlayerClient(pm.gameid, pm.thisisme);
+    if (requestingClient) { // We should find the client that just asked!
+        requestingClient.send(JSON.stringify(
+            {
+                type: 'pb',
+                func: 'providesyncdata',
+                syncstamp: gameApiInfoMap.syncstamp
+            }
+        ));
+    }
+}
 function processPbAllowUndo(pm, message) {
     let opponentClient = findOpponentClient(pm.gameid, pm.thisisme);
     if (opponentClient) {
@@ -92,15 +120,14 @@ function processPbStartGame(pm) {
         Send updated game list to clients in lobby
     */
 
-    let current_datetime = new Date();
-    let formatted_date = current_datetime.getFullYear() + "-" + appendLeadingZeroes(current_datetime.getMonth() + 1) + "-" + appendLeadingZeroes(current_datetime.getDate()) + " " + appendLeadingZeroes(current_datetime.getHours()) + ":" + appendLeadingZeroes(current_datetime.getMinutes());
     let jStartGame = {
-        datestamp: formatted_date,
+        datestamp: pm.timestamp,
         gameid: pm.gameid,
         racksize: pm.racksize,
         pname: pm.pname,
         events: [{
             index: 0,
+            timestamp: pm.timestamp,
             type: "STARTGAME",
             whoseturn: "P",
             ptiles: pm.ptiles.join(""),
@@ -161,29 +188,29 @@ function processPbRejoinGame(pm) {
 }
 
 function processPbProvideMove(pm) {
-    // console.log(`processPbProvideMove ${JSON.stringify(pm)}`);
     let move = pm.move;
-    let jEndTurn = {
+    let jProvideMove = {
         type: move.type,
         by: pm.sender,
+        timestamp: pm.timestamp,
         whoseturn: pm.whoseturn
     };
     if (move.type === "PLAY" || move.type === "SWAP") {
-        jEndTurn.tiles = pm.tiles.join("");
+        jProvideMove.tiles = pm.tiles.join("");
         if (pm.sender === "P") {
-            jEndTurn.ptiles = pm.ptiles.join("");
+            jProvideMove.ptiles = pm.ptiles.join("");
         } else {
-            jEndTurn.gtiles = pm.gtiles.join("");
+            jProvideMove.gtiles = pm.gtiles.join("");
         }
     }
     if (move.type === "PLAY") {
-        jEndTurn.pos = move.pos;
-        jEndTurn.mainword = move.mainword;
-        jEndTurn.extrawords = move.extrawords.join(",");
-        jEndTurn.rescues = pm.rescues;
+        jProvideMove.pos = move.pos;
+        jProvideMove.mainword = move.mainword;
+        jProvideMove.extrawords = move.extrawords.join(",");
+        jProvideMove.rescues = pm.rescues;
     }
     let opponentClient = findOpponentClient(pm.gameid, pm.thisisme);
-    handleProvideMove(pm.gameid, jEndTurn, opponentClient); // Send move to data API, send update to opponent if found
+    handleProvideMove(pm.gameid, jProvideMove, opponentClient); // Send move to data API, send update to opponent if found
 }
 
 function processPbUndoMove(pm) {
@@ -267,26 +294,29 @@ function getGameThenUpdateClients(gameid, gameclients) {
         }
     })
     .then(function (response) {
-        // console.log(`Get game from bin ${dataApiId}: Status ${response.status} ${response.statusText} Data: ${JSON.stringify(response.data)}`);
         let msg = BuildGamedataFromAidata(response.data); // For 'get' the response data is the json data
         gameclients.forEach((client) => {
             client.send(JSON.stringify(msg));
         });        
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
+}
+
+function logApiError(error) {
+    if (error.response) {
+        // Request made and server responded
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+    } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+    } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+    }
 }
 
 function handleChatMessages(pm, message) { // pm=json object, message=string of json
@@ -301,7 +331,6 @@ function handleChatMessages(pm, message) { // pm=json object, message=string of 
    game         game        send        Client is not the sender and has same gameid as sender  Support game chat messages
 */
     wss.clients.forEach((client) => {
-        // console.log(`Client: clientType=${client.clientType}, gameid=${client.gameid}, thisisme=${client.thisisme}`);
         if (client.clientType === pm.type) { // Same type of game
             if (client.thisisme === pm.thisisme) { // This is the client that sent the message
                 // Don't send the chat back to the caller
@@ -327,7 +356,6 @@ const setupGameApiInfoMap = () => {
         }
     })
     .then(function (response) {
-        // console.log(`Get bins: Status ${response.status} ${response.statusText} Array ${response.data}`);
         let jresponse = response.data;
         jresponse.forEach(element => {
             setGameData(element);
@@ -335,18 +363,7 @@ const setupGameApiInfoMap = () => {
         // If I put a code statement here, gameApiInfoMap will be empty due to async nature.
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
@@ -360,33 +377,22 @@ const setGameData = (dataApiId) => {
         }
     })
     .then(function (response) {
-        // console.log(`Get bin ${dataApiId}: Status ${response.status} ${response.statusText}`);
         let gameApiInfoElement = makeGameApiInfoObject(dataApiId, response.data);
-        // console.log(`Startup adding game: ${JSON.stringify(gameApiInfoElement)}`);
         gameApiInfoMap.push(gameApiInfoElement);
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
 function makeGameApiInfoObject(dataApiId, gameData) {
     let lastEventIndex = gameData.events.length - 1;
     let lastEvent = gameData.events[lastEventIndex];
+    let syncstamp = lastEvent.timestamp;
     return {
         dataApiId: dataApiId,
         datestamp: gameData.datestamp,
+        syncstamp: syncstamp,
         gameid: gameData.gameid,
         racksize: gameData.racksize,
         pname: gameData.pname,
@@ -406,25 +412,13 @@ function handleStartGame(jStartGame) {
         data: jStartGame
     })
     .then(function (response) {
-        // console.log(`Status ${response.status} ${response.statusText}`);
         let jresponse = response.data;
         let gameApiInfoObject = makeGameApiInfoObject(jresponse.id, jStartGame);
         gameApiInfoMap.push(gameApiInfoObject);
         updateLobbyClients();
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
@@ -442,24 +436,12 @@ function handleJoinGame(gameid, jProvideGname, joinClient) { // Update data api 
         data: jProvideGname
     })
     .then(function (response) {
-        // console.log(`Provide gname: Status ${response.status} ${response.statusText} ${JSON.stringify(response.data)}`);
         updateGameApiInfoObject(response.data); // Map gets gname
         updateLobbyClients(); // Lobby gets summary info for the game list
         getGameThenUpdateClients(gameid, [joinClient]); // The caller joined so they need the entire game data
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
@@ -485,29 +467,14 @@ function handleProvideMove(gameid, jProvideMove, opponentClient) {
         data: patchjson
     })
     .then(function (response) {
-        // console.log(`handleProvideMove then`);
-        // console.log(`Provide move ${dataApiId}: Status ${response.status} ${response.statusText} Data: ${response.data.data}`);
         updateGameApiInfoObject(response.data);
-        // console.log(`handleProvideMove after map update`);
         if (opponentClient) {
             let msg = BuildGamedataFromAidata(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
-            // console.log(`handleProvideMove after game data build`);
             opponentClient.send(JSON.stringify(msg));
         }
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
@@ -531,7 +498,6 @@ function handleUndoMove(gameid, gameclients) {
         data: patchjson
     })
     .then(function (response) {
-        // console.log(`Undo move ${dataApiId}: Status ${response.status} ${response.statusText} Data: ${response.data.data}`);
         updateGameApiInfoObject(response.data);
         let msg = BuildGamedataFromAidata(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
         gameclients.forEach((client) => {
@@ -539,18 +505,7 @@ function handleUndoMove(gameid, gameclients) {
         });
     })
     .catch(error => {
-        if (error.response) {
-            // Request made and server responded
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', error.message);
-        }
+        logApiError(error);
     });
 }
 
@@ -580,33 +535,24 @@ function getGameListMessageString() {
 function getGameApiInfo(gameid) {
     let dataApiId = '';
     let nextEventIndex = 0;
+    let syncstamp = '';
     for (let index = 0; index < gameApiInfoMap.length; index++) {
         const element = gameApiInfoMap[index];
         if (element.gameid === gameid) {
             dataApiId = element.dataApiId;
             nextEventIndex = element.nextEventIndex;
+            syncstamp = element.syncstamp;
         }
     }
-    return ({dataApiId: dataApiId, nextEventIndex: nextEventIndex});
+    return ({dataApiId: dataApiId, nextEventIndex: nextEventIndex, syncstamp: syncstamp});
 }
 
 function updateGameApiInfoObject(apiResponseData) { // Pass the axios response
     let gameData = JSON.parse(apiResponseData.data); // Parse the json string into a json object
-    // console.log(`Updating map for: ${JSON.stringify(gameData)}`);
     for (let index = 0; index < gameApiInfoMap.length; index++) {
         const element = gameApiInfoMap[index];
-        // console.log(`Looking at element with gameid=${element.gameid}: ${JSON.stringify(element)}`);
         if (element.gameid === gameData.gameid) {
             gameApiInfoMap[index] = makeGameApiInfoObject(element.dataApiId, gameData);
-            // console.log(`Updated game: ${JSON.stringify(gameApiInfoMap[index])}`);
         }
     }
-    // console.log(`Updated map: ${JSON.stringify(gameApiInfoMap)}`);
-}
-
-function appendLeadingZeroes(n) {
-    if(n <= 9){
-      return "0" + n;
-    }
-    return n;
 }
