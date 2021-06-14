@@ -1,4 +1,4 @@
-import * as c from '../../lib/pbcommon';
+import * as c from '../../lib/pb/prisonBreakConstants';
 
 const ShowMoves = ({moves}) => { // show moves made
     return (

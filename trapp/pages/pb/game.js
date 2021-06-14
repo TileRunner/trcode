@@ -6,10 +6,13 @@ import ShowUnseenTiles from '../pb/unseenTilesSection';
 import ShowMoves from '../pb/movesSection';
 import ShowRescues from '../pb/rescuesSection';
 import Chat from '../pb/chatSection';
-import * as c from '../../lib/pbcommon';
-import {InitialSquareArray} from '../../lib/pbInitialSquareArray';
-
-// import { getClientBuildManifest } from "next/dist/client/route-loader";
+import * as c from '../../lib/pb/prisonBreakConstants';
+import { initialSquareArray } from '../../lib/pb/initialSquareArray';
+import { anyUnusedEscapeHatches } from "../../lib/pb/anyUnusedEscapeHatches";
+import { buildGamedataFromApidata } from "../../lib/pb/buildGamedataFromApidata";
+import { isDoublePass } from "../../lib/pb/isDoublePass";
+import { scrollToBottom } from "../../lib/scrollToBottom";
+import { usePrevious } from "../../lib/usePrevious";
 
 const Game = ({isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
@@ -43,13 +46,19 @@ const Game = ({isrejoin
     const [oppname, setOppname] = useState('');
     const [chatmsgs, setChatmsgs] = useState([]);
     const prevRescues = usePrevious(rescues);
-    function usePrevious(value) {
-      const ref = useRef();
-      useEffect(() => {
-        ref.current = value;
-      });
-      return ref.current;
-    }
+    useEffect(() => { // This code executes the first time Game is used only
+      initializeRoutine();
+    }, []);
+    useEffect(() => {
+      let msg = wsmessage;
+      if (msg !== '') processGameMessage(msg);      
+    },[wsmessage])
+    useEffect(() => {
+      scrollToBottom("ScrollableMoves");
+    },[moves])
+    useEffect(() => {
+      scrollToBottom("ScrollableChat");
+    },[chatmsgs])
     useEffect(() => {
       if (rescues > prevRescues) {
           var myaudio = document.createElement('audio');
@@ -63,22 +72,22 @@ const Game = ({isrejoin
         newji = 0;
       }
       setJokeindex(newji);
-      const interval = setInterval(() => {
-        // If it is not my turn && the game has not ended
-        if (participant !== whoseturn && whoseturn !== c.WHOSE_TURN_GAMEOVER) {
-          // I am waiting for opponent move to come through but sometimes it gets missed (no idea why)
-          // Send a request for the timestamp of the last event (syncstamp)
-          // Server will send func=providesyncstamp with a syncstamp value
-          // ProcessGameMessage will check syncstamp from the server to syncstamp here
-          // If different it will send func=requestgamedata, server will send us providegamedata, and we sync
-          requestSyncData(); // Send a request for sync data
-        }
-      }, c.PING_INTERVAL); // this many milliseconds between above code block executions
-      return () => clearInterval(interval);
     }, [whoseturn]); // want up to date value of whoseturn to decide whether to ask for an update
 
+    useEffect(() => {
+      const interval = setInterval(() => {
+        if (participant !== whoseturn && whoseturn !== c.WHOSE_TURN_GAMEOVER) {
+          requestSyncData(); // Send a request for sync data when waiting for their move
+        }
+        // Send a request for the timestamp of the last event (syncstamp)
+        // Server will send func=providesyncstamp with a syncstamp value
+        // ProcessGameMessage will check syncstamp from the server to syncstamp here
+        // If different it will send func=requestgamedata, server will send us providegamedata, and we sync
+        }, c.PING_INTERVAL); // this many milliseconds between above code block executions
+      return () => clearInterval(interval);
+    });
     const initializeRoutine = () => {
-      let firstSquareArray = InitialSquareArray(racksize);
+      let firstSquareArray = initialSquareArray(racksize);
       setSquareArray(firstSquareArray);
       if (isrejoin) {
         rejoinGame()
@@ -89,7 +98,7 @@ const Game = ({isrejoin
       }
     }
     const startGame = (firstSquareArray) => {
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       let tempPTiles = [];
       let tempGTiles = [];
       let tempTiles = [...initialtiles];
@@ -149,19 +158,6 @@ const Game = ({isrejoin
       );
     }
 
-    useEffect(() => { // This code executes the first time Game is used only
-      initializeRoutine();
-    }, []);
-    useEffect(() => {
-      let msg = wsmessage;
-      if (msg !== '') processGameMessage(msg);      
-    },[wsmessage])
-    useEffect(() => {
-      scrollToBottom("ScrollableMoves");
-    },[moves])
-    useEffect(() => {
-      scrollToBottom("ScrollableChat");
-    },[chatmsgs])
     function putAtMoveStart() {
       setSelection(-1);
       setAllowRewind(false);
@@ -171,29 +167,31 @@ const Game = ({isrejoin
   
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
+      console.log(`${messageData.gameid} ${messageData.func}`);
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
         if (messageData.func === "providegamedata") {
-          setSyncstamp(messageData.syncstamp);
+          let gd = buildGamedataFromApidata(messageData.apidata);
+          setSyncstamp(gd.syncstamp);
           // Server providing game data
           if (participant === c.PARTY_TYPE_PRISONERS) {
-            setOppname(messageData.gname);
+            setOppname(gd.gname);
           } else {
-            setOppname(messageData.pname);
+            setOppname(gd.pname);
           }
-          setTiles(messageData.tiles);
-          setSquareArray(messageData.squareArray);
-          setPtiles(messageData.ptiles);
-          setGtiles(messageData.gtiles);
-          setWhoseturn(messageData.whoseturn);
+          setTiles(gd.tiles);
+          setSquareArray(gd.squareArray);
+          setPtiles(gd.ptiles);
+          setGtiles(gd.gtiles);
+          setWhoseturn(gd.whoseturn);
           let newSnapshot = {
-            squareArray: JSON.parse(JSON.stringify(messageData.squareArray)), // Deep copy
-            ptiles: [...messageData.ptiles],
-            gtiles: [...messageData.gtiles]
+            squareArray: JSON.parse(JSON.stringify(gd.squareArray)), // Deep copy
+            ptiles: [...gd.ptiles],
+            gtiles: [...gd.gtiles]
           };
           setSnapshot(newSnapshot);
-          setMoves(messageData.moves);
-          setRescues(messageData.rescues);
-          setAllowRewind(messageData.allowRewind);
+          setMoves(gd.moves);
+          setRescues(gd.rescues);
+          setAllowRewind(gd.allowRewind);
           putAtMoveStart();
         }
         if (messageData.func === "providegname") {
@@ -210,7 +208,9 @@ const Game = ({isrejoin
           setChatmsgs(newChatmsgs);
         }
         if (messageData.func === "providesyncdata") {
+          console.log(`providesyndata passed ${messageData.syncstamp} and I have ${syncstamp}`);
           if (messageData.syncstamp !== syncstamp) {
+            console.log(`Out of sync - requesting latest game data`);
             requestGameData();
           }
         }
@@ -340,13 +340,13 @@ const Game = ({isrejoin
       }
       newPtiles.sort();
       let newWhoseturn = newPtiles.length > 0 ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_GAMEOVER;
-      if (!c.AnyUnusedEscapeHatches(squareArray)) {
+      if (!anyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
@@ -392,13 +392,13 @@ const Game = ({isrejoin
       let snapptiles = [...ptiles];
       let snapgtiles = [...gtiles];
       let newWhoseturn = newGtiles.length > 0 ? c.WHOSE_TURN_PRISONERS : c.WHOSE_TURN_GAMEOVER;
-      if (!c.AnyUnusedEscapeHatches(squareArray)) {
+      if (!anyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
       let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
@@ -444,7 +444,7 @@ const Game = ({isrejoin
       newTiles.sort();
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
@@ -491,7 +491,7 @@ const Game = ({isrejoin
       newTiles.sort();
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
@@ -755,7 +755,7 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_GUARDS; // If both players pass then end the game
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       recallTiles(); // In case they put some tiles on the board before clicking Pass
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
@@ -778,7 +778,7 @@ const Game = ({isrejoin
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
       let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_PRISONERS; // If both players pass then end the game
-      let newSyncstamp = new Date();
+      let newSyncstamp = Date.now();
       recallTiles(); // In case they put some tiles on the board before clicking Pass
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
@@ -797,13 +797,6 @@ const Game = ({isrejoin
       );
     }
   
-    function isDoublePass(movelist) {
-        let last = movelist.length - 1;
-        let secondlast = last - 1;
-        return secondlast > -1 &&
-          movelist[secondlast].type === c.MOVE_TYPE_PASS &&
-          movelist[last].type === c.MOVE_TYPE_PASS;
-    }
 
     const requestGameData = () => {
       client.send(
@@ -812,12 +805,13 @@ const Game = ({isrejoin
           type: "pb", // prisonbreak
           sender: participant,
           func: "requestgamedata", // request game data
-          syncstamp: prevSyncstamp // so server can decide whether I am up to date
+          syncstamp: syncstamp // so server can decide whether I am up to date
         }
       )
     }
   
     const requestSyncData = () => {
+      console.log(`Send requestsyncdata ${syncstamp}`);
       client.send(
         {
           gameid: gameid, // the id for the game
@@ -1032,9 +1026,5 @@ const Game = ({isrejoin
     );
   };
   
-  const scrollToBottom = (elementid) => {
-    const theElement = document.getElementById(elementid);
-    theElement.scrollTop = theElement.scrollHeight;
-  }
 
   export default Game;

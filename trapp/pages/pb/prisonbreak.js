@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from "react";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
-import * as c from '../../lib/pbcommon';
+import * as c from '../../lib/pb/prisonBreakConstants';
 import { v4 as uuid_v4 } from 'uuid';
 
 export default function PrisonBreak() {

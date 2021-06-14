@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Chat from '../pb/chatSection';
-import * as c from '../../lib/pbcommon';
+import * as c from '../../lib/pb/prisonBreakConstants';
+import { scrollToBottom } from "../../lib/scrollToBottom";
 
 const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
 // There is no availableActionStart because there is a specific Start button in the Prisoners row
@@ -285,9 +286,4 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
     )
   }
   
-const scrollToBottom = (elementid) => {
-  const theElement = document.getElementById(elementid);
-  theElement.scrollTop = theElement.scrollHeight;
-}
-
 export default Lobby;  

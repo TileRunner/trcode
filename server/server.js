@@ -1,5 +1,4 @@
 const _ = require('cors');
-const { BuildGamedataFromAidata } = require("../trapp/lib/pbBuildGamedataFromApidata");
 const express = require("express");
 const { Server } = require("ws");
 const path = require("path");
@@ -50,7 +49,9 @@ const processMessage = (message) => {
     }
 }
 
-function processPrisonBreakMessage(pm, message) {
+const processPrisonBreakMessage = (pm, message) => {
+    // console.log(`processPrisonBreakMessage: ${pm.func} ${pm.gameid}.${pm.thisisme}`);
+    // console.log(message);
     if (pm.func === "announce") {
         processPbAnnounce(pm);
     } else if (pm.func === "requestgamedata") {
@@ -76,14 +77,14 @@ function processPrisonBreakMessage(pm, message) {
     }
 }
 
-function processPbAnnounce(pm) {
+const processPbAnnounce = (pm) => {
     let lobbyClient = findLobbyClient(pm.thisisme);
     if (lobbyClient) {
         updateLobbyClient(lobbyClient);
     }
 }
 
-function processPbRequestGameData(pm) {
+const processPbRequestGameData = (pm) => {
     let gameApiInfo = getGameApiInfo(pm.gameid);
     let requestingClient = findPlayerClient(pm.gameid, pm.thisisme);
     if (requestingClient) { // We should find the client that just asked!
@@ -91,34 +92,48 @@ function processPbRequestGameData(pm) {
     }
 }
 
-function processPbRequestSyncData(pm) {
+const processPbRequestSyncData = (pm) => {
     let gameApiInfo = getGameApiInfo(pm.gameid);
     let requestingClient = findPlayerClient(pm.gameid, pm.thisisme);
     if (requestingClient) { // We should find the client that just asked!
+        // console.log(`Sending ${gameApiInfo.syncstamp} to ${pm.gameid} ${requestingClient.thisisme}`);
         requestingClient.send(JSON.stringify(
             {
                 type: 'pb',
+                gameid: pm.gameid,
                 func: 'providesyncdata',
-                syncstamp: gameApiInfoMap.syncstamp
+                syncstamp: gameApiInfo.syncstamp
             }
         ));
+    } else {
+        console.log(`Cannot find client that requested syncdata! ${pm.gameid} ${pm.thisisme} ${gameApiInfo.syncstamp}`);
     }
 }
-function processPbAllowUndo(pm, message) {
+const processPbAllowUndo = (pm, message) => {
     let opponentClient = findOpponentClient(pm.gameid, pm.thisisme);
     if (opponentClient) {
         opponentClient.send(message);
     }
 }
-function processPbStartGame(pm) {
+
+const processPbStartGame = (pm) => {
     /*
         STARTING A GAME
         ---------------
+        Set the client gameid
         Create the game data
         Post game to API
         Update game info map
         Send updated game list to clients in lobby
     */
+    // Set the client gameid
+    // HOW AM I NOT GETTING ANY CONSOLE.LOG FOR BELOW?
+    wss.clients.forEach((client) => {
+        if (client.thisisme === pm.thisisme) {
+            // console.log(`Setting gameid to ${pm.gameid} for client ${client.thisisme}`);
+            client.gameid = pm.gameid;
+        }
+    });
 
     let jStartGame = {
         datestamp: pm.timestamp,
@@ -138,7 +153,7 @@ function processPbStartGame(pm) {
     handleStartGame(jStartGame); // Send new game to data API
 }
 
-function processPbJoinGame(pm) {
+const processPbJoinGame = (pm) => {
     /*
         JOINING A GAME
         --------------
@@ -177,7 +192,7 @@ function processPbJoinGame(pm) {
     });
 }
 
-function processPbRejoinGame(pm) {
+const processPbRejoinGame = (pm) => {
     /*
         REJOINING A GAME
         --------------
@@ -187,7 +202,7 @@ function processPbRejoinGame(pm) {
     getGameThenUpdateClients(pm.gameid, [joinClient]);
 }
 
-function processPbProvideMove(pm) {
+const processPbProvideMove = (pm) => {
     let move = pm.move;
     let jProvideMove = {
         type: move.type,
@@ -213,13 +228,13 @@ function processPbProvideMove(pm) {
     handleProvideMove(pm.gameid, jProvideMove, opponentClient); // Send move to data API, send update to opponent if found
 }
 
-function processPbUndoMove(pm) {
-    // We need to update the database then build and send the game data to the clients in the game
+const processPbUndoMove = (pm) => {
+    // We need to update the database then send the api game data to the clients in the game
     let gameclients = findGameClients(pm.gameid);
     handleUndoMove(pm.gameid, gameclients);
 }
 
-function findLobbyClient(thisisme) {
+const findLobbyClient = (thisisme) => {
     let lobbyClient;
     wss.clients.forEach((client) => {
         if (client.thisisme === thisisme) {
@@ -229,7 +244,7 @@ function findLobbyClient(thisisme) {
     return lobbyClient;
 }
 
-function findGameClients(gameid) {
+const findGameClients = (gameid) => {
     let gameclients = [];
     wss.clients.forEach((client) => {
         if (client.gameid === gameid) {
@@ -239,7 +254,7 @@ function findGameClients(gameid) {
     return gameclients;
 }
 
-function findGameClientsExceptMe(gameid, playerThisisme) {
+const findGameClientsExceptMe = (gameid, playerThisisme) => {
     let gameclients = [];
     wss.clients.forEach((client) => {
         if (client.gameid === gameid && client.thisisme !== playerThisisme) {
@@ -249,21 +264,25 @@ function findGameClientsExceptMe(gameid, playerThisisme) {
     return gameclients;
 }
 
-function findOpponentClient(gameid, playerThisisme) {
+const findOpponentClient = (gameid, playerThisisme) => {
     let foundClient = null;
+    let msg = '';
     wss.clients.forEach((client) => {
+        msg = msg + client.gameid + '.' + client.thisisme + ', ';
         if (client.gameid === gameid && client.thisisme !== playerThisisme) {
             foundClient = client;
         }
     });
+    if (!foundClient) console.log(msg);
     return foundClient;
 }
 
-function findPlayerClient(gameid, playerThisisme) {
+const findPlayerClient = (gameid, playerThisisme) => {
     let foundClient = null;
     wss.clients.forEach((client) => {
         if (client.thisisme === playerThisisme) {
             if (!client.gameid && gameid) {
+                // console.log(`Setting gameid to ${gameid} for client ${playerThisisme}`);
                 client.gameid = gameid;
             }
             foundClient = client;
@@ -272,7 +291,7 @@ function findPlayerClient(gameid, playerThisisme) {
     return foundClient;
 }
 
-function findLobbyClients() {
+const findLobbyClients = () => {
     let lobbyclients = [];
     wss.clients.forEach((client) => {
         if (!client.gameid) {
@@ -282,7 +301,7 @@ function findLobbyClients() {
     return lobbyclients;
 }
 
-function getGameThenUpdateClients(gameid, gameclients) {
+const getGameThenUpdateClients = (gameid, gameclients) => {
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     axios({
@@ -294,7 +313,7 @@ function getGameThenUpdateClients(gameid, gameclients) {
         }
     })
     .then(function (response) {
-        let msg = BuildGamedataFromAidata(response.data); // For 'get' the response data is the json data
+        let msg = buildProvidegamedataMessage(response.data); // For 'get' the response data is the json data
         gameclients.forEach((client) => {
             client.send(JSON.stringify(msg));
         });        
@@ -304,7 +323,16 @@ function getGameThenUpdateClients(gameid, gameclients) {
     });
 }
 
-function logApiError(error) {
+const buildProvidegamedataMessage = (apidata) => {
+    return {
+        type: "pb",
+        func: "providegamedata",
+        gameid: apidata.gameid,
+        apidata: apidata
+    };
+}
+
+const logApiError = (error) => {
     if (error.response) {
         // Request made and server responded
         console.log(error.response.data);
@@ -319,7 +347,7 @@ function logApiError(error) {
     }
 }
 
-function handleChatMessages(pm, message) { // pm=json object, message=string of json
+const handleChatMessages = (pm, message) => { // pm=json object, message=string of json
 /* Send the chat message to clients that need it
    Overall rule - only send message to clients with the same client type (e.g. 'pb' for Prison Break)
 
@@ -385,7 +413,7 @@ const setGameData = (dataApiId) => {
     });
 }
 
-function makeGameApiInfoObject(dataApiId, gameData) {
+const makeGameApiInfoObject = (dataApiId, gameData) => {
     let lastEventIndex = gameData.events.length - 1;
     let lastEvent = gameData.events[lastEventIndex];
     let syncstamp = lastEvent.timestamp;
@@ -402,7 +430,7 @@ function makeGameApiInfoObject(dataApiId, gameData) {
     };
 }
 
-function handleStartGame(jStartGame) {
+const handleStartGame = (jStartGame) => {
     axios({
         method: 'post',
         url: dataApiUrl,
@@ -422,7 +450,7 @@ function handleStartGame(jStartGame) {
     });
 }
 
-function handleJoinGame(gameid, jProvideGname, joinClient) { // Update data api and map, update lobby clients, get and send game to joiner
+const handleJoinGame = (gameid, jProvideGname, joinClient) => { // Update data api and map, update lobby clients, get and send game to joiner
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     axios({
@@ -445,7 +473,7 @@ function handleJoinGame(gameid, jProvideGname, joinClient) { // Update data api 
     });
 }
 
-function handleProvideMove(gameid, jProvideMove, opponentClient) {
+const handleProvideMove = (gameid, jProvideMove, opponentClient) => {
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     let nextEventIndex = gameApiInfo.nextEventIndex;
@@ -469,7 +497,8 @@ function handleProvideMove(gameid, jProvideMove, opponentClient) {
     .then(function (response) {
         updateGameApiInfoObject(response.data);
         if (opponentClient) {
-            let msg = BuildGamedataFromAidata(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
+            let msg = buildProvidegamedataMessage(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
+            // console.log(`Sending update to opponent after move made`);
             opponentClient.send(JSON.stringify(msg));
         }
     })
@@ -478,7 +507,7 @@ function handleProvideMove(gameid, jProvideMove, opponentClient) {
     });
 }
 
-function handleUndoMove(gameid, gameclients) {
+const handleUndoMove = (gameid, gameclients) => {
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     let removeEventIndex = gameApiInfo.nextEventIndex - 1;
@@ -499,7 +528,7 @@ function handleUndoMove(gameid, gameclients) {
     })
     .then(function (response) {
         updateGameApiInfoObject(response.data);
-        let msg = BuildGamedataFromAidata(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
+        let msg = buildProvidegamedataMessage(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
         gameclients.forEach((client) => {
             client.send(JSON.stringify(msg));
         });
@@ -509,12 +538,12 @@ function handleUndoMove(gameid, gameclients) {
     });
 }
 
-function updateLobbyClient(client) {
+const updateLobbyClient = (client) => {
     let msg = getGameListMessageString();
     client.send(msg);
 }
 
-function updateLobbyClients() {
+const updateLobbyClients = () => {
     let lobbyClients = findLobbyClients();
     let msg = getGameListMessageString();
     lobbyClients.forEach((client) => {
@@ -522,7 +551,7 @@ function updateLobbyClients() {
     });
 }
 
-function getGameListMessageString() {
+const getGameListMessageString = () => {
     gameApiInfoMap.sort((a, b) => a.datestamp < b.datestamp ? 1 : -1); // Youngest on top
     let jgamelist = {
         type: "pb",
@@ -532,7 +561,7 @@ function getGameListMessageString() {
     return JSON.stringify(jgamelist);
 }
 
-function getGameApiInfo(gameid) {
+const getGameApiInfo = (gameid) => {
     let dataApiId = '';
     let nextEventIndex = 0;
     let syncstamp = '';
@@ -547,7 +576,7 @@ function getGameApiInfo(gameid) {
     return ({dataApiId: dataApiId, nextEventIndex: nextEventIndex, syncstamp: syncstamp});
 }
 
-function updateGameApiInfoObject(apiResponseData) { // Pass the axios response
+const updateGameApiInfoObject = (apiResponseData) => { // Pass the axios response
     let gameData = JSON.parse(apiResponseData.data); // Parse the json string into a json object
     for (let index = 0; index < gameApiInfoMap.length; index++) {
         const element = gameApiInfoMap[index];

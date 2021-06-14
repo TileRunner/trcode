@@ -1,5 +1,5 @@
 import Square from './square';
-import * as c from '../../lib/pbcommon';
+import * as c from '../../lib/pb/prisonBreakConstants';
 
 // Here I used default squareArray=[] so the npm run build always has squareArray defined
 const Board = ({ onClick, squareArray=[], rcd }) => {
