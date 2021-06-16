@@ -66,6 +66,8 @@ const processPrisonBreakMessage = (pm, message) => {
         processPbJoinGame(pm);
     } else if (pm.func === "rejoingame") {
         processPbRejoinGame(pm);
+    } else if (pm.func === "startObserving") {
+        processPbStartObservingGame(pm);
     } else if (pm.func === "ept" || pm.func === "egt") {
         processPbProvideMove(pm);
     } else if (pm.func === "undoturn") {
@@ -126,12 +128,12 @@ const processPbStartGame = (pm) => {
         Update game info map
         Send updated game list to clients in lobby
     */
-    // Set the client gameid
-    // HOW AM I NOT GETTING ANY CONSOLE.LOG FOR BELOW?
+    // Set the client gameid and participant
     wss.clients.forEach((client) => {
         if (client.thisisme === pm.thisisme) {
             // console.log(`Setting gameid to ${pm.gameid} for client ${client.thisisme}`);
             client.gameid = pm.gameid;
+            client.participant = pm.sender; // This is will be 'P' since prisoners start the game
         }
     });
 
@@ -163,6 +165,7 @@ const processPbJoinGame = (pm) => {
     */
     let joinClient = findPlayerClient(pm.gameid, pm.thisisme);
     if (joinClient) {
+        joinClient.participant = pm.sender; // This will be 'G' because prisoners start and guards join
         // We should always find the client that sent the message by design
         let gameApiInfo = getGameApiInfo(pm.gameid);
         if (gameApiInfo) {
@@ -199,7 +202,21 @@ const processPbRejoinGame = (pm) => {
         This is guards or prisoners rejoining a game
     */
     let joinClient = findPlayerClient(pm.gameid, pm.thisisme);
-    getGameThenUpdateClients(pm.gameid, [joinClient]);
+    if (joinClient) {
+        joinClient.participant = pm.sender;
+        getGameThenUpdateClients(pm.gameid, [joinClient]);
+    }
+}
+
+const processPbStartObservingGame = (pm) => {
+    wss.clients.forEach((client) => {
+        if (client.thisisme === pm.thisisme) {
+            // console.log(`Setting observer gameid to ${pm.gameid} for client ${client.thisisme}`);
+            client.gameid = pm.gameid;
+            client.participant = 'O';
+            getGameThenUpdateClients(pm.gameid, [client]);
+        }
+    });
 }
 
 const processPbProvideMove = (pm) => {
@@ -224,12 +241,12 @@ const processPbProvideMove = (pm) => {
         jProvideMove.extrawords = move.extrawords.join(",");
         jProvideMove.rescues = pm.rescues;
     }
-    let opponentClient = findOpponentClient(pm.gameid, pm.thisisme);
-    handleProvideMove(pm.gameid, jProvideMove, opponentClient); // Send move to data API, send update to opponent if found
+    let otherGameClients = findGameClientsExceptMe(pm.gameid, pm.thisisme);
+    handleProvideMove(pm.gameid, jProvideMove, otherGameClients); // Send move to data API, send update to opponent if found
 }
 
 const processPbUndoMove = (pm) => {
-    // We need to update the database then send the api game data to the clients in the game
+    // We need to update the database then send the api game data to the players and observers in the game
     let gameclients = findGameClients(pm.gameid);
     handleUndoMove(pm.gameid, gameclients);
 }
@@ -269,7 +286,7 @@ const findOpponentClient = (gameid, playerThisisme) => {
     let msg = '';
     wss.clients.forEach((client) => {
         msg = msg + client.gameid + '.' + client.thisisme + ', ';
-        if (client.gameid === gameid && client.thisisme !== playerThisisme) {
+        if (client.gameid === gameid && client.thisisme !== playerThisisme && client.participant !== 'O') {
             foundClient = client;
         }
     });
@@ -357,14 +374,25 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
    lobby        game        none
    game         lobby       none
    game         game        send        Client is not the sender and has same gameid as sender  Support game chat messages
+                                        Also must be observer to observers or player to player  Support observer chat
 */
     wss.clients.forEach((client) => {
         if (client.clientType === pm.type) { // Same type of game
             if (client.thisisme === pm.thisisme) { // This is the client that sent the message
                 // Don't send the chat back to the caller
             } else if (pm.gameid) { // Sent from within a game, not from lobby
-                if (pm.gameid === client.gameid) { // Client is in same game as sender - send the message
-                    client.send(message);
+                if (pm.gameid === client.gameid) { // Client is in same game as sender
+                    if (pm.type !== 'pb'
+                    || (pm.sender === 'O' && client.participant === 'O') // Observer chat
+                    || (pm.sender !== 'O' && client.participant !== 'O') // Player chat
+                    ) {
+                        // console.log(`Include ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.participant}.${client.thisisme}`);
+                        client.send(message);
+                    // } else {
+                    //     console.log(`Exclude ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.participant}.${client.thisisme}`);
+                    }
+                } else {
+                    console.log(`Exclude ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.gameid}.${client.participant}.${client.thisisme}`);
                 }
             } else { // Sent from lobby, not from within a game
                 if (!client.gameid) { // Client is in lobby - send message from lobby
@@ -473,7 +501,7 @@ const handleJoinGame = (gameid, jProvideGname, joinClient) => { // Update data a
     });
 }
 
-const handleProvideMove = (gameid, jProvideMove, opponentClient) => {
+const handleProvideMove = (gameid, jProvideMove, otherGameClients) => {
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     let nextEventIndex = gameApiInfo.nextEventIndex;
@@ -496,10 +524,13 @@ const handleProvideMove = (gameid, jProvideMove, opponentClient) => {
     })
     .then(function (response) {
         updateGameApiInfoObject(response.data);
-        if (opponentClient) {
+        if (otherGameClients) {
+            // console.log(`Sending update to opponent and observers after move made`);
             let msg = buildProvidegamedataMessage(JSON.parse(response.data.data)); // For 'patch' the response data is "status": 0, "data": -- string of JSON data updated
-            // console.log(`Sending update to opponent after move made`);
-            opponentClient.send(JSON.stringify(msg));
+            let textmsg = JSON.stringify(msg);
+            otherGameClients.forEach((client) => {
+                client.send(textmsg);
+            })
         }
     })
     .catch(error => {

@@ -9,6 +9,7 @@ const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
 const availableActionNone = 0;
 const availableActionJoin = 1;
 const availableActionReconnect = 2;
+const availableActionObserve = 3;
 
 const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
     , racksize, setRacksize // Option for rack size
@@ -61,15 +62,16 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
       return gi > -1;
     }
     function availableActionP(gd) {
-      if (nickname.length === 0 || gd.whoseturn === c.WHOSE_TURN_GAMEOVER) { return availableActionNone; }
-      if (gd.pname === nickname) { return availableActionReconnect; }
-      return availableActionNone;
+      if (nickname.length === 0) { return availableActionNone; } // No particpation without nickname
+      if (gd.pname === nickname) { return availableActionReconnect; } // Allow reconnect if nickname matches
+      if (gd.gname) { return availableActionObserve; } // If guards have joined allow observe
+      return availableActionNone; // Guards have not joined to allow observe, not my game to allow reconnect
     }
     function availableActionG(gd) {
-      if (nickname.length === 0 || gd.whoseturn === c.WHOSE_TURN_GAMEOVER) { return availableActionNone; }
-      if (!gd.gname) { return availableActionJoin; }
-      if (gd.gname === nickname) { return availableActionReconnect; }
-      return availableActionNone;
+      if (nickname.length === 0) { return availableActionNone; } // No particpation without nickname
+      if (gd.gname === nickname) { return availableActionReconnect; } // Allow reconnect if nickname matches
+      if (!gd.gname) { return availableActionJoin; } // Allow join if guards have not joined
+      return availableActionObserve; // Allow observe since both players are determined
     }
     function selectRackSize(newRacksize) {
       setRacksize(newRacksize);
@@ -228,6 +230,19 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                                 } }
                               >
                                 Reconnect
+                              </button>
+                            </td>
+                          :availableActionP(value) === availableActionObserve ?
+                            <td id={`PrisonersObserve${index}`} className="w3-border-right">
+                              <button className="w3-button w3-yellow w3-round w3-hover-black"
+                                onClick={function () {
+                                  setIsrejoin(false);
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_OBSERVER);
+                                  setRacksize(value.racksize);
+                                } }
+                              >
+                                Observe
                               </button>
                             </td>
                           :

@@ -62,6 +62,7 @@ const Game = ({isrejoin
     useEffect(() => {
       if (rescues > prevRescues) {
           var myaudio = document.createElement('audio');
+          // Observers hear yippee
           myaudio.src = participant === c.PARTY_TYPE_GUARDS ? "https://tilerunner.github.io/OneGotAway.m4a" : "https://tilerunner.github.io/yippee.m4a";
           myaudio.play();
       }
@@ -92,9 +93,11 @@ const Game = ({isrejoin
       if (isrejoin) {
         rejoinGame()
       } else if (participant === c.PARTY_TYPE_PRISONERS) {
-        startGame(firstSquareArray); // Prisoner is starting the game so pick racks
+        startGame(firstSquareArray); // Prisoners starting the game
+      } else if (participant === c.PARTY_TYPE_GUARDS) {
+        joinGame(); // Guards joining the game
       } else {
-        joinGame(); // Prisoner rejoin or guard join or guard rejoin
+        startObservingGame(); // Observer viewing the game
       }
     }
     const startGame = (firstSquareArray) => {
@@ -157,6 +160,15 @@ const Game = ({isrejoin
         }
       );
     }
+    const startObservingGame = () => {
+      client.send(
+        {
+          gameid: gameid,
+          type: "pb",
+          func: "startObserving"
+        }
+      );
+    }
 
     function putAtMoveStart() {
       setSelection(-1);
@@ -171,11 +183,12 @@ const Game = ({isrejoin
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
         if (messageData.func === "providegamedata") {
           let gd = buildGamedataFromApidata(messageData.apidata);
-          setSyncstamp(gd.syncstamp);
           // Server providing game data
+          setSyncstamp(gd.syncstamp);
+          // No opponent name for observers
           if (participant === c.PARTY_TYPE_PRISONERS) {
             setOppname(gd.gname);
-          } else {
+          } else if (participant === c.PARTY_TYPE_GUARDS) {
             setOppname(gd.pname);
           }
           setTiles(gd.tiles);
@@ -203,12 +216,12 @@ const Game = ({isrejoin
           // Opponent clicked button to allow undo turn
           setAllowRewind(true);
         }
-        if (messageData.func === "chat" && messageData.sender != participant) { // Opponent chat message
+        if (messageData.func === "chat") { // Server decided whether this chat was for me
           let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
           setChatmsgs(newChatmsgs);
         }
         if (messageData.func === "providesyncdata") {
-          console.log(`providesyndata passed ${messageData.syncstamp} and I have ${syncstamp}`);
+          // console.log(`providesyndata passed ${messageData.syncstamp} and I have ${syncstamp}`);
           if (messageData.syncstamp !== syncstamp) {
             console.log(`Out of sync - requesting latest game data`);
             requestGameData();
@@ -290,6 +303,7 @@ const Game = ({isrejoin
     };
   
     const handleRackTileClick = (tileindex) => {
+      if (participant === c.PARTY_TYPE_OBSERVER) {return;}
       // If no tile is selected already then set the selection
       if (selection === -1) {
         setSelection(tileindex);
@@ -938,7 +952,11 @@ const Game = ({isrejoin
             Game id: {gameid}
           </div>
           <div className="w3-display-bottomleft w3-orange topBarCorner commonFontFamily">
-            Prisoners: {participant === c.PARTY_TYPE_PRISONERS ? nickname : oppname}
+            Prisoners: {
+              participant === c.PARTY_TYPE_PRISONERS ? nickname
+              : participant === c.PARTY_TYPE_GUARDS ? oppname
+              : 'Secret'
+              }
           </div>
           <div className="w3-display-topright w3-black topBarCorner commonFontFamily">
             <Link href={"../../"}>
@@ -946,12 +964,22 @@ const Game = ({isrejoin
             </Link>
           </div>
           <div className="w3-display-bottomright w3-orange topBarCorner commonFontFamily">
-            Guards: {participant === c.PARTY_TYPE_PRISONERS ? oppname : nickname}
+            Guards: {
+              participant === c.PARTY_TYPE_PRISONERS ? oppname
+              : participant === c.PARTY_TYPE_GUARDS ? nickname
+              : 'Secret'
+              }
           </div>
         </div>
         <div className="row">
           <div className="col pbTileAndMovesOuter">
-              <ShowUnseenTiles tiles={tiles} othertiles={participant === c.PARTY_TYPE_PRISONERS ? gtiles : ptiles}/>
+              <ShowUnseenTiles
+                tiles={tiles}
+                othertiles={
+                  participant === c.PARTY_TYPE_PRISONERS ? gtiles
+                  : participant === c.PARTY_TYPE_GUARDS ? ptiles
+                  : []} // Observers see both racks so nothing to exclude from tilebag as unseen
+                />
               <ShowMoves moves={moves}/>
           </div>
           <div className="col pbPlayerOuterSection">
@@ -971,7 +999,7 @@ const Game = ({isrejoin
                 moves={moves}
                 allowRewind={allowRewind}
               />
-            :
+            :participant === c.PARTY_TYPE_GUARDS ?
               <PlayerSection
                 racktiles={gtiles}
                 whoseturn={whoseturn}
@@ -987,6 +1015,31 @@ const Game = ({isrejoin
                 moves={moves}
                 allowRewind={allowRewind}
               />
+            :
+              <div className="pbPlayerInnerSection">
+                <div className="pbPlayerTitle"><i className="material-icons">{c.PARTY_ICON_PRISONERS}</i>&nbsp;{c.PARTY_TITLE_PRISONERS}&nbsp;<i className="material-icons">{c.PARTY_ICON_PRISONERS}</i></div>
+                <div className="pbTilerack">
+                  {ptiles && ptiles.map((t, ti) =>
+                      <ObserverRackTile
+                          key={`ObserverPrisonersRackTile${ti}`}
+                          participant='P'
+                          tilevalue={t}
+                          tileindex={ti}
+                      />
+                  )}
+                </div>
+                <div className="pbPlayerTitle"><i className="material-icons">{c.PARTY_ICON_GUARDS}</i>&nbsp;{c.PARTY_TITLE_GUARDS}&nbsp;<i className="material-icons">{c.PARTY_ICON_GUARDS}</i></div>
+                <div className="pbTilerack">
+                  {gtiles && gtiles.map((t, ti) =>
+                      <ObserverRackTile
+                          key={`ObserverGuardsRackTile${ti}`}
+                          participant='G'
+                          tilevalue={t}
+                          tileindex={ti}
+                      />
+                  )}
+                </div>
+              </div>
             }
           </div>
           <div className="col">
@@ -1025,6 +1078,20 @@ const Game = ({isrejoin
       </div>
     );
   };
-  
+
+const ObserverRackTile = (props) => {
+  const selectedUnselected = "Unselected ";
+  const uNotU = props.tilevalue === "Q" ? "u " : "";
+  const tileclass = "pbTileOnRack " + selectedUnselected + uNotU + props.participant;
+  return (
+      <div
+          key={props.tileindex}
+          className={tileclass}
+      >
+          <div className="pbTileOnRackText">{props.tilevalue}</div>
+      </div>
+  );
+}
+
 
   export default Game;
