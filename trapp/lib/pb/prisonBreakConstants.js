@@ -5,7 +5,8 @@ export const SQUARE_UNUSED = ".";
 export const PARTY_TYPE_UNDETERMINED = 'U'; // Not determined yet
 export const PARTY_TYPE_PRISONERS = 'P'; // Player representing prisoners
 export const PARTY_TYPE_GUARDS = 'G'; // Player representing guards
-export const PARTY_TYPE_OBSERVER = 'O'; // Observer
+export const PARTY_TYPE_OBSERVER = 'O'; // Observer (someone watching a game in progress)
+export const PARTY_TYPE_EXAMINER = 'E'; // Examiner (someone examing a completed game)
 // Whose turn
 export const WHOSE_TURN_PRISONERS = PARTY_TYPE_PRISONERS;
 export const WHOSE_TURN_GUARDS = PARTY_TYPE_GUARDS;

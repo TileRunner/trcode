@@ -10,6 +10,7 @@ const availableActionNone = 0;
 const availableActionJoin = 1;
 const availableActionReconnect = 2;
 const availableActionObserve = 3;
+const availableActionExamine = 4;
 
 const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
     , racksize, setRacksize // Option for rack size
@@ -71,7 +72,8 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
       if (nickname.length === 0) { return availableActionNone; } // No particpation without nickname
       if (gd.gname === nickname) { return availableActionReconnect; } // Allow reconnect if nickname matches
       if (!gd.gname) { return availableActionJoin; } // Allow join if guards have not joined
-      return availableActionObserve; // Allow observe since both players are determined
+      if (gd.gamestatus === 'Game over') { return availableActionExamine; } // Allow examine if game over
+      return availableActionNone; // The observe option is in the prisoners column
     }
     function selectRackSize(newRacksize) {
       setRacksize(newRacksize);
@@ -271,6 +273,18 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
                                 } }
                               >
                                 Join Game
+                              </button>
+                            </td>
+                          : availableActionG(value) === availableActionExamine ?
+                            <td id={`GuardsExamine${index}`} className="w3-border-right">
+                              <button className={buttonClassName}
+                                onClick={function () {
+                                  setGameid(value.gameid);
+                                  setParticipant(c.PARTY_TYPE_EXAMINER);
+                                  setRacksize(value.racksize);
+                                } }
+                              >
+                                Examine Game
                               </button>
                             </td>
                           : 

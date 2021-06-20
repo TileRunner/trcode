@@ -2,11 +2,9 @@ import { DIR_RIGHT, PARTY_TYPE_PRISONERS, USED_BY_NONE, MOVE_TYPE_PASS, MOVE_TYP
 import { initialSquareArray } from "./initialSquareArray";
 import { getRowColDirFromPos } from "./getRowColDirFromPos";
 
-export function buildGamedataFromApidata(jApiGameData) {
-    // console.log(`BuildGamedataFromAidata ${JSON.stringify(jApiGameData)}`);
+export function buildExamineDataFromApidata(jApiGameData) {
+    let snapshots = [];
     let gd = jApiGameData; // game data (json)
-    let lastEventIndex = gd.events.length - 1;
-    let lastEventObject = gd.events[lastEventIndex];
     let ptiles = "";
     let gtiles = "";
     let tiles = "";
@@ -55,21 +53,21 @@ export function buildGamedataFromApidata(jApiGameData) {
             }
             moves.push(move);
         }
+        snapshots.push({
+            tiles: tiles.split(""),
+            squareArray: JSON.parse(JSON.stringify(squareArray)), // Deep copy
+            ptiles: ptiles.split(""),
+            gtiles: gtiles.split(""),
+            rescues: rescues,
+            whoseturn: ev.whoseturn    
+        });
     }
     return {
         pname: gd.pname, // prisoners nickname
         gname: gd.gname, // guards nickname
-        syncstamp: lastEventObject.timestamp, // for data sync logic
-        // no sender
-        tiles: tiles.split(""),
-        squareArray: squareArray,
-        ptiles: ptiles.split(""),
-        gtiles: gtiles.split(""),
-        whoseturn: lastEventObject.whoseturn,
-        moves: moves, // no rewind info
-        rescues: rescues,
-        racksize: gd.racksize, // rack size option (lobby needs to know for when guards join game and they call Game)
-        allowRewind: false
+        moves: moves, // move list
+        racksize: gd.racksize, // rack size
+        snapshots: snapshots // game data after each event
     };
 }
 

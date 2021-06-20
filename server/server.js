@@ -68,6 +68,8 @@ const processPrisonBreakMessage = (pm, message) => {
         processPbRejoinGame(pm);
     } else if (pm.func === "startObserving") {
         processPbStartObservingGame(pm);
+    } else if (pm.func === "startExamining") {
+        processPbStartExaminingGame(pm);
     } else if (pm.func === "ept" || pm.func === "egt") {
         processPbProvideMove(pm);
     } else if (pm.func === "undoturn") {
@@ -219,6 +221,17 @@ const processPbStartObservingGame = (pm) => {
     });
 }
 
+const processPbStartExaminingGame = (pm) => {
+    wss.clients.forEach((client) => {
+        if (client.thisisme === pm.thisisme) {
+            // console.log(`Setting observer gameid to ${pm.gameid} for client ${client.thisisme}`);
+            client.gameid = pm.gameid;
+            client.participant = 'E';
+            getGameThenUpdateClients(pm.gameid, [client]);
+        }
+    });
+}
+
 const processPbProvideMove = (pm) => {
     let move = pm.move;
     let jProvideMove = {
@@ -286,7 +299,7 @@ const findOpponentClient = (gameid, playerThisisme) => {
     let msg = '';
     wss.clients.forEach((client) => {
         msg = msg + client.gameid + '.' + client.thisisme + ', ';
-        if (client.gameid === gameid && client.thisisme !== playerThisisme && client.participant !== 'O') {
+        if (client.gameid === gameid && client.thisisme !== playerThisisme && client.participant !== 'O' && client.participant !== 'E') {
             foundClient = client;
         }
     });

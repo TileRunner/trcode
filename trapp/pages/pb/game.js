@@ -179,7 +179,6 @@ const Game = ({isrejoin
   
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
-      console.log(`${messageData.gameid} ${messageData.func}`);
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
         if (messageData.func === "providegamedata") {
           let gd = buildGamedataFromApidata(messageData.apidata);

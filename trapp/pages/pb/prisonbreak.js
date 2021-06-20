@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef} from "react";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
+import Examine from '../pb/examine';
 import * as c from '../../lib/pb/prisonBreakConstants';
 import { v4 as uuid_v4 } from 'uuid';
 
@@ -37,7 +38,13 @@ export default function PrisonBreak() {
         racksize={racksize}
         setRacksize={setRacksize}
       />
-    :
+    : participant === c.PARTY_TYPE_EXAMINER ?
+      <Examine
+        client={client}
+        wsmessage={wsmessage}
+        gameid={gameid}
+      />
+      :
       <Game
         isrejoin={isrejoin}
         participant={participant}
