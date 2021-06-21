@@ -36,21 +36,38 @@ const Examine = ({ client, wsmessage, gameid }) => {
             }
         }
     }
+
+    const fastRewind = () => {
+      setSnapshotIndex(0);
+    }
   
     const nextMove = () => {
-        if (snapshotIndex + 1 < examineData.snapshots.length) {
-            let nextSnapshotIndex = snapshotIndex + 1;
-            setSnapshotIndex(nextSnapshotIndex);
-        }
+      if (snapshotIndex + 1 < examineData.snapshots.length) {
+        let nextSnapshotIndex = snapshotIndex + 1;
+        setSnapshotIndex(nextSnapshotIndex);
+      }
     }
     
     const prevMove = () => {
-        if (snapshotIndex - 1 > -1) {
-            let prevSnapshotIndex = snapshotIndex - 1;
-            setSnapshotIndex(prevSnapshotIndex);
-        }
+      if (snapshotIndex - 1 > -1) {
+        let prevSnapshotIndex = snapshotIndex - 1;
+        setSnapshotIndex(prevSnapshotIndex);
+      }
+    }
+
+    const fastForward = () => {
+      let newSnapshotIndex = examineData.snapshots.length - 1;
+      setSnapshotIndex(newSnapshotIndex);
     }
     
+    const isPrisonersTurn = () => {
+      return (examineData.snapshots[snapshotIndex].whoseturn === c.WHOSE_TURN_PRISONERS);
+    }
+
+    const isGuardsTurn = () => {
+      return (examineData.snapshots[snapshotIndex].whoseturn === c.WHOSE_TURN_GUARDS);
+    }
+
     return (
       <div className="prisonbreak">
         <div className="w3-display-container w3-teal topBarHeight">
@@ -76,32 +93,42 @@ const Examine = ({ client, wsmessage, gameid }) => {
           <div className="col pbTileAndMovesOuter">
               <ShowUnseenTiles
                 tiles={examineData.snapshots[snapshotIndex].tiles}
-                othertiles={ [] } // Examiners see both racks so nothing to exclude from tilebag as unseen
+                othertiles={ isPrisonersTurn() ? examineData.snapshots[snapshotIndex].gtiles
+                : isGuardsTurn() ? examineData.snapshots[snapshotIndex].ptiles
+                : [] }
                 />
-              <ShowMoves moves={examineData.moves}/>
+              <ShowMoves moves={examineData.moves.slice(0,snapshotIndex)}/>
           </div>
           <div className="col pbPlayerOuterSection">
             <div className="pbPlayerInnerSection">
             <div className="pbPlayerTitle"><i className="material-icons">{c.PARTY_ICON_PRISONERS}</i>&nbsp;{c.PARTY_TITLE_PRISONERS}&nbsp;<i className="material-icons">{c.PARTY_ICON_PRISONERS}</i></div>
             <div className="pbTilerack">
-                {examineData.snapshots[snapshotIndex].whoseturn === c.PARTY_TYPE_PRISONERS && <span className="w3-green w3-round"><i className="material-icons">arrow_right</i></span>}
-                {examineData.snapshots[snapshotIndex].ptiles.map((t, ti) =>
-                    <ExaminerTileRack
-                        key={`ObserverPrisonersRackTile${ti}`}
-                        participant={c.PARTY_TYPE_PRISONERS}
-                        tilevalue={t}
-                        tileindex={ti}
-                    />
-                )}
+              {examineData.snapshots[snapshotIndex].whoseturn === c.PARTY_TYPE_PRISONERS &&
+                <button className="w3-black pbTilerackArrow" onClick={nextMove}>
+                  <i className="material-icons">arrow_right</i>
+                </button>
+              }
+              {examineData.snapshots[snapshotIndex].ptiles.map((t, ti) =>
+                  <ExaminerTileRack
+                      key={`ObserverPrisonersRackTile${ti}`}
+                      participant={c.PARTY_TYPE_PRISONERS}
+                      tilevalue={ isGuardsTurn() ? '*' : t}
+                      tileindex={ti}
+                  />
+              )}
             </div>
             <div className="pbPlayerTitle"><i className="material-icons">{c.PARTY_ICON_GUARDS}</i>&nbsp;{c.PARTY_TITLE_GUARDS}&nbsp;<i className="material-icons">{c.PARTY_ICON_GUARDS}</i></div>
             <div className="pbTilerack">
-                {examineData.snapshots[snapshotIndex].whoseturn === c.PARTY_TYPE_GUARDS && <span className="w3-green w3-round"><i className="material-icons">arrow_right</i></span>}
+                {examineData.snapshots[snapshotIndex].whoseturn === c.PARTY_TYPE_GUARDS &&
+                  <button className="w3-black pbTilerackArrow" onClick={nextMove}>
+                    <i className="material-icons">arrow_right</i>
+                  </button>
+                }
                 {examineData.snapshots[snapshotIndex].gtiles.map((t, ti) =>
                     <ExaminerTileRack
                         key={`ObserverGuardsRackTile${ti}`}
                         participant={c.PARTY_TYPE_GUARDS}
-                        tilevalue={t}
+                        tilevalue={isPrisonersTurn() ? '*' : t}
                         tileindex={ti}
                     />
                 )}
@@ -124,11 +151,17 @@ const Examine = ({ client, wsmessage, gameid }) => {
         <div className="w3-display-container w3-teal topBarHeight">
           <div className="w3-display-middle commonFontFamily">
             <div>
-                <button className="pbActionButton" onClick={prevMove}>
-                    <span className="pbActionButtonText"><i className="material-icons">arrow_left</i>&nbsp;Prev</span>
+                <button className="w3-black w3-round" onClick={fastRewind}>
+                  <i className="material-icons">fast_rewind</i>
                 </button>
-                <button className="pbActionButton" onClick={nextMove}>
-                    <span className="pbActionButtonText">&nbsp;Next&nbsp;<i className="material-icons">arrow_right</i></span>
+                <button className="w3-black w3-round" onClick={prevMove}>
+                  <i className="material-icons">arrow_left</i>
+                </button>
+                <button className="w3-black w3-round" onClick={nextMove}>
+                  <i className="material-icons">arrow_right</i>
+                </button>
+                <button className="w3-black w3-round" onClick={fastForward}>
+                  <i className="material-icons">fast_forward</i>
                 </button>
             </div>
           </div>

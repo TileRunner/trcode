@@ -824,7 +824,7 @@ const Game = ({isrejoin
     }
   
     const requestSyncData = () => {
-      console.log(`Send requestsyncdata ${syncstamp}`);
+      // console.log(`Send requestsyncdata ${syncstamp}`);
       client.send(
         {
           gameid: gameid, // the id for the game
