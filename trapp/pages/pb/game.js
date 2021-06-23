@@ -941,6 +941,7 @@ const Game = ({isrejoin
         setSelection(newSelection);
       }
     }
+    const handleMoveClick = (_mi) => {}
     return (
       <div className="prisonbreak">
         <div className="w3-display-container w3-teal topBarHeight">
@@ -979,7 +980,7 @@ const Game = ({isrejoin
                   : participant === c.PARTY_TYPE_GUARDS ? ptiles
                   : []} // Observers see both racks so nothing to exclude from tilebag as unseen
                 />
-              <ShowMoves moves={moves}/>
+              <ShowMoves moves={moves} onmoveclick={(mi) => handleMoveClick(mi)}/>
           </div>
           <div className="col pbPlayerOuterSection">
             {participant === c.PARTY_TYPE_PRISONERS ?

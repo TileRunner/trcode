@@ -380,14 +380,16 @@ const logApiError = (error) => {
 const handleChatMessages = (pm, message) => { // pm=json object, message=string of json
 /* Send the chat message to clients that need it
    Overall rule - only send message to clients with the same client type (e.g. 'pb' for Prison Break)
+   Overall rule - do not send message back to sender
+   Table below shows when to send
 
-   Message from Client loc  Action      Rule                                                    Reason
-   ------------ ----------  ------      ----                                                    ------
-   lobby        lobby       send        Client is not the sender                                Support lobby chat messages
-   lobby        game        none
-   game         lobby       none
-   game         game        send        Client is not the sender and has same gameid as sender  Support game chat messages
-                                        Also must be observer to observers or player to player  Support observer chat
+   Sender       Client      Action      Rule/Note
+   ------------ ----------  ------      ---------
+   lobby        lobby       send        Lobby dwellers have sender/participant=U (undefined) and no gameid
+   prisoners    guards      send        Same gameid
+   guards       prisoners   send        Same gameid
+   observer     observer    send        Same gameid
+   examiner     examiner    send        Same gameid
 */
     wss.clients.forEach((client) => {
         if (client.clientType === pm.type) { // Same type of game
@@ -396,16 +398,13 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
             } else if (pm.gameid) { // Sent from within a game, not from lobby
                 if (pm.gameid === client.gameid) { // Client is in same game as sender
                     if (pm.type !== 'pb'
-                    || (pm.sender === 'O' && client.participant === 'O') // Observer chat
-                    || (pm.sender !== 'O' && client.participant !== 'O') // Player chat
+                    || (pm.sender === 'O' && client.participant === 'O') // Observers chat
+                    || (pm.sender === 'E' && client.participant === 'E') // Examiners chat
+                    || (pm.sender === 'P' && client.participant === 'G') // Prisoners to Guards
+                    || (pm.sender === 'G' && client.participant === 'P') // Guards to Prisoners
                     ) {
-                        // console.log(`Include ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.participant}.${client.thisisme}`);
                         client.send(message);
-                    // } else {
-                    //     console.log(`Exclude ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.participant}.${client.thisisme}`);
                     }
-                } else {
-                    console.log(`Exclude ${pm.gameid} chat from ${pm.sender}.${pm.thisisme} to ${client.gameid}.${client.participant}.${client.thisisme}`);
                 }
             } else { // Sent from lobby, not from within a game
                 if (!client.gameid) { // Client is in lobby - send message from lobby

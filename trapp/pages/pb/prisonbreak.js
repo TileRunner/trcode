@@ -43,6 +43,8 @@ export default function PrisonBreak() {
         client={client}
         wsmessage={wsmessage}
         gameid={gameid}
+        nickname={nickname}
+        participant={participant}
       />
       :
       <Game

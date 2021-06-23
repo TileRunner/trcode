@@ -309,6 +309,10 @@
     padding-left: 2px;
     padding-right: 2px;
 }
+.pbMove:hover {
+    background-color: magenta;
+    cursor: pointer;
+}
 .pbMove.by {
     color: yellow;
 }
@@ -334,12 +338,19 @@
     flex-direction: row;
 }
 .pbTilerackArrow {
-    margin-top: 5px;
-    margin-left: 5px;
-    margin-right: 5px;
-    border-radius: 50pc;
-    border-width: 0px;
-    height: 30px;
+    /*
+        I got this idea online.
+        It is a box with a border, but the box has no height or width leaving just borders.
+        When the 4 borders meet (no box) it is like 4 triangles (imagine X ).
+        You make 3 borders transparent, leaving only the triangle you want to display.
+    */
+    margin-top: 13px; /* push the arrow down to the middle */
+    margin-right: 5px; /* put some space between the arrow and tilerack */
+    width: 0; 
+    height: 0; 
+    border-top: 7px solid transparent; /* less than 15px here and next line for a more slender arrow */
+    border-bottom: 7px solid transparent;   
+    border-left: 15px solid rgb(44, 240, 37);
 }
 .pbTileOnRack {
     background-image: url('../../public/tile.png');

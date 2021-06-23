@@ -21,14 +21,14 @@ export function buildGamedataFromApidata(jApiGameData) {
         if (ev.gtiles) {
             gtiles = ev.gtiles;
         }
+        if (ev.type === "STARTGAME" || ev.type === MOVE_TYPE_PLAY || ev.type === MOVE_TYPE_SWAP) {
+            tiles = ev.tiles;
+        }
         if (ev.type === MOVE_TYPE_PLAY || ev.type === MOVE_TYPE_SWAP || ev.type === MOVE_TYPE_PASS) {
             let move = {
                 by: ev.by,
                 type: ev.type
             };
-            if (ev.type === MOVE_TYPE_PLAY || ev.type === MOVE_TYPE_SWAP) {
-                tiles = ev.tiles;
-            }
             if (ev.type === MOVE_TYPE_PLAY) {
                 move.mainword = ev.mainword;
                 move.extrawords = ev.extrawords.split(",");

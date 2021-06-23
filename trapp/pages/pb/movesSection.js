@@ -1,12 +1,12 @@
 import * as c from '../../lib/pb/prisonBreakConstants';
 
-const ShowMoves = ({moves}) => { // show moves made
+const ShowMoves = ({moves, onmoveclick}) => { // show moves made
     return (
       <div className="pbMoves">
         <div className="pbMovesTitle">MOVES</div>
         <div className="pbMovesScrollable" id="ScrollableMoves">
           {moves && moves.map((m, mi) => (
-            <div key={`move${mi}`} className="pbMove">
+            <div key={`move${mi}`} className="pbMove" onClick={() => onmoveclick(mi)}>
               <span className="pbMove by">{m.by}</span>
               :
               <span className={`pbMove ${m.type}`}>
