@@ -89,6 +89,20 @@ const Examine = ({ client, wsmessage, gameid, nickname, participant }) => {
       }
     }
 
+    const handleBoardSquareClick = (ri, ci) => {
+      // Find the move where the tile at [ri][ci] was played and jump to where that move was about to be played
+      let foundIndex = -1;
+      for (let index = 0; index < examineData.snapshots.length; index++) {
+        const element = examineData.snapshots[index];
+        if (foundIndex === -1 && element.squareArray[ri][ci].usedby !== c.USED_BY_NONE) {
+          foundIndex = index;
+        }
+      }
+      if (foundIndex > 0) {
+        setSnapshotIndex(foundIndex - 1); // Go to the move before tile was played so they see the rack it was played from
+      }
+    }
+
     return (
       <div className="prisonbreak">
         <div className="w3-display-container w3-teal topBarHeight">
@@ -162,7 +176,7 @@ const Examine = ({ client, wsmessage, gameid, nickname, participant }) => {
                 <Board
                   squareArray={examineData.snapshots[snapshotIndex].squareArray}
                   rcd={[-1,-1,c.DIR_NONE]}
-                  onClick={() => {}}
+                  onClick={(ri, ci) => handleBoardSquareClick(ri, ci)}
                 />
               </div>
           </div>
@@ -171,22 +185,39 @@ const Examine = ({ client, wsmessage, gameid, nickname, participant }) => {
             <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs} participant={participant}/>
           </div>
         </div>
-        <div className="w3-display-container w3-teal topBarHeight">
+        <div className="w3-display-container w3-teal examineFooterHeight">
           <div className="w3-display-middle commonFontFamily">
             <div>
+              {snapshotIndex > 0 &&
                 <button className="w3-black w3-round" onClick={fastRewind}>
                   <i className="material-icons">fast_rewind</i>
                 </button>
+              }
+              {snapshotIndex > 0 &&
                 <button className="w3-black w3-round" onClick={prevMove}>
                   <i className="material-icons">arrow_left</i>
                 </button>
+              }
+              {snapshotIndex < examineData.snapshots.length - 1 &&
                 <button className="w3-black w3-round" onClick={nextMove}>
                   <i className="material-icons">arrow_right</i>
                 </button>
+              }
+              {snapshotIndex < examineData.snapshots.length - 1 &&
                 <button className="w3-black w3-round" onClick={fastForward}>
                   <i className="material-icons">fast_forward</i>
                 </button>
+              }
             </div>
+          </div>
+          <div className="w3-display-topleft commonFontFamily">
+            <p>&nbsp;Click on a move in the move list to jump to where it was played</p>
+          </div>
+          <div className="w3-display-bottomleft commonFontFamily">
+            <p>&nbsp;Click on a tile on the board to jump to where it was played</p>
+          </div>
+          <div className="w3-display-topright commonFontFamily">
+            <div className="pbTilerack">Click on the <span className="pbTilerackArrowInFooter"> </span> by the rack to advance one move&nbsp;</div>
           </div>
         </div>
       </div>

@@ -11,6 +11,9 @@
 .topBarHeight {
     height: 60px;
 }
+.examineFooterHeight {
+    height: 90px;
+}
 .topBarCorner {
     width: 20%;
     height: 50%;
@@ -348,6 +351,16 @@
     margin-right: 5px; /* put some space between the arrow and tilerack */
     width: 0; 
     height: 0; 
+    border-top: 7px solid transparent; /* less than 15px here and next line for a more slender arrow */
+    border-bottom: 7px solid transparent;   
+    border-left: 15px solid rgb(44, 240, 37);
+}
+.pbTilerackArrowInFooter {
+    margin-top: 2px;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 0;
+    height: 0;
     border-top: 7px solid transparent; /* less than 15px here and next line for a more slender arrow */
     border-bottom: 7px solid transparent;   
     border-left: 15px solid rgb(44, 240, 37);
