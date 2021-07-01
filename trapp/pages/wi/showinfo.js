@@ -9,7 +9,8 @@ export default function Showinfo( props ) {
             let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
              'http://localhost:3000/api/words?word=' 
              :
-             'https://words-scrabble.herokuapp.com/api/info/'
+             'https://tilerunner.herokuapp.com/api/words?word='
+            //  'https://words-scrabble.herokuapp.com/api/info/'
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
             let response = await fetch(url + props.word)
             let data = await response.text()
@@ -22,32 +23,30 @@ export default function Showinfo( props ) {
     },[])
 
     return (
-        <html>
-        <body className="wibody">
+        <div className="wibody">
             {loaded ?
-                <table>
-                <tr>
-                    <td>
-                    <table>
+                // <table>
+                // <tr>
+                //     <td>
+                    <table><tbody>
                         {props.showInserts === "Y" ? displayInsertsRow(info.inserts) : <></>}
                         {props.showSwaps === "Y" ? displaySwapsRow() : <></>}
                         {displayWordRow()}
                         {props.showDrops === "Y" ? displayDropsRow(info.drops) : <></> }
                         <tr className="divider"><td colSpan={props.word.length + props.word.length + 3}>&nbsp;</td></tr>
-                    </table>
-                    </td>
-                </tr>
-                </table>
+                    </tbody></table>
+                //     </td>
+                // </tr>
+                // </table>
             :
                 <p>Loading ...</p>
             }
-        </body>
-        </html>        
+        </div>
     );
 
     function displayInsertsRow(inserts) {
         return(
-            <tr key={props.word}>
+            <tr key={`inserts.${props.word}`}>
             {inserts.map(i => (
                 <>
                     {i === '' ?
@@ -65,7 +64,7 @@ export default function Showinfo( props ) {
     function displaySwapsRow() {
         const swaps2 = [...info.swaps, '']
         return(
-            <tr key={props.word}>
+            <tr key={`swaps.${props.word}`}>
             {swaps2?.map((s, index) => (
                 <>
                     {props.showInserts === 'N' || info.inserts[index] === '' ?
@@ -89,7 +88,7 @@ export default function Showinfo( props ) {
         const key1 = props.word;
         const key2 = props.word + '2';
         return(
-            <tr className="displayWordRow">
+            <tr className="displayWordRow" key={`word.${props.word}`}>
             <td className="insertCountSpacer"></td>
             {props.word?.split("").map((l, index) => (
                 <>
@@ -98,7 +97,7 @@ export default function Showinfo( props ) {
                 </>
             ))}
             <td key={key1}>
-            {props.showAnagrams === "Y" ?
+            {props.showAnagrams === "Y" &&
                 <span key={info.anagrams}>
                 {info.anagrams.length === 0 ?
                 <></>
@@ -106,9 +105,6 @@ export default function Showinfo( props ) {
                 <span className="anagramCount" data-toggle="tooltip" title={info.anagrams}>{info.anagrams.length}</span>
                 }
                 </span>
-        :
-            <>
-            </>
             }
             </td>
             <td key={key2}>
@@ -124,7 +120,7 @@ export default function Showinfo( props ) {
 
     function displayDropsRow(drops) {
         return(
-            <tr key={props.word} className="dropRow">
+            <tr key={`drops.${props.word}`} className="dropRow">
             {drops.map(d => (
                 <>
                 <td></td>

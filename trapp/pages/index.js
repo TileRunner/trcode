@@ -35,6 +35,10 @@ export default function Home() {
         <h2>{coderMsg}</h2>
       </div>
       <div className="w3-container w3-margin-left">
+        <div className="w3-blue">
+        <h1>The Enhanced North American Benchmark LEexicon, millenial edition</h1>
+        <p>This site uses the ENABLE2K lexicon, a public domain word list that I gratefully acknowledge.</p>
+        </div>
         <WMOption descWm={descWm} setDescWm={setDescWm}/>
         <WIOption descWi={descWi} setDescWi={setDescWi}/>
         <BrowserView>
@@ -80,7 +84,6 @@ const WMOption = (props) => {
               <li>The computer shows you word info for guessed words.</li>
             </BrowserView>
             <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
-            <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
           </ul>
         </div>
       :
@@ -119,7 +122,6 @@ const WIOption = (props) => {
             <li>Inserts - words that can be made by inserting a single letter.</li>
             <li>Drops - words that can be made by dropping a single letter.</li>
             <li>Swaps - words that can be made by swapping a single letter.</li>
-            <li>Due to licensing restrictions, this uses a 'common English lexicon' developed by some word game enthusiasts.</li>
           </ul>
         </div>
       :
@@ -164,7 +166,6 @@ const PBOption = (props) => {
               <li>The game ends if a player empties their rack.</li>
               <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
               <li>The game ends if both players pass.</li>
-              <li>Due to licensing restrictions, this game does not validate words against any lexicon.</li>
             </ul>
           </div>
       :

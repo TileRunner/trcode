@@ -12,6 +12,9 @@
   text-align: right;
 }
 .wibody {
+  /* Without the margins you see a useless vertical scrollbar */
+  margin-top: 10px;
+  margin-bottom: 10px;
   background-color: darkgray;
   color: whitesmoke;
 }

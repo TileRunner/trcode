@@ -79,8 +79,8 @@ function Game() {
                         <BrowserView>
                             <div className="row">
                                 <div className="col-lg-12">
-                                    {guesses.map(g => (
-                                        <Showinfo key={g} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                                    {guesses.map((g,gi) => (
+                                        <Showinfo key={`${gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
                                     ))}
                                 </div>
                             </div>
@@ -175,9 +175,14 @@ function Game() {
         {
             setSetGuessCount(0);
         }
-        const url = 'https://words-scrabble.herokuapp.com/api/random/' + newlen.toString();
+        const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+            'http://localhost:3000/api/words?random=' 
+        :
+            'https://tilerunner.herokuapp.com/api/words?random=';
+        const url = baseurl + newlen.toString();
         fetch(url).then(res => res.text()).then(text => {
-            setSecretWord(text);
+            console.log(text);
+            setSecretWord(text.toUpperCase());
             setSecretDisplay(text.split("").map(element=>("*")));
         })
     }

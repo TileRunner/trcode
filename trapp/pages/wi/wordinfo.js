@@ -45,7 +45,8 @@ export default function handler(req, res)  {
                                 let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
                                 'http://localhost:3000/api/words?alphagram=' 
                                 :
-                                'https://words-scrabble.herokuapp.com/api/info/'
+                                'https://tilerunner.herokuapp.com/api/words?alphagram='
+                                // 'https://words-scrabble.herokuapp.com/api/info/'
                                 fetch(url + word).then(res => res.text()).then(text => {
                                     // console.log("alphagram response data=" + text + ". NODE_ENV here is " + process.env.NODE_ENV)
                                     let jdata = JSON.parse(text)
@@ -71,7 +72,10 @@ export default function handler(req, res)  {
                                 <label>&nbsp;</label>
                                 <button id="acceptRegex"
                                     onClick={function() {
-                                        let url = 'http://localhost:3000/api/words?regex='
+                                        let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
+                                        'http://localhost:3000/api/words?regex=' 
+                                        :
+                                        'https://tilerunner.herokuapp.com/api/words?regex='
                                         fetch(url + word).then(res => res.text()).then(text => {
                                             // console.log("regex response data=" + text)
                                             let jdata = JSON.parse(text)
@@ -99,9 +103,9 @@ export default function handler(req, res)  {
             </div>
             <div className="row">
                 <div className="col-sm-8">
-                    {words.map((w) => (
+                    {words.map((w,wi) => (
                         w === '' ? <></> :
-                        <Showinfo key={w} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
+                        <Showinfo key={`${wi}.${w}`} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
                     ))}
                 </div>
                 <div className="col-sm-4"></div>
