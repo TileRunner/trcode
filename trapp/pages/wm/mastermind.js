@@ -175,11 +175,8 @@ function Game() {
         {
             setSetGuessCount(0);
         }
-        const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
-            'http://localhost:3000/api/words?random=' 
-        :
-            'https://tilerunner.herokuapp.com/api/words?random=';
-        const url = baseurl + newlen.toString();
+        /* TODO: Support random at https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K */
+        const url = 'https://words-scrabble.herokuapp.com/api/random/' + newlen.toString();
         fetch(url).then(res => res.text()).then(text => {
             console.log(text);
             setSecretWord(text.toUpperCase());

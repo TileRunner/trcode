@@ -42,10 +42,7 @@ export default function handler(req, res)  {
                         <label>&nbsp;</label>
                         <button id="acceptAlphagram"
                             onClick={function() {
-                                let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
-                                'http://localhost:3000/api/words?alphagram=' 
-                                :
-                                'https://tilerunner.herokuapp.com/api/words?alphagram='
+                                let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?letters=' : 'https://tilerunner.herokuapp.com/ENABLE2K?letters='
                                 // 'https://words-scrabble.herokuapp.com/api/info/'
                                 fetch(url + word).then(res => res.text()).then(text => {
                                     // console.log("alphagram response data=" + text + ". NODE_ENV here is " + process.env.NODE_ENV)
@@ -72,8 +69,9 @@ export default function handler(req, res)  {
                                 <label>&nbsp;</label>
                                 <button id="acceptRegex"
                                     onClick={function() {
+                                        /* TODO: Support regex at https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K */
                                         let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
-                                        'http://localhost:3000/api/words?regex=' 
+                                        'https://tilerunner.herokuapp.com/api/words?regex=' 
                                         :
                                         'https://tilerunner.herokuapp.com/api/words?regex='
                                         fetch(url + word).then(res => res.text()).then(text => {

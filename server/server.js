@@ -10,13 +10,36 @@ const dataApiUrl = 'https://json.extendsclass.com/bin'; // This is not a secret
 const dataApiKey = process.env.NEXT_PUBLIC_DATAAPIKEY; // This is a secret
 var gameApiInfoMap = []; // For mapping gameid to the id assigned by the API that is used, plus next event index
 
+const handleENABLE2K = (letters) => {
+}
+
+
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
-    .get("/evtest", (req, res) => {
+    .get("/evtest", (_req, res) => {
         let evtest = process.env.NEXT_PUBLIC_CODER_MESSAGE; // On developers local computer environment variables and heroku config settings
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json({test: 'value', evtest: evtest});
+    })
+    .get("/ENABLE2K", (req, res) => {
+        res.header("Access-Control-Allow-Origin", allowedCaller);
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        let url = 'https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K/Info/';
+        axios({
+            method: 'Get',
+            baseURL: url,
+            url: req.query.letters,
+            headers: {
+                'Content-type': 'application/json'
+            }
+        })
+        .then(function (response) {
+            res.json(response.data);
+        })
+        .catch(error => {
+            logApiError(error);
+        });   
     })
     .listen(PORT, () => {
         console.log(`Listening on ${PORT}`);

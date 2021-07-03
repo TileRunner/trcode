@@ -44,7 +44,8 @@
   visibility: visible;
 }
 .displayWordRow {
-  line-height: 100%;
+  height: 50px;
+  font-size: larger;
 }
 .divider {
   line-height: 5px;
@@ -65,8 +66,8 @@
   color: azure;
   text-align: center;
   font-family: 'Courier New', Courier, monospace;
-  width: 30px;
-  font-size: large;
+  padding-inline: 10px;
+  font-size: larger;
 }
 .letterInvalidWord {
   border: 1px solid black;
@@ -74,8 +75,8 @@
   color: azure;
   text-align: center;
   font-family: 'Courier New', Courier, monospace;
-  width: 30px;
-  font-size: large;
+  padding-inline: 10px;
+  font-size: larger;
 }
 .facevalue {
   text-align: left;
