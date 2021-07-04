@@ -6,12 +6,10 @@ const PORT = process.env.PORT || 5000;
 require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
 const axios = require('axios').default; // For API calls
+const { Console } = require('console');
 const dataApiUrl = 'https://json.extendsclass.com/bin'; // This is not a secret
 const dataApiKey = process.env.NEXT_PUBLIC_DATAAPIKEY; // This is a secret
 var gameApiInfoMap = []; // For mapping gameid to the id assigned by the API that is used, plus next event index
-
-const handleENABLE2K = (letters) => {
-}
 
 
 const server = express()
@@ -25,11 +23,16 @@ const server = express()
     .get("/ENABLE2K", (req, res) => {
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        let url = 'https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K/Info/';
+        // When I try use my locally running api, it fails with "self signed certificate".
+        let baseurl = 'https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K';
+        let url;
+        if (req.query.letters) {url = `/Info/v2/${req.query.letters}`;}
+        if (req.query.random) {url = `/Random/${req.query.random}`;}
+        console.log(`Call ${baseurl}${url}`);
         axios({
             method: 'Get',
-            baseURL: url,
-            url: req.query.letters,
+            baseURL: baseurl,
+            url: url,
             headers: {
                 'Content-type': 'application/json'
             }
@@ -38,6 +41,7 @@ const server = express()
             res.json(response.data);
         })
         .catch(error => {
+            console.log(`Error calling api`);
             logApiError(error);
         });   
     })
@@ -387,16 +391,19 @@ const buildProvidegamedataMessage = (apidata) => {
 
 const logApiError = (error) => {
     if (error.response) {
+        console.log(`api error response - ${error.message}`);
         // Request made and server responded
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
     } else if (error.request) {
+        console.log(`api error request - ${error.message}`);
         // The request was made but no response was received
-        console.log(error.request);
+        // console.log(error.request);
     } else {
+        console.log(`api error else - ${error.message}`);
         // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
+        // console.log('Error', error.message);
     }
 }
 

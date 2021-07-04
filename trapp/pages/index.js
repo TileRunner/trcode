@@ -5,7 +5,7 @@ import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { useEffect, useState } from 'react';
 
 const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
-const showButtonClassName = 'w3-right mymaterialicon w3-green';
+const showButtonClassName = 'w3-right mymaterialicon w3-green w3-animate-right';
 const menuItemWidthNormal = '320px';
 const descriptionCard = 'w3-card-4 w3-green w3-cell w3-animate-right';
 
@@ -47,6 +47,7 @@ export default function Home() {
       </div>
       <div className="w3-container w3-teal">
         <h1>Have fun!</h1>
+        <p>I apologize for the current slowness for Word Mastermind and Word Info. Lot to learn here.</p>
       </div>
     </div>
   )
@@ -80,10 +81,10 @@ const WMOption = (props) => {
             <li>The computer picks a random word.</li>
             <li>You enter guesses until you guess correctly.</li>
             <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
+            <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
             <BrowserView>
               <li>The computer shows you word info for guessed words.</li>
             </BrowserView>
-            <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
           </ul>
         </div>
       :

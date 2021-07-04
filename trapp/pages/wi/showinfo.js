@@ -10,29 +10,72 @@ export default function Showinfo( props ) {
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
             let response = await fetch(url + props.word)
             let jdata = await response.json()
+            jdata.drops = convertDrops(jdata.drops, props.word)
+            jdata.inserts = convertInserts(jdata.inserts, props.word)
+            jdata.swaps = convertSwaps(jdata.swaps, props.word)
             setInfo(jdata)
             setLoaded(true)
         }
         apiCall()
     },[])
 
+    function convertDrops(drops, word) {
+        let dropinfo = []
+        for (let index = 0; index < word.length; index++) {
+            let yn = 'N'
+            for (let index2 = 0; index2 < drops.length; index2++) {
+                if (drops[index2].index === index)
+                {
+                    yn = 'Y'
+                }
+            }
+            dropinfo.push(yn)
+        }
+        return dropinfo
+    }
+
+    function convertInserts(inserts, word) {
+        let insertinfo = []
+        for (let index = 0; index <= word.length; index++) {
+            let letters = ''
+            inserts.forEach(i => {
+                if (i.index === index) {
+                    letters = letters + i.letter
+                }
+            });
+            let a = letters.split('')
+            let s = a.sort()
+            insertinfo.push(s.join(''))
+        }
+        return insertinfo
+    }
+
+    function convertSwaps(swaps, word) {
+        let swapinfo = []
+        for (let index = 0; index < word.length; index++) {
+            let letters = ''
+            swaps.forEach(i => {
+                if (i.index === index) {
+                    letters = letters + i.letter
+                }
+            });
+            let a = letters.split('')
+            let s = a.sort()
+            swapinfo.push(s.join(''))
+        }
+        return swapinfo
+    }
+
     return (
         <div className="wibody">
             {loaded ?
-                // <table>
-                // <tr>
-                //     <td>
-                    <table><tbody>
-                        {displayWordRow()}
-                        {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
-                        {props.showAnagrams === "Y" && info.anagrams.length > 0 && displayAnagramsRow(info.anagrams)}
-                        {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
-                        {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
-                        <tr className="divider"><td colSpan={props.word.length + props.word.length + 3}>&nbsp;</td></tr>
-                    </tbody></table>
-                //     </td>
-                // </tr>
-                // </table>
+                <table><tbody>
+                    {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
+                    {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
+                    {displayWordRow()}
+                    {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
+                    <tr className="divider"><td colSpan={props.word.length + props.word.length + 3}>&nbsp;</td></tr>
+                </tbody></table>
             :
                 <p>Loading ...</p>
             }
@@ -42,43 +85,89 @@ export default function Showinfo( props ) {
     function displayInsertsRow(inserts) {
         return(
             <tr key={`inserts.${props.word}`}>
-                <td>{`Inserts: ${inserts}`}</td>
+                {inserts.map(i => (
+                    <>
+                        {i === '' ?
+                            <td></td>
+                            :
+                            <td className="insertCount" data-toggle="tooltip" title={i}>{i.length}
+                            </td>
+                        }
+                        <td></td>
+                    </>
+                ))}
             </tr>
         )
     }
     function displaySwapsRow(swaps) {
+        const swaps2 = [...swaps, '']
         return(
             <tr key={`swaps.${props.word}`}>
-                <td>{`Swaps: ${swaps}`}</td>
+            {swaps2?.map((s, index) => (
+                <>
+                    {props.showInserts === 'N' || info.inserts[index] === '' ?
+                        <td className="insertCountSpacer"></td>
+                    :
+                        <td className="balloonstring">➻</td>
+                    }
+                    {s === '' ?
+                        <td></td>
+                        :
+                        <td className="swapCount" data-toggle="tooltip" title={s}>{s.length}
+                        </td>
+                    }
+                </>
+            ))}
             </tr>
         )
     }
 
     function displayWordRow() {
+        const key1 = props.word;
+        const key2 = props.word + '2';
         return(
             <tr className="displayWordRow" key={`word.${props.word}`}>
-            <td>
-            {props.word?.split("").map((l, index) => (
-                <>
-                <span className={info.valid ? "letter" : "letterInvalidWord"}>{l}</span>
-                <span className="facevalue"><sub>{letterValue(l)}</sub></span>
-                </>
-            ))}
-            {info.valid ?
-                <span className="wordIsValid">Valid word</span>
-            :
-                <span className="wordIsNotValid">Not a recognized word</span>
-            }
-            </td>
+                <td className="insertCountSpacer"></td>
+                {props.word?.split("").map((l, index) => (
+                    <>
+                        <td className={info.valid ? "letter" : "letterInvalidWord"}>{l}</td>
+                        <td className="facevalue"><sub>{letterValue(l)}</sub></td>
+                    </>
+                ))}
+                <td key={key1}>
+                {props.showAnagrams === "Y" &&
+                    <span key={info.anagrams}>
+                    {info.anagrams.length > 0 &&
+                        <span className="anagramCount" data-toggle="tooltip" title={info.anagrams}>{info.anagrams.length}</span>
+                    }
+                    </span>
+                }
+                </td>
+                <td key={key2}>
+                    {info.valid ?
+                        <span className="wordIsValid">Valid word</span>
+                    :
+                        <span className="wordIsNotValid">Not a recognized word</span>
+                    }
+                </td>
             </tr>
         )
     }
 
     function displayDropsRow(drops) {
         return(
-            <tr key={`drops.${props.word}`}>
-                <td>{`Drops: ${drops}`}</td>
-            </tr>
+            <tr key={`drops.${props.word}`} className="dropRow">
+            {drops.map(d => (
+                <>
+                <td></td>
+                {d === "Y" ?
+                    <td className="dropIndicator" data-toggle="tooltip" title="You can drop this letter">&bull;</td>
+                    :
+                    <td></td>
+                }
+                </>
+            ))}
+        </tr>
         )
     }
 

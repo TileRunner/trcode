@@ -80,7 +80,7 @@ function Game() {
                             <div className="row">
                                 <div className="col-lg-12">
                                     {guesses.map((g,gi) => (
-                                        <Showinfo key={`${gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                                        <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
                                     ))}
                                 </div>
                             </div>
@@ -175,11 +175,12 @@ function Game() {
         {
             setSetGuessCount(0);
         }
-        /* TODO: Support random at https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K */
-        const url = 'https://words-scrabble.herokuapp.com/api/random/' + newlen.toString();
+        const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?random=' : 'https://tilerunner.herokuapp.com/ENABLE2K?random='
+        const url = baseurl + newlen.toString();
         fetch(url).then(res => res.text()).then(text => {
-            console.log(text);
-            setSecretWord(text.toUpperCase());
+            let randomword=JSON.parse(text); // It is just a word in double quotes but it is json nonetheless
+            console.log(`text=${text} randomword=${randomword}`);
+            setSecretWord(randomword);
             setSecretDisplay(text.split("").map(element=>("*")));
         })
     }

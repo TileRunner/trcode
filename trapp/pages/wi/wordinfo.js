@@ -51,10 +51,8 @@ export default function handler(req, res)  {
                                     jdata.anagrams.map((w) => {
                                         newwords =[...newwords, w]
                                     })
-                                    if (!(!process.env.NODE_ENV || process.env.NODE_ENV === 'development')) {
-                                        if (jdata.valid === 'Y') {
-                                            newwords = [word.toUpperCase(), ...newwords]
-                                        }
+                                    if (jdata.valid) {
+                                        newwords.push(word.toUpperCase())
                                     }
                                     newwords.sort()
                                     setWord('');
@@ -103,7 +101,7 @@ export default function handler(req, res)  {
                 <div className="col-sm-8">
                     {words.map((w,wi) => (
                         w === '' ? <></> :
-                        <Showinfo key={`${wi}.${w}`} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
+                        <Showinfo key={`${words.length - wi}.${w}`} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
                     ))}
                 </div>
                 <div className="col-sm-4"></div>
