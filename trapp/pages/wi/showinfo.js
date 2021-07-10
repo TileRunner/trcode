@@ -10,61 +10,12 @@ export default function Showinfo( props ) {
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
             let response = await fetch(url + props.word)
             let jdata = await response.json()
-            jdata.drops = convertDrops(jdata.drops, props.word)
-            jdata.inserts = convertInserts(jdata.inserts, props.word)
-            jdata.swaps = convertSwaps(jdata.swaps, props.word)
+            console.log(`swaps=${JSON.stringify(jdata.swaps)}`)
             setInfo(jdata)
             setLoaded(true)
         }
         apiCall()
     },[])
-
-    function convertDrops(drops, word) {
-        let dropinfo = []
-        for (let index = 0; index < word.length; index++) {
-            let yn = 'N'
-            for (let index2 = 0; index2 < drops.length; index2++) {
-                if (drops[index2].index === index)
-                {
-                    yn = 'Y'
-                }
-            }
-            dropinfo.push(yn)
-        }
-        return dropinfo
-    }
-
-    function convertInserts(inserts, word) {
-        let insertinfo = []
-        for (let index = 0; index <= word.length; index++) {
-            let letters = ''
-            inserts.forEach(i => {
-                if (i.index === index) {
-                    letters = letters + i.letter
-                }
-            });
-            let a = letters.split('')
-            let s = a.sort()
-            insertinfo.push(s.join(''))
-        }
-        return insertinfo
-    }
-
-    function convertSwaps(swaps, word) {
-        let swapinfo = []
-        for (let index = 0; index < word.length; index++) {
-            let letters = ''
-            swaps.forEach(i => {
-                if (i.index === index) {
-                    letters = letters + i.letter
-                }
-            });
-            let a = letters.split('')
-            let s = a.sort()
-            swapinfo.push(s.join(''))
-        }
-        return swapinfo
-    }
 
     return (
         <div className="wibody">
@@ -128,7 +79,7 @@ export default function Showinfo( props ) {
         return(
             <tr className="displayWordRow" key={`word.${props.word}`}>
                 <td className="insertCountSpacer"></td>
-                {props.word?.split("").map((l, index) => (
+                {props.word?.toUpperCase().split("").map((l, index) => (
                     <>
                         <td className={info.valid ? "letter" : "letterInvalidWord"}>{l}</td>
                         <td className="facevalue"><sub>{letterValue(l)}</sub></td>

@@ -62,37 +62,27 @@ export default function handler(req, res)  {
                         >
                             Get Anagrams
                         </button>
-                        {(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
-                            <>
-                                <label>&nbsp;</label>
-                                <button id="acceptRegex"
-                                    onClick={function() {
-                                        /* TODO: Support regex at https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K */
-                                        let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ?
-                                        'https://tilerunner.herokuapp.com/api/words?regex=' 
-                                        :
-                                        'https://tilerunner.herokuapp.com/api/words?regex='
-                                        fetch(url + word).then(res => res.text()).then(text => {
-                                            // console.log("regex response data=" + text)
-                                            let jdata = JSON.parse(text)
-                                            setWord('');
-                                            let newwords = []
-                                            jdata.regexmatches.map((w) => {
-                                                newwords =[...newwords, w]
-                                            })
-                                            setWords([...newwords, ...words])
-                                            if (jdata.count > 50) {
-                                                alert('Too many results, only 50 taken')
-                                            }
-                                        })
-                                    }}
-                                >
-                                    Get Regex Matches
-                                </button>
-                            </>
-                            :
-                            <></>
-                        }
+                        <label>&nbsp;</label>
+                        <button id="acceptRegex"
+                            onClick={function() {
+                                let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?regex=' : 'https://tilerunner.herokuapp.com/ENABLE2K?regex='
+                                fetch(url + word.toLocaleLowerCase()).then(res => res.text()).then(text => {
+                                    // console.log("regex response data=" + text)
+                                    let jdata = JSON.parse(text)
+                                    setWord('');
+                                    let newwords = []
+                                    jdata.regexmatches.map((w) => {
+                                        newwords =[...newwords, w]
+                                    })
+                                    setWords([...newwords, ...words])
+                                    if (jdata.count > 50) {
+                                        alert('Too many results, only 50 taken')
+                                    }
+                                })
+                            }}
+                        >
+                            Get Regex Matches
+                        </button>
                     </div>
                 </div>
                 <div className="col-sm-4"></div>

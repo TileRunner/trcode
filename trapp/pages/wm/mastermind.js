@@ -178,8 +178,7 @@ function Game() {
         const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?random=' : 'https://tilerunner.herokuapp.com/ENABLE2K?random='
         const url = baseurl + newlen.toString();
         fetch(url).then(res => res.text()).then(text => {
-            let randomword=JSON.parse(text); // It is just a word in double quotes but it is json nonetheless
-            console.log(`text=${text} randomword=${randomword}`);
+            let randomword=JSON.parse(text).toUpperCase(); // It is just a word in double quotes but it is json nonetheless
             setSecretWord(randomword);
             setSecretDisplay(text.split("").map(element=>("*")));
         })

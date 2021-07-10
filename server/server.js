@@ -1,49 +1,166 @@
 const _ = require('cors');
 const express = require("express");
 const { Server } = require("ws");
+const fs = require('fs');
 const path = require("path");
 const PORT = process.env.PORT || 5000;
 require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
 const axios = require('axios').default; // For API calls
-const { Console } = require('console');
 const dataApiUrl = 'https://json.extendsclass.com/bin'; // This is not a secret
 const dataApiKey = process.env.NEXT_PUBLIC_DATAAPIKEY; // This is a secret
 var gameApiInfoMap = []; // For mapping gameid to the id assigned by the API that is used, plus next event index
 
-
+const allwordsunsplit = readWordList();
+const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
+function readWordList() {
+    let data = '';
+    try
+    {
+      var wpath = path.join(__dirname, "ENABLE2K_word_list.txt");
+      data = fs.readFileSync(wpath).toString();
+      console.log(`Read word list ok`);
+    }
+    catch (e)
+    {
+      console.log(`Error reading word list ${e}`);
+    }
+    return data;
+}
+function getValid(word, wordssamelength) {
+    return wordssamelength.indexOf(word) > -1 ? 'Y' : 'N'
+}
+function getAnagrams(word, wordssamelength) {
+    let anagrams = []
+    let alphagramarray = word.split('')
+    alphagramarray.sort()
+    let alphagram = alphagramarray.join()
+    let checkword = ''
+    for (checkword of wordssamelength) {
+      if (checkword !== word) {
+        let newalphagram = checkword.split('')
+        newalphagram.sort()
+        let calphagram = newalphagram.join()
+        if (alphagram === calphagram) {
+          anagrams = [...anagrams, checkword]
+        }
+      }
+    }
+    return anagrams
+}
+  
+function getSwaps(word, wordssamelength) {
+    let swaps = []
+    let alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    for (var i = 0; i < word.length; i++) {
+      let swap = ''
+      for (var j = 0; j < 26; j++) {
+        if (word[i] !== alphabet[j]) {
+          let testword = [...word]
+          testword[i] = alphabet[j]
+          let checkword = testword.join('')
+          if (wordssamelength.indexOf(checkword) > -1) {
+            swap = swap + alphabet[j]
+          }
+        }
+      }
+      swaps = [...swaps, swap]
+    }
+    return swaps
+}
+function getDrops(word, wordsonelesslength) {
+    let drops = []
+    for (var i = 0; i < word.length; i++) {
+      let testword = word.split('').filter((el,index) => {return index !== i;})
+      let checkword = testword.join('')
+      let drop = wordsonelesslength.indexOf(checkword) > -1 ? 'Y' : 'N'
+      drops = [...drops, drop]
+    }
+    return drops
+}
+function getInserts(word, wordsonelonger) {
+    let inserts = []
+    let alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    for (var i = 0; i <= word.length; i++) {
+      let insert = ''
+      for (var j = 0; j < 26; j++) {
+        let testword = word.split('')
+        testword.splice(i, 0, alphabet[j])
+        let checkword = testword.join('')
+        if (wordsonelonger.indexOf(checkword) > -1) {
+          insert = insert + alphabet[j]
+        }
+    }
+      inserts = [...inserts, insert]
+    }
+    return inserts
+}  
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
     .get("/evtest", (_req, res) => {
         let evtest = process.env.NEXT_PUBLIC_CODER_MESSAGE; // On developers local computer environment variables and heroku config settings
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        res.json({test: 'value', evtest: evtest});
+        res.json({test: 'value', evtest: evtest, lextest: `${allwords.length.toString()} words read from ENABLE2K`});
     })
     .get("/ENABLE2K", (req, res) => {
+        // Handle who can call this
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        // When I try use my locally running api, it fails with "self signed certificate".
-        let baseurl = 'https://webappscrabbleclub.azurewebsites.net/api/Values/ENABLE2K';
-        let url;
-        if (req.query.letters) {url = `/Info/v2/${req.query.letters}`;}
-        if (req.query.random) {url = `/Random/${req.query.random}`;}
-        console.log(`Call ${baseurl}${url}`);
-        axios({
-            method: 'Get',
-            baseURL: baseurl,
-            url: url,
-            headers: {
-                'Content-type': 'application/json'
+        // Handle picking random word for Word Mastermind
+        if (req.query.random) {
+            // The desired word length is passed in 'random'
+            let wlen = parseInt(req.query.random);
+            let wordssamelength = allwords.filter(function (e) {
+              return e.length === wlen;
+            });
+            let rand = Math.floor(Math.random() * wordssamelength.length);
+            let randomword = wordssamelength[rand];
+            res.json(randomword);
+            return;
+        }
+        // Handle getting info for passed letters
+        if (req.query.letters) {
+            // The desired group of letters is passed in 'letters'
+            let word = req.query.letters.toLowerCase();
+            let wlen = word.length;
+            let wordssamelength = allwords.filter(function (e) {
+              return e.length === wlen;
+            });
+            let sublength = wlen - 1;
+            let wordsonelesslength = allwords.filter(function (e) {
+              return e.length === sublength;
+            });
+            let nextlength = word.length + 1;
+            let wordsonelonger = allwords.filter(function (e) {
+              return e.length === nextlength;
+            });
+            let valid = getValid(word, wordssamelength);
+            let anagrams = getAnagrams(word, wordssamelength);
+            let swaps = getSwaps(word, wordssamelength);
+            let drops = getDrops(word, wordsonelesslength);
+            let inserts = getInserts(word, wordsonelonger);
+            res.send({valid, anagrams, swaps, drops, inserts});
+            return;
+        }
+        // Handle getting regex matches for passed letters
+        if (req.query.regex) {
+            let regexmatches = []
+            try {
+              let regex = new RegExp("\\b" + req.query.regex + "\\b",'g')
+              let regexresult = allwordsunsplit.match(regex) || []
+              regexmatches = [...regexmatches, ...regexresult]
+            } catch(e) {
+              regexmatches = [`Regex internal error ${e}`]
             }
-        })
-        .then(function (response) {
-            res.json(response.data);
-        })
-        .catch(error => {
-            console.log(`Error calling api`);
-            logApiError(error);
-        });   
+            let count = regexmatches.length;
+            if (regexmatches.length > 50) {
+              regexmatches = regexmatches.slice(0,50)
+            }
+            res.send({regexmatches: [...regexmatches], count: count})
+            return;
+        }
+        res.status(404).send('What are you asking?');
     })
     .listen(PORT, () => {
         console.log(`Listening on ${PORT}`);

@@ -14,11 +14,13 @@ export default function Home() {
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [coderMsg, setCoderMsg] = useState('Loading');
+  const [coderMsg2, setCoderMsg2] = useState('Loading');
   const getCoderMsg = async () => {
     let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/evtest' : 'https://tilerunner.herokuapp.com/evtest'
     const res = await fetch(url);
     const jres = await res.json();
     setCoderMsg(`${jres.evtest}`);
+    setCoderMsg2(`${jres.lextest}`);
   }
   useEffect(() => {
     getCoderMsg();
@@ -47,6 +49,7 @@ export default function Home() {
       </div>
       <div className="w3-container w3-teal">
         <h1>Have fun!</h1>
+        <h2>{coderMsg2}</h2>
         <p>I apologize for the current slowness for Word Mastermind and Word Info. Lot to learn here.</p>
       </div>
     </div>
