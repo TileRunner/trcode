@@ -83,6 +83,18 @@ export default function handler(req, res)  {
                         >
                             Get Regex Matches
                         </button>
+                        <label>&nbsp;</label>
+                        {process.env.NODE_ENV === 'development' && <button id="validateWords"
+                            onClick={function() {
+                                let url = 'http://localhost:5000/ENABLE2K?validate='
+                                let validate = word.toLowerCase()
+                                fetch(url + validate).then(res => res.text()).then(text => {
+                                    alert("validate response=" + text)
+                                })
+                            }}
+                        >
+                            Test validate call
+                        </button>}
                     </div>
                 </div>
                 <div className="col-sm-4"></div>

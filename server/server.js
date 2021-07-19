@@ -160,6 +160,22 @@ const server = express()
             res.send({regexmatches: [...regexmatches], count: count})
             return;
         }
+        // Handle getting comma separated list of words to validate
+        if (req.query.validate) {
+            let validwords = [];
+            let invalidwords = [];
+            let checkwords = req.query.validate.toLowerCase().replace(/\?/g,".").split(",");
+            checkwords.forEach((checkword) => {
+                let regex = new RegExp("\\b" + checkword + "\\b",'g')
+                if (allwordsunsplit.match(regex)) {
+                    validwords.push(checkword);
+                } else {
+                    invalidwords.push(checkword);
+                } 
+            });
+            res.send({validwords: validwords, invalidwords: invalidwords});
+            return;
+        }
         res.status(404).send('What are you asking?');
     })
     .listen(PORT, () => {

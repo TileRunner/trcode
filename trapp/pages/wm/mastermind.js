@@ -180,7 +180,7 @@ function Game() {
         fetch(url).then(res => res.text()).then(text => {
             let randomword=JSON.parse(text).toUpperCase(); // It is just a word in double quotes but it is json nonetheless
             setSecretWord(randomword);
-            setSecretDisplay(text.split("").map(element=>("*")));
+            setSecretDisplay(randomword.split("").map(()=>("*")));
         })
     }
 

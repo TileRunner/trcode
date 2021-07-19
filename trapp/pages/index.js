@@ -50,7 +50,6 @@ export default function Home() {
       <div className="w3-container w3-teal">
         <h1>Have fun!</h1>
         <h2>{coderMsg2}</h2>
-        <p>I apologize for the current slowness for Word Mastermind and Word Info. Lot to learn here.</p>
       </div>
     </div>
   )
