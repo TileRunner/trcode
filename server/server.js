@@ -164,13 +164,13 @@ const server = express()
         if (req.query.validate) {
             let validwords = [];
             let invalidwords = [];
-            let checkwords = req.query.validate.toLowerCase().replace(/\?/g,".").split(",");
+            let checkwords = req.query.validate.toLowerCase().replace(/\?/g,".").replace("q","qu?").split(",");
             checkwords.forEach((checkword) => {
                 let regex = new RegExp("\\b" + checkword + "\\b",'g')
                 if (allwordsunsplit.match(regex)) {
-                    validwords.push(checkword);
+                    validwords.push(checkword.replace("qu?","q(u)"));
                 } else {
-                    invalidwords.push(checkword);
+                    invalidwords.push(checkword.replace("qu?","q(u)"));
                 } 
             });
             res.send({validwords: validwords, invalidwords: invalidwords});

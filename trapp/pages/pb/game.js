@@ -324,7 +324,7 @@ const Game = ({isrejoin
       setSelection(-1);
     }
   
-    async function endPrisonersTurn() {
+    async function endPlayersTurn() {
       if (!isPlayValid()) {
         return;
       }
@@ -334,214 +334,110 @@ const Game = ({isrejoin
         return; // Do not apply the play
       }
       let newRescues = rescues;
-      let escapehatches = [
-        "0-0",
-        "0-" + middle,
-        "0-" + edge,
-        middle+ "-0",
-        middle + "-" + edge,
-        edge + "-0",
-        edge + "-" + middle,
-        edge + "-" + edge
-      ]; // coords of escape hatches
-      for (var i = 0; i < currentcoords.length; i++) {
-        if (escapehatches.indexOf(currentcoords[i]) > -1) {
-          newRescues = newRescues + 1;
+      if (participant === c.PARTY_TYPE_PRISONERS) {
+        let escapehatches = [
+          "0-0",
+          "0-" + middle,
+          "0-" + edge,
+          middle+ "-0",
+          middle + "-" + edge,
+          edge + "-0",
+          edge + "-" + middle,
+          edge + "-" + edge
+        ]; // coords of escape hatches
+        for (var i = 0; i < currentcoords.length; i++) {
+          if (escapehatches.indexOf(currentcoords[i]) > -1) {
+            newRescues = newRescues + 1;
+          }
         }
       }
-      let newPtiles = [...ptiles];
+      let newPlayerTiles = participant === c.PARTY_TYPE_PRISONERS ? [...ptiles] : [...gtiles];
       let newTiles = [...tiles];
-      while (newPtiles.length < racksize && newTiles.length > 0) {
+      while (newPlayerTiles.length < racksize && newTiles.length > 0) {
         let rand = Math.floor(Math.random() * newTiles.length);
-        newPtiles.push(newTiles[rand]);
+        newPlayerTiles.push(newTiles[rand]);
         newTiles.splice(rand, 1);
       }
-      newPtiles.sort();
-      let newWhoseturn = newPtiles.length > 0 ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_GAMEOVER;
+      newPlayerTiles.sort();
+      let newWhoseturn = newPlayerTiles.length === 0 ? c.WHOSE_TURN_GAMEOVER : participant === c.PARTY_TYPE_PRISONERS ? c.WHOSE_TURN_GUARDS : c.PARTY_TYPE_PRISONERS;
       if (!anyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
+      let newMove = {by: participant, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
       let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
-      setPtiles(newPtiles);
+      participant === c.PARTY_TYPE_PRISONERS ? setPtiles(newPlayerTiles) : setGtiles(newPlayerTiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setRescues(newRescues);
       setSnapshot({
         squareArray: JSON.parse(JSON.stringify(squareArray)), // Deep copy
-        ptiles: [...newPtiles],
-        gtiles: [...gtiles],
+        ptiles: participant === c.PARTY_TYPE_PRISONERS ? [...newPlayerTiles] : [...ptiles],
+        gtiles: participant === c.PARTY_TYPE_PRISONERS ? [...gtiles] : [...newPlayerTiles],
       });
-  
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "ept", // end prisoners turn
-          timestamp: newSyncstamp, // for data sync logic
-          sender: participant,
-          ptiles: newPtiles, // we picked new tiles for prisoners rack
-          tiles: newTiles, // we picked new tiles so tile pool changed
-          whoseturn: newWhoseturn, // may have ended the game
-          move: newMove, // the move that was made
-          rescues: newRescues // may have rescued another prisoner
-        }
-      );
+      let jsend = {
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: participant === c.PARTY_TYPE_PRISONERS ? "ept" : "egt", // end prisoners or guards turn
+        timestamp: newSyncstamp, // for data sync logic
+        sender: participant,
+        ptiles: newPlayerTiles, // we picked new tiles for prisoners rack
+        tiles: newTiles, // we picked new tiles so tile pool changed
+        whoseturn: newWhoseturn, // may have ended the game
+        move: newMove, // the move that was made
+        rescues: newRescues // may have rescued another prisoner
+      };
+      participant === c.PARTY_TYPE_PRISONERS ? jsend.ptiles = newPlayerTiles : jsend.gtiles = newPlayerTiles;
+      client.send(jsend);
     };
   
-    async function endGuardsTurn() {
-      if (!isPlayValid()) {
-        return;
-      }
-      let playinfo = await getPlayInfo();
-      if (playinfo.invalidwords.length !== 0) {
-        alert(`Invalid according to ENABLE2K lexicon: ${playinfo.invalidwords.join().replace(".","?").toUpperCase()}`);
-        return; // Do not apply the play
-      }
-      let newGtiles = [...gtiles];
-      let newTiles = [...tiles];
-      while (newGtiles.length < racksize && newTiles.length > 0) {
-        let rand = Math.floor(Math.random() * newTiles.length);
-        newGtiles.push(newTiles[rand]);
-        newTiles.splice(rand, 1);
-      }
-      newGtiles.sort();
-      let snapsquarearray = JSON.parse(JSON.stringify(squareArray)); // Deep copy
-      let snapptiles = [...ptiles];
-      let snapgtiles = [...gtiles];
-      let newWhoseturn = newGtiles.length > 0 ? c.WHOSE_TURN_PRISONERS : c.WHOSE_TURN_GAMEOVER;
-      if (!anyUnusedEscapeHatches(squareArray)) {
-        newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
-      }
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
-      let newMoves = [...moves, newMove];
-      let newSyncstamp = Date.now();
-      putAtMoveStart();
-      setSyncstamp(newSyncstamp);
-      setWhoseturn(newWhoseturn);
-      setGtiles(newGtiles);
-      setTiles(newTiles);
-      setMoves(newMoves);
-      setSnapshot({
-        squareArray: snapsquarearray,
-        ptiles: snapptiles,
-        gtiles: snapgtiles,
-      });
-  
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "egt", // end guards turn
-          timestamp: newSyncstamp, // for data sync logic
-          sender: participant,
-          gtiles: newGtiles, // we picked new tiles for guards rack
-          tiles: newTiles, // we picked new tiles so tile pool changed
-          move: newMove, // the move that was made
-          whoseturn: newWhoseturn, // may have ended the game
-          racksize: racksize // rack size option (lobby needs to know for when guards join game and they call Game)
-          }
-        );
-      };
-  
-    const swapPrisonersTiles = () => {
+    const swapPlayersTiles = () => {
       if (tiles.length < racksize) {
         window.alert("Need " + racksize + " tiles in the bag to exchange")
         return;
       }
-      let newPtiles = [];
+      let newPlayerTiles = [];
       let newTiles = [...tiles];
-      while (newPtiles.length < racksize && newTiles.length > 0) {
+      while (newPlayerTiles.length < racksize && newTiles.length > 0) {
         let rand = Math.floor(Math.random() * newTiles.length);
-        newPtiles.push(newTiles[rand]);
+        newPlayerTiles.push(newTiles[rand]);
         newTiles.splice(rand, 1);
       }
-      newPtiles.sort();
-      newTiles = [...newTiles, ...snapshot.ptiles];
+      newPlayerTiles.sort();
+      participant === c.PARTY_TYPE_PRISONERS ? newTiles = [...newTiles, ...snapshot.ptiles] : newTiles = [...newTiles, ...snapshot.gtiles];
       newTiles.sort();
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_SWAP};
+      let newMove = {by: participant, type: c.MOVE_TYPE_SWAP};
       let newMoves = [...moves, newMove];
       let newSyncstamp = Date.now();
       putAtMoveStart();
       setSyncstamp(newSyncstamp);
       setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
-      setWhoseturn(c.WHOSE_TURN_GUARDS);
-      setPtiles(newPtiles);
+      setWhoseturn(participant === c.PARTY_TYPE_PRISONERS ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_PRISONERS);
+      participant === c.PARTY_TYPE_PRISONERS ? setPtiles(newPlayerTiles) : setGtiles(newPlayerTiles);
       setTiles(newTiles);
       setMoves(newMoves);
       setSnapshot({
         squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
-        ptiles: [...newPtiles],
-        gtiles: [...gtiles],
+        ptiles: participant === c.PARTY_TYPE_PRISONERS ? [...newPlayerTiles] : [...ptiles],
+        gtiles: participant === c.PARTY_TYPE_PRISONERS ? [...gtiles] : [...newPlayerTiles],
       });
-  
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "ept", // end prisoners turn
-          timestamp: newSyncstamp, // for data sync logic
-          sender: participant,
-          whoseturn: c.WHOSE_TURN_GUARDS, // swap never ends the game so go to opponent
-          ptiles: newPtiles, // we picked new tiles for prisoners rack
-          tiles: newTiles, // we picked new tiles so tile pool changed
-          move: newMove // the move that was made
-        }
-      );
-  
+      let jsend = {
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: participant === c.PARTY_TYPE_PRISONERS ? "ept" : "egt", // end prisoners or guards turn
+        timestamp: newSyncstamp, // for data sync logic
+        sender: participant,
+        whoseturn: c.WHOSE_TURN_GUARDS, // swap never ends the game so go to opponent
+        tiles: newTiles, // we picked new tiles so tile pool changed
+        move: newMove // the move that was made
+      };
+      participant === c.PARTY_TYPE_PRISONERS ? jsend.ptiles = newPlayerTiles : jsend.gtiles = newPlayerTiles;
+      client.send(jsend);
     }
     
-    const swapGuardsTiles = () => {
-      if (tiles.length < racksize) {
-        window.alert("Need " + racksize + " tiles in the bag to exchange")
-        return;
-      }
-      let newGtiles = [];
-      let newTiles = [...tiles];
-      while (newGtiles.length < racksize && newTiles.length > 0) {
-        let rand = Math.floor(Math.random() * newTiles.length);
-        newGtiles.push(newTiles[rand]);
-        newTiles.splice(rand, 1);
-      }
-      newGtiles.sort();
-      newTiles = [...newTiles, ...snapshot.gtiles];
-      newTiles.sort();
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_SWAP};
-      let newMoves = [...moves, newMove];
-      let newSyncstamp = Date.now();
-      putAtMoveStart();
-      setSyncstamp(newSyncstamp);
-      setSquareArray(JSON.parse(JSON.stringify(snapshot.squareArray))); // Deep copy
-      setWhoseturn(c.WHOSE_TURN_PRISONERS);
-      setGtiles(newGtiles);
-      setTiles(newTiles);
-      setMoves(newMoves);
-      setSnapshot({
-        squareArray: JSON.parse(JSON.stringify(snapshot.squareArray)), // Deep copy
-        ptiles: [...ptiles],
-        gtiles: [...newGtiles],
-      });
-  
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "egt", // end guards turn
-          timestamp: newSyncstamp, // for data sync logic
-          sender: participant,
-          whoseturn: c.WHOSE_TURN_PRISONERS, // swap never ends the game so go to opponent
-          gtiles: newGtiles, // we picked new tiles for prisoners rack
-          tiles: newTiles, // we picked new tiles so tile pool changed
-          move: newMove // the move that was made
-        }
-      );
-  
-    }
-  
     function isPlayValid() {
       // Check if this is the first word since it affects the validity rules
       let firstWord = true;
@@ -785,10 +681,10 @@ const Game = ({isrejoin
       setRcd([-1,-1,c.DIR_NONE]);
     };
   
-    const prisonerPass = () => {
-      let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PASS};
+    const playerPassTurn = () => {
+      let newMove = {by: participant, type: c.MOVE_TYPE_PASS};
       let newMoves = [...moves, newMove];
-      let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_GUARDS; // If both players pass then end the game
+      let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : participant === c.PARTY_TYPE_PRISONERS ? c.WHOSE_TURN_GUARDS : c.WHOSE_TURN_PRISONERS; // If both players pass then end the game
       let newSyncstamp = Date.now();
       recallTiles(); // In case they put some tiles on the board before clicking Pass
       putAtMoveStart();
@@ -799,7 +695,7 @@ const Game = ({isrejoin
         {
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
-          func: "ept", // end prisoners turn
+          func: participant === c.PARTY_TYPE_PRISONERS ? "ept" : "egt", // end prisoners or guards turn
           timestamp: newSyncstamp, // for data sync logic
           sender: participant, // who passed their turn
           whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
@@ -807,30 +703,6 @@ const Game = ({isrejoin
         }
       );
     }
-  
-    const guardsPass = () => {
-      let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PASS};
-      let newMoves = [...moves, newMove];
-      let newWhoseturn = isDoublePass(newMoves) ? c.WHOSE_TURN_GAMEOVER : c.WHOSE_TURN_PRISONERS; // If both players pass then end the game
-      let newSyncstamp = Date.now();
-      recallTiles(); // In case they put some tiles on the board before clicking Pass
-      putAtMoveStart();
-      setSyncstamp(newSyncstamp);
-      setWhoseturn(newWhoseturn);
-      setMoves(newMoves);
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "egt", // end guards turn
-          timestamp: newSyncstamp, // for data sync logic
-          sender: participant, // who passed their turn
-          whoseturn: newWhoseturn, // either it is now opponents turn or the pass ended the game
-          move: newMove // the move that was made
-        }
-      );
-    }
-  
 
     const requestGameData = () => {
       client.send(
@@ -860,7 +732,7 @@ const Game = ({isrejoin
       event.preventDefault();
       if (participant !== whoseturn) {return;}
       if (event.key === "Enter") {
-        whoseturn === c.WHOSE_TURN_PRISONERS ? endPrisonersTurn() : endGuardsTurn();
+        endPlayersTurn();
         return;
       }
       if (event.key === "Escape") {
@@ -1010,10 +882,10 @@ const Game = ({isrejoin
                 whoseturn={whoseturn}
                 selection={selection}
                 onClick={(ti) => handleRackTileClick(ti)}
-                onClickFinishTurn={() => endPrisonersTurn()}
+                onClickFinishTurn={() => endPlayersTurn()}
                 onClickTileRecall={() => recallTiles()}
-                onClickTileExchange={() => swapPrisonersTiles()}
-                onClickPassPlay={() => prisonerPass()}
+                onClickTileExchange={() => swapPlayersTiles()}
+                onClickPassPlay={() => playerPassTurn()}
                 onClickUndoLastPlay={() => performRewind()}
                 onClickAllowUndo={() => allowUndoLastTurn()}
                 participant={participant}
@@ -1026,10 +898,10 @@ const Game = ({isrejoin
                 whoseturn={whoseturn}
                 selection={selection}
                 onClick={(ti) => handleRackTileClick(ti)}
-                onClickFinishTurn={() => endGuardsTurn()}
+                onClickFinishTurn={() => endPlayersTurn()}
                 onClickTileRecall={() => recallTiles()}
-                onClickTileExchange={() => swapGuardsTiles()}
-                onClickPassPlay={() => guardsPass()}
+                onClickTileExchange={() => swapPlayersTiles()}
+                onClickPassPlay={() => playerPassTurn()}
                 onClickUndoLastPlay={() => performRewind()}
                 onClickAllowUndo={() => allowUndoLastTurn()}
                 participant={participant}
