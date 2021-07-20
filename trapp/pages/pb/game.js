@@ -324,9 +324,14 @@ const Game = ({isrejoin
       setSelection(-1);
     }
   
-    const endPrisonersTurn = () => {
+    async function endPrisonersTurn() {
       if (!isPlayValid()) {
         return;
+      }
+      let playinfo = await getPlayInfo();
+      if (playinfo.invalidwords.length !== 0) {
+        alert(`Invalid according to ENABLE2K lexicon: ${playinfo.invalidwords.join().replace(".","?").toUpperCase()}`);
+        return; // Do not apply the play
       }
       let newRescues = rescues;
       let escapehatches = [
@@ -356,7 +361,6 @@ const Game = ({isrejoin
       if (!anyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
-      let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_PRISONERS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
       let newSyncstamp = Date.now();
@@ -389,9 +393,14 @@ const Game = ({isrejoin
       );
     };
   
-    const endGuardsTurn = () => {
+    async function endGuardsTurn() {
       if (!isPlayValid()) {
         return;
+      }
+      let playinfo = await getPlayInfo();
+      if (playinfo.invalidwords.length !== 0) {
+        alert(`Invalid according to ENABLE2K lexicon: ${playinfo.invalidwords.join().replace(".","?").toUpperCase()}`);
+        return; // Do not apply the play
       }
       let newGtiles = [...gtiles];
       let newTiles = [...tiles];
@@ -408,7 +417,6 @@ const Game = ({isrejoin
       if (!anyUnusedEscapeHatches(squareArray)) {
         newWhoseturn = c.WHOSE_TURN_GAMEOVER; // No escape hatches left
       }
-      let playinfo = getPlayInfo();
       let newMove = {by: c.PARTY_TYPE_GUARDS, type: c.MOVE_TYPE_PLAY, mainword: playinfo.mainword, extrawords: playinfo.extrawords, pos: playinfo.pos};
       let newMoves = [...moves, newMove];
       let newSyncstamp = Date.now();
@@ -626,7 +634,7 @@ const Game = ({isrejoin
       return true;
     }
   
-    function getPlayInfo() {
+    async function getPlayInfo() {
       let playinfo = {};
       let mainword = "";
       let extrawords = [];
@@ -726,8 +734,21 @@ const Game = ({isrejoin
           }
         }
       }
-      playinfo = {mainword: mainword, extrawords: extrawords, pos: wordstartcoord};
+      let invalidwords = await validateWords(mainword, extrawords);
+      playinfo = {mainword: mainword, extrawords: extrawords, pos: wordstartcoord, invalidwords: invalidwords};
       return playinfo;
+    }
+
+    async function validateWords(mainword, extrawords) {
+      // Build complete list of newly formed words for validation against lexicon
+      let allwords = mainword;
+      extrawords.forEach((ew) => {
+        allwords = allwords + "," + ew;
+      })
+      let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?validate=' : 'https://tilerunner.herokuapp.com/ENABLE2K?validate='
+      const response = await fetch(url + allwords.toLocaleLowerCase());
+      const jdata = await response.json();
+      return jdata.invalidwords;
     }
   
     function allowUndoLastTurn() {
