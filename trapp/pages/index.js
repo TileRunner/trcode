@@ -13,6 +13,7 @@ export default function Home() {
   const [descWm, setDescWm] = useState(false); // describe word mastermind
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
+  const [descFyb, setDescFyb] = useState(false); // describe fry your brain
   const [coderMsg, setCoderMsg] = useState('Loading');
   const [coderMsg2, setCoderMsg2] = useState('Loading');
   const getCoderMsg = async () => {
@@ -46,6 +47,7 @@ export default function Home() {
         <BrowserView>
           <PBOption descPb={descPb} setDescPb={setDescPb}/>
         </BrowserView>
+        <FYBOption descFyb={descFyb} setDescFyb={setDescFyb}/>
       </div>
       <div className="w3-container w3-teal">
         <h1>Have fun!</h1>
@@ -169,6 +171,48 @@ const PBOption = (props) => {
               <li>The game ends if a player empties their rack.</li>
               <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
               <li>The game ends if both players pass.</li>
+            </ul>
+          </div>
+      :
+        <></>
+      }
+    </div>
+  )
+}
+
+const FYBOption = (props) => {
+  const toggleDescFyb = () => {
+    props.setDescFyb(!props.descFyb);
+  }
+
+  return (
+    <div className="w3-cell-row" style={{width: props.descFyb ? '100%' : menuItemWidthNormal}}>
+      <div className="w3-cell">
+        <Link href={`/fyb/fryyourbrain`}>
+          <a>
+            <h2 className="mySubHeadingFont">Fry Your Brain</h2>
+          </a>
+        </Link>
+      </div>
+      <div className={`w3-cell ${props.descPb ? "w3-cell-middle" : ""}`}>
+        <button id="toggleDescribeFyb" className={props.descFyb ? hideButtonClassName : showButtonClassName}
+          onClick={() => toggleDescFyb()}
+        >
+          {props.descFyb ? "Hide info" : <i className="material-icons">help_outline</i>}
+        </button>
+      </div>
+
+      {props.descFyb ?
+          <div className={descriptionCard}>
+            <ul className="w3-ul commonFontFamily">
+              <li><h2 className="commonHeaderFontFamily">Fry Your Brain is a two to six player word game.</h2></li>
+              <li>Under Construction</li>
+              <li>A tile pool is provided, starting with 3 letters, and players take turns.</li>
+              <li>When it is your turn, make a word that has all the letters in the tile pool, plus any amount of additional letters.</li>
+              <li>When a player fails to make a word on their turn, the other players take part in the free for all.</li>
+              <li>In the free for all, the goal is to submit the shortest answer you can. All players with the shortest of the answers get points.</li>
+              <li>The points given equals the number of letters in the tile pool the last time someone gave a valid answer for that round.</li>
+              <li>Rounds continue until someone reaches the target number of points for the game.</li>
             </ul>
           </div>
       :

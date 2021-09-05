@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect} from "react";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';

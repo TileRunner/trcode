@@ -204,9 +204,29 @@ const processMessage = (message) => {
     if (pm.type === "pb") {
         processPrisonBreakMessage(pm, message);
     }
+    else if (pm.type = "fyb") {
+        processFryYourBrainMessage(pm, message);
+    }
     else if (pm.func === "chat") {
         handleChatMessages(pm, message);
     }
+}
+
+const processFryYourBrainMessage = (pm, message) => {
+    if (pm.func === "announce") {
+        processFybAnnounce(pm);
+    }
+}
+
+const processFybAnnounce = (pm) => {
+    let lobbyClient = findLobbyClient(pm.thisisme);
+    if (lobbyClient) {
+        updateFybLobbyClient(lobbyClient);
+    }
+}
+
+const updateFybLobbyClient = (client) => {
+    client.send(JSON.stringify({info:`Announcing client ${client.thisisme}`}));
 }
 
 const processPrisonBreakMessage = (pm, message) => {
