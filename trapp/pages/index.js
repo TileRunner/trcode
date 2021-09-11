@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
 const showButtonClassName = 'w3-right mymaterialicon w3-green w3-animate-right';
-const menuItemWidthNormal = '320px';
+const menuItemWidthNormal = '390px';
 const descriptionCard = 'w3-card-4 w3-green w3-cell w3-animate-right';
 
 export default function Home() {

@@ -3,8 +3,9 @@ const dataApiUrl = 'https://json.extendsclass.com/bin'; // This is not a secret
 const dataApiKey = process.env.NEXT_PUBLIC_DATAAPIKEY; // This is a secret
 var gameApiInfoMap = []; // For mapping gameid to the id assigned by the API that is used, plus next event index
 const { findLobbyClient, findLobbyClients, findPlayerClient, findGameClients, findGameClientsExceptMe } = require('../clients/clientFunctions');
+const clientType = 'pb';
 
-function setupGameApiInfoMap() {
+function pbInitialize() {
     axios({
         method: 'get',
         url: `${dataApiUrl}s`,
@@ -255,7 +256,7 @@ const processPbJoinGame = (wss, pm) => {
             }
         }
     }
-    let clients = findGameClientsExceptMe(wss, pm.gameid, pm.thisisme);
+    let clients = findGameClientsExceptMe(wss, clientType, pm.gameid, pm.thisisme);
     clients.forEach((client) => {
         let jSendGname = {
             type: "pm",
@@ -324,13 +325,13 @@ const processPbProvideMove = (wss, pm) => {
         jProvideMove.extrawords = move.extrawords.join(",");
         jProvideMove.rescues = pm.rescues;
     }
-    let otherGameClients = findGameClientsExceptMe(wss, pm.gameid, pm.thisisme);
+    let otherGameClients = findGameClientsExceptMe(wss, clientType, pm.gameid, pm.thisisme);
     handleProvideMove(pm.gameid, jProvideMove, otherGameClients); // Send move to data API, send update to opponent if found
 }
 
 const processPbUndoMove = (wss, pm) => {
     // We need to update the database then send the api game data to the players and observers in the game
-    let gameclients = findGameClients(wss, pm.gameid);
+    let gameclients = findGameClients(wss, clientType, pm.gameid);
     handleUndoMove(pm.gameid, gameclients);
 }
 
@@ -474,7 +475,7 @@ const updateGameApiInfoObject = (apiResponseData) => { // Pass the axios respons
 }
 
 const updateLobbyClients = (wss) => {
-    let lobbyClients = findLobbyClients(wss);
+    let lobbyClients = findLobbyClients(wss, clientType);
     let msg = getGameListMessageString();
     lobbyClients.forEach((client) => {
         client.send(msg);
@@ -499,4 +500,4 @@ const makeGameApiInfoObject = (dataApiId, gameData) => {
 }
 
 
-module.exports = { setupGameApiInfoMap, processMessagePB };
+module.exports = { pbInitialize, processMessagePB };

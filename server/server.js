@@ -6,8 +6,8 @@ const path = require("path");
 const PORT = process.env.PORT || 5000;
 require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
-const { setupGameApiInfoMap, processMessagePB } = require('./pb/processMessagePB');
-const { processMessageFYB } = require('./fyb/processMessageFYB');
+const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
+const { fybInitialize, processMessageFYB } = require('./fyb/processMessageFYB');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 
@@ -178,7 +178,8 @@ const server = express()
     })
     .listen(PORT, () => {
         console.log(`Listening on ${PORT}`);
-        setupGameApiInfoMap();
+        pbInitialize();
+        fybInitialize();
     });
 
 const wss = new Server({ server });

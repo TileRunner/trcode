@@ -8,10 +8,10 @@ function findLobbyClient(wss, thisisme) {
     return lobbyClient;
 }
 
-function findLobbyClients(wss) {
+function findLobbyClients(wss, clientType) {
     let lobbyclients = [];
     wss.clients.forEach((client) => {
-        if (!client.gameid) {
+        if (!client.gameid && client.clientType === clientType) {
             lobbyclients.push(client);
         }
     });
@@ -32,20 +32,20 @@ function findPlayerClient(wss, gameid, playerThisisme) {
     return foundClient;
 }
 
-function findGameClients(wss, gameid) {
+function findGameClients(wss, clientType, gameid) {
     let gameclients = [];
     wss.clients.forEach((client) => {
-        if (client.gameid === gameid) {
+        if (client.gameid === gameid && client.clientType === clientType) {
             gameclients.push(client);
         }
     });
     return gameclients;
 }
 
-function findGameClientsExceptMe(wss, gameid, playerThisisme) {
+function findGameClientsExceptMe(wss, clientType, gameid, playerThisisme) {
     let gameclients = [];
     wss.clients.forEach((client) => {
-        if (client.gameid === gameid && client.thisisme !== playerThisisme) {
+        if (client.gameid === gameid && client.clientType === clientType && client.thisisme !== playerThisisme) {
             gameclients.push(client);
         }
     });
