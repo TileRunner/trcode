@@ -10,7 +10,7 @@ import { buildExamineDataFromApidata } from "../../lib/pb/buildExamineDataFromAp
 import { scrollToBottom } from "../../lib/scrollToBottom";
 
 // I am setting up a default skeleton so the build does not try reference properties of undefined objects
-const Examine = ({ client, wsmessage, gameid, nickname, participant }) => {
+const Examine = ({setWhereto, client, wsmessage, gameid, nickname, participant}) => {
     const [snapshotIndex, setSnapshotIndex] = useState(0); // Start at the end of the first snapshot (tiles picked, no moves made)
     const [examineData, setExamineData] = useState({pname: 'loading...', gname: 'loading...', moves: [], snapshots:[{tiles: [], ptiles: [], gtiles: [], rescues: 0, whoseturn: 'P'}]});
     const [chatmsgs, setChatmsgs] = useState([]);
@@ -116,9 +116,9 @@ const Examine = ({ client, wsmessage, gameid, nickname, participant }) => {
             Prisoners: { examineData.pname }
           </div>
           <div className="w3-display-topright w3-black topBarCorner commonFontFamily">
-            <Link href={"../../"}>
-              <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-            </Link>
+            <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+            </button>
           </div>
           <div className="w3-display-bottomright w3-orange topBarCorner commonFontFamily">
             Guards: { examineData.gname }

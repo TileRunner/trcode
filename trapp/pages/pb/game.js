@@ -14,7 +14,8 @@ import { isDoublePass } from "../../lib/pb/isDoublePass";
 import { scrollToBottom } from "../../lib/scrollToBottom";
 import { usePrevious } from "../../lib/usePrevious";
 
-const Game = ({isrejoin
+const Game = ({setWhereto
+    , isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
     , gameid
     , nickname
@@ -852,9 +853,9 @@ const Game = ({isrejoin
               }
           </div>
           <div className="w3-display-topright w3-black topBarCorner commonFontFamily">
-            <Link href={"../../"}>
-              <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-            </Link>
+            <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+              <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+            </button>
           </div>
           <div className="w3-display-bottomright w3-orange topBarCorner commonFontFamily">
             Guards: {

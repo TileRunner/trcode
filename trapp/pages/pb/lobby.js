@@ -12,7 +12,7 @@ const availableActionReconnect = 2;
 const availableActionObserve = 3;
 const availableActionExamine = 4;
 
-const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
+const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, nickname, setNickname, setParticipant
     , racksize, setRacksize // Option for rack size
     }) => {
     const [gamelist, setGamelist] = useState([]) // Game info by game id
@@ -83,9 +83,9 @@ const Lobby = ({client, setIsrejoin, wsmessage, gameid, setGameid, nickname, set
         <div className="w3-container w3-teal w3-bar">
           <h1 className="w3-bar-item w3-centre myHeadingFont">Prison Break Lobby</h1>
           <div className="w3-bar-item w3-right">
-            <Link href={"../../"}>
-              <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-            </Link>
+            <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+            </button>
           </div>
         </div>
         <div className="w3-row">

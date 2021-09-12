@@ -3,6 +3,10 @@ import Head from 'next/head'
 import Link from 'next/link'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { useEffect, useState } from 'react';
+import WordMastermind from './wm/mastermind';
+import WordInfo from './wi/wordinfo';
+import PrisonBreak from './pb/prisonbreak';
+import FryYourBrain from './fyb/fryyourbrain';
 
 const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
 const showButtonClassName = 'w3-right mymaterialicon w3-green w3-animate-right';
@@ -10,10 +14,7 @@ const menuItemWidthNormal = '390px';
 const descriptionCard = 'w3-card-4 w3-green w3-cell w3-animate-right';
 
 export default function Home() {
-  const [descWm, setDescWm] = useState(false); // describe word mastermind
-  const [descWi, setDescWi] = useState(false); // describe word info
-  const [descPb, setDescPb] = useState(false); // describe prison break
-  const [descFyb, setDescFyb] = useState(false); // describe fry your brain
+  const [whereto, setWhereto] = useState('menu');
   const [coderMsg, setCoderMsg] = useState('Loading');
   const [coderMsg2, setCoderMsg2] = useState('Loading');
   const getCoderMsg = async () => {
@@ -29,29 +30,55 @@ export default function Home() {
 
   return (
     <div>
+      {whereto === 'menu' && <Menu setWhereto={setWhereto} coderMsg={coderMsg} coderMsg2={coderMsg2}></Menu>}
+      {whereto === 'wm' && <WordMastermind setWhereto={setWhereto}></WordMastermind>}
+      {whereto === 'wi' && <WordInfo setWhereto={setWhereto}></WordInfo>}
+      {whereto === 'pb' && <PrisonBreak setWhereto={setWhereto}></PrisonBreak>}
+      {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
+    </div>
+  )
+}
+
+const Menu = (props) => {
+  const [descWm, setDescWm] = useState(false); // describe word mastermind
+  const [descWi, setDescWi] = useState(false); // describe word info
+  const [descPb, setDescPb] = useState(false); // describe prison break
+  const [descFyb, setDescFyb] = useState(false); // describe fry your brain
+  return (
+    <div>
       <Head>
         <title>Tile Runner App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="w3-container w3-teal">
         <h1 className="myHeadingFont">Menu</h1>
-        <h2>{coderMsg}</h2>
+        <h2>{props.coderMsg}</h2>
       </div>
       <div className="w3-container w3-margin-left">
         <div className="w3-blue">
-        <h1>The Enhanced North American Benchmark LEexicon, millenial edition</h1>
-        <p>This site uses the ENABLE2K lexicon, a public domain word list that I gratefully acknowledge.</p>
+          <h1>The Enhanced North American Benchmark LEexicon, millenial edition</h1>
+          <p>This site uses the ENABLE2K lexicon, a public domain word list that I gratefully acknowledge.</p>
         </div>
-        <WMOption descWm={descWm} setDescWm={setDescWm}/>
-        <WIOption descWi={descWi} setDescWi={setDescWi}/>
-        <BrowserView>
-          <PBOption descPb={descPb} setDescPb={setDescPb}/>
-        </BrowserView>
-        <FYBOption descFyb={descFyb} setDescFyb={setDescFyb}/>
+        <div className="w3-bar-block">
+          <div className="w3-bar-item">
+          <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
+          </div>
+          <div className="w3-bar-item">
+          <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
+          </div>
+          <BrowserView>
+            <div className="w3-bar-item">
+              <PBOption descPb={descPb} setDescPb={setDescPb} setWhereto={props.setWhereto}/>
+            </div>
+          </BrowserView>
+          <div className="w3-bar-item">
+            <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
+          </div>
+        </div>
       </div>
       <div className="w3-container w3-teal">
         <h1>Have fun!</h1>
-        <h2>{coderMsg2}</h2>
+        <h2>{props.coderMsg2}</h2>
       </div>
     </div>
   )
@@ -65,11 +92,11 @@ const WMOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descWm ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <Link href={`/wm/mastermind`}>
-          <a>
-            <h2 className="mySubHeadingFont">Word Mastermind</h2>
-          </a>
-        </Link>
+        <button className='w3-button w3-border w3-green'
+          onClick={() => {props.setWhereto('wm');}}
+        >
+          <h2 className="mySubHeadingFont">Word Mastermind</h2>
+        </button>
       </div>
       <div className={`w3-cell ${props.descWm ? "w3-cell-middle" : ""}`}>
         <button id="toggleDescribeWm" className={props.descWm ? hideButtonClassName : showButtonClassName}
@@ -106,11 +133,11 @@ const WIOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descWi ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <Link href={`/wi/wordinfo`}>
-          <a>
-            <h2 className="mySubHeadingFont">Word Info</h2>
-          </a>
-        </Link>
+        <button className='w3-button w3-border w3-green'
+          onClick={() => {props.setWhereto('wi');}}
+        >
+          <h2 className="mySubHeadingFont">Word Info</h2>
+        </button>
       </div>
       <div className={`w3-cell ${props.descWi ? "w3-cell-middle" : ""}`}>
         <button id="toggleDescribeWi" className={props.descWi ? hideButtonClassName : showButtonClassName}
@@ -144,11 +171,11 @@ const PBOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descPb ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <Link href={`/pb/prisonbreak`}>
-          <a>
-            <h2 className="mySubHeadingFont">Prison Break</h2>
-          </a>
-        </Link>
+        <button className='w3-button w3-border w3-green'
+          onClick={() => {props.setWhereto('pb');}}
+        >
+          <h2 className="mySubHeadingFont">Prison Break</h2>
+        </button>
       </div>
       <div className={`w3-cell ${props.descPb ? "w3-cell-middle" : ""}`}>
         <button id="toggleDescribePb" className={props.descPb ? hideButtonClassName : showButtonClassName}
@@ -188,11 +215,11 @@ const FYBOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descFyb ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <Link href={`/fyb/fryyourbrain`}>
-          <a>
-            <h2 className="mySubHeadingFont">Fry Your Brain</h2>
-          </a>
-        </Link>
+        <button className='w3-button w3-border w3-green'
+          onClick={() => {props.setWhereto('fyb');}}
+        >
+          <h2 className="mySubHeadingFont">Fry Your Brain</h2>
+        </button>
       </div>
       <div className={`w3-cell ${props.descPb ? "w3-cell-middle" : ""}`}>
         <button id="toggleDescribeFyb" className={props.descFyb ? hideButtonClassName : showButtonClassName}
@@ -202,7 +229,7 @@ const FYBOption = (props) => {
         </button>
       </div>
 
-      {props.descFyb ?
+      {props.descFyb &&
           <div className={descriptionCard}>
             <ul className="w3-ul commonFontFamily">
               <li><h2 className="commonHeaderFontFamily">Fry Your Brain is a two to six player word game.</h2></li>
@@ -215,8 +242,6 @@ const FYBOption = (props) => {
               <li>Rounds continue until someone reaches the target number of points for the game.</li>
             </ul>
           </div>
-      :
-        <></>
       }
     </div>
   )

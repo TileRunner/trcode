@@ -6,7 +6,7 @@ import Examine from '../pb/examine';
 import * as c from '../../lib/pb/prisonBreakConstants';
 import { v4 as uuid_v4 } from 'uuid';
 
-export default function PrisonBreak() {
+const PrisonBreak = ({setWhereto}) => {
   const [thisisme] = useState(uuid_v4()); // Generate an id for this participant and send it on web socket messages
   const [isrejoin, setIsrejoin] = useState(false) // Used when player loses connection and rejoins
   const [gameid, setGameid] = useState('')
@@ -27,6 +27,7 @@ export default function PrisonBreak() {
   return (
     participant === c.PARTY_TYPE_UNDETERMINED ?
       <Lobby
+        setWhereto={setWhereto}
         client={client}
         setIsrejoin={setIsrejoin}
         wsmessage={wsmessage}
@@ -40,6 +41,7 @@ export default function PrisonBreak() {
       />
     : participant === c.PARTY_TYPE_EXAMINER ?
       <Examine
+        setWhereto={setWhereto}
         client={client}
         wsmessage={wsmessage}
         gameid={gameid}
@@ -48,6 +50,7 @@ export default function PrisonBreak() {
       />
       :
       <Game
+        setWhereto={setWhereto}
         isrejoin={isrejoin}
         participant={participant}
         gameid={gameid}
@@ -58,3 +61,5 @@ export default function PrisonBreak() {
       />
   )
 }
+
+export default PrisonBreak;

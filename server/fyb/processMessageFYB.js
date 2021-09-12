@@ -1,4 +1,4 @@
-const { findLobbyClient, findLobbyClients } = require('../clients/clientFunctions');
+const { findLobbyClient, findLobbyClients, findGameClientsExceptMe, findGameClients } = require('../clients/clientFunctions');
 const clientType = 'fyb';
 var games = []; // Array of games in progress
 function fybInitialize() {
@@ -27,6 +27,8 @@ function processMessageFYB (wss, pm, message) {
         processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
         processFybCreateGame(wss, pm);
+    } else if (pm.func === "join") {
+        processFybJoinGame(wss, pm);
     }
 }
 
@@ -50,6 +52,8 @@ const processFybCreateGame = (wss, pm) => {
             let takenMessage = JSON.stringify(takenJson);
             callingClient.send(takenMessage);
         } else {
+            callingClient.gameid = pm.gameid;
+            callingClient.nickname = pm.nickname;
             let game = {
                 datestamp: pm.timestamp,
                 gameid: pm.gameid,
@@ -68,7 +72,9 @@ const processFybCreateGame = (wss, pm) => {
             let gamecreatedJson = {
                 type: clientType,
                 func: 'gamecreated',
-                gameid: pm.gameid
+                nickname: pm.nickname,
+                thisisme: pm.thisisme,
+                game: JSON.parse(JSON.stringify(game))
             };
             let gamecreatedMessage = JSON.stringify(gamecreatedJson);
             callingClient.send(gamecreatedMessage);
@@ -76,26 +82,61 @@ const processFybCreateGame = (wss, pm) => {
     }
 }
 
+const processFybJoinGame = (wss, pm) => {
+    let foundGame = findGame(pm.gameid);
+    let callingClient = findLobbyClient(wss, pm.thisisme);
+    if (callingClient) {
+        if (!foundGame) {
+            let gameUnknownJson = {
+                type: clientType,
+                func: 'gameidunknown',
+                gameid: pm.gameid
+            };
+            let gameUnknownMessage = JSON.stringify(gameUnknownJson);
+            callingClient.send(gameUnknownMessage);
+        } else if (foundGame.numPlayers === foundGame.players.length) {
+            let gameFullJson = {
+                type: clientType,
+                func: 'gamefull',
+                gameid: pm.gameid
+            };
+            let gameFullMessage = JSON.stringify(gameFullJson);
+            callingClient.send(gameFullMessage);
+        } else {
+            callingClient.gameid = pm.gameid;
+            callingClient.nickname = pm.nickname;
+            let playerIndex = foundGame.players.length;
+            let newPlayer = {
+                index: playerIndex,
+                nickname: pm.nickname
+            };
+            foundGame.players.push(newPlayer);
+            let eventIndex = foundGame.events.length;
+            let joinEvent = {
+                index: eventIndex,
+                type: 'JOINGAME',
+                nickname: pm.nickname
+            };
+            foundGame.events.push(joinEvent);
+            let gameJoinedJson = {
+                type: clientType,
+                func: 'gamejoined',
+                nickname: pm.nickname,
+                thisisme: pm.thisisme,
+                game: JSON.parse(JSON.stringify(foundGame))
+            };
+            let gameJoinedMessage = JSON.stringify(gameJoinedJson);
+            callingClient.send(gameJoinedMessage);
+            let gameClients = findGameClientsExceptMe(wss, clientType, pm.gameid, pm.thisisme);
+            gameClients.forEach((gameClient) => {
+                gameClient.send(gameJoinedMessage);
+            })
+        }
+    }
+}
+
 const updateFybLobbyClient = (client) => {
     client.send(JSON.stringify({info:`Announcing client ${client.thisisme}`}));
-}
-
-const updateLobbyClients = (wss) => {
-    let lobbyClients = findLobbyClients(wss, clientType);
-    let msg = getGameListMessageString();
-    lobbyClients.forEach((client) => {
-        client.send(msg);
-    });
-}
-
-const getGameListMessageString = () => {
-    games.sort((a, b) => a.datestamp < b.datestamp ? 1 : -1); // Youngest on top
-    let jgamelist = {
-        type: clientType,
-        func: "gamelist",
-        gamelist: games
-    };
-    return JSON.stringify(jgamelist);
 }
 
 module.exports = { fybInitialize, processMessageFYB };

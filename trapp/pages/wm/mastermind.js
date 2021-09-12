@@ -3,13 +3,7 @@ import Link from 'next/link'
 import Showinfo from '../wi/showinfo'
 import {BrowserView} from 'react-device-detect'
 
-export default function handler(req, res)  {
-    return (
-        <Game />
-    );
-}
-
-function Game() {
+const WordMastermind = ({setWhereto}) => {
     const [setSolveCounts, setSetSolveCounts] = useState([]) // how many guesses to solve each set
     const [setGuessCount, setSetGuessCount] = useState(0) // total guess count for the 2-8 letter set
     const [secretWord, setSecretWord] = useState('')
@@ -29,9 +23,9 @@ function Game() {
                         <span className="material-icons">psychology</span>
                     </div>
                     <div className="col-1 wmhomelink">
-                        <Link href={"../../"}>
-                            <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-                        </Link>
+                        <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                        </button>
                     </div>
                 </div>
                 <div className="row">
@@ -203,3 +197,5 @@ function Game() {
         return n
     }
 }
+
+export default WordMastermind;

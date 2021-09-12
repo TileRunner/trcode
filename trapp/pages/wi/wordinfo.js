@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link'
 import Showinfo from './showinfo'
 
-export default function handler(req, res)  {
+const WordInfo = ({setWhereto}) => {
     const [word, setWord] = useState('');
     const [words, setWords] = useState([]);
     return (
@@ -13,9 +13,9 @@ export default function handler(req, res)  {
                     <i className="material-icons">help_outline</i>
                 </div>
                 <div className="col-1 wihomelink">
-                    <Link href={"../../"}>
-                        <a><i className="material-icons" data-toggle="tooltip" title="Home">home</i></a>
-                    </Link>
+                    <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                        <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                    </button>
                 </div>
             </div>
             <div className="row">
@@ -112,3 +112,4 @@ export default function handler(req, res)  {
         );
 }
 
+export default WordInfo;

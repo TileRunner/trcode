@@ -5,7 +5,7 @@ import Game from '../fyb/game';
 import * as c from '../../lib/fyb/constants';
 import { v4 as uuid_v4 } from 'uuid';
 
-export default function FryYourBrain() {
+const FryYourBrain = ({setWhereto}) => {
     const [thisisme] = useState(uuid_v4()); // Generate an id for this participant and send it on web socket messages
     const [participant, setParticipant] = useState(c.PARTY_TYPE_UNDETERMINED)
     const [wsmessage, setWsmessage] = useState('') // Latest message from the websocket
@@ -26,6 +26,7 @@ export default function FryYourBrain() {
         <>
         {participant === c.PARTY_TYPE_UNDETERMINED &&
             <Lobby
+             setWhereto={setWhereto}
              client={client}
              thisisme={thisisme}
              setParticipant={setParticipant}
@@ -40,6 +41,7 @@ export default function FryYourBrain() {
             </Lobby>}
         {participant === c.PARTY_TYPE_PLAYER &&
             <Game
+             setWhereto={setWhereto}
              setParticipant={setParticipant}
              wsmessage={wsmessage}
              nickname={nickname}
@@ -51,3 +53,4 @@ export default function FryYourBrain() {
     );
 }
 
+export default FryYourBrain;
