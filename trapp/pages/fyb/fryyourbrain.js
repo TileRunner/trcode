@@ -26,27 +26,29 @@ const FryYourBrain = ({setWhereto}) => {
         <>
         {participant === c.PARTY_TYPE_UNDETERMINED &&
             <Lobby
-             setWhereto={setWhereto}
-             client={client}
-             thisisme={thisisme}
-             setParticipant={setParticipant}
-             wsmessage={wsmessage}
-             nickname={nickname}
-             setNickname={setNickname}
-             gameid={gameid}
-             setGameid={setGameid}
-             numPlayers={numPlayers}
-             setNumPlayers={setNumPlayers}
+                setWhereto={setWhereto}
+                client={client}
+                thisisme={thisisme}
+                setParticipant={setParticipant}
+                wsmessage={wsmessage}
+                nickname={nickname}
+                setNickname={setNickname}
+                gameid={gameid}
+                setGameid={setGameid}
+                numPlayers={numPlayers}
+                setNumPlayers={setNumPlayers}
              >
             </Lobby>}
         {participant === c.PARTY_TYPE_PLAYER &&
             <Game
-             setWhereto={setWhereto}
-             setParticipant={setParticipant}
-             wsmessage={wsmessage}
-             nickname={nickname}
-             gameid={gameid}
-             numPlayers={numPlayers}
+                setWhereto={setWhereto}
+                client={client}
+                thisisme={thisisme}
+                setParticipant={setParticipant}
+                wsmessage={wsmessage}
+                nickname={nickname}
+                gameid={gameid}
+                numPlayers={numPlayers}
              >
             </Game>}
         </>

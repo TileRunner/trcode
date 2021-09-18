@@ -14,7 +14,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
         let messageData = JSON.parse(message);
         setSnat(message);
         if (messageData.type === 'fyb') {
-            if (messageData.func === 'gamecreated') {
+            if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 if (messageData.thisisme === thisisme) { // I created
                     // Stick to what was requested
                     if (gameid !== messageData.game.gameid) {setGameid(messageData.game.gameid);}

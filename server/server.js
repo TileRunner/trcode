@@ -117,6 +117,14 @@ const server = express()
             res.json(randomword);
             return;
         }
+        // Handle checking if passed word exists
+        if (req.query.exists) {
+            // The word to check is passed in 'exists'
+            let word = req.query.exists.toLowerCase();
+            let exists = {exists:allwords.indexOf(word) > -1};
+            res.json(exists);
+            return;
+        }
         // Handle getting info for passed letters
         if (req.query.letters) {
             // The desired group of letters is passed in 'letters'
