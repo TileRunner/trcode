@@ -5,10 +5,24 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
     const [snat, setSnat] = useState('');
     const [gamedata, setGamedata] = useState({whoseturn:-1, players:[{index: 0, nickname: 'Loading...'}]});
     const [word, setWord] = useState(''); // my word to submit
+    const [syncstamp, setSyncstamp] = useState('');
+    useEffect(() => {
+        const interval = setInterval(() => {
+          client.send({
+              type: c.CLIENT_TYPE_FYB,
+              func: 'interval',
+              syncstamp: syncstamp,
+              thisisme: thisisme,
+              nickname: nickname,
+              gameid: gamedata.gameid
+          });
+        }, c.PING_INTERVAL); // this many milliseconds between above code block executions
+        return () => clearInterval(interval);
+    });
     useEffect(() => {
         let msg = wsmessage;
         if (msg !== '') processGameMessage(msg);
-      },[wsmessage])
+    },[wsmessage])
     function processGameMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
@@ -16,6 +30,7 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                 console.log(messageData.game);
                 setSnat(messageData.snat);
                 setGamedata(messageData.game);
+                setSyncstamp(messageData.game.syncstamp);
             } else {
                 setSnat(`Unhandled message: ${message}`);
             }
@@ -69,13 +84,26 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
             </div>
             <h1>Game under construction</h1>
             <p>{snat}</p>
-            <p>Players:
-            {gamedata.players.map((pl) => (
-                <span key={`Player${pl.index}`} className='w3-teal'>&nbsp;{pl.nickname}{pl.index === gamedata.numPlayers - 1 ? '' : ','}</span>
-            ))}
-            </p>
+            <div className="w3-container w3-responsive w3-quarter">
+                <table className="w3-table w3-card">
+                    <thead>
+                        <tr className="w3-teal">
+                            <th>Player</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {gamedata.players.map((pl) => (
+                            <tr key={`Player${pl.index}`} className="w3-green">
+                                <td>{pl.nickname}</td>
+                                <td class="w3-monospace">&nbsp;&nbsp;{pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
             {!gamedata.freeforall && gamedata.playersWhoMoved && gamedata.playersWhoMoved.length > 0 &&
-                <div>
+                <div class="w3-container">
                     <h2>Previous free for all results:</h2>
                     {gamedata.playersWhoMoved.map((pwm) => (
                         <p key={`PlayerWhoMovedFFA${pwm.nickname}`}>
@@ -85,7 +113,7 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                 </div>
             }
             {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
-                <div>
+                <div className="w3-container">
                     <h2>Moves this round:</h2>
                     {gamedata.movesThisRound.map((mtr) => (
                         <p key={`PlayerWhoMovedThisRound${mtr.nickname}`}>

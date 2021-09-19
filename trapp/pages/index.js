@@ -55,10 +55,6 @@ const Menu = (props) => {
         <h2>{props.coderMsg}</h2>
       </div>
       <div className="w3-container w3-margin-left">
-        <div className="w3-blue">
-          <h1>The Enhanced North American Benchmark LEexicon, millenial edition</h1>
-          <p>This site uses the ENABLE2K lexicon, a public domain word list that I gratefully acknowledge.</p>
-        </div>
         <div className="w3-bar-block">
           <div className="w3-bar-item">
           <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
@@ -74,6 +70,14 @@ const Menu = (props) => {
           <div className="w3-bar-item">
             <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
           </div>
+        </div>
+        <div className="w3-blue">
+          <h1>The Enhanced North American Benchmark LEexicon, millenial edition</h1>
+          <p>This site uses the ENABLE2K lexicon, a public domain word list that I gratefully acknowledge.</p>
+        </div>
+        <div className="w3-black">
+          <h1>Free JSON storage</h1>
+          <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
         </div>
       </div>
       <div className="w3-container w3-teal">

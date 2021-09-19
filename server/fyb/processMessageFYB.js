@@ -1,4 +1,4 @@
-const { findLobbyClient, findLobbyClients, findGameClientsExceptMe, findGameClients } = require('../clients/clientFunctions');
+const { findLobbyClient, findLobbyClients, findGameClientsExceptMe, findGameClients, findPlayerClient } = require('../clients/clientFunctions');
 const clientType = 'fyb';
 var games = []; // Array of games in progress
 function fybInitialize() { // The server calls this when the server starts
@@ -31,6 +31,8 @@ function processMessageFYB (wss, pm, message) {
         processFybJoinGame(wss, pm);
     } else if (pm.func === "move") {
         processFybMove(wss, pm);
+    } else if (pm.func === "interval") {
+        processFybInterval(wss, pm);
     }
 }
 
@@ -57,7 +59,7 @@ const processFybCreateGame = (wss, pm) => {
             callingClient.gameid = pm.gameid;
             callingClient.nickname = pm.nickname;
             let game = {
-                datestamp: pm.timestamp,
+                syncstamp: pm.timestamp,
                 gameid: pm.gameid,
                 numPlayers: pm.numPlayers,
                 whoseturn: -1,
@@ -65,11 +67,14 @@ const processFybCreateGame = (wss, pm) => {
                 freeforall: false,
                 players: [{
                     index: 0,
-                    nickname: pm.nickname
+                    nickname: pm.nickname,
+                    points: 0
                 }]
             };
             games.push(game);
             sendGameData([callingClient], game, 'Game created, waiting for others to join.');
+            let lobbyClients = findLobbyClients(wss, clientType);
+            sendGameData(lobbyClients, game, `${pm.nickname} created game ${pm.gameid}`);
         }
     }
 }
@@ -100,7 +105,8 @@ const processFybJoinGame = (wss, pm) => {
             let playerIndex = foundGame.players.length;
             let newPlayer = {
                 index: playerIndex,
-                nickname: pm.nickname
+                nickname: pm.nickname,
+                points: 0
             };
             foundGame.players.push(newPlayer);
             let snat;
@@ -116,6 +122,7 @@ const processFybJoinGame = (wss, pm) => {
             } else {
                 snat = `${pm.nickname} just joined the game. Waiting for others to join.`;
             }
+            foundGame.syncstamp = pm.datestamp;
             let gameClients = findGameClients(wss, clientType, pm.gameid);
             sendGameData(gameClients, foundGame, snat);
         }
@@ -129,6 +136,32 @@ const processFybMove = (wss, pm) => {
         if (foundGame.freeforall) { // In free for all round
             foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: pm.valid, word: pm.word});
             if (foundGame.playersWhoMoved.length === foundGame.numPlayers - 1) { // All have moved
+                let anyValidAnswers = false;
+                let shortestAnswer = 0;
+                for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
+                    let move = foundGame.playersWhoMoved[i];
+                    if (move.valid) {
+                        anyValidAnswers = true;
+                        if (shortestAnswer === 0 || move.word.length < shortestAnswer) {
+                            shortestAnswer = move.word.length;
+                        }
+                    }
+                }
+                if (anyValidAnswers) {
+                    for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
+                        let move = foundGame.playersWhoMoved[i];
+                        if (move.valid && move.word.length === shortestAnswer) {
+                            for (let j = 0; j < foundGame.players.length; j++) {
+                                if (foundGame.players[j].nickname === move.nickname) {
+                                    foundGame.players[j].points = foundGame.players[j].points + foundGame.fryLetters.length;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    let winner = foundGame.whoseturn === 0 ? foundGame.numPlayers - 1 : foundGame.whoseturn - 1;
+                    foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
+                }
                 foundGame.round = foundGame.round + 1;
                 if (foundGame.whostarted + 1 === foundGame.numPlayers) {
                     foundGame.whoseturn = 0;
@@ -167,8 +200,22 @@ const processFybMove = (wss, pm) => {
                 snat = `${foundGame.players[foundGame.whoseturn].nickname} got their ${pm.word} fried. Free for all round in progress.`;
             }
         }
+        foundGame.syncstamp = pm.datestamp;
         let gameClients = findGameClients(wss, clientType, pm.gameid);
         sendGameData(gameClients, foundGame, snat);
+    }
+}
+
+const processFybInterval = (wss, pm) => {
+    let foundGame = findGame(pm.gameid);
+    let callingClient = findPlayerClient(wss, pm.gameid, pm.thisisme);
+    if (foundGame && callingClient) { // Should find both
+        if (foundGame.syncstamp !== pm.syncstamp) { // Out of date
+            console.log(`Sent interval driven update to ${pm.nickname}`);
+            sendGameData([callingClient], foundGame, foundGame.snat);
+        // } else { // For testing the interval
+        //     sendGameData([callingClient], foundGame, `Game data was up to date at interval.`);
+        }
     }
 }
 
@@ -226,6 +273,7 @@ const updateFybLobbyClient = (client) => {
 }
 
 const sendGameData = (clients, game, snat) => {
+    game.snat = snat;
     clients.forEach((client) => {
         let gameJson = {
             type: clientType,

@@ -181,7 +181,8 @@ function sendJoinGameRequest(client, thisisme, gameid, nickname) {
         func: 'join',
         thisisme: thisisme,
         gameid: gameid,
-        nickname: nickname
+        nickname: nickname,
+        timestamp: Date.now()
     });
 }
 
