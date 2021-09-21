@@ -23,9 +23,7 @@ function sendErrorMessage(client, errorText) {
     client.send(errorMessage);
 }
 function processMessageFYB (wss, pm, message) {
-    if (pm.func === "announce") {
-        processFybAnnounce(wss, pm);
-    } else if (pm.func === "create") {
+    if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
         processFybJoinGame(wss, pm);
@@ -33,13 +31,6 @@ function processMessageFYB (wss, pm, message) {
         processFybMove(wss, pm);
     } else if (pm.func === "interval") {
         processFybInterval(wss, pm);
-    }
-}
-
-const processFybAnnounce = (wss, pm) => {
-    let lobbyClient = findLobbyClient(wss, pm.thisisme);
-    if (lobbyClient) {
-        updateFybLobbyClient(lobbyClient);
     }
 }
 
@@ -134,7 +125,7 @@ const processFybMove = (wss, pm) => {
     if (foundGame) { // I mean, it should!
         let snat = 'oops';
         if (foundGame.freeforall) { // In free for all round
-            foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: pm.valid, word: pm.word});
+            foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: pm.valid, word: pm.word, pass: pm.pass});
             if (foundGame.playersWhoMoved.length === foundGame.numPlayers - 1) { // All have moved
                 let anyValidAnswers = false;
                 let shortestAnswer = 0;
@@ -182,7 +173,7 @@ const processFybMove = (wss, pm) => {
             // Clear previous free for all results once a word is sent in this round
             foundGame.playersWhoMoved = [];
             // Add the move to the list of moves for this round
-            foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: pm.valid});
+            foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: pm.valid, pass: pm.pass});
             if (pm.valid) { // Valid word, pick next tile
                 let tilePicked = pickNextTile(foundGame.tiles, foundGame.fryLetters);
                 foundGame.tiles = [...tilePicked.newTiles];
@@ -197,7 +188,11 @@ const processFybMove = (wss, pm) => {
                 foundGame.freeforall = true;
                 foundGame.excludedPlayer = pm.nickname;
                 foundGame.playersWhoMoved = [];
-                snat = `${foundGame.players[foundGame.whoseturn].nickname} got their ${pm.word} fried. Free for all round in progress.`;
+                if (pm.pass) {
+                    snat = `${foundGame.players[foundGame.whoseturn].nickname} passed. Free for all round in progress.`;
+                } else {
+                    snat = `${foundGame.players[foundGame.whoseturn].nickname} got their ${pm.word} fried. Free for all round in progress.`;
+                }
             }
         }
         foundGame.syncstamp = pm.datestamp;
@@ -268,11 +263,17 @@ function pickNextTile(tiles, fryLetters) {
     return({newTiles: newTiles, newFryLetters: newFryLetters});
 }
 
-const updateFybLobbyClient = (client) => {
-    client.send(JSON.stringify({info:`Announcing client ${client.thisisme}`}));
-}
-
 const sendGameData = (clients, game, snat) => {
+    let winners = 0;
+    for (let i = 0; i < game.players.length; i++) {
+        if (game.players[i].points > 10) {
+            winners = winners + 1;
+        }
+    }
+    if (winners > 0) {
+        game.whoseturn = -1;
+        snat = winners === 1 ? 'We have a winner!' : 'We have multiple winners!';
+    }
     game.snat = snat;
     clients.forEach((client) => {
         let gameJson = {

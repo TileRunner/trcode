@@ -43,7 +43,7 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
         }
         if (event.key === "Enter") {
             event.preventDefault();
-            submitPlayerWord(word, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname);
+            submitPlayerWord(word, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname, setWord);
             return;
         }
     }
@@ -96,7 +96,11 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                         {gamedata.players.map((pl) => (
                             <tr key={`Player${pl.index}`} className="w3-green">
                                 <td>{pl.nickname}</td>
-                                <td class="w3-monospace">&nbsp;&nbsp;{pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}</td>
+                                <td class="w3-monospace">
+                                    &nbsp;&nbsp;
+                                    {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
+                                    {pl.points > 10 && <span class="w3-purple w3-cursive w3-margin w3-wide">Winner!</span>}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -107,7 +111,11 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                     <h2>Previous free for all results:</h2>
                     {gamedata.playersWhoMoved.map((pwm) => (
                         <p key={`PlayerWhoMovedFFA${pwm.nickname}`}>
-                            {pwm.nickname} played {pwm.word} {pwm.valid ? '(valid)' : '(invalid)'}
+                            {pwm.pass ?
+                                <span>{pwm.nickname} passed</span>
+                            :
+                                <span>{pwm.nickname} played {pwm.word} {pwm.valid ? '(valid)' : '(invalid)'}</span>
+                            }
                         </p>
                     ))}
                 </div>
@@ -117,7 +125,11 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                     <h2>Moves this round:</h2>
                     {gamedata.movesThisRound.map((mtr) => (
                         <p key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
-                            {mtr.nickname} played {mtr.word} {mtr.valid ? '(valid)' : '(invalid)'}
+                            {mtr.pass ?
+                                <span>{mtr.nickname} passed</span>
+                            :
+                                <span>{mtr.nickname} played {mtr.word} {mtr.valid ? '(valid)' : '(invalid)'}</span>
+                            }
                         </p>
                     ))}
                 </div>
@@ -128,13 +140,13 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                 </div>
             }
             {meToEnterWord() &&
-                getPlayerWord(handleKeyDown, word, setWord, gamedata.fryLetters, setSnat, client)
+                getPlayerWord(handleKeyDown, word, setWord, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname)
             }
         </div>
     );
 }
 
-function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client) {
+function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client, thisisme, gameid, nickname) {
     return <div className="w3-quarter w3-margin" onKeyDownCapture={handleKeyDown}>
         <label>Enter Word:</label>
         <input className="w3-input w3-border w3-blue myCommonFont" type="text"
@@ -143,10 +155,23 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
             onChange={(e) => {
                 setWord(e.target.value.toUpperCase());
             } } />
+
+
+        {word && <button className="w3-button w3-green w3-margin" key="submitWord"
+         onClick={() => {submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord)}}>
+            SUBMIT
+        </button>}
+
+        <button className="w3-button w3-red w3-margin" key="passButton"
+         onClick={() => {submitPass(setSnat, client, thisisme, gameid, nickname, setWord)}}>
+            PASS
+        </button>
+
+
     </div>;
 }
 
-async function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname) {
+async function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord) {
     // First check if the have all the fry letters
     for (let i = 0; i < fryLetters.length; i++) {
         let letterCountRequired = 0;
@@ -174,6 +199,7 @@ async function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gam
     client.send({
         type: c.CLIENT_TYPE_FYB,
         func: 'move',
+        pass: false,
         valid: jdata.exists,
         thisisme: thisisme,
         gameid: gameid,
@@ -181,6 +207,24 @@ async function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gam
         timestamp: Date.now(),
         word: word
     });
+    setWord('');
+}
+
+function submitPass(setSnat, client, thisisme, gameid, nickname, setWord) {
+    // If you get here they have all the required letters. Send the guess to the server.
+    setSnat(`Sending PASS ... shouldn't take long.`);
+    client.send({
+        type: c.CLIENT_TYPE_FYB,
+        func: 'move',
+        pass: true,
+        valid: false,
+        thisisme: thisisme,
+        gameid: gameid,
+        nickname: nickname,
+        timestamp: Date.now(),
+        word: ''
+    });
+    setWord('');
 }
 
 export default Game;

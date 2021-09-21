@@ -13,12 +13,12 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     function processLobbyMessage(message) {
         let messageData = JSON.parse(message);
         setSnat(message);
-        if (messageData.type === 'fyb') {
+        if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 if (messageData.thisisme === thisisme) { // I created
                     // Stick to what was requested
-                    if (gameid !== messageData.game.gameid) {setGameid(messageData.game.gameid);}
-                    if (numPlayers !== messageData.game.numPlayers) {setNumPlayers(messageData.game.numPlayers);}
+                    setGameid(messageData.game.gameid);
+                    setNumPlayers(messageData.game.numPlayers);
                     setParticipant(c.PARTY_TYPE_PLAYER);
                 } else {
                     setSnat(`${messageData.nickname} just created game ${messageData.gameid}.`);
@@ -27,7 +27,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
                 setSnat('That game ID is already taken');
             } else if (messageData.func === 'gamejoined') {
                 if (messageData.thisisme === thisisme) { // I joined
-                    if (gameid !== messageData.game.gameid) {setGameid(messageData.game.gameid);} // Stick to what was requested
+                    setGameid(messageData.game.gameid);
                     setNumPlayers(messageData.game.numPlayers);
                     setParticipant(c.PARTY_TYPE_PLAYER);
                 } else {

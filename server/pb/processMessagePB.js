@@ -46,9 +46,7 @@ const setGameData = (dataApiId) => {
 function processMessagePB(wss, pm, message) {
     // console.log(`processPrisonBreakMessage: ${pm.func} ${pm.gameid}.${pm.thisisme}`);
     // console.log(message);
-    if (pm.func === "announce") {
-        processPbAnnounce(wss, pm);
-    } else if (pm.func === "requestgamedata") {
+    if (pm.func === "requestgamedata") {
         processPbRequestGameData(wss, pm);
     } else if (pm.func === "requestsyncdata") {
         processPbRequestSyncData(wss, pm);
@@ -70,13 +68,6 @@ function processMessagePB(wss, pm, message) {
         processPbUndoMove(wss, pm);
     } else {
         console.log(`log: ${message}`);
-    }
-}
-
-const processPbAnnounce = (wss, pm) => {
-    let lobbyClient = findLobbyClient(wss, pm.thisisme);
-    if (lobbyClient) {
-        updateLobbyClient(lobbyClient);
     }
 }
 
@@ -103,11 +94,6 @@ const processPbRequestSyncData = (wss, pm) => {
     } else {
         console.log(`Cannot find client that requested syncdata! ${pm.gameid} ${pm.thisisme} ${gameApiInfo.syncstamp}`);
     }
-}
-
-const updateLobbyClient = (client) => {
-    let msg = getGameListMessageString();
-    client.send(msg);
 }
 
 const getGameListMessageString = () => {
