@@ -71,6 +71,7 @@ export default class CustomSocket {
     send(message) {
         message.thisisme = this.thisisme; // Include client identifier
         message.clientType = this.clientType; // Include client type (pb=Prison Break)
-        this.customSocket.send(JSON.stringify(message)); // Has to be a string going across the wire, not an object
+        let stringmessage = JSON.stringify(message);
+        this.customSocket.send(stringmessage); // Has to be a string going across the wire, not an object
     }
 }

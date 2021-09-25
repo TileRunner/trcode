@@ -8,14 +8,16 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
     const [syncstamp, setSyncstamp] = useState('');
     useEffect(() => {
         const interval = setInterval(() => {
-          client.send({
-              type: c.CLIENT_TYPE_FYB,
-              func: 'interval',
-              syncstamp: syncstamp,
-              thisisme: thisisme,
-              nickname: nickname,
-              gameid: gamedata.gameid
-          });
+            if (gamedata.whoseturn > -1 && gamedata.players.length > 0) {
+                client.send({
+                    type: c.CLIENT_TYPE_FYB,
+                    func: 'interval',
+                    syncstamp: syncstamp,
+                    thisisme: thisisme,
+                    nickname: nickname,
+                    gameid: gamedata.gameid
+                });
+            }
         }, c.PING_INTERVAL); // this many milliseconds between above code block executions
         return () => clearInterval(interval);
     });
@@ -27,7 +29,6 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
-                console.log(messageData.game);
                 setSnat(messageData.snat);
                 setGamedata(messageData.game);
                 setSyncstamp(messageData.game.syncstamp);
@@ -134,7 +135,7 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                     ))}
                 </div>
             }
-            {gamedata.fryLetters &&
+            {gamedata.fryLetters && gamedata.whoseturn > -1 &&
                 <div className='w3-container'>
                     <h2 className="w3-white w3-quarter">Fry Letters: {gamedata.fryLetters}</h2>
                 </div>

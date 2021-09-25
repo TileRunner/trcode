@@ -13,20 +13,33 @@ function findGame(gameid) {
     });
     return foundGame;
 }
-function sendErrorMessage(client, errorText) {
-    let errorJson = {
-        type: clientType,
-        func: 'error',
-        text: errorText
-    };
-    let errorMessage = JSON.stringify(errorJson);
-    client.send(errorMessage);
+function removeGame(gameid) {
+    let j = -1;
+    for (let i = 0; i < games.length; i++) {
+        if (games[i].gameid === gameid) {
+            j = i;
+        }       
+    }
+    if (j > -1) {
+        games.splice(j,1);
+    }
 }
+// function sendErrorMessage(client, errorText) {
+//     let errorJson = {
+//         type: clientType,
+//         func: 'error',
+//         text: errorText
+//     };
+//     let errorMessage = JSON.stringify(errorJson);
+//     client.send(errorMessage);
+// }
 function processMessageFYB (wss, pm, message) {
     if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
         processFybJoinGame(wss, pm);
+    } else if (pm.func === "rejoin") {
+        processFybRejoinGame(wss, pm);
     } else if (pm.func === "move") {
         processFybMove(wss, pm);
     } else if (pm.func === "interval") {
@@ -65,7 +78,18 @@ const processFybCreateGame = (wss, pm) => {
             games.push(game);
             sendGameData([callingClient], game, 'Game created, waiting for others to join.');
             let lobbyClients = findLobbyClients(wss, clientType);
-            sendGameData(lobbyClients, game, `${pm.nickname} created game ${pm.gameid}`);
+            if (lobbyClients) {
+                let gameCreateJson = {
+                    type: clientType,
+                    func: 'GAME_CREATED',
+                    gameid: pm.gameid,
+                    nickname: pm.nickname
+                };
+                let gameCreateMessage = JSON.stringify(gameCreateJson);
+                lobbyClients.forEach((lobbyClient) => {
+                    lobbyClient.send(gameCreateMessage);
+                })
+            }
         }
     }
 }
@@ -116,6 +140,55 @@ const processFybJoinGame = (wss, pm) => {
             foundGame.syncstamp = pm.datestamp;
             let gameClients = findGameClients(wss, clientType, pm.gameid);
             sendGameData(gameClients, foundGame, snat);
+        }
+    }
+}
+
+const processFybRejoinGame = (wss, pm) => {
+    let foundGame = findGame(pm.gameid);
+    let callingClient = findLobbyClient(wss, pm.thisisme);
+    if (callingClient) {
+        if (!foundGame) {
+            let gameUnknownJson = {
+                type: clientType,
+                func: 'gameidunknown',
+                gameid: pm.gameid
+            };
+            let gameUnknownMessage = JSON.stringify(gameUnknownJson);
+            callingClient.send(gameUnknownMessage);
+        } else {
+            let foundPlayer = findPlayerInArray(foundGame.players, pm.nickname);
+            if (!foundPlayer) {
+                let notInThatGameJson = {
+                    type: clientType,
+                    func: 'notinthatgame',
+                    gameid: pm.gameid
+                };
+                let notInThatGameMessage = JSON.stringify(notInThatGameJson);
+                callingClient.send(notInThatGameMessage);
+            } else {
+                let otherClient;
+                for (let i = 0; i < wss.clients.length; i++) {
+                    const checkClient = wss.clients[i];
+                    if (checkClient.clientType === clientType && checkClient.gameid === pm.gameid && checkClient.nickname === pm.nickname) {
+                        otherClient = checkClient;
+                    }
+                }
+                if (otherClient) {
+                    let otherClientJson = {
+                        type: clientType,
+                        func: 'otherclientfound',
+                        gameid: pm.gameid
+                    };
+                    let otherClientMessage = JSON.stringify(otherClientJson);
+                    callingClient.send(otherClientMessage);
+                } else {
+                    callingClient.gameid = pm.gameid;
+                    callingClient.nickname = pm.nickname;   
+                    let snat = `You rejoined the game.`;
+                    sendGameData([callingClient], foundGame, snat);   
+                }
+            }
         }
     }
 }
@@ -198,6 +271,9 @@ const processFybMove = (wss, pm) => {
         foundGame.syncstamp = pm.datestamp;
         let gameClients = findGameClients(wss, clientType, pm.gameid);
         sendGameData(gameClients, foundGame, snat);
+        if (foundGame.whoseturn === -1) { // game over
+            removeGame(foundGame.gameid);
+        }
     }
 }
 
@@ -261,6 +337,16 @@ function pickNextTile(tiles, fryLetters) {
     let newTiles = [...tiles];
     tiles.splice(rand, 1);
     return({newTiles: newTiles, newFryLetters: newFryLetters});
+}
+
+function findPlayerInArray(players, nickname) {
+    let player;
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].nickname === nickname) {
+            player = players[i];
+        }
+    }
+    return player;
 }
 
 const sendGameData = (clients, game, snat) => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+//import Link from "next/link";
 import * as c from '../../lib/fyb/constants';
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
     const [snat, setSnat] = useState('');
     const [gotNickname, setGotNickname] = useState(false);
-    const [createOrJoin, setCreateOrJoin] = useState('');
+    const [mainAction, setMainAction] = useState('');
     useEffect(() => {
         let msg = wsmessage;
         if (msg !== '') processLobbyMessage(msg);
@@ -15,7 +15,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
         setSnat(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
-                if (messageData.thisisme === thisisme) { // I created
+                if (messageData.thisisme === thisisme) { // I created or rejoined
                     // Stick to what was requested
                     setGameid(messageData.game.gameid);
                     setNumPlayers(messageData.game.numPlayers);
@@ -37,6 +37,12 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
                 setSnat('That game ID is not being used');
             } else if (messageData.func === 'gamefull') {
                 setSnat('That game is full');
+            } else if (messageData.func === 'notinthatgame') {
+                setSnat('You are not in that game');
+            } else if (messageData.func === 'otherclientfound') {
+                setSnat('That nickname is already in that game');
+            } else if (messageData.func = c.S2C_FUNC_GAMECREATED) {
+                setSnat(`${messageData.nickname} created game ${messageData.gameid}`);
             } else {
                 setSnat(`Unhandled message: ${message}`);
             }
@@ -56,9 +62,10 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
             <h1>Lobby under construction</h1>
             <p>{snat}</p>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
-            {gotNickname && !createOrJoin && getCreateOrJoin(setCreateOrJoin)}
-            {gotNickname && createOrJoin === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, nickname)}
-            {gotNickname && createOrJoin === 'J' && joinGame(client, thisisme, gameid, setGameid, nickname)}
+            {gotNickname && !mainAction && getMainAction(setMainAction)}
+            {gotNickname && mainAction === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, nickname)}
+            {gotNickname && mainAction === 'J' && joinGame(client, thisisme, gameid, setGameid, nickname)}
+            {gotNickname && mainAction === 'R' && rejoinGame(client, thisisme, gameid, setGameid, nickname)}
         </div>
     );
 }
@@ -75,7 +82,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 } } />
         </div>
         {nickname && <div className="w3-quarter">
-            <button className="w3-button w3-border w3-blue myCommonFont" type="submit"
+            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
                 onClick={() => {
                     setGotNickname(true);
                 }}>
@@ -85,24 +92,33 @@ function getNickname(nickname, setNickname, setGotNickname) {
     </div>;
 }
 
-function getCreateOrJoin(setCreateOrJoin) {
+function getMainAction(setMainAction) {
     return <div className="w3-row-padding h4">
         <div className="w3-quarter">
-            <button className="w3-button w3-border w3-blue myCommonFont" type="submit"
+            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
                 id="chooseCreateGame"
                 onClick={() => {
-                    setCreateOrJoin('C');
+                    setMainAction('C');
                 }}>
                 CREATE A GAME
             </button>
         </div>
         <div className="w3-quarter">
-            <button className="w3-button w3-border w3-blue myCommonFont" type="submit"
+            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
                 id="chooseJoinGame"
                 onClick={() => {
-                    setCreateOrJoin('J');
+                    setMainAction('J');
                 }}>
                 JOIN A GAME
+            </button>
+        </div>
+        <div className="w3-quarter">
+            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
+                id="chooseRejoinGame"
+                onClick={() => {
+                    setMainAction('R');
+                }}>
+                REJOIN A GAME
             </button>
         </div>
     </div>;
@@ -131,7 +147,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
         {gameid && <div className="w3-quarter">
             <button
                 id="requestCreateGame"
-                className="w3-button w3-border w3-blue myCommonFont"
+                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
                 onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, nickname);}}>
                 SUBMIT
@@ -166,7 +182,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
         {gameid && <div className="w3-quarter">
             <button
                 id="requestJoinGame"
-                className="w3-button w3-border w3-blue myCommonFont"
+                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
                 onClick={() => {sendJoinGameRequest(client, thisisme, gameid, nickname);}}>
                 SUBMIT
@@ -179,6 +195,40 @@ function sendJoinGameRequest(client, thisisme, gameid, nickname) {
     client.send({
         type: 'fyb',
         func: 'join',
+        thisisme: thisisme,
+        gameid: gameid,
+        nickname: nickname,
+        timestamp: Date.now()
+    });
+}
+
+function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
+    return <div className="w3-row-padding h4">
+        <div className="w3-quarter">
+            <label>Game ID to rejoin:</label>
+            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+                name="gameid"
+                value={gameid}
+                onChange={(e) => {
+                    setGameid(e.target.value);
+                } } />
+        </div>
+        {gameid && <div className="w3-quarter">
+            <button
+                id="requestRejoinGame"
+                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
+                type="submit"
+                onClick={() => {sendRejoinGameRequest(client, thisisme, gameid, nickname);}}>
+                SUBMIT
+            </button>
+        </div>}
+    </div>;
+}
+
+function sendRejoinGameRequest(client, thisisme, gameid, nickname) {
+    client.send({
+        type: 'fyb',
+        func: 'rejoin',
         thisisme: thisisme,
         gameid: gameid,
         nickname: nickname,

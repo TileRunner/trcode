@@ -1,6 +1,6 @@
 import Head from 'next/head'
 // import styles from '../styles/Home.module.css'
-import Link from 'next/link'
+// import Link from 'next/link'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { useEffect, useState } from 'react';
 import WordMastermind from './wm/mastermind';
@@ -8,9 +8,10 @@ import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
 import FryYourBrain from './fyb/fryyourbrain';
 
+const menuButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-round-xxlarge';
 const hideButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-animate-left';
-const showButtonClassName = 'w3-right mymaterialicon w3-green w3-animate-right';
-const menuItemWidthNormal = '390px';
+const showButtonClassName = 'w3-right w3-hover-black mymaterialicon w3-green w3-animate-right w3-round-xxlarge';
+const menuItemWidthNormal = '300px';
 const descriptionCard = 'w3-card-4 w3-green w3-cell w3-animate-right';
 
 export default function Home() {
@@ -96,10 +97,10 @@ const WMOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descWm ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <button className='w3-button w3-border w3-green'
+        <button className={menuButtonClassName}
           onClick={() => {props.setWhereto('wm');}}
         >
-          <h2 className="mySubHeadingFont">Word Mastermind</h2>
+          Word Mastermind
         </button>
       </div>
       <div className={`w3-cell ${props.descWm ? "w3-cell-middle" : ""}`}>
@@ -137,10 +138,10 @@ const WIOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descWi ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <button className='w3-button w3-border w3-green'
+        <button className={menuButtonClassName}
           onClick={() => {props.setWhereto('wi');}}
         >
-          <h2 className="mySubHeadingFont">Word Info</h2>
+          Word Info
         </button>
       </div>
       <div className={`w3-cell ${props.descWi ? "w3-cell-middle" : ""}`}>
@@ -175,10 +176,10 @@ const PBOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descPb ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <button className='w3-button w3-border w3-green'
+        <button className={menuButtonClassName}
           onClick={() => {props.setWhereto('pb');}}
         >
-          <h2 className="mySubHeadingFont">Prison Break</h2>
+          Prison Break
         </button>
       </div>
       <div className={`w3-cell ${props.descPb ? "w3-cell-middle" : ""}`}>
@@ -219,10 +220,10 @@ const FYBOption = (props) => {
   return (
     <div className="w3-cell-row" style={{width: props.descFyb ? '100%' : menuItemWidthNormal}}>
       <div className="w3-cell">
-        <button className='w3-button w3-border w3-green'
+        <button className={menuButtonClassName}
           onClick={() => {props.setWhereto('fyb');}}
         >
-          <h2 className="mySubHeadingFont">Fry Your Brain</h2>
+          Fry Your Brain
         </button>
       </div>
       <div className={`w3-cell ${props.descPb ? "w3-cell-middle" : ""}`}>
