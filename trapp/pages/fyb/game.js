@@ -83,12 +83,10 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
                     </button>
                 </div>
             </div>
-            <h1>Game under construction</h1>
-            <p>{snat}</p>
             <div className="w3-container w3-responsive w3-quarter">
                 <table className="w3-table w3-card">
                     <thead>
-                        <tr className="w3-teal">
+                        <tr className="w3-black">
                             <th>Player</th>
                             <th>Points</th>
                         </tr>
@@ -124,14 +122,14 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
             {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
                 <div className="w3-container">
                     <h2>Moves this round:</h2>
-                    {gamedata.movesThisRound.map((mtr) => (
-                        <p key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
+                    {gamedata.movesThisRound.map((mtr, index) => (
+                        <span key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
                             {mtr.pass ?
-                                <span>{mtr.nickname} passed</span>
+                                <span className="w3-red">{mtr.nickname} passed</span>
                             :
-                                <span>{mtr.nickname} played {mtr.word} {mtr.valid ? '(valid)' : '(invalid)'}</span>
+                                <span className={`${mtr.valid ? '' : 'w3-red'}`}>{index > 0 && <span>,&nbsp;</span>}{mtr.word}</span>
                             }
-                        </p>
+                        </span>
                     ))}
                 </div>
             }
@@ -143,6 +141,9 @@ const Game = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname
             {meToEnterWord() &&
                 getPlayerWord(handleKeyDown, word, setWord, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname)
             }
+            <div className="w3-container">
+            <p>{snat}</p>
+            </div>
         </div>
     );
 }
