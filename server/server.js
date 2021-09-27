@@ -187,7 +187,7 @@ const server = express()
     .listen(PORT, () => {
         console.log(`Listening on ${PORT}`);
         pbInitialize();
-        fybInitialize();
+        fybInitialize(allwords);
     });
 
 const wss = new Server({ server });
@@ -215,7 +215,7 @@ const processMessage = (message) => {
         processMessagePB(wss, pm, message);
     }
     else if (pm.type = "fyb") {
-        processMessageFYB(wss, pm, message);
+        processMessageFYB(wss, pm);
     }
 }
 

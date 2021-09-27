@@ -6,6 +6,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     const [snat, setSnat] = useState('');
     const [gotNickname, setGotNickname] = useState(false);
     const [mainAction, setMainAction] = useState('');
+    const [goal, setGoal] = useState(11); // How many points needed to win
     useEffect(() => {
         let msg = wsmessage;
         if (msg !== '') processLobbyMessage(msg);
@@ -63,7 +64,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
             <p>{snat}</p>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
             {gotNickname && !mainAction && getMainAction(setMainAction)}
-            {gotNickname && mainAction === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, nickname)}
+            {gotNickname && mainAction === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, goal, setGoal, nickname)}
             {gotNickname && mainAction === 'J' && joinGame(client, thisisme, gameid, setGameid, nickname)}
             {gotNickname && mainAction === 'R' && rejoinGame(client, thisisme, gameid, setGameid, nickname)}
         </div>
@@ -78,7 +79,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 name="nickname"
                 value={nickname}
                 onChange={(e) => {
-                    setNickname(e.target.value);
+                    setNickname(e.target.value.trim());
                 } } />
         </div>
         {nickname && <div className="w3-quarter">
@@ -124,7 +125,7 @@ function getMainAction(setMainAction) {
     </div>;
 }
 
-function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, nickname) {
+function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, goal, setGoal, nickname) {
     return <div className="w3-row-padding h4">
         <div className="w3-quarter">
             <label>Game ID:</label>
@@ -132,7 +133,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
-                    setGameid(e.target.value);
+                    setGameid(e.target.value.trim());
                 } } />
         </div>
         <div className="w3-quarter">
@@ -144,25 +145,35 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
                     if (e.target.value.match(/[23456]/)) { setNumPlayers(e.target.value); }
                 } } />
         </div>
+        <div className="w3-quarter">
+            <label>Points needed to win (3 to 21):</label>
+            <input className="w3-input w3-border w3-blue myCommonFont" type="number"
+                name="goal"
+                value={goal}
+                onChange={(e) => {
+                    if (e.target.value > 2 && e.target.value < 22) { setGoal(e.target.value); }
+                } } />
+        </div>
         {gameid && <div className="w3-quarter">
             <button
                 id="requestCreateGame"
                 className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
-                onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, nickname);}}>
+                onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);}}>
                 SUBMIT
             </button>
         </div>}
     </div>;
 }
 
-function sendCreateGameRequest(client, thisisme, gameid, numPlayers, nickname) {
+function sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname) {
     client.send({
         type: 'fyb',
         func: 'create',
         thisisme: thisisme,
         gameid: gameid,
         numPlayers: numPlayers,
+        goal: goal,
         nickname: nickname,
         timestamp: Date.now()
     });
@@ -176,7 +187,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
-                    setGameid(e.target.value);
+                    setGameid(e.target.value.trim());
                 } } />
         </div>
         {gameid && <div className="w3-quarter">
@@ -210,7 +221,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
-                    setGameid(e.target.value);
+                    setGameid(e.target.value.trim());
                 } } />
         </div>
         {gameid && <div className="w3-quarter">

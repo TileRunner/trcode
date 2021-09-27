@@ -2,7 +2,7 @@ const axios = require('axios').default; // For API calls
 const dataApiUrl = 'https://json.extendsclass.com/bin'; // This is not a secret
 const dataApiKey = process.env.NEXT_PUBLIC_DATAAPIKEY; // This is a secret
 var gameApiInfoMap = []; // For mapping gameid to the id assigned by the API that is used, plus next event index
-const { findLobbyClient, findLobbyClients, findPlayerClient, findGameClients, findGameClientsExceptMe } = require('../clients/clientFunctions');
+const { findLobbyClients, findPlayerClient, findGameClients, findGameClientsExceptMe } = require('../clients/clientFunctions');
 const clientType = 'pb';
 
 function pbInitialize() {

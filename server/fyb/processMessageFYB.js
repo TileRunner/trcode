@@ -1,8 +1,9 @@
-const { findLobbyClient, findLobbyClients, findGameClientsExceptMe, findGameClients, findPlayerClient } = require('../clients/clientFunctions');
+const { findLobbyClient, findLobbyClients, findGameClients, findPlayerClient } = require('../clients/clientFunctions');
 const clientType = 'fyb';
 var games = []; // Array of games in progress
-function fybInitialize() { // The server calls this when the server starts
-
+var wordlist = [];
+function fybInitialize(allwords) { // The server calls this when the server starts
+    wordlist = allwords;
 }
 function findGame(gameid) {
     let foundGame;
@@ -24,16 +25,7 @@ function removeGame(gameid) {
         games.splice(j,1);
     }
 }
-// function sendErrorMessage(client, errorText) {
-//     let errorJson = {
-//         type: clientType,
-//         func: 'error',
-//         text: errorText
-//     };
-//     let errorMessage = JSON.stringify(errorJson);
-//     client.send(errorMessage);
-// }
-function processMessageFYB (wss, pm, message) {
+function processMessageFYB (wss, pm) {
     if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
@@ -66,6 +58,7 @@ const processFybCreateGame = (wss, pm) => {
                 syncstamp: pm.timestamp,
                 gameid: pm.gameid,
                 numPlayers: pm.numPlayers,
+                goal: pm.goal,
                 whoseturn: -1,
                 round: 0,
                 freeforall: false,
@@ -76,7 +69,7 @@ const processFybCreateGame = (wss, pm) => {
                 }]
             };
             games.push(game);
-            sendGameData([callingClient], game, 'Game created, waiting for others to join.');
+            sendGameData([callingClient], game, `Game created, waiting for others to join. ${wordlist.length} words available.`);
             let lobbyClients = findLobbyClients(wss, clientType);
             if (lobbyClients) {
                 let gameCreateJson = {
@@ -195,10 +188,11 @@ const processFybRejoinGame = (wss, pm) => {
 
 const processFybMove = (wss, pm) => {
     let foundGame = findGame(pm.gameid);
+    let isvalid = !pm.pass && wordlist.indexOf(pm.word.toLowerCase()) > -1;
     if (foundGame) { // I mean, it should!
         let snat = 'oops';
         if (foundGame.freeforall) { // In free for all round
-            foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: pm.valid, word: pm.word, pass: pm.pass});
+            foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
             if (foundGame.playersWhoMoved.length === foundGame.numPlayers - 1) { // All have moved
                 let anyValidAnswers = false;
                 let shortestAnswer = 0;
@@ -210,6 +204,20 @@ const processFybMove = (wss, pm) => {
                             shortestAnswer = move.word.length;
                         }
                     }
+                }
+                // Find a possible answer, shortest length
+                let possibleAnswer = '';
+                wordlist.forEach((checkword) => {
+                    if (wordHasFryLetters(foundGame.fryLetters, checkword)) {
+                        if (checkword.length < possibleAnswer.length || possibleAnswer === '') {
+                            possibleAnswer = checkword.toUpperCase();
+                        }
+                    }
+                })
+                if (possibleAnswer) {
+                    snat = " Fry cook fried " + foundGame.fryLetters + " with " + possibleAnswer;
+                } else {
+                    snat = " Fry cook could not fry " + foundGame.fryLetters;
                 }
                 if (anyValidAnswers) {
                     for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
@@ -223,8 +231,11 @@ const processFybMove = (wss, pm) => {
                         }
                     }
                 } else {
-                    let winner = foundGame.whoseturn === 0 ? foundGame.numPlayers - 1 : foundGame.whoseturn - 1;
-                    foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
+                    if (foundGame.fryLetters.length > 3) { // No points if nobody played a valid word on the initial 3 fry letters
+                        // When nobody gets a valid word in the free for all then the last valid play gets points
+                        let winner = foundGame.whoseturn === 0 ? foundGame.numPlayers - 1 : foundGame.whoseturn - 1;
+                        foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
+                    }
                 }
                 foundGame.round = foundGame.round + 1;
                 if (foundGame.whostarted + 1 === foundGame.numPlayers) {
@@ -238,7 +249,7 @@ const processFybMove = (wss, pm) => {
                 foundGame.fryLetters = tilespicked.picked;
                 foundGame.tiles = tilespicked.tiles;
                 foundGame.movesThisRound = [];
-                snat = `Free for all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
+                snat = `Free for all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
             } else {
                 snat = `Free for all round in progress.`;
             }
@@ -246,8 +257,8 @@ const processFybMove = (wss, pm) => {
             // Clear previous free for all results once a word is sent in this round
             foundGame.playersWhoMoved = [];
             // Add the move to the list of moves for this round
-            foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: pm.valid, pass: pm.pass});
-            if (pm.valid) { // Valid word, pick next tile
+            foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: isvalid, pass: pm.pass});
+            if (isvalid) { // Valid word, pick next tile
                 let tilePicked = pickNextTile(foundGame.tiles, foundGame.fryLetters);
                 foundGame.tiles = [...tilePicked.newTiles];
                 foundGame.fryLetters = [...tilePicked.newFryLetters];
@@ -275,6 +286,28 @@ const processFybMove = (wss, pm) => {
             removeGame(foundGame.gameid);
         }
     }
+}
+
+function wordHasFryLetters(fryLetters, checkword) {
+    let word = checkword.toUpperCase();
+    for (let i = 0; i < fryLetters.length; i++) {
+        let letterCountRequired = 0;
+        let actualLetterCount = 0;
+        for (let j = 0; j < fryLetters.length; j++) {
+            if (fryLetters[i] === fryLetters[j]) {
+                letterCountRequired = letterCountRequired + 1;
+            }
+        }
+        for (let j = 0; j < word.length; j++) {
+            if (fryLetters[i] === word[j]) {
+                actualLetterCount = actualLetterCount + 1;
+            }
+        }
+        if (actualLetterCount < letterCountRequired) {
+            return false;
+        }
+    }
+    return true;
 }
 
 const processFybInterval = (wss, pm) => {
@@ -352,13 +385,12 @@ function findPlayerInArray(players, nickname) {
 const sendGameData = (clients, game, snat) => {
     let winners = 0;
     for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i].points > 10) {
+        if (game.players[i].points >= game.goal) {
             winners = winners + 1;
         }
     }
     if (winners > 0) {
         game.whoseturn = -1;
-        snat = winners === 1 ? 'We have a winner!' : 'We have multiple winners!';
     }
     game.snat = snat;
     clients.forEach((client) => {
