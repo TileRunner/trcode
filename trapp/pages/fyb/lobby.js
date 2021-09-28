@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
-    const [snat, setSnat] = useState('Loading...');
+    const [snat, setSnat] = useState('');
     const [gotNickname, setGotNickname] = useState(false);
     const [mainAction, setMainAction] = useState('');
     const [goal, setGoal] = useState(11); // How many points needed to win
@@ -54,8 +54,8 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     return (
         <div>
             <div className="w3-container w3-teal w3-bar">
-                <h1 className="w3-bar-item w3-centre myHeadingFont">Fry Your Brain Lobby</h1>
-                <div className="w3-bar-item w3-right">
+                <h1 className="w3-bar-item w3-left myHeadingFont">Fry Your Brain Lobby</h1>
+                <div className="w3-bar-item w3-left">
                     <button className="w3-button" onClick={() => {setWhereto('menu');}}>
                         <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                     </button>
@@ -94,9 +94,9 @@ function getNickname(nickname, setNickname, setGotNickname) {
 }
 
 function getMainAction(setMainAction) {
-    return <div className="w3-row-padding h4">
-        <div className="w3-quarter">
-            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
+    return <div className="w3-container h4 w3-responsive">
+        <div className="w3-row w3-padding">
+            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
                 id="chooseCreateGame"
                 onClick={() => {
                     setMainAction('C');
@@ -104,8 +104,8 @@ function getMainAction(setMainAction) {
                 CREATE A GAME
             </button>
         </div>
-        <div className="w3-quarter">
-            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
+        <div className="w3-row w3-padding">
+            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
                 id="chooseJoinGame"
                 onClick={() => {
                     setMainAction('J');
@@ -113,8 +113,8 @@ function getMainAction(setMainAction) {
                 JOIN A GAME
             </button>
         </div>
-        <div className="w3-quarter">
-            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
+        <div className="w3-row w3-padding">
+            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
                 id="chooseRejoinGame"
                 onClick={() => {
                     setMainAction('R');

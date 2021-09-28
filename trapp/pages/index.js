@@ -1,7 +1,7 @@
 import Head from 'next/head'
 // import styles from '../styles/Home.module.css'
 // import Link from 'next/link'
-import {BrowserView, _MobileOnlyView} from 'react-device-detect'
+import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { _useEffect, useState } from 'react';
 import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
@@ -35,8 +35,6 @@ export default function Home() {
 }
 
 const Menu = (props) => {
-  const menuOptionClassName = 'w3-cell';
-  const menuOptionClassName2 = 'w3-cell';
   const menuButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-round-xxlarge w3-margin';
   const hideButtonClassName = 'w3-button w3-black w3-border w3-animate-left w3-margin';
   const showButtonClassName = 'w3-button w3-hover-black mymaterialicon w3-animate-right w3-round-xxlarge w3-margin';
@@ -53,22 +51,22 @@ const Menu = (props) => {
     };
 
     return (
-      <div className="w3-row">
-        <div className={menuOptionClassName}>
+      <tr>
+        <td>
           <button className={menuButtonClassName}
             onClick={() => {props.setWhereto('wm');}}
           >
             Word Mastermind
           </button>
-        </div>
-        <div className={menuOptionClassName2}>
+        </td>
+        <td>
           <button id="toggleDescribeWm" className={props.descWm ? hideButtonClassName : showButtonClassName}
             onClick={() => toggleDescWm()}
           >
             {props.descWm ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
-        </div>
-      </div>
+        </td>
+      </tr>
     )
   }
 
@@ -78,22 +76,22 @@ const Menu = (props) => {
     }
 
     return (
-      <div className="w3-row">
-        <div className={menuOptionClassName}>
+      <tr>
+        <td>
           <button className={menuButtonClassName}
             onClick={() => {props.setWhereto('wi');}}
           >
             Word Info
           </button>
-        </div>
-        <div className={menuOptionClassName2}>
+        </td>
+        <td>
           <button id="toggleDescribeWi" className={props.descWi ? hideButtonClassName : showButtonClassName}
             onClick={() => toggleDescWi()}
           >
             {props.descWi ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
-        </div>
-      </div>
+        </td>
+      </tr>
     )
   }
 
@@ -103,22 +101,22 @@ const Menu = (props) => {
     }
 
     return (
-      <div className="w3-row">
-        <div className={menuOptionClassName}>
+      <tr>
+        <td>
           <button className={menuButtonClassName}
             onClick={() => {props.setWhereto('pb');}}
           >
             Prison Break
           </button>
-        </div>
-        <div className={menuOptionClassName2}>
+        </td>
+        <td>
           <button id="toggleDescribePb" className={props.descPb ? hideButtonClassName : showButtonClassName}
             onClick={() => toggleDescPb()}
           >
             {props.descPb ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
-        </div>
-      </div>
+        </td>
+      </tr>
     )
   }
 
@@ -128,22 +126,22 @@ const Menu = (props) => {
     }
 
     return (
-      <div className="w3-row">
-        <div className={menuOptionClassName}>
+      <tr>
+        <td>
           <button className={menuButtonClassName}
             onClick={() => {props.setWhereto('fyb');}}
           >
             Fry Your Brain
           </button>
-        </div>
-        <div className={menuOptionClassName2}>
+        </td>
+        <td>
           <button id="toggleDescribeFyb" className={props.descFyb ? hideButtonClassName : showButtonClassName}
             onClick={() => toggleDescFyb()}
           >
             {props.descFyb ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
-        </div>
-      </div>
+        </td>
+      </tr>
     )
   }
 
@@ -200,32 +198,42 @@ const Menu = (props) => {
   return (
     <div>
       <Head>
-        <title>Tile Runner App</title>
+        <title>Tile Runner</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="w3-container w3-teal">
-        <h1 className="myHeadingFont">Menu</h1>
+        <h1 className="myHeadingFont">Tile Runner</h1>
         {/* <h2>{props.coderMsg}</h2> */}
       </div>
-      <div>
-          <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
-          <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
-          <BrowserView>
+      <BrowserView>
+        <table className="w3-table w3-responsive">
+            <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
+            <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
             <PBOption descPb={descPb} setDescPb={setDescPb} setWhereto={props.setWhereto}/>
-          </BrowserView>
-          <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
-      </div>
+            <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
+        </table>
+      </BrowserView>
+      <MobileOnlyView>
+        <table className="w3-table w3-responsive">
+            <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
+            <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
+            <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
+        </table>
+      </MobileOnlyView>
       {descWm && DescribeWordMastermind}
       {descWi && DescribeWordInfo}
       {descPb && DescribePrisonBreak}
       {descFyb && DescribeFryYourBrain}
-      <div className="w3-blue">
-        <h1>The ENABLE2K lexicon</h1>
-        <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
-      </div>
-      <div className="w3-black">
-        <h1>extendsclass.com</h1>
-        <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
+      <div className="w3-panel">
+        <h1>Acknowledgements</h1>
+        <div className="w3-blue">
+          <h2>ENABLE2K</h2>
+          <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
+        </div>
+        <div className="w3-black">
+          <h2>extendsclass.com</h2>
+          <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
+        </div>
       </div>
     </div>
   )

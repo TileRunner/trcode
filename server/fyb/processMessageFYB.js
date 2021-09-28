@@ -42,21 +42,23 @@ function processMessageFYB (wss, pm) {
 }
 
 const processFybGetGameList = (wss, pm) => {
-    let callingClient = findLobbyClient(wss, pm.thisisme);
-    if (callingClient) {
-        let gamelist = 'Game list:';
-        games.forEach((game, index) => {
-            gamelist = `${gamelist} ${game.players[0].nickname} created game ${game.gameid}`;
-            if (game.players.length === game.numPlayers) gamelist = gamelist + ' (full)';
-            if (index + 1 < games.length) gamelist = gamelist + ', ';
-        });
-        let gamesJson = {
-            type: clientType,
-            func: 'gamelist',
-            gamelist: gamelist
-        };
-        let gamesMessage = JSON.stringify(gamesJson);
-        callingClient.send(gamesMessage);
+    if (games.length > 0) {
+        let callingClient = findLobbyClient(wss, pm.thisisme);
+        if (callingClient) {
+            let gamelist = 'Game list:';
+            games.forEach((game, index) => {
+                gamelist = `${gamelist} ${game.players[0].nickname} created game ${game.gameid}`;
+                if (game.players.length === game.numPlayers) gamelist = gamelist + ' (full)';
+                if (index + 1 < games.length) gamelist = gamelist + ', ';
+            });
+            let gamesJson = {
+                type: clientType,
+                func: 'gamelist',
+                gamelist: gamelist
+            };
+            let gamesMessage = JSON.stringify(gamesJson);
+            callingClient.send(gamesMessage);
+        }
     }
 }
 
