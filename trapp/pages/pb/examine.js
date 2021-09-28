@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+//import Link from "next/link";
 import Board from '../pb/board';
 import ShowUnseenTiles from '../pb/unseenTilesSection';
 import ShowMoves from '../pb/movesSection';

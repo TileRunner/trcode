@@ -45,7 +45,8 @@ export default class CustomSocket {
 
         // onopen - called when connection is open and ready to send and receive data.
         this.customSocket.onopen = (event) => {
-            console.log("client type " + this.clientType + " connected as " + this.thisisme);
+            // console.log("client type " + this.clientType + " connected as " + this.thisisme);
+            this.send({type: this.clientType, func: "announce", thisisme: this.thisisme}); // So client can know they connected
         };
 
         // onclose - called when the connection's closes.
@@ -69,6 +70,7 @@ export default class CustomSocket {
         this.customSocket.close();
     }
     send(message) {
+        // console.log(`ws send ${JSON.stringify(message)}`);
         message.thisisme = this.thisisme; // Include client identifier
         message.clientType = this.clientType; // Include client type (pb=Prison Break)
         let stringmessage = JSON.stringify(message);

@@ -3,17 +3,16 @@ import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
-    const [snat, setSnat] = useState('');
+    const [snat, setSnat] = useState('Loading...');
     const [gotNickname, setGotNickname] = useState(false);
     const [mainAction, setMainAction] = useState('');
     const [goal, setGoal] = useState(11); // How many points needed to win
     useEffect(() => {
         let msg = wsmessage;
         if (msg !== '') processLobbyMessage(msg);
-      },[wsmessage])
+    },[wsmessage]);
     function processLobbyMessage(message) {
         let messageData = JSON.parse(message);
-        setSnat(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 if (messageData.thisisme === thisisme) { // I created or rejoined
@@ -42,8 +41,10 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
                 setSnat('You are not in that game');
             } else if (messageData.func === 'otherclientfound') {
                 setSnat('That nickname is already in that game');
-            } else if (messageData.func = c.S2C_FUNC_GAMECREATED) {
+            } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
                 setSnat(`${messageData.nickname} created game ${messageData.gameid}`);
+            } else if (messageData.func === 'gamelist') {
+                setSnat(messageData.gamelist);
             } else {
                 setSnat(`Unhandled message: ${message}`);
             }
@@ -60,7 +61,6 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
                     </button>
                 </div>
             </div>
-            <h1>Lobby under construction</h1>
             <p>{snat}</p>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
             {gotNickname && !mainAction && getMainAction(setMainAction)}
@@ -168,7 +168,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
 
 function sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname) {
     client.send({
-        type: 'fyb',
+        type: c.CLIENT_TYPE_FYB,
         func: 'create',
         thisisme: thisisme,
         gameid: gameid,
@@ -204,7 +204,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
 
 function sendJoinGameRequest(client, thisisme, gameid, nickname) {
     client.send({
-        type: 'fyb',
+        type: c.CLIENT_TYPE_FYB,
         func: 'join',
         thisisme: thisisme,
         gameid: gameid,
@@ -238,7 +238,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
 
 function sendRejoinGameRequest(client, thisisme, gameid, nickname) {
     client.send({
-        type: 'fyb',
+        type: c.CLIENT_TYPE_FYB,
         func: 'rejoin',
         thisisme: thisisme,
         gameid: gameid,

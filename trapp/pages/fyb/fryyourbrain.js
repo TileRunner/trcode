@@ -16,9 +16,10 @@ const FryYourBrain = ({setWhereto}) => {
     + '/?clientType=fyb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
     const acceptMessage = (message) => {
         // If I reference participant here it will always be the initial value.
+        // console.log(`Accept message as ${message.data}`);
         setWsmessage(message.data);
     }
-    const [client] = useState(new CustomSocket(host, acceptMessage, "fyb", thisisme));
+    const [client] = useState(new CustomSocket(host, acceptMessage, c.CLIENT_TYPE_FYB, thisisme));
     useEffect(() => (
         client.connect()
     ),[]);

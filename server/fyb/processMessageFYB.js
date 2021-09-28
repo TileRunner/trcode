@@ -26,7 +26,9 @@ function removeGame(gameid) {
     }
 }
 function processMessageFYB (wss, pm) {
-    if (pm.func === "create") {
+    if (pm.func === "announce") {
+        processFybGetGameList(wss, pm);
+    } else if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
         processFybJoinGame(wss, pm);
@@ -36,6 +38,25 @@ function processMessageFYB (wss, pm) {
         processFybMove(wss, pm);
     } else if (pm.func === "interval") {
         processFybInterval(wss, pm);
+    }
+}
+
+const processFybGetGameList = (wss, pm) => {
+    let callingClient = findLobbyClient(wss, pm.thisisme);
+    if (callingClient) {
+        let gamelist = 'Game list:';
+        games.forEach((game, index) => {
+            gamelist = `${gamelist} ${game.players[0].nickname} created game ${game.gameid}`;
+            if (game.players.length === game.numPlayers) gamelist = gamelist + ' (full)';
+            if (index + 1 < games.length) gamelist = gamelist + ', ';
+        });
+        let gamesJson = {
+            type: clientType,
+            func: 'gamelist',
+            gamelist: gamelist
+        };
+        let gamesMessage = JSON.stringify(gamesJson);
+        callingClient.send(gamesMessage);
     }
 }
 
@@ -191,7 +212,7 @@ const processFybMove = (wss, pm) => {
     let isvalid = !pm.pass && wordlist.indexOf(pm.word.toLowerCase()) > -1;
     if (foundGame) { // I mean, it should!
         let snat = 'oops';
-        if (foundGame.freeforall) { // In free for all round
+        if (foundGame.freeforall) { // In free-for-all round
             foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
             if (foundGame.playersWhoMoved.length === foundGame.numPlayers - 1) { // All have moved
                 let anyValidAnswers = false;
@@ -232,7 +253,7 @@ const processFybMove = (wss, pm) => {
                     }
                 } else {
                     if (foundGame.fryLetters.length > 3) { // No points if nobody played a valid word on the initial 3 fry letters
-                        // When nobody gets a valid word in the free for all then the last valid play gets points
+                        // When nobody gets a valid word in the free-for-all then the last valid play gets points
                         let winner = foundGame.whoseturn === 0 ? foundGame.numPlayers - 1 : foundGame.whoseturn - 1;
                         foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
                     }
@@ -249,12 +270,12 @@ const processFybMove = (wss, pm) => {
                 foundGame.fryLetters = tilespicked.picked;
                 foundGame.tiles = tilespicked.tiles;
                 foundGame.movesThisRound = [];
-                snat = `Free for all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
+                snat = `Free-for-all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
             } else {
-                snat = `Free for all round in progress.`;
+                snat = `Free-for-all round in progress.`;
             }
         } else { // In regular round
-            // Clear previous free for all results once a word is sent in this round
+            // Clear previous free-for-all results once a word is sent in this round
             foundGame.playersWhoMoved = [];
             // Add the move to the list of moves for this round
             foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: isvalid, pass: pm.pass});
@@ -268,14 +289,14 @@ const processFybMove = (wss, pm) => {
                     foundGame.whoseturn = foundGame.whoseturn + 1;
                 }
                 snat = `Round ${foundGame.round} : ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
-            } else { // Invalid word, go to free for all
+            } else { // Invalid word, go to free-for-all
                 foundGame.freeforall = true;
                 foundGame.excludedPlayer = pm.nickname;
                 foundGame.playersWhoMoved = [];
                 if (pm.pass) {
-                    snat = `${foundGame.players[foundGame.whoseturn].nickname} passed. Free for all round in progress.`;
+                    snat = `${foundGame.players[foundGame.whoseturn].nickname} passed. Free-for-all round in progress.`;
                 } else {
-                    snat = `${foundGame.players[foundGame.whoseturn].nickname} got their ${pm.word} fried. Free for all round in progress.`;
+                    snat = `${foundGame.players[foundGame.whoseturn].nickname} got their ${pm.word} fried. Free-for-all round in progress.`;
                 }
             }
         }
@@ -315,7 +336,7 @@ const processFybInterval = (wss, pm) => {
     let callingClient = findPlayerClient(wss, pm.gameid, pm.thisisme);
     if (foundGame && callingClient) { // Should find both
         if (foundGame.syncstamp !== pm.syncstamp) { // Out of date
-            console.log(`Sent interval driven update to ${pm.nickname}`);
+            // console.log(`Sent interval driven update to ${pm.nickname}`);
             sendGameData([callingClient], foundGame, foundGame.snat);
         // } else { // For testing the interval
         //     sendGameData([callingClient], foundGame, `Game data was up to date at interval.`);

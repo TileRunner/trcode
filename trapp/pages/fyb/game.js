@@ -52,7 +52,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const meToEnterWord = () => {
         if (gamedata.whoseturn < 0) { // Game has not started or has ended
             return false;
-        } else if (gamedata.freeforall) { // In free for all round
+        } else if (gamedata.freeforall) { // In free-for-all round
             if (gamedata.excludedPlayer === nickname) {
                 return false;
             }
@@ -82,7 +82,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </button>
                 </div>
             </div>
-            <div className="w3-container w3-responsive w3-quarter">
+            <div className="w3-panel w3-responsive">
                 <table className="w3-table w3-card">
                     <thead>
                         <tr className="w3-black">
@@ -106,7 +106,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             </div>
             {!gamedata.freeforall && gamedata.playersWhoMoved && gamedata.playersWhoMoved.length > 0 &&
                 <div class="w3-container">
-                    <h2>Previous free for all results:</h2>
+                    <h2>Previous free-for-all results:</h2>
                     {gamedata.playersWhoMoved.map((pwm) => (
                         <p key={`PlayerWhoMovedFFA${pwm.nickname}`}>
                             {pwm.pass ?
@@ -123,21 +123,25 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
                 <div className="w3-container">
                     <h2>Moves this round:</h2>
+                    <table className="w3-table w3-responsive">
                     {gamedata.movesThisRound.map((mtr, index) => (
-                        <span key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
-                            {index > 0 && <span>,&nbsp;</span>}
+                        <tr key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
+                            <td>{mtr.nickname}</td>
+                            <td>
                             {mtr.pass ?
-                                <span className="w3-red">{mtr.nickname} passed</span>
+                                <span className="w3-black"> passed</span>
                             :
-                                <span className={`${mtr.valid ? '' : 'w3-red'}`}>{mtr.word}</span>
+                                <span className={`w3-monospace ${mtr.valid ? '' : 'w3-red'}`}>{mtr.word}</span>
                             }
-                        </span>
-                    ))}
+                            </td>
+                        </tr>
+                        ))}
+                    </table>
                 </div>
             }
             {gamedata.fryLetters && gamedata.whoseturn > -1 &&
-                <div className='w3-container'>
-                    <h2 className="w3-white w3-quarter">Fry Letters: {gamedata.fryLetters}</h2>
+                <div className='w3-panel w3-row'>
+                    <h2 className="w3-white w3-cell w3-padding-small">Fry Letters: {gamedata.fryLetters}</h2>
                 </div>
             }
             {meToEnterWord() &&
@@ -160,11 +164,10 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
                 setWord(e.target.value.toUpperCase());
             } } />
 
-
-        {word && <button className="w3-button w3-green w3-margin" key="submitWord"
+        <button className="w3-button w3-green w3-margin" key="submitWord"
          onClick={() => {submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord)}}>
             SUBMIT
-        </button>}
+        </button>
 
         <button className="w3-button w3-red w3-margin" key="passButton"
          onClick={() => {submitPass(setSnat, client, thisisme, gameid, nickname, setWord)}}>
