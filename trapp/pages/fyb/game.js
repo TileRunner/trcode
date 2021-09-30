@@ -122,12 +122,12 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             }
             {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
                 <div className="w3-container">
-                    <h2>Moves this round:</h2>
-                    <table className="w3-table w3-responsive">
+                    <h2 className="w3-black w3-padding-small w3-cell">Moves this round:</h2>
+                    <table>
                     {gamedata.movesThisRound.map((mtr, index) => (
                         <tr key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
-                            <td>{mtr.nickname}</td>
-                            <td>
+                            <td className="w3-green">&nbsp;{mtr.nickname}:</td>
+                            <td>&nbsp;
                             {mtr.pass ?
                                 <span className="w3-black"> passed</span>
                             :
@@ -141,7 +141,9 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             }
             {gamedata.fryLetters && gamedata.whoseturn > -1 &&
                 <div className='w3-panel w3-row'>
-                    <h2 className="w3-white w3-cell w3-padding-small">Fry Letters: {gamedata.fryLetters}</h2>
+                    <h2 className="w3-black w3-cell w3-padding-small">Fry Letters: {gamedata.fryLetters.map((fl,i) => (
+                        <span key={`FryLetter${i}`} className="FryLetter">{fl}</span>
+                    ))}</h2>
                 </div>
             }
             {meToEnterWord() &&

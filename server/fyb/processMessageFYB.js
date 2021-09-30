@@ -260,19 +260,25 @@ const processFybMove = (wss, pm) => {
                         foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
                     }
                 }
-                foundGame.round = foundGame.round + 1;
-                if (foundGame.whostarted + 1 === foundGame.numPlayers) {
-                    foundGame.whoseturn = 0;
+                let winners = countWinners(foundGame);
+                if (winners > 0) {
+                    foundGame.whoseturn = -1;
+                    snat = `Free-for-all round complete. ${snat}`;
                 } else {
-                    foundGame.whoseturn = foundGame.whostarted + 1;
+                    foundGame.round = foundGame.round + 1;
+                    if (foundGame.whostarted + 1 === foundGame.numPlayers) {
+                        foundGame.whoseturn = 0;
+                    } else {
+                        foundGame.whoseturn = foundGame.whostarted + 1;
+                    }
+                    foundGame.whostarted = foundGame.whoseturn;
+                    foundGame.freeforall = false;
+                    let tilespicked = pickInitialTiles();
+                    foundGame.fryLetters = tilespicked.picked;
+                    foundGame.tiles = tilespicked.tiles;
+                    foundGame.movesThisRound = [];
+                    snat = `Free-for-all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
                 }
-                foundGame.whostarted = foundGame.whoseturn;
-                foundGame.freeforall = false;
-                let tilespicked = pickInitialTiles();
-                foundGame.fryLetters = tilespicked.picked;
-                foundGame.tiles = tilespicked.tiles;
-                foundGame.movesThisRound = [];
-                snat = `Free-for-all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
             } else {
                 snat = `Free-for-all round in progress.`;
             }
@@ -405,16 +411,17 @@ function findPlayerInArray(players, nickname) {
     return player;
 }
 
-const sendGameData = (clients, game, snat) => {
+function countWinners(game) {
     let winners = 0;
     for (let i = 0; i < game.players.length; i++) {
         if (game.players[i].points >= game.goal) {
             winners = winners + 1;
         }
     }
-    if (winners > 0) {
-        game.whoseturn = -1;
-    }
+    return winners;
+}
+
+const sendGameData = (clients, game, snat) => {
     game.snat = snat;
     clients.forEach((client) => {
         let gameJson = {
