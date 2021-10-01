@@ -83,17 +83,12 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 </div>
             </div>
             <div className="w3-panel w3-responsive">
-                <table className="w3-table w3-card">
-                    <thead>
-                        <tr className="w3-black">
-                            <th>Player</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
+                <h2 className="w3-black w3-padding-small w3-cell">Player totals:</h2>
+                <table>
                     <tbody>
                         {gamedata.players.map((pl) => (
-                            <tr key={`Player${pl.index}`} className="w3-green">
-                                <td>{pl.nickname}</td>
+                            <tr key={`Player${pl.index}`}>
+                                <td className="w3-green">{pl.nickname}</td>
                                 <td class="w3-monospace">
                                     &nbsp;&nbsp;
                                     {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
@@ -104,22 +99,6 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </tbody>
                 </table>
             </div>
-            {!gamedata.freeforall && gamedata.playersWhoMoved && gamedata.playersWhoMoved.length > 0 &&
-                <div class="w3-container">
-                    <h2>Previous free-for-all results:</h2>
-                    {gamedata.playersWhoMoved.map((pwm) => (
-                        <p key={`PlayerWhoMovedFFA${pwm.nickname}`}>
-                            {pwm.pass ?
-                                <span>{pwm.nickname} passed</span>
-                            : pwm.valid ?
-                                <span>{pwm.nickname} fried <span className="w3-green">{pwm.word}</span></span>
-                            :
-                                <span>{pwm.nickname} miscooked <span className="w3-red">{pwm.word}</span></span>
-                            }
-                        </p>
-                    ))}
-                </div>
-            }
             {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
                 <div className="w3-container">
                     <h2 className="w3-black w3-padding-small w3-cell">Moves this round:</h2>
@@ -139,7 +118,26 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </table>
                 </div>
             }
-            {gamedata.fryLetters && gamedata.whoseturn > -1 &&
+            {!gamedata.freeforall && gamedata.playersWhoMoved && gamedata.playersWhoMoved.length > 0 &&
+                <div class="w3-panel">
+                    <h2 className="w3-black w3-padding-small w3-cell">Free-for-all results:</h2>
+                    <table>
+                    {gamedata.playersWhoMoved.map((pwm) => (
+                        <tr key={`PlayerWhoMovedFFA${pwm.nickname}`}>
+                            <td className="w3-green">&nbsp;{pwm.nickname}:</td>
+                            <td>&nbsp;
+                            {pwm.pass ?
+                                <span className="w3-black"> passed</span>
+                            :
+                                <span className={`w3-monospace ${pwm.valid ? '' : 'w3-red'}`}>{pwm.word}</span>
+                            }
+                            </td>
+                        </tr>
+                    ))}
+                    </table>
+                </div>
+            }
+            {gamedata.whoseturn > -1 &&
                 <div className='w3-panel w3-row'>
                     <h2 className="w3-black w3-cell w3-padding-small">Fry Letters: {gamedata.fryLetters.map((fl,i) => (
                         <span key={`FryLetter${i}`} className="FryLetter">{fl}</span>
@@ -151,6 +149,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             }
             <div className="w3-container">
             <p>{snat}</p>
+            {gamedata.gameOver && <h2 className="w3-black w3-cell w3-padding-small">Game Over</h2>}
             </div>
         </div>
     );

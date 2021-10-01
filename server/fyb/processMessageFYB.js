@@ -238,9 +238,9 @@ const processFybMove = (wss, pm) => {
                     }
                 })
                 if (possibleAnswer) {
-                    snat = " Fry cook fried " + foundGame.fryLetters + " with " + possibleAnswer;
+                    snat = `Fry cook fried ${foundGame.fryLetters} with ${possibleAnswer}.`;
                 } else {
-                    snat = " Fry cook could not fry " + foundGame.fryLetters;
+                    snat = `Fry cook could not fry ${foundGame.fryLetters}.`;
                 }
                 if (anyValidAnswers) {
                     for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
@@ -260,10 +260,12 @@ const processFybMove = (wss, pm) => {
                         foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
                     }
                 }
+                foundGame.freeforall = false;
                 let winners = countWinners(foundGame);
                 if (winners > 0) {
                     foundGame.whoseturn = -1;
-                    snat = `Free-for-all round complete. ${snat}`;
+                    foundGame.fryLetters = [];
+                    foundGame.gameOver = true;
                 } else {
                     foundGame.round = foundGame.round + 1;
                     if (foundGame.whostarted + 1 === foundGame.numPlayers) {
@@ -272,12 +274,11 @@ const processFybMove = (wss, pm) => {
                         foundGame.whoseturn = foundGame.whostarted + 1;
                     }
                     foundGame.whostarted = foundGame.whoseturn;
-                    foundGame.freeforall = false;
                     let tilespicked = pickInitialTiles();
                     foundGame.fryLetters = tilespicked.picked;
                     foundGame.tiles = tilespicked.tiles;
                     foundGame.movesThisRound = [];
-                    snat = `Free-for-all round complete. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play. ${snat}`;
+                    snat = `${snat}. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
                 }
             } else {
                 snat = `Free-for-all round in progress.`;
