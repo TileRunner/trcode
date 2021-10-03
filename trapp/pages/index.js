@@ -38,114 +38,45 @@ const Menu = (props) => {
   const menuButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-round-xxlarge w3-margin';
   const hideButtonClassName = 'w3-button w3-black w3-border w3-animate-left w3-margin';
   const showButtonClassName = 'w3-button w3-hover-black mymaterialicon w3-animate-right w3-round-xxlarge w3-margin';
-  const descriptionCard = 'w3-green w3-animate-right';
+  const menuOptDescCard = 'w3-green w3-animate-right';
+  const ackTextClassName = 'w3-padding';
+  const ackDescCard = 'w3-animate-right';
   
   const [descWm, setDescWm] = useState(false); // describe word mastermind
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
 
-  const WMOption = (props) => {
-    const toggleDescWm = () => {
-      props.setDescWm(!props.descWm);
-    };
+  const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
+  const [descExtendsClass, setDescExtendsClass] = useState(false); // describe extendsclass.com
+  const [descFriends, setDescFriends] = useState(false); // describe friends
 
-    return (
-      <tr>
-        <td>
-          <button className={menuButtonClassName}
-            onClick={() => {props.setWhereto('wm');}}
-          >
-            Word Mastermind
-          </button>
-        </td>
-        <td>
-          <button id="toggleDescribeWm" className={props.descWm ? hideButtonClassName : showButtonClassName}
-            onClick={() => toggleDescWm()}
-          >
-            {props.descWm ? "Hide info" : <i className="material-icons">help_outline</i>}
-          </button>
-        </td>
-      </tr>
-    )
-  }
-
-  const WIOption = (props) => {
-    const toggleDescWi = () => {
-      props.setDescWi(!props.descWi);
+  const MenuOption = (props) => {
+    const toggleDescFlag = () => {
+      props.setDescFlag(!props.descFlag);
     }
 
     return (
       <tr>
         <td>
           <button className={menuButtonClassName}
-            onClick={() => {props.setWhereto('wi');}}
+            onClick={() => {props.setWhereto(props.targetWhereto);}}
           >
-            Word Info
+            {props.optionText}
           </button>
         </td>
         <td>
-          <button id="toggleDescribeWi" className={props.descWi ? hideButtonClassName : showButtonClassName}
-            onClick={() => toggleDescWi()}
+          <button id="toggleDescribeFlag" className={props.descFlag ? hideButtonClassName : showButtonClassName}
+            onClick={() => toggleDescFlag()}
           >
-            {props.descWi ? "Hide info" : <i className="material-icons">help_outline</i>}
+            {props.descFlag ? "Hide info" : <i className="material-icons">help_outline</i>}
           </button>
         </td>
       </tr>
     )
   }
 
-  const PBOption = (props) => {
-    const toggleDescPb = () => {
-      props.setDescPb(!props.descPb);
-    }
-
-    return (
-      <tr>
-        <td>
-          <button className={menuButtonClassName}
-            onClick={() => {props.setWhereto('pb');}}
-          >
-            Prison Break
-          </button>
-        </td>
-        <td>
-          <button id="toggleDescribePb" className={props.descPb ? hideButtonClassName : showButtonClassName}
-            onClick={() => toggleDescPb()}
-          >
-            {props.descPb ? "Hide info" : <i className="material-icons">help_outline</i>}
-          </button>
-        </td>
-      </tr>
-    )
-  }
-
-  const FYBOption = (props) => {
-    const toggleDescFyb = () => {
-      props.setDescFyb(!props.descFyb);
-    }
-
-    return (
-      <tr>
-        <td>
-          <button className={menuButtonClassName}
-            onClick={() => {props.setWhereto('fyb');}}
-          >
-            Fry Your Brain
-          </button>
-        </td>
-        <td>
-          <button id="toggleDescribeFyb" className={props.descFyb ? hideButtonClassName : showButtonClassName}
-            onClick={() => toggleDescFyb()}
-          >
-            {props.descFyb ? "Hide info" : <i className="material-icons">help_outline</i>}
-          </button>
-        </td>
-      </tr>
-    )
-  }
-
-  const DescribeWordMastermind = <div className={descriptionCard}>
+  const DescribeWordMastermind = <div className={menuOptDescCard}>
     <ul className="w3-ul commonFontFamily">
       <li><h2 className="CommenHeaderFontFamily">Word Mastermind is a single player code cracking game.</h2></li>
       <li>The computer picks a random word.</li>
@@ -158,7 +89,7 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeWordInfo = <div className={descriptionCard}>
+  const DescribeWordInfo = <div className={menuOptDescCard}>
     <ul className="w3-ul commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Word Info is a utility to get information on words.</h2></li>
       <li>Anagrams - words that use the exact same letters.</li>
@@ -168,7 +99,7 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribePrisonBreak = <div className={descriptionCard}>
+  const DescribePrisonBreak = <div className={menuOptDescCard}>
     <ul className="w3-ul commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Prison Break is a two player crossword style game.</h2></li>
       <li>You play two games, one as the Prisoners and one as the Guards. Whoever frees the most prisoners wins.</li>
@@ -183,7 +114,7 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeFryYourBrain = <div className={descriptionCard}>
+  const DescribeFryYourBrain = <div className={menuOptDescCard}>
     <ul className="w3-ul commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Fry Your Brain is a word game that can be contested by two to six players.</h2></li>
       <li>A tile pool is provided, starting with 3 letters. Players take turns.</li>
@@ -195,7 +126,39 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  return (
+  const Acknowledge = (props) => {
+    const toggleDescFlag = () => {
+      props.setDescFlag(!props.descFlag);
+    }
+
+    return (
+      <div className="w3-cell w3-blue w3-mobile">
+        <span className={ackTextClassName}>
+            {props.ackText}
+          <button className={props.descFlag ? hideButtonClassName : showButtonClassName}
+            onClick={() => toggleDescFlag()}
+          >
+            {props.descFlag ? "Hide info" : <i className="material-icons">help_outline</i>}
+          </button>
+        </span>
+      </div>
+    )
+  }
+
+  const DescribeEnable2k = <div className={ackDescCard}>
+    This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.
+  </div>
+
+  const DescribeExtendsClass = <div className={ackDescCard}>
+    This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!
+  </div>
+
+  const DescribeFriends = <div className={ackDescCard}>
+    <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, and others.</p>
+    <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
+  </div>
+
+return (
     <div>
       <Head>
         <title>Tile Runner</title>
@@ -207,17 +170,17 @@ const Menu = (props) => {
       </div>
       <BrowserView>
         <table className="w3-table w3-responsive">
-            <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
-            <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
-            <PBOption descPb={descPb} setDescPb={setDescPb} setWhereto={props.setWhereto}/>
-            <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
+            <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
+            <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
+            <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
+            <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
         </table>
       </BrowserView>
       <MobileOnlyView>
         <table className="w3-table w3-responsive">
-            <WMOption descWm={descWm} setDescWm={setDescWm} setWhereto={props.setWhereto}/>
-            <WIOption descWi={descWi} setDescWi={setDescWi} setWhereto={props.setWhereto}/>
-            <FYBOption descFyb={descFyb} setDescFyb={setDescFyb} setWhereto={props.setWhereto}/>
+            <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
+            <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
+            <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
         </table>
       </MobileOnlyView>
       {descWm && DescribeWordMastermind}
@@ -225,17 +188,14 @@ const Menu = (props) => {
       {descPb && DescribePrisonBreak}
       {descFyb && DescribeFryYourBrain}
       <div className="w3-panel">
-        <h1>Acknowledgements</h1>
-        <div className="w3-blue">
-          <h2>ENABLE2K</h2>
-          <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
-        </div>
-        <div className="w3-black">
-          <h2>extendsclass.com</h2>
-          <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
-        </div>
+        <h1>Acknowledgements:</h1>
+        <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+        {descEnable2k && DescribeEnable2k}
+        <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
+        {descExtendsClass && DescribeExtendsClass}
+        <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+        {descFriends && DescribeFriends}
       </div>
     </div>
   )
-
 }
