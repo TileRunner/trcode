@@ -142,7 +142,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
                 name="numPlayers"
                 value={numPlayers}
                 onChange={(e) => {
-                    if (e.target.value.match(/[23456]/)) { setNumPlayers(e.target.value); }
+                    if (e.target.value > 1 && e.target.value < 7) { setNumPlayers(e.target.value); }
                 } } />
         </div>
         <div className="w3-quarter">

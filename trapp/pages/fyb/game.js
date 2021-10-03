@@ -56,8 +56,8 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             if (gamedata.excludedPlayer === nickname) {
                 return false;
             }
-            for (let i = 0; i < gamedata.playersWhoMoved.length; i++) {
-                if (gamedata.playersWhoMoved[i].nickname === nickname) {
+            for (let i = 0; i < gamedata.freeforallMoves.length; i++) {
+                if (gamedata.freeforallMoves[i].nickname === nickname) {
                     return false;
                 }
             }
@@ -99,43 +99,14 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </tbody>
                 </table>
             </div>
-            {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
-                <div className="w3-container">
-                    <h2 className="w3-black w3-padding-small w3-cell">Moves this round:</h2>
-                    <table>
-                    {gamedata.movesThisRound.map((mtr, index) => (
-                        <tr key={`PlayerWhoMovedThisRound${mtr.nickname}`}>
-                            <td className="w3-green">&nbsp;{mtr.nickname}:</td>
-                            <td>&nbsp;
-                            {mtr.pass ?
-                                <span className="w3-black"> passed</span>
-                            :
-                                <span className={`w3-monospace ${mtr.valid ? '' : 'w3-red'}`}>{mtr.word}</span>
-                            }
-                            </td>
-                        </tr>
-                        ))}
-                    </table>
-                </div>
+            {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
+                showMoveList('Moves previous round', gamedata.movesPrevRound)
             }
-            {!gamedata.freeforall && gamedata.playersWhoMoved && gamedata.playersWhoMoved.length > 0 &&
-                <div class="w3-panel">
-                    <h2 className="w3-black w3-padding-small w3-cell">Free-for-all results:</h2>
-                    <table>
-                    {gamedata.playersWhoMoved.map((pwm) => (
-                        <tr key={`PlayerWhoMovedFFA${pwm.nickname}`}>
-                            <td className="w3-green">&nbsp;{pwm.nickname}:</td>
-                            <td>&nbsp;
-                            {pwm.pass ?
-                                <span className="w3-black"> passed</span>
-                            :
-                                <span className={`w3-monospace ${pwm.valid ? '' : 'w3-red'}`}>{pwm.word}</span>
-                            }
-                            </td>
-                        </tr>
-                    ))}
-                    </table>
-                </div>
+            {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
+                showMoveList('Moves this round', gamedata.movesThisRound)
+            }
+            {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
+                showMoveList('Free-for-all results', gamedata.freeforallMoves)
             }
             {gamedata.whoseturn > -1 &&
                 <div className='w3-panel w3-row'>
@@ -155,14 +126,36 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     );
 }
 
+function showMoveList(moveListTitle, moveArray) {
+    return <div className="w3-panel">
+        <h2 className="w3-black w3-padding-small w3-cell">{moveListTitle}:</h2>
+        <table>
+        {moveArray.map((move) => (
+            <tr key={`${moveListTitle}${move.nickname}`}>
+                <td className="w3-green">&nbsp;{move.nickname}:</td>
+                <td>&nbsp;
+                {move.pass ?
+                    <span className="w3-black"> passed</span>
+                :
+                    <span className={`w3-monospace ${move.valid ? '' : 'w3-red'}`}>{move.word}</span>
+                }
+                </td>
+            </tr>
+            ))}
+        </table>
+    </div>
+}
+
 function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client, thisisme, gameid, nickname) {
     return <div className="w3-quarter w3-margin" onKeyDownCapture={handleKeyDown}>
         <label>Enter Word:</label>
-        <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+        <input className="w3-input w3-border w3-blue myCommonFont" type="text" autoComplete="off" spellCheck="false"
             name="word"
             value={word}
             onChange={(e) => {
-                setWord(e.target.value.toUpperCase());
+                if (e.target.value.match("^[a-zA-Z]*$")) {
+                    setWord(e.target.value.toUpperCase());
+                }
             } } />
 
         <button className="w3-button w3-green w3-margin" key="submitWord"

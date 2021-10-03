@@ -80,8 +80,8 @@ const processFybCreateGame = (wss, pm) => {
             let game = {
                 syncstamp: pm.timestamp,
                 gameid: pm.gameid,
-                numPlayers: pm.numPlayers,
-                goal: pm.goal,
+                numPlayers: Number(pm.numPlayers), // For some reason, when I go past the default of 2 players in the lobby it was treating pm.numPlayers as a string.
+                goal: Number(pm.goal),
                 whoseturn: -1,
                 round: 0,
                 freeforall: false,
@@ -215,12 +215,12 @@ const processFybMove = (wss, pm) => {
     if (foundGame) { // I mean, it should!
         let snat = 'oops';
         if (foundGame.freeforall) { // In free-for-all round
-            foundGame.playersWhoMoved.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
-            if (foundGame.playersWhoMoved.length === foundGame.numPlayers - 1) { // All have moved
+            foundGame.freeforallMoves.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
+            if (foundGame.freeforallMoves.length === foundGame.numPlayers - 1) { // All have moved
                 let anyValidAnswers = false;
                 let shortestAnswer = 0;
-                for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
-                    let move = foundGame.playersWhoMoved[i];
+                for (let i = 0; i < foundGame.freeforallMoves.length; i++) {
+                    let move = foundGame.freeforallMoves[i];
                     if (move.valid) {
                         anyValidAnswers = true;
                         if (shortestAnswer === 0 || move.word.length < shortestAnswer) {
@@ -243,8 +243,8 @@ const processFybMove = (wss, pm) => {
                     snat = `Fry cook could not fry ${foundGame.fryLetters}.`;
                 }
                 if (anyValidAnswers) {
-                    for (let i = 0; i < foundGame.playersWhoMoved.length; i++) {
-                        let move = foundGame.playersWhoMoved[i];
+                    for (let i = 0; i < foundGame.freeforallMoves.length; i++) {
+                        let move = foundGame.freeforallMoves[i];
                         if (move.valid && move.word.length === shortestAnswer) {
                             for (let j = 0; j < foundGame.players.length; j++) {
                                 if (foundGame.players[j].nickname === move.nickname) {
@@ -277,15 +277,17 @@ const processFybMove = (wss, pm) => {
                     let tilespicked = pickInitialTiles();
                     foundGame.fryLetters = tilespicked.picked;
                     foundGame.tiles = tilespicked.tiles;
+                    foundGame.movesPrevRound = [...foundGame.movesThisRound];
                     foundGame.movesThisRound = [];
-                    snat = `${snat}. Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
+                    snat = `${snat} Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
                 }
             } else {
                 snat = `Free-for-all round in progress.`;
             }
         } else { // In regular round
-            // Clear previous free-for-all results once a word is sent in this round
-            foundGame.playersWhoMoved = [];
+            // Clear previous results once a word is sent in this round
+            foundGame.freeforallMoves = [];
+            foundGame.movesPrevRound = [];
             // Add the move to the list of moves for this round
             foundGame.movesThisRound.push({nickname: pm.nickname, word: pm.word, valid: isvalid, pass: pm.pass});
             if (isvalid) { // Valid word, pick next tile
@@ -301,7 +303,7 @@ const processFybMove = (wss, pm) => {
             } else { // Invalid word, go to free-for-all
                 foundGame.freeforall = true;
                 foundGame.excludedPlayer = pm.nickname;
-                foundGame.playersWhoMoved = [];
+                foundGame.freeforallMoves = [];
                 if (pm.pass) {
                     snat = `${foundGame.players[foundGame.whoseturn].nickname} passed. Free-for-all round in progress.`;
                 } else {
@@ -345,10 +347,7 @@ const processFybInterval = (wss, pm) => {
     let callingClient = findPlayerClient(wss, pm.gameid, pm.thisisme);
     if (foundGame && callingClient) { // Should find both
         if (foundGame.syncstamp !== pm.syncstamp) { // Out of date
-            // console.log(`Sent interval driven update to ${pm.nickname}`);
             sendGameData([callingClient], foundGame, foundGame.snat);
-        // } else { // For testing the interval
-        //     sendGameData([callingClient], foundGame, `Game data was up to date at interval.`);
         }
     }
 }
