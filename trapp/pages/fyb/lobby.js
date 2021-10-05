@@ -141,20 +141,18 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
             <input className="w3-input w3-border w3-blue myCommonFont" type="number"
                 name="numPlayers"
                 value={numPlayers}
-                onChange={(e) => {
-                    if (e.target.value > 1 && e.target.value < 7) { setNumPlayers(e.target.value); }
-                } } />
+                onChange={(e) => { setNumPlayers(e.target.value); } } 
+                />
         </div>
         <div className="w3-quarter">
             <label>Points needed to win (3 to 21):</label>
             <input className="w3-input w3-border w3-blue myCommonFont" type="number"
                 name="goal"
                 value={goal}
-                onChange={(e) => {
-                    if (e.target.value > 2 && e.target.value < 22) { setGoal(e.target.value); }
-                } } />
+                onChange={(e) => { setGoal(e.target.value); } } 
+                />
         </div>
-        {gameid && <div className="w3-quarter">
+        {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 && <div className="w3-quarter">
             <button
                 id="requestCreateGame"
                 className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"

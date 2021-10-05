@@ -153,15 +153,13 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
             name="word"
             value={word}
             onChange={(e) => {
-                if (e.target.value.match("^[a-zA-Z]*$")) {
-                    setWord(e.target.value.toUpperCase());
-                }
+                setWord(e.target.value);
             } } />
 
-        <button className="w3-button w3-green w3-margin" key="submitWord"
+        {word.toUpperCase().trim().match("^[a-zA-Z]*$") && <button className="w3-button w3-green w3-margin" key="submitWord"
          onClick={() => {submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord)}}>
             SUBMIT
-        </button>
+        </button>}
 
         <button className="w3-button w3-red w3-margin" key="passButton"
          onClick={() => {submitPass(setSnat, client, thisisme, gameid, nickname, setWord)}}>
@@ -173,6 +171,7 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
 }
 
 function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord) {
+    let fixedword = word.toUpperCase().trim();
     // First check if the have all the fry letters
     for (let i = 0; i < fryLetters.length; i++) {
         let letterCountRequired = 0;
@@ -182,8 +181,8 @@ function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, n
                 letterCountRequired = letterCountRequired + 1;
             }
         }
-        for (let j = 0; j < word.length; j++) {
-            if (fryLetters[i] === word[j]) {
+        for (let j = 0; j < fixedword.length; j++) {
+            if (fryLetters[i] === fixedword[j]) {
                 actualLetterCount = actualLetterCount + 1;
             }
         }
@@ -193,7 +192,7 @@ function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, n
         }
     }
     // If you get here they have all the required letters. Send the guess to the server.
-    setSnat(`Checking your word ... shouldn't take long.`);
+    setSnat(`Checking your word ... shouldn't take long. If it does, please try rejoining the game.`);
     client.send({
         type: c.CLIENT_TYPE_FYB,
         func: 'move',
@@ -202,7 +201,7 @@ function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, n
         gameid: gameid,
         nickname: nickname,
         timestamp: Date.now(),
-        word: word
+        word: fixedword
     });
     setWord('');
 }
