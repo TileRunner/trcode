@@ -32,6 +32,8 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 setSnat(messageData.snat);
                 setGamedata(messageData.game);
                 setSyncstamp(messageData.game.syncstamp);
+            } else if (messageData.func = c.S2C_FUNC_GAMECREATED) {
+                // Nothing to do, this is really for the lobby dwellers
             } else {
                 setSnat(`Unhandled message: ${message}`);
             }
@@ -120,7 +122,15 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             }
             <div className="w3-container">
             <p>{snat}</p>
-            {gamedata.gameOver && <h2 className="w3-black w3-cell w3-padding-small">Game Over</h2>}
+            {gamedata.gameOver && <div>
+                <h2 className="w3-black w3-cell w3-padding-small">Game Over</h2>
+                <button
+                    className="w3-button w3-green w3-margin"
+                    onClick={() => {sendReplayRequest(client, thisisme, gamedata, nickname)}}
+                >
+                    PLAY AGAIN
+                </button>
+            </div>}
             </div>
         </div>
     );
@@ -221,6 +231,17 @@ function submitPass(setSnat, client, thisisme, gameid, nickname, setWord) {
         word: ''
     });
     setWord('');
+}
+
+function sendReplayRequest(client, thisisme, gamedata, nickname) {
+    client.send({
+        type: c.CLIENT_TYPE_FYB,
+        func: 'replay',
+        thisisme: thisisme,
+        game: gamedata,
+        nickname: nickname,
+        timestamp: Date.now()
+    });
 }
 
 export default Game;

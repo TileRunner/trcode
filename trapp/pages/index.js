@@ -154,7 +154,7 @@ const Menu = (props) => {
   </div>
 
   const DescribeFriends = <div className={ackDescCard}>
-    <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, and others.</p>
+    <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
@@ -162,10 +162,10 @@ return (
     <div>
       <Head>
         <title>Tile Runner</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/tileTR.ico" />
       </Head>
       <div className="w3-container w3-teal">
-        <h1 className="myHeadingFont">Tile Runner</h1>
+        <h1 className="myHeadingFont"><span className="pbSquareInner PlayerTile">T</span>ile <span className="pbSquareInner PlayerTile">R</span>unner</h1>
         {/* <h2>{props.coderMsg}</h2> */}
       </div>
       <BrowserView>

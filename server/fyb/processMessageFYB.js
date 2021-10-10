@@ -38,6 +38,8 @@ function processMessageFYB (wss, pm) {
         processFybMove(wss, pm);
     } else if (pm.func === "interval") {
         processFybInterval(wss, pm);
+    } else if (pm.func === "replay") {
+        processFybReplay(wss, pm);
     }
 }
 
@@ -78,13 +80,15 @@ const processFybCreateGame = (wss, pm) => {
             callingClient.gameid = pm.gameid;
             callingClient.nickname = pm.nickname;
             let game = {
+                gameindex: 0, // first game
+                gamestarter: 0, // player going first in first round
+                whoseturn: -1, // nobody's turn until all players arrive
+                round: 0, // first round
+                freeforall: false, // not in free-for-all round
                 syncstamp: pm.timestamp,
                 gameid: pm.gameid,
                 numPlayers: Number(pm.numPlayers), // For some reason, when I go past the default of 2 players in the lobby it was treating pm.numPlayers as a string.
                 goal: Number(pm.goal),
-                whoseturn: -1,
-                round: 0,
-                freeforall: false,
                 players: [{
                     index: 0,
                     nickname: pm.nickname,
@@ -350,6 +354,37 @@ const processFybInterval = (wss, pm) => {
             sendGameData([callingClient], foundGame, foundGame.snat);
         }
     }
+}
+
+const processFybReplay = (wss, pm) => {
+    let starter = pm.game.gamestarter + 1 === pm.game.numPlayers ? 0 : pm.game.gamestarter + 1; // this player goes first this game
+    let tilespicked = pickInitialTiles();
+    let newGame = {
+        gameid: pm.game.gameid,
+        numPlayers: pm.game.numPlayers,
+        players: [...pm.game.players],
+        goal: pm.game.goal,
+        syncstamp: pm.datestamp,
+        gameindex: pm.game.gameindex + 1, // next game
+        gamestarter: starter,
+        whoseturn: starter,
+        whostarted: starter,
+        round: 1,
+        freeforall: false,
+        fryLetters: tilespicked.picked,
+        tiles: tilespicked.tiles,
+        movesThisRound: [],
+        movesPrevRound: [],
+        freeforallMoves: []
+    };
+    for (let i = 0; i < newGame.players.length; i++) {
+        const player = newGame.players[i];
+        player.points = 0;
+    }
+    games.push(newGame);
+    let gameClients = findGameClients(wss, clientType, newGame.gameid);
+    let snat = `Starting game ${newGame.gameindex + 1}. ${newGame.players[newGame.whoseturn].nickname} to play.`;
+    sendGameData(gameClients, newGame, snat);
 }
 
 function pickInitialTiles() {
