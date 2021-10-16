@@ -46,7 +46,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         }
         if (event.key === "Enter") {
             event.preventDefault();
-            submitPlayerWord(word, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname, setWord);
+            submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord);
             return;
         }
     }
@@ -118,7 +118,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 </div>
             }
             {meToEnterWord() &&
-                getPlayerWord(handleKeyDown, word, setWord, gamedata.fryLetters, setSnat, client, thisisme, gameid, nickname)
+                getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
             }
             <div className="w3-container">
             <p>{snat}</p>
@@ -156,7 +156,7 @@ function showMoveList(moveListTitle, moveArray) {
     </div>
 }
 
-function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client, thisisme, gameid, nickname) {
+function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname) {
     return <div className="w3-quarter w3-margin" onKeyDownCapture={handleKeyDown}>
         <label>Enter Word:</label>
         <input className="w3-input w3-border w3-blue myCommonFont" type="text" autoComplete="off" spellCheck="false"
@@ -167,12 +167,12 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
             } } />
 
         {word.toUpperCase().trim().match("^[a-zA-Z]*$") && <button className="w3-button w3-green w3-margin" key="submitWord"
-         onClick={() => {submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord)}}>
+         onClick={() => {submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord)}}>
             SUBMIT
         </button>}
 
         <button className="w3-button w3-red w3-margin" key="passButton"
-         onClick={() => {submitPass(setSnat, client, thisisme, gameid, nickname, setWord)}}>
+         onClick={() => {submitPass(setSnat, client, thisisme, gamedata.gameid, nickname, setWord)}}>
             PASS
         </button>
 
@@ -180,24 +180,36 @@ function getPlayerWord(handleKeyDown, word, setWord, fryLetters, setSnat, client
     </div>;
 }
 
-function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, nickname, setWord) {
+function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord) {
     let fixedword = word.toUpperCase().trim();
-    // First check if the have all the fry letters
-    for (let i = 0; i < fryLetters.length; i++) {
+    // Check if the word is allowed based on previous words this round
+    for (let i = 0; i < gamedata.movesThisRound.length; i++) {
+        const pw = gamedata.movesThisRound[i].word;
+        if (pw == fixedword) {
+            setSnat(`You cannot reuse a previous word from this round (${pw}).`);
+            return;
+        }
+        if (pw + 'S' == fixedword && pw.substring(pw.length-1) !== 'S') {
+            setSnat(`You cannot add S to a previous word (${pw}) from this round unless it ends with S.`);
+            return;
+        }
+    }
+    // Check if the have all the fry letters
+    for (let i = 0; i < gamedata.fryLetters.length; i++) {
         let letterCountRequired = 0;
         let actualLetterCount = 0;
-        for (let j = 0; j < fryLetters.length; j++) {
-            if (fryLetters[i] === fryLetters[j]) {
+        for (let j = 0; j < gamedata.fryLetters.length; j++) {
+            if (gamedata.fryLetters[i] === gamedata.fryLetters[j]) {
                 letterCountRequired = letterCountRequired + 1;
             }
         }
         for (let j = 0; j < fixedword.length; j++) {
-            if (fryLetters[i] === fixedword[j]) {
+            if (gamedata.fryLetters[i] === fixedword[j]) {
                 actualLetterCount = actualLetterCount + 1;
             }
         }
         if (actualLetterCount < letterCountRequired) {
-            setSnat(`You need the letter ${fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
+            setSnat(`You need the letter ${gamedata.fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
             return;
         }
     }
@@ -208,7 +220,7 @@ function submitPlayerWord(word, fryLetters, setSnat, client, thisisme, gameid, n
         func: 'move',
         pass: false,
         thisisme: thisisme,
-        gameid: gameid,
+        gameid: gamedata.gameid,
         nickname: nickname,
         timestamp: Date.now(),
         word: fixedword
