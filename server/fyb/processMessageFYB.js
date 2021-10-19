@@ -234,13 +234,19 @@ const processFybMove = (wss, pm) => {
                 }
                 // Find a possible answer, shortest length
                 let possibleAnswer = '';
+                let possibleAnswers = [];
                 wordlist.forEach((checkword) => {
-                    if (wordHasFryLetters(foundGame.fryLetters, checkword)) {
-                        if (checkword.length < possibleAnswer.length || possibleAnswer === '') {
-                            possibleAnswer = checkword.toUpperCase();
-                        }
+                    if (wordHasFryLetters(foundGame.fryLetters, checkword) && wordAllowed(checkword, foundGame.movesThisRound)) {
+                        possibleAnswers.push(checkword.toUpperCase());
                     }
-                })
+                });
+                if (possibleAnswers.length > 0) {
+                    possibleAnswers.sort(function(a,b){return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1});
+                    if (possibleAnswers.length > 10) {
+                        possibleAnswers = possibleAnswers.slice(0,10);
+                    }
+                    possibleAnswer = possibleAnswers.join(", ");
+                }
                 if (possibleAnswer) {
                     snat = `Fry cook fried ${foundGame.fryLetters} with ${possibleAnswer}.`;
                 } else {
@@ -340,6 +346,20 @@ function wordHasFryLetters(fryLetters, checkword) {
             }
         }
         if (actualLetterCount < letterCountRequired) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function wordAllowed(checkword, movesThisRound) {
+    // Check if the word is allowed based on previous words this round
+    for (let i = 0; i < movesThisRound.length; i++) {        
+        const pw = movesThisRound[i].word.toLowerCase(); // lexicon is in lower case
+        if (pw === checkword) {
+            return false;
+        }
+        if (pw + 'S' === checkword && pw.substring(pw.length-1) !== 'S' && movesThisRound[i].valid) {
             return false;
         }
     }

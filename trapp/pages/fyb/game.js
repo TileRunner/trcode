@@ -185,12 +185,12 @@ function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, s
     // Check if the word is allowed based on previous words this round
     for (let i = 0; i < gamedata.movesThisRound.length; i++) {
         const pw = gamedata.movesThisRound[i].word;
-        if (pw == fixedword) {
+        if (pw === fixedword) {
             setSnat(`You cannot reuse a previous word from this round (${pw}).`);
             return;
         }
-        if (pw + 'S' == fixedword && pw.substring(pw.length-1) !== 'S') {
-            setSnat(`You cannot add S to a previous word (${pw}) from this round unless it ends with S.`);
+        if (pw + 'S' === fixedword && pw.substring(pw.length-1) !== 'S' && gamedata.movesThisRound[i].valid) {
+            setSnat(`You cannot add S to a previous valid word (${pw}) from this round unless it ends with S.`);
             return;
         }
     }

@@ -120,7 +120,7 @@ const Menu = (props) => {
       <li>A tile pool is provided, starting with 3 letters. Players take turns.</li>
       <li>When it is your turn, make a word that has all the letters in the tile pool, plus any amount of additional letters.</li>
       <li>You cannot reuse a word from the same round.</li>
-      <li>You cannot merely add an S to a word from the same round, unless that word ends in S.</li>
+      <li>You cannot merely add an S to a valid word from the same round, unless that word ends in S.</li>
       <li>When a player fails to make a valid word on their turn, the other players take part in the free-for-all.</li>
       <li>In the free-for-all, the goal is to submit the shortest answer you can. All players with the shortest of the answers get points.</li>
       <li>The points given equals the number of letters in the tile pool the last time someone gave a valid answer for that round.</li>
