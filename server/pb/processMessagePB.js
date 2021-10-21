@@ -46,7 +46,9 @@ const setGameData = (dataApiId) => {
 function processMessagePB(wss, pm, message) {
     // console.log(`processPrisonBreakMessage: ${pm.func} ${pm.gameid}.${pm.thisisme}`);
     // console.log(message);
-    if (pm.func === "requestgamedata") {
+    if (pm.func === "announce") {
+        updateLobbyClients(wss); // Just update all lobby clients in case any client missed an update somehow
+    } else if (pm.func === "requestgamedata") {
         processPbRequestGameData(wss, pm);
     } else if (pm.func === "requestsyncdata") {
         processPbRequestSyncData(wss, pm);
