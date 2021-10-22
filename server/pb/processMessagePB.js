@@ -68,6 +68,8 @@ function processMessagePB(wss, pm, message) {
         processPbProvideMove(wss, pm);
     } else if (pm.func === "undoturn") {
         processPbUndoMove(wss, pm);
+    } else if (pm.func === "deletegame") {
+        processPbDeleteGame(wss, pm);
     } else {
         console.log(`log: ${message}`);
     }
@@ -323,6 +325,9 @@ const processPbUndoMove = (wss, pm) => {
     handleUndoMove(pm.gameid, gameclients);
 }
 
+const processPbDeleteGame = (wss, pm) => {
+    handleDeleteGame(pm.gameid, wss);
+}
 
 /*
    The logic for findOpponentClient is specific to Prison Break particpant types
@@ -446,6 +451,36 @@ const handleUndoMove = (gameid, gameclients) => {
         gameclients.forEach((client) => {
             client.send(JSON.stringify(msg));
         });
+    })
+    .catch(error => {
+        logApiError(error);
+    });
+}
+
+const handleDeleteGame = (gameid, wss) => {
+    let gameApiInfo = getGameApiInfo(gameid);
+    let dataApiId = gameApiInfo.dataApiId;
+    axios({
+        method: 'delete',
+        baseURL: dataApiUrl,
+        url: `/${dataApiId}`,
+        headers: {
+            'Api-key': dataApiKey,
+            'Content-type': 'application/json-patch+json'
+        }
+    })
+    .then(function (_response) {
+        let gameindex = -1;
+        for (let index = 0; index < gameApiInfoMap.length; index++) {
+            const element = gameApiInfoMap[index];
+            if (element.gameid === gameid) {
+                gameindex = index;
+            }
+        }
+        if (gameindex > -1) {
+            gameApiInfoMap.splice(gameindex, 1);
+            updateLobbyClients(wss);
+        }
     })
     .catch(error => {
         logApiError(error);
