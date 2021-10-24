@@ -18,11 +18,12 @@ const Game = ({setWhereto
     , isrejoin
     , participant // Prisoners, Guards, or Observer (not implemented)
     , gameid
-    , nickname
+    , nickname='' // Give it a default for Build
     , wsmessage
     , client
     , racksize=4 // Option for rack size (give it a default for Build)
     }) => {
+    const [snat, setSnat] = useState('Hello. This space is for debugging messages.');
     const [syncstamp, setSyncstamp] = useState('');
     const middle = racksize; // Middle element in row or column array
     const edge = racksize * 2; // Last element in row or column array
@@ -181,6 +182,7 @@ const Game = ({setWhereto
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
+        setSnat(`Got message: func=${messageData.func}`);
         if (messageData.func === "providegamedata") {
           let gd = buildGamedataFromApidata(messageData.apidata);
           // Server providing game data
@@ -334,6 +336,7 @@ const Game = ({setWhereto
         alert(`Invalid according to ENABLE2K lexicon: ${playinfo.invalidwords.join().replace(".","?").toUpperCase()}`);
         return; // Do not apply the play
       }
+      setSnat(`Ending player turn.`);
       let newRescues = rescues;
       if (participant === c.PARTY_TYPE_PRISONERS) {
         let escapehatches = [
@@ -400,6 +403,7 @@ const Game = ({setWhereto
         window.alert("Need " + racksize + " tiles in the bag to exchange")
         return;
       }
+      setSnat(`Swapping rack.`);
       let newPlayerTiles = [];
       let newTiles = [...tiles];
       while (newPlayerTiles.length < racksize && newTiles.length > 0) {
@@ -692,6 +696,7 @@ const Game = ({setWhereto
       setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
+      setSnat(`Sending player pass.`);
       client.send(
         {
           gameid: gameid, // the id for the game
@@ -969,6 +974,11 @@ const Game = ({setWhereto
             }
           </div>
         </div>
+        {nickname && nickname.length > 3 && nickname.toUpperCase().substring(0,4) === 'TEST' &&
+          <div className="w3-purple w3-monospace">
+             <p>&nbsp;{snat}</p>
+          </div>
+        }
       </div>
     );
   };
