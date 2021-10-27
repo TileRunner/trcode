@@ -191,15 +191,26 @@ const processPbStartGame = (wss, pm) => {
         Update game info map
         Send updated game list to clients in lobby
     */
+    // Check for game already available.
+    // In dev mode especially I have seen it try start the game again (when I save a code change)
+    // If the game exists then update the game clients with what is stored to get it back to the original game
+    for (let i = 0; i < gameApiInfoMap.length; i++) {
+        const g = gameApiInfoMap[i];
+        if (g.gameid === pm.gameid) {
+            console.log(`Client ${pm.thisisme} is trying to start game ${pm.gameid} but is that game is in use already.`);
+            let gameClients = findGameClients(wss, clientType, pm.gameid);
+            getGameThenUpdateClients(pm.gameid, gameClients);
+            return;
+        }
+    }
     // Set the client gameid and participant
     wss.clients.forEach((client) => {
         if (client.thisisme === pm.thisisme) {
             // console.log(`Setting gameid to ${pm.gameid} for client ${client.thisisme}`);
             client.gameid = pm.gameid;
-            client.participant = pm.sender; // This is will be 'P' since prisoners start the game
+            client.participant = pm.sender; // This will be 'P' since prisoners start the game
         }
     });
-
     let jStartGame = {
         datestamp: pm.timestamp,
         gameid: pm.gameid,

@@ -23,7 +23,7 @@ const Game = ({setWhereto
     , client
     , racksize=4 // Option for rack size (give it a default for Build)
     }) => {
-    const [snat, setSnat] = useState('Hello. This space is for debugging messages.');
+    const [snats, setSnats] = useState(['Hello. This space is for debugging messages.']);
     const [syncstamp, setSyncstamp] = useState('');
     const middle = racksize; // Middle element in row or column array
     const edge = racksize * 2; // Last element in row or column array
@@ -102,6 +102,23 @@ const Game = ({setWhereto
         startObservingGame(); // Observer viewing the game
       }
     }
+
+    const sendNextMessage = (jMessage) => {
+      addSnat(`Sending message: func=${jMessage.func}`);
+      client.send(jMessage);
+    }
+
+    const addSnat = (snat) => {
+      let newSnats = [...snats];
+      let current_datetime = new Date();
+      let current_hours = current_datetime.getHours();
+      let current_minutes = current_datetime.getMinutes();
+      let current_seconds = current_datetime.getSeconds();
+      let formatted_date = `${current_hours < 10 ? '0' : ''}${current_hours}:${current_minutes < 10 ? '0' : ''}${current_minutes}:${current_seconds < 10 ? '0' : ''}${current_seconds}`;
+      newSnats.push(`${formatted_date}: ${snat}`);
+      setSnats(newSnats);
+    }
+
     const startGame = (firstSquareArray) => {
       let newSyncstamp = Date.now();
       let tempPTiles = [];
@@ -126,50 +143,42 @@ const Game = ({setWhereto
         ptiles: [...tempPTiles],
         gtiles: [...tempGTiles]    
       });
-      client.send(
-        {
-          type: "pb",
-          func: "startgame",
-          gameid: gameid, // Game id
-          timestamp: newSyncstamp, // For telling server my last data timestamp
-          racksize: racksize, // Rack size option
-          sender: participant, // This will be prisoners since prisoners start the game
-          pname: nickname, // This will be the prisoners nickname since prisoners are sending this
-          tiles: tempTiles, // Tile bag after first racks selected
-          ptiles: tempPTiles, // Prisoners first rack
-          gtiles: tempGTiles // Guards first rack
-        }
-      );
+      sendNextMessage({
+        type: "pb",
+        func: "startgame",
+        gameid: gameid, // Game id
+        timestamp: newSyncstamp, // For telling server my last data timestamp
+        racksize: racksize, // Rack size option
+        sender: participant, // This will be prisoners since prisoners start the game
+        pname: nickname, // This will be the prisoners nickname since prisoners are sending this
+        tiles: tempTiles, // Tile bag after first racks selected
+        ptiles: tempPTiles, // Prisoners first rack
+        gtiles: tempGTiles // Guards first rack
+      });
     }
     const joinGame = () => {
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          gname: nickname, // player nickname
-          type: "pb", // prisonbreak
-          func: "joingame", // join the game
-          sender: participant // this will eb guards
-        }
-      );
+      sendNextMessage({
+        gameid: gameid, // the id for the game
+        gname: nickname, // player nickname
+        type: "pb", // prisonbreak
+        func: "joingame", // join the game
+        sender: participant // this will eb guards
+      });
     }
     const rejoinGame = () => {
-      client.send(
-        {
-          gameid: gameid, // the id for the game
-          type: "pb", // prisonbreak
-          func: "rejoingame", // join the game
-          sender: participant // could be either player
-        }
-      );
+      sendNextMessage({
+        gameid: gameid, // the id for the game
+        type: "pb", // prisonbreak
+        func: "rejoingame", // join the game
+        sender: participant // could be either player
+      });
     }
     const startObservingGame = () => {
-      client.send(
-        {
-          gameid: gameid,
-          type: "pb",
-          func: "startObserving"
-        }
-      );
+      sendNextMessage({
+        gameid: gameid,
+        type: "pb",
+        func: "startObserving"
+      });
     }
 
     function putAtMoveStart() {
@@ -182,7 +191,7 @@ const Game = ({setWhereto
     function processGameMessage(message) {
       let messageData = JSON.parse(message);
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
-        setSnat(`Got message: func=${messageData.func}`);
+        addSnat(`Getting message: func=${messageData.func}`);
         if (messageData.func === "providegamedata") {
           let gd = buildGamedataFromApidata(messageData.apidata);
           // Server providing game data
@@ -336,7 +345,6 @@ const Game = ({setWhereto
         alert(`Invalid according to ENABLE2K lexicon: ${playinfo.invalidwords.join().replace(".","?").toUpperCase()}`);
         return; // Do not apply the play
       }
-      setSnat(`Ending player turn.`);
       let newRescues = rescues;
       if (participant === c.PARTY_TYPE_PRISONERS) {
         let escapehatches = [
@@ -395,7 +403,7 @@ const Game = ({setWhereto
         rescues: newRescues // may have rescued another prisoner
       };
       participant === c.PARTY_TYPE_PRISONERS ? jsend.ptiles = newPlayerTiles : jsend.gtiles = newPlayerTiles;
-      client.send(jsend);
+      sendNextMessage(jsend);
     };
   
     const swapPlayersTiles = () => {
@@ -440,7 +448,7 @@ const Game = ({setWhereto
         move: newMove // the move that was made
       };
       participant === c.PARTY_TYPE_PRISONERS ? jsend.ptiles = newPlayerTiles : jsend.gtiles = newPlayerTiles;
-      client.send(jsend);
+      sendNextMessage(jsend);
     }
     
     function isPlayValid() {
@@ -655,7 +663,7 @@ const Game = ({setWhereto
     function allowUndoLastTurn() {
       if (!allowRewind) {
         setAllowRewind(true);
-        client.send(
+        sendNextMessage(
           {
             gameid: gameid, // the id for the game
             type: "pb", // prisonbreak
@@ -668,7 +676,7 @@ const Game = ({setWhereto
   
     function performRewind() {
       /* Send undoturn to server and it will send the updated game data to game clients, including this one */
-      client.send(
+      sendNextMessage(
         {
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
@@ -696,8 +704,7 @@ const Game = ({setWhereto
       setSyncstamp(newSyncstamp);
       setWhoseturn(newWhoseturn);
       setMoves(newMoves);
-      setSnat(`Sending player pass.`);
-      client.send(
+      sendNextMessage(
         {
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
@@ -711,7 +718,7 @@ const Game = ({setWhereto
     }
 
     const requestGameData = () => {
-      client.send(
+      sendNextMessage(
         {
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
@@ -724,7 +731,7 @@ const Game = ({setWhereto
   
     const requestSyncData = () => {
       // console.log(`Send requestsyncdata ${syncstamp}`);
-      client.send(
+      sendNextMessage(
         {
           gameid: gameid, // the id for the game
           type: "pb", // prisonbreak
@@ -976,7 +983,10 @@ const Game = ({setWhereto
         </div>
         {nickname && nickname.length > 3 && nickname.toUpperCase().substring(0,4) === 'TEST' &&
           <div className="w3-purple w3-monospace">
-             <p>&nbsp;{snat}</p>
+            <p>Snats for debugging: ({snats.length})</p>
+            {snats.map((snat,i) => (
+             <p key={`snat${i}`}>&nbsp;{snat}</p>
+            ))}
           </div>
         }
       </div>
@@ -998,4 +1008,4 @@ const ObserverRackTile = (props) => {
 }
 
 
-  export default Game;
+export default Game;
