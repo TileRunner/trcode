@@ -62,6 +62,9 @@ const Game = ({setWhereto
       scrollToBottom("ScrollableChat");
     },[chatmsgs])
     useEffect(() => {
+      scrollToBottom("ScrollableSnats");
+    },[snats])
+    useEffect(() => {
       if (rescues > prevRescues) {
           var myaudio = document.createElement('audio');
           // Observers hear yippee
@@ -982,10 +985,9 @@ const Game = ({setWhereto
           </div>
         </div>
         {nickname && nickname.length > 3 && nickname.toUpperCase().substring(0,4) === 'TEST' &&
-          <div className="w3-purple w3-monospace">
-            <p>Snats for debugging: ({snats.length})</p>
+          <div id="ScrollableSnats" className="pbSnatDiv">
             {snats.map((snat,i) => (
-             <p key={`snat${i}`}>&nbsp;{snat}</p>
+             <p key={`snat${i}`} className="pbSnat">{snat}</p>
             ))}
           </div>
         }

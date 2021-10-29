@@ -38,7 +38,7 @@ export const JOKE_ARRAY = [
     "The prisoners fave punctuation is a period. It marks the end of a sentence!",
     "Prison is only one word, but to robbers it's a whole sentence."
   ];
-export const PING_INTERVAL = 20000; // when waiting for opponent ping every this many milliseconds
+export const PING_INTERVAL = 60000; // when waiting for opponent ping every this many milliseconds
 export const TILEBAG4 = [
     "A",  "A",  "A",
     "B",

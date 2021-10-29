@@ -538,3 +538,21 @@
     max-block-size: 30px;
     cursor: text;
 }
+.pbSnatDiv {
+    align-items: left;
+    display: display-box;
+    flex-direction: column;
+    justify-content: left;
+    border-width: 5px;
+    border-style: none none solid solid;
+    border-color: black;
+    max-height: 300px;
+    max-width: 450px;
+    overflow-y: scroll;
+}
+.pbSnat {
+    background-color: black;
+    color: white;
+    font-family: monospace;
+    margin: auto;
+}
