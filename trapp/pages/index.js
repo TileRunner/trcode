@@ -1,8 +1,7 @@
 import Head from 'next/head'
 // import styles from '../styles/Home.module.css'
-// import Link from 'next/link'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
-import React, { _useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
@@ -10,18 +9,6 @@ import FryYourBrain from './fyb/fryyourbrain';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
-  // const [coderMsg, setCoderMsg] = useState('Loading');
-  // const [coderMsg2, setCoderMsg2] = useState('Loading');
-  // const getCoderMsg = async () => {
-  //   let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/evtest' : 'https://tilerunner.herokuapp.com/evtest'
-  //   const res = await fetch(url);
-  //   const jres = await res.json();
-  //   setCoderMsg(`${jres.evtest}`);
-  //   setCoderMsg2(`${jres.lextest}`);
-  // }
-  // useEffect(() => {
-  //   getCoderMsg();
-  // },[])
 
   return (
     <div>
@@ -35,18 +22,12 @@ export default function Home() {
 }
 
 const Menu = (props) => {
-  const menuButtonClassName = 'w3-button w3-green w3-hover-black w3-border w3-round-xxlarge w3-margin';
-  const hideButtonClassName = 'w3-button w3-black w3-border w3-animate-left w3-margin';
-  const showButtonClassName = 'w3-button w3-hover-black mymaterialicon w3-animate-right w3-round-xxlarge w3-margin';
-  const menuOptDescCard = 'w3-green w3-animate-right';
-  const ackTextClassName = 'w3-padding';
-  const ackDescCard = 'w3-animate-right';
-  
+  // Menu option toggle description flags
   const [descWm, setDescWm] = useState(false); // describe word mastermind
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
-
+  // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descExtendsClass, setDescExtendsClass] = useState(false); // describe extendsclass.com
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -59,25 +40,25 @@ const Menu = (props) => {
     return (
       <tr>
         <td>
-          <button className={menuButtonClassName}
+          <button className="menuButton"
             onClick={() => {props.setWhereto(props.targetWhereto);}}
           >
             {props.optionText}
           </button>
         </td>
         <td>
-          <button id="toggleDescribeFlag" className={props.descFlag ? hideButtonClassName : showButtonClassName}
+          <button id="toggleDescribeFlag" className={`menuToggleDescButton ${props.descFlag ? 'Y' : 'N'}`}
             onClick={() => toggleDescFlag()}
           >
-            {props.descFlag ? "Hide info" : <i className="material-icons">help_outline</i>}
+            {props.descFlag ? "Hide info" : "Show info"}
           </button>
         </td>
       </tr>
     )
   }
 
-  const DescribeWordMastermind = <div className={menuOptDescCard}>
-    <ul className="w3-ul commonFontFamily">
+  const DescribeWordMastermind = <div className="menuOptionDescDiv">
+    <ul className="commonFontFamily">
       <li><h2 className="CommenHeaderFontFamily">Word Mastermind is a single player code cracking game.</h2></li>
       <li>The computer picks a random word.</li>
       <li>You enter guesses until you guess correctly.</li>
@@ -89,8 +70,8 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeWordInfo = <div className={menuOptDescCard}>
-    <ul className="w3-ul commonFontFamily">
+  const DescribeWordInfo = <div className="menuOptionDescDiv">
+    <ul className="commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Word Info is a utility to get information on words.</h2></li>
       <li>Anagrams - words that use the exact same letters.</li>
       <li>Inserts - words that can be made by inserting a single letter.</li>
@@ -99,8 +80,8 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribePrisonBreak = <div className={menuOptDescCard}>
-    <ul className="w3-ul commonFontFamily">
+  const DescribePrisonBreak = <div className="menuOptionDescDiv">
+    <ul className="commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Prison Break is a two player crossword style game.</h2></li>
       <li>You play two games, one as the Prisoners and one as the Guards. Whoever frees the most prisoners wins.</li>
       <li>Prisoners always play first.</li>
@@ -114,8 +95,8 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeFryYourBrain = <div className={menuOptDescCard}>
-    <ul className="w3-ul commonFontFamily">
+  const DescribeFryYourBrain = <div className="menuOptionDescDiv">
+    <ul className="commonFontFamily">
       <li><h2 className="commonHeaderFontFamily">Fry Your Brain is a word game that can be contested by two to six players.</h2></li>
       <li>A tile pool is provided, starting with 3 letters. Players take turns.</li>
       <li>When it is your turn, make a word that has all the letters in the tile pool, plus any amount of additional letters.</li>
@@ -134,28 +115,30 @@ const Menu = (props) => {
     }
 
     return (
-      <div className="w3-cell w3-blue w3-mobile">
-        <span className={ackTextClassName}>
+      <tr>
+        <td className="menuAckShort">
             {props.ackText}
-          <button className={props.descFlag ? hideButtonClassName : showButtonClassName}
+        </td>
+        <td>
+          <button className={`menuToggleDescButton ${props.descFlag ? 'Y' : 'N'}`}
             onClick={() => toggleDescFlag()}
           >
-            {props.descFlag ? "Hide info" : <i className="material-icons">help_outline</i>}
+            {props.descFlag ? "Hide info" : "Show info"}
           </button>
-        </span>
-      </div>
+        </td>
+      </tr>
     )
   }
 
-  const DescribeEnable2k = <div className={ackDescCard}>
-    This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.
+  const DescribeEnable2k = <div>
+    <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
   </div>
 
-  const DescribeExtendsClass = <div className={ackDescCard}>
-    This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!
+  const DescribeExtendsClass = <div>
+    <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
   </div>
 
-  const DescribeFriends = <div className={ackDescCard}>
+  const DescribeFriends = <div>
     <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
@@ -180,12 +163,11 @@ return (
         <meta property="og:locale" content="en_US" />
         <meta property="og:type" content="website" />
       </Head>
-      <div className="w3-container w3-teal">
-        <h1 className="myHeadingFont"><span className="pbSquareInner PlayerTile">T</span>ile <span className="pbSquareInner PlayerTile">R</span>unner</h1>
-        {/* <h2>{props.coderMsg}</h2> */}
+      <div className="menuHeaderDiv">
+        <h1 className="myHeadingFont"><span className="pbSquareInner PlayerTile">M</span>enu <span className="pbSquareInner PlayerTile">O</span>ptions</h1>
       </div>
       <BrowserView>
-        <table className="w3-table w3-responsive">
+        <table>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
@@ -193,7 +175,7 @@ return (
         </table>
       </BrowserView>
       <MobileOnlyView>
-        <table className="w3-table w3-responsive">
+        <table>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
@@ -203,13 +185,17 @@ return (
       {descWi && DescribeWordInfo}
       {descPb && DescribePrisonBreak}
       {descFyb && DescribeFryYourBrain}
-      <div className="w3-panel">
-        <h1>Acknowledgements:</h1>
-        <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+      <div>
+        <div className="menuHeaderDiv">
+          <h2 className="myHeadingFont"><span className="pbSquareInner PlayerTile">S</span>pecial <span className="pbSquareInner PlayerTile">T</span>hanks</h2>
+        </div>
+        <table>
+          <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+          <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
+          <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+        </table>
         {descEnable2k && DescribeEnable2k}
-        <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
         {descExtendsClass && DescribeExtendsClass}
-        <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
         {descFriends && DescribeFriends}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import '../styles/globals.css'
+import '../styles/menu.css'
 import './wi/wordinfo.css'
 import './wm/mastermind.css'
 import './pb/prisonbreak.css'

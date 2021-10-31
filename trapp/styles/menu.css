@@ -1,0 +1,29 @@
+.menuHeaderDiv {
+    background-color: teal;
+}
+.menuButton {
+    background-color: teal;
+    color:burlywood;
+}
+.menuToggleDescButton {
+    background-color: teal;
+    margin-left: 5px;
+    padding: none;
+}
+.menuToggleDescButton.Y {
+    background-color: black;
+    color:burlywood;
+}
+.menuToggleDescButton.N {
+    color: whitesmoke;
+}
+.menuOptionDescDiv {
+    background-color: green;
+}
+.menuAckShort {
+    padding: 0px 5px;
+    background-color: teal;
+    color: burlywood;
+    border-style: dashed none;
+    border-color: burlywood black;
+}
