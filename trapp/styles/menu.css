@@ -26,7 +26,7 @@
     padding: 10px;
 }
 .menuOptRow td:nth-child(odd) {
-    padding: 0px 20px;
+    padding: 10px 20px;
 }
 .menuOptRow:nth-child(odd) {
     background-color: #183BF0;
@@ -38,6 +38,10 @@
 }
 .menuButton {
     border-radius: 50pc;
+    border-width: thick;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: lightsteelblue;
 }
 .menuAckRow:nth-child(odd) {
     background-color: #183BF0;
