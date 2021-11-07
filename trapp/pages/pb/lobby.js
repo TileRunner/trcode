@@ -215,7 +215,7 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                         <th className="w3-border-right">Guards</th>
                         <th className="w3-border-right">Rack Size</th>
                         <th>Game Status</th>
-                        {nickname === "TileRunner" && <th className="w3-border-left">Delete</th>}
+                        <th className="w3-border-left">Delete</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -297,21 +297,23 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                           <td id={`GameStatus${index}`}>
                             {value.gamestatus}
                           </td>
-                          {nickname === "TileRunner" && <td id={`DeleteGame${index}`} className="w3-border-left">
-                            <button className="w3-button w3-red w3-border w3-round w3-hover-black"
-                              onClick={function() {
-                                client.send(
-                                  {
-                                    type: "pb",
-                                    func: "deletegame",
-                                    gameid: value.gameid // Game id
-                                  }                         
-                                );
-                              }}
-                            >
-                              Delete Game
-                            </button>
-                          </td>}
+                          <td id={`DeleteGame${index}`} className="w3-border-left">
+                            {(nickname === "TileRunner" || nickname === value.pname || nickname === value.gname) &&
+                              <button className="w3-button w3-red w3-border w3-round w3-hover-black"
+                                onClick={function() {
+                                  client.send(
+                                    {
+                                      type: "pb",
+                                      func: "deletegame",
+                                      gameid: value.gameid // Game id
+                                    }                         
+                                  );
+                                }}
+                              >
+                                Delete Game
+                              </button>
+                            }
+                          </td>
                         </tr>
                       ))}
                     </tbody>

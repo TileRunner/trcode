@@ -1,9 +1,6 @@
 .menuHeaderDiv {
     background-color: teal;
-}
-.menuButton {
-    background-color: teal;
-    color:burlywood;
+    padding-left: 5px;
 }
 .menuToggleDescButton {
     background-color: teal;
@@ -20,10 +17,42 @@
 .menuOptionDescDiv {
     background-color: green;
 }
+.menuOptTable {
+    background-color: black;
+    padding: 10px;
+}
+.menuAckTable {
+    background-color: black;
+    padding: 10px;
+}
+.menuOptRow td:nth-child(odd) {
+    padding: 0px 20px;
+}
+.menuOptRow:nth-child(odd) {
+    background-color: #183BF0;
+    color: #FBA90A;
+}
+.menuOptRow:nth-child(even) {
+    background-color: #F7EBD4;
+    color: #1430B8;
+}
+.menuButton {
+    border-radius: 50pc;
+}
+.menuAckRow:nth-child(odd) {
+    background-color: #183BF0;
+    color: #FBA90A;
+}
+.menuAckRow:nth-child(even) {
+    background-color: #F7EBD4;
+    color: #1430B8;
+}
+.menuOptRow td:nth-child(even) {
+    background-color: black;
+}
+.menuAckRow td:nth-child(even) {
+    background-color: black;
+}
 .menuAckShort {
-    padding: 0px 5px;
-    background-color: teal;
-    color: burlywood;
-    border-style: dashed none;
-    border-color: burlywood black;
+    padding: 0px 28px;
 }

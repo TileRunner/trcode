@@ -38,7 +38,7 @@ const Menu = (props) => {
     }
 
     return (
-      <tr>
+      <tr className="menuOptRow">
         <td>
           <button className="menuButton"
             onClick={() => {props.setWhereto(props.targetWhereto);}}
@@ -115,7 +115,7 @@ const Menu = (props) => {
     }
 
     return (
-      <tr>
+      <tr className="menuAckRow">
         <td className="menuAckShort">
             {props.ackText}
         </td>
@@ -167,7 +167,7 @@ return (
         <h1 className="myHeadingFont"><span className="pbSquareInner PlayerTile">M</span>enu <span className="pbSquareInner PlayerTile">O</span>ptions</h1>
       </div>
       <BrowserView>
-        <table>
+        <table className="menuOptTable">
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
@@ -175,7 +175,7 @@ return (
         </table>
       </BrowserView>
       <MobileOnlyView>
-        <table>
+        <table className="menuOptTable">
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
@@ -189,7 +189,7 @@ return (
         <div className="menuHeaderDiv">
           <h2 className="myHeadingFont"><span className="pbSquareInner PlayerTile">S</span>pecial <span className="pbSquareInner PlayerTile">T</span>hanks</h2>
         </div>
-        <table>
+        <table className="menuAckTable">
           <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
           <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
           <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
