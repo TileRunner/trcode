@@ -1,3 +1,8 @@
+.fybLobby Button {
+    background-color: var(--commonButtonBackgroundColour);
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
+}
 .FryLetter {
     font-family: monospace;
     text-align: center;

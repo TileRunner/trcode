@@ -1,44 +1,46 @@
+.menu {
+    font-family: var(--commonFontFamily);
+    color: var(--commmonTextColour);
+}
 .menuHeaderDiv {
-    /* background-color: teal; */
-    color: black;
     padding-left: 5px;
+    font-family: var(--commonHeaderFontFamily);
+    font-weight: bold;
 }
 .menuButton {
     border-radius: 50pc;
     border-width: 2px;
     padding: 5px 10px;
-    background-color: teal;
-    border-color: black;
-    color: whitesmoke;
+    background-color: var(--commonButtonBackgroundColour);
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
 }
 .menuToggleDescButton {
-    background-color: teal;
+    background-color: var(--commonButtonBackgroundColour);
     margin-left: 5px;
     padding: none;
 }
 .menuToggleDescButton.Y {
+    border-color: burlywood;
     background-color: black;
     color:burlywood;
 }
 .menuToggleDescButton.N {
-    color: whitesmoke;
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
 }
 .menuOptionDescDiv {
-    background-color: green;
+    background-color: black;
+    color:burlywood;
 }
 .menuOptTable {
-    /* background-color: black; */
     padding: 10px;
 }
 .menuOptTable td{
     padding: 10px 20px;
 }
-.menuAckTable {
-    color: black;
-}
 .menuAckTable tr td:nth-child(1) {
     font-weight: bold;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 .menuAckTable td {
     padding: 10px 20px;

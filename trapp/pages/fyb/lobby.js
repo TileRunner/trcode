@@ -52,11 +52,11 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     }
 
     return (
-        <div>
+        <div className="fybLobby">
             <div className="w3-container w3-teal w3-bar">
                 <h1 className="w3-bar-item w3-left myHeadingFont">Fry Your Brain Lobby</h1>
                 <div className="w3-bar-item w3-left">
-                    <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                    <button onClick={() => {setWhereto('menu');}}>
                         <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                     </button>
                 </div>
@@ -83,7 +83,8 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 } } />
         </div>
         {nickname && <div className="w3-quarter">
-            <button className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont" type="submit"
+            <button 
+                type="submit"
                 onClick={() => {
                     setGotNickname(true);
                 }}>
@@ -96,7 +97,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
 function getMainAction(setMainAction) {
     return <div className="w3-container h4 w3-responsive">
         <div className="w3-row w3-padding">
-            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
+            <button type="submit"
                 id="chooseCreateGame"
                 onClick={() => {
                     setMainAction('C');
@@ -105,7 +106,7 @@ function getMainAction(setMainAction) {
             </button>
         </div>
         <div className="w3-row w3-padding">
-            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
+            <button type="submit"
                 id="chooseJoinGame"
                 onClick={() => {
                     setMainAction('J');
@@ -114,7 +115,7 @@ function getMainAction(setMainAction) {
             </button>
         </div>
         <div className="w3-row w3-padding">
-            <button className="w3-button w3-border w3-green w3-hover-black w3-round-xxlarge myCommonFont" type="submit"
+            <button type="submit"
                 id="chooseRejoinGame"
                 onClick={() => {
                     setMainAction('R');
@@ -155,7 +156,6 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
         {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 && <div className="w3-quarter">
             <button
                 id="requestCreateGame"
-                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
                 onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);}}>
                 SUBMIT
@@ -191,7 +191,6 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
         {gameid && <div className="w3-quarter">
             <button
                 id="requestJoinGame"
-                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
                 onClick={() => {sendJoinGameRequest(client, thisisme, gameid, nickname);}}>
                 SUBMIT
@@ -225,7 +224,6 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
         {gameid && <div className="w3-quarter">
             <button
                 id="requestRejoinGame"
-                className="w3-button w3-border w3-green w3-round-xxlarge myCommonFont"
                 type="submit"
                 onClick={() => {sendRejoinGameRequest(client, thisisme, gameid, nickname);}}>
                 SUBMIT

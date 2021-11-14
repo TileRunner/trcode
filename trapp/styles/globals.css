@@ -5,6 +5,9 @@
   --commonTextColour: whitesmoke;
   --commonHeaderFontFamily: Merriweather;
   --commonFontFamily: 'Open Sans', sans-serif;
+  --commonButtonBackgroundColour: teal;
+  --commonButtonTextColour: whitesmoke;
+  --commonButtonBorderColour: black;
 }
 .commonHeaderFontFamily {
   font-family: var(--commonHeaderFontFamily);

@@ -130,21 +130,21 @@ const Menu = (props) => {
     )
   }
 
-  const DescribeEnable2k = <div>
+  const DescribeEnable2k = <div className="menuOptionDescDiv">
     <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
   </div>
 
-  const DescribeExtendsClass = <div>
+  const DescribeExtendsClass = <div className="menuOptionDescDiv">
     <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
   </div>
 
-  const DescribeFriends = <div>
+  const DescribeFriends = <div className="menuOptionDescDiv">
     <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
 return (
-    <div>
+    <div class="menu">
       <Head>
         <title>Tile Runner</title>
         <link rel="icon" href="/tileTR.ico" />

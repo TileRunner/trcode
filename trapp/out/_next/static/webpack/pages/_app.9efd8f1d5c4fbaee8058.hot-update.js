@@ -1,0 +1,25 @@
+self["webpackHotUpdate_N_E"]("pages/_app",{
+
+/***/ "./node_modules/next/dist/compiled/css-loader/cjs.js??ruleSet[1].rules[2].oneOf[6].use[1]!./node_modules/next/dist/compiled/postcss-loader/cjs.js??ruleSet[1].rules[2].oneOf[6].use[2]!./pages/fyb/fyb.css":
+/*!*****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/compiled/css-loader/cjs.js??ruleSet[1].rules[2].oneOf[6].use[1]!./node_modules/next/dist/compiled/postcss-loader/cjs.js??ruleSet[1].rules[2].oneOf[6].use[2]!./pages/fyb/fyb.css ***!
+  \*****************************************************************************************************************************************************************************************************************/
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_next_dist_compiled_css_loader_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/next/dist/compiled/css-loader/api.js */ "./node_modules/next/dist/compiled/css-loader/api.js");
+/* harmony import */ var _node_modules_next_dist_compiled_css_loader_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_next_dist_compiled_css_loader_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_next_dist_compiled_css_loader_api_js__WEBPACK_IMPORTED_MODULE_0___default()(true);
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, ".fybLobbyButton {\r\n    background-color: var(--commonButtonBackgroundColour);\r\n    border-color: var(--commonButtonBorderColour);\r\n    color: var(--commonButtonTextColour);\r\n}\r\n.FryLetter {\r\n    font-family: monospace;\r\n    text-align: center;\r\n    padding-left: 2px;\r\n}\r\n.heart {\r\n    color: red;\r\n}", "",{"version":3,"sources":["webpack://pages/fyb/fyb.css"],"names":[],"mappings":"AAAA;IACI,qDAAqD;IACrD,6CAA6C;IAC7C,oCAAoC;AACxC;AACA;IACI,sBAAsB;IACtB,kBAAkB;IAClB,iBAAiB;AACrB;AACA;IACI,UAAU;AACd","sourcesContent":[".fybLobbyButton {\r\n    background-color: var(--commonButtonBackgroundColour);\r\n    border-color: var(--commonButtonBorderColour);\r\n    color: var(--commonButtonTextColour);\r\n}\r\n.FryLetter {\r\n    font-family: monospace;\r\n    text-align: center;\r\n    padding-left: 2px;\r\n}\r\n.heart {\r\n    color: red;\r\n}"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
+
+
+/***/ })
+
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9fTl9FLy4vcGFnZXMvZnliL2Z5Yi5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUE7QUFDa0c7QUFDbEcsOEJBQThCLHlGQUEyQjtBQUN6RDtBQUNBLDJEQUEyRCw4REFBOEQsc0RBQXNELDZDQUE2QyxLQUFLLGdCQUFnQiwrQkFBK0IsMkJBQTJCLDBCQUEwQixLQUFLLFlBQVksbUJBQW1CLEtBQUssT0FBTyxrRkFBa0YsWUFBWSxhQUFhLGFBQWEsTUFBTSxLQUFLLFlBQVksYUFBYSxhQUFhLE1BQU0sS0FBSyxVQUFVLDBDQUEwQyw4REFBOEQsc0RBQXNELDZDQUE2QyxLQUFLLGdCQUFnQiwrQkFBK0IsMkJBQTJCLDBCQUEwQixLQUFLLFlBQVksbUJBQW1CLEtBQUssbUJBQW1CO0FBQ242QjtBQUNBLCtEQUFlLHVCQUF1QixFQUFDIiwiZmlsZSI6InN0YXRpYy93ZWJwYWNrL3BhZ2VzL19hcHAuOWVmZDhmMWQ1YzRmYmFlZTgwNTguaG90LXVwZGF0ZS5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8vIEltcG9ydHNcbmltcG9ydCBfX19DU1NfTE9BREVSX0FQSV9JTVBPUlRfX18gZnJvbSBcIi4uLy4uL25vZGVfbW9kdWxlcy9uZXh0L2Rpc3QvY29tcGlsZWQvY3NzLWxvYWRlci9hcGkuanNcIjtcbnZhciBfX19DU1NfTE9BREVSX0VYUE9SVF9fXyA9IF9fX0NTU19MT0FERVJfQVBJX0lNUE9SVF9fXyh0cnVlKTtcbi8vIE1vZHVsZVxuX19fQ1NTX0xPQURFUl9FWFBPUlRfX18ucHVzaChbbW9kdWxlLmlkLCBcIi5meWJMb2JieUJ1dHRvbiB7XFxyXFxuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWNvbW1vbkJ1dHRvbkJhY2tncm91bmRDb2xvdXIpO1xcclxcbiAgICBib3JkZXItY29sb3I6IHZhcigtLWNvbW1vbkJ1dHRvbkJvcmRlckNvbG91cik7XFxyXFxuICAgIGNvbG9yOiB2YXIoLS1jb21tb25CdXR0b25UZXh0Q29sb3VyKTtcXHJcXG59XFxyXFxuLkZyeUxldHRlciB7XFxyXFxuICAgIGZvbnQtZmFtaWx5OiBtb25vc3BhY2U7XFxyXFxuICAgIHRleHQtYWxpZ246IGNlbnRlcjtcXHJcXG4gICAgcGFkZGluZy1sZWZ0OiAycHg7XFxyXFxufVxcclxcbi5oZWFydCB7XFxyXFxuICAgIGNvbG9yOiByZWQ7XFxyXFxufVwiLCBcIlwiLHtcInZlcnNpb25cIjozLFwic291cmNlc1wiOltcIndlYnBhY2s6Ly9wYWdlcy9meWIvZnliLmNzc1wiXSxcIm5hbWVzXCI6W10sXCJtYXBwaW5nc1wiOlwiQUFBQTtJQUNJLHFEQUFxRDtJQUNyRCw2Q0FBNkM7SUFDN0Msb0NBQW9DO0FBQ3hDO0FBQ0E7SUFDSSxzQkFBc0I7SUFDdEIsa0JBQWtCO0lBQ2xCLGlCQUFpQjtBQUNyQjtBQUNBO0lBQ0ksVUFBVTtBQUNkXCIsXCJzb3VyY2VzQ29udGVudFwiOltcIi5meWJMb2JieUJ1dHRvbiB7XFxyXFxuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWNvbW1vbkJ1dHRvbkJhY2tncm91bmRDb2xvdXIpO1xcclxcbiAgICBib3JkZXItY29sb3I6IHZhcigtLWNvbW1vbkJ1dHRvbkJvcmRlckNvbG91cik7XFxyXFxuICAgIGNvbG9yOiB2YXIoLS1jb21tb25CdXR0b25UZXh0Q29sb3VyKTtcXHJcXG59XFxyXFxuLkZyeUxldHRlciB7XFxyXFxuICAgIGZvbnQtZmFtaWx5OiBtb25vc3BhY2U7XFxyXFxuICAgIHRleHQtYWxpZ246IGNlbnRlcjtcXHJcXG4gICAgcGFkZGluZy1sZWZ0OiAycHg7XFxyXFxufVxcclxcbi5oZWFydCB7XFxyXFxuICAgIGNvbG9yOiByZWQ7XFxyXFxufVwiXSxcInNvdXJjZVJvb3RcIjpcIlwifV0pO1xuLy8gRXhwb3J0c1xuZXhwb3J0IGRlZmF1bHQgX19fQ1NTX0xPQURFUl9FWFBPUlRfX187XG4iXSwic291cmNlUm9vdCI6IiJ9
