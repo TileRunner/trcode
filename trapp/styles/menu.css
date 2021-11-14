@@ -1,6 +1,15 @@
 .menuHeaderDiv {
-    background-color: teal;
+    /* background-color: teal; */
+    color: black;
     padding-left: 5px;
+}
+.menuButton {
+    border-radius: 50pc;
+    border-width: 2px;
+    padding: 5px 10px;
+    background-color: teal;
+    border-color: black;
+    color: whitesmoke;
 }
 .menuToggleDescButton {
     background-color: teal;
@@ -18,45 +27,19 @@
     background-color: green;
 }
 .menuOptTable {
-    background-color: black;
+    /* background-color: black; */
     padding: 10px;
 }
-.menuAckTable {
-    background-color: black;
-    padding: 10px;
-}
-.menuOptRow td:nth-child(odd) {
+.menuOptTable td{
     padding: 10px 20px;
 }
-.menuOptRow:nth-child(odd) {
-    background-color: #183BF0;
-    color: #FBA90A;
+.menuAckTable {
+    color: black;
 }
-.menuOptRow:nth-child(even) {
-    background-color: #F7EBD4;
-    color: #1430B8;
+.menuAckTable tr td:nth-child(1) {
+    font-weight: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
-.menuButton {
-    border-radius: 50pc;
-    border-width: thick;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    background-color: lightsteelblue;
-}
-.menuAckRow:nth-child(odd) {
-    background-color: #183BF0;
-    color: #FBA90A;
-}
-.menuAckRow:nth-child(even) {
-    background-color: #F7EBD4;
-    color: #1430B8;
-}
-.menuOptRow td:nth-child(even) {
-    background-color: black;
-}
-.menuAckRow td:nth-child(even) {
-    background-color: black;
-}
-.menuAckShort {
-    padding: 0px 28px;
+.menuAckTable td {
+    padding: 10px 20px;
 }

@@ -38,7 +38,7 @@ const Menu = (props) => {
     }
 
     return (
-      <tr className="menuOptRow">
+      <tr>
         <td>
           <button className="menuButton"
             onClick={() => {props.setWhereto(props.targetWhereto);}}
@@ -115,8 +115,8 @@ const Menu = (props) => {
     }
 
     return (
-      <tr className="menuAckRow">
-        <td className="menuAckShort">
+      <tr>
+        <td>
             {props.ackText}
         </td>
         <td>
@@ -164,7 +164,7 @@ return (
         <meta property="og:type" content="website" />
       </Head>
       <div className="menuHeaderDiv">
-        <h1 className="myHeadingFont"><span className="pbSquareInner PlayerTile">M</span>enu <span className="pbSquareInner PlayerTile">O</span>ptions</h1>
+        <h1 className="myHeadingFont">Menu Options</h1>
       </div>
       <BrowserView>
         <table className="menuOptTable">
@@ -187,7 +187,7 @@ return (
       {descFyb && DescribeFryYourBrain}
       <div>
         <div className="menuHeaderDiv">
-          <h2 className="myHeadingFont"><span className="pbSquareInner PlayerTile">S</span>pecial <span className="pbSquareInner PlayerTile">T</span>hanks</h2>
+          <h2 className="myHeadingFont">Special Thanks</h2>
         </div>
         <table className="menuAckTable">
           <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
