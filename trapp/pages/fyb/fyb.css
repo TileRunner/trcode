@@ -1,6 +1,39 @@
-.fybLobby Button {
+.fybHeaderDiv {
+    padding-left: 5px;
+    font-family: var(--commonHeaderFontFamily);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.fybHomeButton {
+    padding-top: 5px;
+    margin-left: 10px;
+    border-radius: 0pc;
     background-color: var(--commonButtonBackgroundColour);
     border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
+}
+.fybLobbyButton {
+    margin-left: 10px;
+    border-radius: 50pc;
+    border-width: 2px;
+    padding: 5px 10px;
+    background-color: var(--commonButtonBackgroundColour);
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
+}
+.fybInputWarning {
+    background-color: whitesmoke;
+    color: red;
+    font-style: italic;
+    margin-left: 10px;
+    width: fit-content;
+}
+.fybLobby label {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.fybLobby input {
+    background-color: var(--commonButtonBackgroundColour);
     color: var(--commonButtonTextColour);
 }
 .FryLetter {

@@ -53,13 +53,11 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
 
     return (
         <div className="fybLobby">
-            <div className="w3-container w3-teal w3-bar">
-                <h1 className="w3-bar-item w3-left myHeadingFont">Fry Your Brain Lobby</h1>
-                <div className="w3-bar-item w3-left">
-                    <button onClick={() => {setWhereto('menu');}}>
-                        <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-                    </button>
-                </div>
+            <div className="fybHeaderDiv">
+                <span className="h1">Fry Your Brain</span>
+                <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
+                    <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                </button>
             </div>
             <p>{snat}</p>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
@@ -72,10 +70,11 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
 }
 
 function getNickname(nickname, setNickname, setGotNickname) {
-    return <div className="w3-row-padding h4">
-        <div className="w3-quarter">
+    return <div>
+        <div>
             <label>Nickname:</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+            <input
+                type="text"
                 name="nickname"
                 value={nickname}
                 onChange={(e) => {
@@ -83,7 +82,8 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 } } />
         </div>
         {nickname && <div className="w3-quarter">
-            <button 
+            <button
+                className="fybLobbyButton"
                 type="submit"
                 onClick={() => {
                     setGotNickname(true);
@@ -95,72 +95,97 @@ function getNickname(nickname, setNickname, setGotNickname) {
 }
 
 function getMainAction(setMainAction) {
-    return <div className="w3-container h4 w3-responsive">
-        <div className="w3-row w3-padding">
-            <button type="submit"
+    return <div>
+        <p>
+            <button
+                className="fybLobbyButton"
+                type="submit"
                 id="chooseCreateGame"
                 onClick={() => {
                     setMainAction('C');
                 }}>
                 CREATE A GAME
             </button>
-        </div>
-        <div className="w3-row w3-padding">
-            <button type="submit"
+        </p>
+        <p>
+            <button
+                className="fybLobbyButton"
+                type="submit"
                 id="chooseJoinGame"
                 onClick={() => {
                     setMainAction('J');
                 }}>
                 JOIN A GAME
             </button>
-        </div>
-        <div className="w3-row w3-padding">
+        </p>
+        <p>
             <button type="submit"
+                className="fybLobbyButton"
                 id="chooseRejoinGame"
                 onClick={() => {
                     setMainAction('R');
                 }}>
                 REJOIN A GAME
             </button>
-        </div>
+        </p>
     </div>;
 }
 
 function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, goal, setGoal, nickname) {
-    return <div className="w3-row-padding h4">
-        <div className="w3-quarter">
-            <label>Game ID:</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
-                name="gameid"
-                value={gameid}
-                onChange={(e) => {
-                    setGameid(e.target.value.trim());
-                } } />
+    return <div>
+        <div className="fybHeaderDiv">
+            <span className="h2">Create Game</span>
         </div>
-        <div className="w3-quarter">
-            <label>Number of Players:</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="number"
-                name="numPlayers"
-                value={numPlayers}
-                onChange={(e) => { setNumPlayers(e.target.value); } } 
-                />
-        </div>
-        <div className="w3-quarter">
-            <label>Points needed to win (3 to 21):</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="number"
-                name="goal"
-                value={goal}
-                onChange={(e) => { setGoal(e.target.value); } } 
-                />
-        </div>
-        {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 && <div className="w3-quarter">
+        <table>
+            <tr>
+                <td><label>Game ID:</label></td>
+                <td><input
+                    type="text"
+                    name="gameid"
+                    value={gameid}
+                    onChange={(e) => {
+                        setGameid(e.target.value.trim());
+                    } } /></td>
+            </tr>
+            <tr>
+                <td><label># Players:</label></td>
+                <td><input
+                    type="number"
+                    name="numPlayers"
+                    value={numPlayers}
+                    onChange={(e) => { setNumPlayers(e.target.value); } } 
+                    /></td>
+            </tr>
+            <tr>
+                <td><label>Pts to win:</label></td>
+                <td><input
+                    type="number"
+                    name="goal"
+                    value={goal}
+                    onChange={(e) => { setGoal(e.target.value); } } 
+                    /></td>
+            </tr>
+        </table>
+        {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 &&
             <button
+                className="fybLobbyButton"
                 id="requestCreateGame"
                 type="submit"
                 onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);}}>
                 SUBMIT
             </button>
-        </div>}
+        }
+        <div className="fybInputWarning">
+            {!gameid &&
+                <p>Game ID is required</p>
+            }
+            {!(numPlayers > 1 && numPlayers < 7) &&
+                <p># Players is 2-6</p>
+            }
+            {!(goal > 2 && goal < 22) &&
+                <p>Pts to win is 3-21</p>
+            }
+        </div>
     </div>;
 }
 
@@ -178,24 +203,34 @@ function sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickn
 }
 
 function joinGame(client, thisisme, gameid, setGameid, nickname) {
-    return <div className="w3-row-padding h4">
-        <div className="w3-quarter">
+    return <div>
+        <div className="fybHeaderDiv">
+            <span className="h2">Join Game</span>
+        </div>
+        <div>
             <label>Game ID to join:</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+            <input
+                type="text"
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
                     setGameid(e.target.value.trim());
                 } } />
         </div>
-        {gameid && <div className="w3-quarter">
+        {gameid && <div>
             <button
+                className="fybLobbyButton"
                 id="requestJoinGame"
                 type="submit"
                 onClick={() => {sendJoinGameRequest(client, thisisme, gameid, nickname);}}>
                 SUBMIT
             </button>
         </div>}
+        {!gameid &&
+            <div className="fybInputWarning">
+                <p>Game ID is required</p>
+            </div>
+        }
     </div>;
 }
 
@@ -211,10 +246,14 @@ function sendJoinGameRequest(client, thisisme, gameid, nickname) {
 }
 
 function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
-    return <div className="w3-row-padding h4">
-        <div className="w3-quarter">
+    return <div>
+        <div className="fybHeaderDiv">
+            <span className="h2">Rejoin Game</span>
+        </div>
+        <div>
             <label>Game ID to rejoin:</label>
-            <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+            <input
+                type="text"
                 name="gameid"
                 value={gameid}
                 onChange={(e) => {
@@ -223,12 +262,18 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
         </div>
         {gameid && <div className="w3-quarter">
             <button
+                className="fybLobbyButton"
                 id="requestRejoinGame"
                 type="submit"
                 onClick={() => {sendRejoinGameRequest(client, thisisme, gameid, nickname);}}>
                 SUBMIT
             </button>
         </div>}
+        {!gameid &&
+            <div className="fybInputWarning">
+                <p>Game ID is required</p>
+            </div>
+        }
     </div>;
 }
 

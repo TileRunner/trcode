@@ -144,7 +144,7 @@ const Menu = (props) => {
   </div>
 
 return (
-    <div class="menu">
+    <div className="menu">
       <Head>
         <title>Tile Runner</title>
         <link rel="icon" href="/tileTR.ico" />
