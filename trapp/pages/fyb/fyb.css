@@ -36,11 +36,102 @@
     background-color: var(--commonButtonBackgroundColour);
     color: var(--commonButtonTextColour);
 }
-.FryLetter {
-    font-family: monospace;
-    text-align: center;
-    padding-left: 2px;
-}
 .heart {
     color: red;
+}
+.fybGameSectionHeader {
+    margin-left: 20px;
+    background-color: black;
+    color: whitesmoke;
+    font-size: x-large;
+    font-family: var(--commonHeaderFontFamily);
+    width: fit-content;
+    padding: 2px 10px;
+}
+.fybGamePlayer {
+    background-color: green;
+    color: whitesmoke;
+    padding: 1px 3px;
+}
+.fybGamePlayer::after {
+    content: ' :';
+}
+.fybGameWord {
+    padding: 1px 3px;
+    background-color: green;
+    color: whitesmoke;
+    font-family: monospace;
+    font-size: x-large;
+}
+.fybGameWord.pass {
+    background-color: red;
+}
+.fybGameWord.valid {
+    background-color: green;
+}
+.fybGameWord.invalid {
+    background-color: red;
+}
+.fybGameScore {
+    background-color: green;
+    color: whitesmoke;
+    font-family: monospace;
+    padding: 1px 5px;
+}
+.fybWinner {
+    background-color: purple;
+    font-style: oblique;
+    font-size: larger;
+    letter-spacing: 1px;
+    margin-left: 5px;
+    padding: 2px;
+}
+.fybGame table {
+    margin-left: 30px;
+}
+.fryLetterDiv {
+    background-color: black;
+    color: whitesmoke;
+    font-family: var(--commonHeaderFontFamily);
+    font-size: x-large;
+    width: fit-content;
+    padding: 2px 10px;
+    margin: 0px 0px 10px 20px;
+}
+.fryLetter {
+    background-color: green;
+    font-family: monospace;
+    font-size: xx-large;
+    text-align: center;
+    padding: 0px 2px;
+}
+.fybGame label {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.fybGame input {
+    background-color: var(--commonButtonBackgroundColour);
+    color: var(--commonButtonTextColour);
+}
+.fybGameWordSubmitButton {
+    margin-left: 10px;
+    border-radius: 50pc;
+    border-width: 2px;
+    padding: 5px 10px;
+    background-color: var(--commonButtonBackgroundColour);
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
+}
+.fybGameWordPassButton {
+    margin-left: 10px;
+    border-radius: 50pc;
+    border-width: 2px;
+    padding: 5px 10px;
+    background-color: red;
+    border-color: var(--commonButtonBorderColour);
+    color: var(--commonButtonTextColour);
+}
+.fybSnat {
+    margin: 10px 0px 10px 10px;
+    font-style: italic;
 }

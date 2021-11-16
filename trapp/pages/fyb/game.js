@@ -69,38 +69,30 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         }
     }
     return (
-        <div>
-            <div className="w3-teal w3-cell-row">
-                <div className="w3-container w3-cell w3-cell-middle w3-padding w3-mobile">
-                    <h1 className="myHeadingFont">Fry Your Brain</h1>
-                </div>
-                <div className="w3-container w3-cell w3-mobile">
-                    <h4 className="myCommonFont">Game id: {gameid}</h4>
-                    <h4 className="myCommonFont">First to {gamedata.goal}</h4>
-                </div>
-                <div className="w3-container w3-cell w3-padding w3-mobile">
-                    <button className="w3-button" onClick={() => {setWhereto('menu');}}>
-                        <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-                    </button>
-                </div>
+        <div className="fybGame">
+            <div className="fybHeaderDiv">
+                <span className="h1">Fry Your Brain</span>
+                <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
+                    <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                </button>
             </div>
-            <div className="w3-panel w3-responsive">
-                <h2 className="w3-black w3-padding-small w3-cell">Player totals:</h2>
-                <table>
-                    <tbody>
-                        {gamedata.players.map((pl) => (
-                            <tr key={`Player${pl.index}`}>
-                                <td className="w3-green">{pl.nickname}</td>
-                                <td class="w3-monospace">
-                                    &nbsp;&nbsp;
-                                    {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
-                                    {pl.points >= gamedata.goal && <span class="w3-purple w3-cursive w3-margin w3-wide">Winner!</span>}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="fybHeaderDiv">
+                <span className="h4">Game id: {gameid}, First to {gamedata.goal}</span>
             </div>
+            <div className="fybGameSectionHeader">Player totals:</div>
+            <table>
+                <tbody>
+                    {gamedata.players.map((pl) => (
+                        <tr key={`Player${pl.index}`}>
+                            <td className="fybGamePlayer">{pl.nickname}</td>
+                            <td class="fybGameScore">
+                                {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
+                                {pl.points >= gamedata.goal && <span class="fybWinner">Winner!</span>}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
             {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
                 showMoveList('Moves previous round', gamedata.movesPrevRound)
             }
@@ -111,21 +103,22 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 showMoveList('Free-for-all results', gamedata.freeforallMoves)
             }
             {gamedata.whoseturn > -1 &&
-                <div className='w3-panel w3-row'>
-                    <h2 className="w3-black w3-cell w3-padding-small">Fry Letters: {gamedata.fryLetters.map((fl,i) => (
-                        <span key={`FryLetter${i}`} className="FryLetter">{fl}</span>
-                    ))}</h2>
+                <div className="fryLetterDiv">
+                    Fry Letters:
+                    {gamedata.fryLetters.map((fl,i) => (
+                        <span key={`FryLetter${i}`} className="fryLetter">{fl}</span>
+                    ))}
                 </div>
             }
             {meToEnterWord() &&
                 getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
             }
-            <div className="w3-container">
-            <p>{snat}</p>
+            <div>
+            <p className="fybSnat">{snat}</p>
             {gamedata.gameOver && <div>
-                <h2 className="w3-black w3-cell w3-padding-small">Game Over</h2>
+                <span className="fybGameSectionHeader">Game Over</span>
                 <button
-                    className="w3-button w3-green w3-margin"
+                    className="fybGameWordSubmitButton"
                     onClick={() => {sendReplayRequest(client, thisisme, gamedata, nickname)}}
                 >
                     PLAY AGAIN
@@ -137,17 +130,17 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
 }
 
 function showMoveList(moveListTitle, moveArray) {
-    return <div className="w3-panel">
-        <h2 className="w3-black w3-padding-small w3-cell">{moveListTitle}:</h2>
+    return <div>
+        <div className="fybGameSectionHeader">{moveListTitle}:</div>
         <table>
         {moveArray.map((move) => (
             <tr key={`${moveListTitle}${move.nickname}`}>
-                <td className="w3-green">&nbsp;{move.nickname}:</td>
-                <td>&nbsp;
+                <td className="fybGamePlayer">{move.nickname}</td>
+                <td className="fybGameWord">
                 {move.pass ?
-                    <span className="w3-black"> passed</span>
+                    <span className="fybGameWord pass"> passed</span>
                 :
-                    <span className={`w3-monospace ${move.valid ? '' : 'w3-red'}`}>{move.word}</span>
+                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'}`}>{move.word}</span>
                 }
                 </td>
             </tr>
@@ -157,26 +150,27 @@ function showMoveList(moveListTitle, moveArray) {
 }
 
 function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname) {
-    return <div className="w3-quarter w3-margin" onKeyDownCapture={handleKeyDown}>
+    return <div onKeyDownCapture={handleKeyDown}>
         <label>Enter Word:</label>
-        <input className="w3-input w3-border w3-blue myCommonFont" type="text" autoComplete="off" spellCheck="false"
+        <input type="text" autoComplete="off" spellCheck="false"
             name="word"
             value={word}
             onChange={(e) => {
                 setWord(e.target.value);
             } } />
+        <div>
+            {word.toUpperCase().trim().match("^[a-zA-Z]*$") && 
+                <button className="fybGameWordSubmitButton" key="submitWord"
+                onClick={() => {submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord)}}>
+                    SUBMIT
+                </button>
+            }
 
-        {word.toUpperCase().trim().match("^[a-zA-Z]*$") && <button className="w3-button w3-green w3-margin" key="submitWord"
-         onClick={() => {submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord)}}>
-            SUBMIT
-        </button>}
-
-        <button className="w3-button w3-red w3-margin" key="passButton"
-         onClick={() => {submitPass(setSnat, client, thisisme, gamedata.gameid, nickname, setWord)}}>
-            PASS
-        </button>
-
-
+            <button className="fybGameWordPassButton" key="passButton"
+            onClick={() => {submitPass(setSnat, client, thisisme, gamedata.gameid, nickname, setWord)}}>
+                PASS
+            </button>
+        </div>
     </div>;
 }
 

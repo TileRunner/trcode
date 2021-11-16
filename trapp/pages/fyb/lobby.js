@@ -81,7 +81,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
                     setNickname(e.target.value.trim());
                 } } />
         </div>
-        {nickname && <div className="w3-quarter">
+        {nickname && <div>
             <button
                 className="fybLobbyButton"
                 type="submit"
@@ -260,7 +260,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
                     setGameid(e.target.value.trim());
                 } } />
         </div>
-        {gameid && <div className="w3-quarter">
+        {gameid && <div>
             <button
                 className="fybLobbyButton"
                 id="requestRejoinGame"
