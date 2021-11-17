@@ -71,17 +71,19 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     return (
         <div className="fybGame">
             <div className="fybHeaderDiv">
-                <span className="h1">Fry Your Brain</span>
+                <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
             <div className="fybHeaderDiv">
-                <span className="h4">Game id: {gameid}, First to {gamedata.goal}</span>
+                <span className="h4">Game id: {gameid}</span>
             </div>
-            <div className="fybGameSectionHeader">Player totals:</div>
             <table>
                 <tbody>
+                    <tr>
+                        <td colSpan="2" className="fybGameSectionHeader">First to {gamedata.goal} wins!</td>
+                    </tr>
                     {gamedata.players.map((pl) => (
                         <tr key={`Player${pl.index}`}>
                             <td className="fybGamePlayer">{pl.nickname}</td>
@@ -91,17 +93,32 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                             </td>
                         </tr>
                     ))}
+                    {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
+                        <tr>
+                            <td className="fybGameSectionHeader" colSpan="2">Previous round:</td>
+                        </tr>
+                    }
+                    {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
+                        showMoveList('movesPrevRound', gamedata.movesPrevRound)
+                    }
+                    {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
+                        <tr>
+                            <td className="fybGameSectionHeader" colSpan="2">This round:</td>
+                        </tr>
+                    }
+                    {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
+                        showMoveList('movesThisRound', gamedata.movesThisRound)
+                    }
+                    {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
+                        <tr>
+                            <td className="fybGameSectionHeader" colSpan="2">Free-for-all:</td>
+                        </tr>
+                    }
+                    {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
+                        showMoveList('ffaMoves', gamedata.freeforallMoves)
+                    }
                 </tbody>
             </table>
-            {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
-                showMoveList('Moves previous round', gamedata.movesPrevRound)
-            }
-            {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
-                showMoveList('Moves this round', gamedata.movesThisRound)
-            }
-            {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
-                showMoveList('Free-for-all results', gamedata.freeforallMoves)
-            }
             {gamedata.whoseturn > -1 &&
                 <div className="fryLetterDiv">
                     Fry Letters:
@@ -129,12 +146,10 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     );
 }
 
-function showMoveList(moveListTitle, moveArray) {
-    return <div>
-        <div className="fybGameSectionHeader">{moveListTitle}:</div>
-        <table>
-        {moveArray.map((move) => (
-            <tr key={`${moveListTitle}${move.nickname}`}>
+function showMoveList(moveListKey, moveArray) {
+    return (
+        moveArray.map((move) => (
+            <tr key={`${moveListKey}${move.nickname}`}>
                 <td className="fybGamePlayer">{move.nickname}</td>
                 <td className="fybGameWord">
                 {move.pass ?
@@ -144,15 +159,14 @@ function showMoveList(moveListTitle, moveArray) {
                 }
                 </td>
             </tr>
-            ))}
-        </table>
-    </div>
+        )))
 }
 
 function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname) {
     return <div onKeyDownCapture={handleKeyDown}>
-        <label>Enter Word:</label>
-        <input type="text" autoComplete="off" spellCheck="false"
+        <div className="fybGameEnterWordLabel">Enter Word:</div>
+        <input
+            type="text" autoComplete="off" spellCheck="false"
             name="word"
             value={word}
             onChange={(e) => {
