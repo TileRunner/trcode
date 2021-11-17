@@ -39,8 +39,16 @@
 .heart {
     color: red;
 }
+.fybGame {
+    /*
+        There is an annoying mobile effect of auto scrolling down and right.
+        This puts some content out of view, slightly.
+        The margin left and padding top are my attempt to improve the mobile experience.
+     */
+     margin-top: 10px;
+     margin-left: 10px;
+}
 .fybGameSectionHeader {
-    margin-left: 10px;
     background-color: black;
     color: whitesmoke;
     font-size: x-large;
@@ -82,9 +90,6 @@
     letter-spacing: 1px;
     margin-left: 5px;
     padding: 2px;
-}
-.fybGame {
-    margin-top: 2px;
 }
 .fybGame table {
     margin-left: 10px;
@@ -131,6 +136,10 @@
     background-color: red;
     border-color: var(--commonButtonBorderColour);
     color: var(--commonButtonTextColour);
+}
+.fybGameOver {
+    margin-top: 10px;
+    margin-left: 10px;
 }
 .fybSnat {
     margin: 10px 0px 10px 10px;

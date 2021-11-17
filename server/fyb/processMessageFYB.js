@@ -219,6 +219,14 @@ const processFybMove = (wss, pm) => {
     if (foundGame) { // I mean, it should!
         let snat = 'oops';
         if (foundGame.freeforall) { // In free-for-all round
+            // Sometimes client submits a word and does not get the reply and they can submit again!
+            // Ignore resubmit but send game data again.
+            foundGame.freeforallMoves.forEach((m) => {
+                if (m.nickname === pm.nickname) {
+                    sendGameToCaller(wss, pm, false);
+                    return;
+                }
+            });
             foundGame.freeforallMoves.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
             if (foundGame.freeforallMoves.length === foundGame.numPlayers - 1) { // All have moved
                 let anyValidAnswers = false;
@@ -295,6 +303,14 @@ const processFybMove = (wss, pm) => {
                 snat = `Free-for-all round in progress.`;
             }
         } else { // In regular round
+            // Sometimes client submits a word and does not get the reply and they can submit again!
+            // Ignore resubmit but send game data again.
+            foundGame.movesThisRound.forEach((m) => {
+                if (m.nickname === pm.nickname) {
+                    sendGameToCaller(wss, pm, false);
+                    return;
+                }
+            });
             // Clear previous results once a word is sent in this round
             foundGame.freeforallMoves = [];
             foundGame.movesPrevRound = [];
@@ -367,10 +383,14 @@ function wordAllowed(checkword, movesThisRound) {
 }
 
 const processFybInterval = (wss, pm) => {
+    sendGameToCaller(wss, pm, true);
+}
+
+const sendGameToCaller = (wss, pm, checksync) => {
     let foundGame = findGame(pm.gameid);
     let callingClient = findPlayerClient(wss, pm.gameid, pm.thisisme);
     if (foundGame && callingClient) { // Should find both
-        if (foundGame.syncstamp !== pm.syncstamp) { // Out of date
+        if (!checksync || (foundGame.syncstamp !== pm.syncstamp)) { // Out of date
             sendGameData([callingClient], foundGame, foundGame.snat);
         }
     }

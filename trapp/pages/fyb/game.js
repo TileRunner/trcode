@@ -121,7 +121,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             </table>
             {gamedata.whoseturn > -1 &&
                 <div className="fryLetterDiv">
-                    Fry Letters:
+                    Letters:&nbsp;
                     {gamedata.fryLetters.map((fl,i) => (
                         <span key={`FryLetter${i}`} className="fryLetter">{fl}</span>
                     ))}
@@ -131,8 +131,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
             }
             <div>
-            <p className="fybSnat">{snat}</p>
-            {gamedata.gameOver && <div>
+            {gamedata.gameOver && <div className="fybGameOver">
                 <span className="fybGameSectionHeader">Game Over</span>
                 <button
                     className="fybGameWordSubmitButton"
@@ -141,6 +140,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     PLAY AGAIN
                 </button>
             </div>}
+            <p className="fybSnat">{snat}</p>
             </div>
         </div>
     );

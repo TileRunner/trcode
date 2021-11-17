@@ -1,4 +1,7 @@
 export const scrollToBottom = (elementid) => {
     const theElement = document.getElementById(elementid);
-    theElement.scrollTop = theElement.scrollHeight;
+    // I have optional elements that my useEffect still tries to scroll when absent
+    if (theElement) {
+        theElement.scrollTop = theElement.scrollHeight;
+    }
 }
