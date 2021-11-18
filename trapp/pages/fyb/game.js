@@ -69,7 +69,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         }
     }
     return (
-        <div className="fybGame">
+        <div className="container fybGame">
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
@@ -87,9 +87,9 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     {gamedata.players.map((pl) => (
                         <tr key={`Player${pl.index}`}>
                             <td className="fybGamePlayer">{pl.nickname}</td>
-                            <td class="fybGameScore">
+                            <td className="fybGameScore">
                                 {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
-                                {pl.points >= gamedata.goal && <span class="fybWinner">Winner!</span>}
+                                {pl.points >= gamedata.goal && <span className="fybWinner">Winner!</span>}
                             </td>
                         </tr>
                     ))}

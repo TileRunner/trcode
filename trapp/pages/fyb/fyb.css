@@ -44,9 +44,12 @@
         There is an annoying mobile effect of auto scrolling down and right.
         This puts some content out of view, slightly.
         The margin left and padding top are my attempt to improve the mobile experience.
+        Using class name "container" along with "fryGame" seems helpful at least on device emulation.
      */
-     margin-top: 10px;
-     margin-left: 10px;
+     border-width: 10px;
+     border-color: green;
+     border-style: groove;
+     padding-top: 5px;
 }
 .fybGameSectionHeader {
     background-color: black;
