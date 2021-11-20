@@ -120,13 +120,21 @@
     width: fit-content;
     padding: 2px 10px 2px 2px;
     margin: 0px 0px 10px 10px;
+    user-select: none;
 }
-.fryLetter {
+.fybFryLetter {
     /* background-color: green; */
     font-family: monospace;
     font-size: xx-large;
     text-align: center;
     padding: 0px 2px;
+}
+.fybFryLetter.Selected {
+    color: blue;
+    border-style: inset;
+    border-width: thick;
+    border-color: blue;
+    background-color: whitesmoke;
 }
 .fybGameEnterWordLabel {
     margin: 0px 0px 2px 10px;

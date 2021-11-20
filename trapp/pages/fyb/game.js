@@ -3,9 +3,10 @@ import * as c from '../../lib/fyb/constants';
 
 const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const [snat, setSnat] = useState('');
-    const [gamedata, setGamedata] = useState({goal:99, whoseturn:-1, players:[{index: 0, nickname: 'Loading...'}]});
+    const [gamedata, setGamedata] = useState({goal:99, whoseturn:-1, fryLetters:[], players:[{index: 0, nickname: 'Loading...'}]});
     const [word, setWord] = useState(''); // my word to submit
     const [syncstamp, setSyncstamp] = useState('');
+    const [selected, setSelected] = useState(-1);
     useEffect(() => {
         const interval = setInterval(() => {
             if (gamedata.whoseturn > -1 && gamedata.players.length > 0) {
@@ -30,6 +31,11 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 setSnat(messageData.snat);
+                if (messageData.game.fryLetters &&
+                    gamedata.fryLetters &&
+                    messageData.game.fryLetters.join() !== gamedata.fryLetters.join()) {
+                        setSelected(-1);
+                    }
                 setGamedata(messageData.game);
                 setSyncstamp(messageData.game.syncstamp);
             } else if (messageData.func = c.S2C_FUNC_GAMECREATED) {
@@ -149,7 +155,43 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 </div>
                 <div className="fryLetterDiv">
                     {gamedata.fryLetters.map((fl,i) => (
-                        <span key={`FryLetter${i}`} className="fryLetter">{fl}</span>
+                        <span key={`FryLetter${i}`}
+                            className={i === selected ? "fybFryLetter Selected":"fybFryLetter"}
+                            onDoubleClick={() => {
+                                let moveLetter = gamedata.fryLetters[i];
+                                let shiftedLetters = [...gamedata.fryLetters];
+                                shiftedLetters.splice(i,1);
+                                shiftedLetters.push(moveLetter);
+                                let newGamedata = JSON.parse(JSON.stringify(gamedata));
+                                newGamedata.fryLetters = [...shiftedLetters];
+                                setGamedata(newGamedata);
+                                setSelected(-1);
+                            }}
+                            onClick={() => {
+                                if (selected === -1) {
+                                    setSelected(i);
+                                } else if (i === selected) {
+                                    setSelected(-1); // unselect when clicked a second time
+                                } else {
+                                    // Move selected tile to this position
+                                    let shiftedLetters = [];
+                                    let moveLetter = gamedata.fryLetters[selected];
+                                    for (let index = 0; index < gamedata.fryLetters.length; index++) {
+                                        const element = gamedata.fryLetters[index];
+                                        if (index === i) {
+                                            shiftedLetters.push(moveLetter);
+                                        }
+                                        if (index !== selected) {
+                                            shiftedLetters.push(element);
+                                        }
+                                    }
+                                    let newGamedata = JSON.parse(JSON.stringify(gamedata));
+                                    newGamedata.fryLetters = [...shiftedLetters];
+                                    setGamedata(newGamedata);
+                                    setSelected(-1);
+                                }
+                            }}
+                            >{fl}</span>
                     ))}
                 </div>
             </div>}
