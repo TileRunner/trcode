@@ -120,13 +120,39 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 </tbody>
             </table>
             {gamedata.whoseturn > -1 &&
+            <div>
+                <div className="fybGameFryLettersLabel">Fry Letters:
+                    <button className="fybGameShuffleButton" onClick={() => {
+                        let shuffleSize = gamedata.fryLetters.length;
+                        let beforeShuffle = [...gamedata.fryLetters];
+                        let afterShuffle = [];
+                        while (afterShuffle.length < shuffleSize) {
+                            let rand = Math.floor(Math.random() * beforeShuffle.length);
+                            afterShuffle.push(beforeShuffle[rand]);
+                            beforeShuffle.splice(rand, 1);
+                        };
+                        let newGamedata = JSON.parse(JSON.stringify(gamedata));
+                        newGamedata.fryLetters = [...afterShuffle];
+                        setGamedata(newGamedata);
+                    }}>
+                        <i className="material-icons fybGameShuffleButtonIcon">cached</i>
+                    </button>
+                    <button className="fybGameShuffleButton" onClick={() => {
+                        let sortwork = [...gamedata.fryLetters];
+                        sortwork.sort();
+                        let newGamedata = JSON.parse(JSON.stringify(gamedata));
+                        newGamedata.fryLetters = [...sortwork];
+                        setGamedata(newGamedata);
+                    }}>
+                        <i className="material-icons fybGameShuffleButtonIcon">sort_by_alpha</i>
+                    </button>
+                </div>
                 <div className="fryLetterDiv">
-                    Letters:&nbsp;
                     {gamedata.fryLetters.map((fl,i) => (
                         <span key={`FryLetter${i}`} className="fryLetter">{fl}</span>
                     ))}
                 </div>
-            }
+            </div>}
             {meToEnterWord() &&
                 getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
             }

@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[969],{7784:function(n,_,u){(window.__NEXT_P=window.__NEXT_P||[]).push(["/fyb/fryyourbrain",function(){return u(4891)}])}},function(n){n.O(0,[891,774,888,179],(function(){return _=7784,n(n.s=_);var _}));var _=n.O();_N_E=_}]);

@@ -50,6 +50,7 @@
      border-color: green;
      border-style: groove;
      padding-top: 5px;
+     max-width: 330px;
 }
 .fybGameSectionHeader {
     background-color: black;
@@ -98,6 +99,19 @@
     margin-left: 10px;
     background-color: green;
 }
+.fybGameFryLettersLabel {
+    margin: 5px 0px 0px 10px;
+}
+.fybGameShuffleButton {
+    margin-left: 5px;
+    border: none;
+    padding: 0px 0px 0px 0px;
+    background-color: darkgrey;
+    color: blue;
+}
+.fybGameShuffleButtonIcon {
+    margin: 5px 0px 0px 5px;
+}
 .fryLetterDiv {
     background-color: black;
     color: whitesmoke;
@@ -105,10 +119,10 @@
     font-size: x-large;
     width: fit-content;
     padding: 2px 10px 2px 2px;
-    margin: 10px 0px 10px 10px;
+    margin: 0px 0px 10px 10px;
 }
 .fryLetter {
-    background-color: green;
+    /* background-color: green; */
     font-family: monospace;
     font-size: xx-large;
     text-align: center;
