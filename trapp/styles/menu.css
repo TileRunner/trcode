@@ -1,6 +1,13 @@
 .menu {
     font-family: var(--commonFontFamily);
     color: var(--commmonTextColour);
+    margin-left: 5px;
+    margin-top: 5px;
+    border-width: 10px;
+    border-color: green;
+    border-style: groove;
+    padding-top: 5px;
+    max-width: 340px;
 }
 .menuHeaderDiv {
     padding-left: 5px;
@@ -34,10 +41,10 @@
     color:burlywood;
 }
 .menuOptTable {
-    padding: 10px;
+    padding: 0px;
 }
 .menuOptTable td{
-    padding: 10px 20px;
+    padding: 10px 5px;
 }
 .menuAckTable tr td:nth-child(1) {
     font-weight: bold;

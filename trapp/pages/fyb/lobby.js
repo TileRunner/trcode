@@ -54,7 +54,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     return (
         <div className="fybLobby">
             <div className="fybHeaderDiv">
-                <span className="h1">Fry Your Brain</span>
+                <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
@@ -65,6 +65,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
             {gotNickname && mainAction === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, goal, setGoal, nickname)}
             {gotNickname && mainAction === 'J' && joinGame(client, thisisme, gameid, setGameid, nickname)}
             {gotNickname && mainAction === 'R' && rejoinGame(client, thisisme, gameid, setGameid, nickname)}
+            <div className="fivepxdivider">&nbsp;</div>
         </div>
     );
 }
@@ -207,16 +208,22 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
         <div className="fybHeaderDiv">
             <span className="h2">Join Game</span>
         </div>
-        <div>
-            <label>Game ID to join:</label>
-            <input
-                type="text"
-                name="gameid"
-                value={gameid}
-                onChange={(e) => {
-                    setGameid(e.target.value.trim());
-                } } />
-        </div>
+        <table>
+            <tr>
+                <td>
+                    <label>Game ID:</label>
+                </td>
+                <td>
+                    <input
+                    type="text"
+                    name="gameid"
+                    value={gameid}
+                    onChange={(e) => {
+                        setGameid(e.target.value.trim());
+                    } } />
+                </td>
+            </tr>
+        </table>
         {gameid && <div>
             <button
                 className="fybLobbyButton"
@@ -226,6 +233,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
                 SUBMIT
             </button>
         </div>}
+        <div className="fivepxdivider">&nbsp;</div>
         {!gameid &&
             <div className="fybInputWarning">
                 <p>Game ID is required</p>
@@ -250,16 +258,22 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
         <div className="fybHeaderDiv">
             <span className="h2">Rejoin Game</span>
         </div>
-        <div>
-            <label>Game ID to rejoin:</label>
-            <input
-                type="text"
-                name="gameid"
-                value={gameid}
-                onChange={(e) => {
-                    setGameid(e.target.value.trim());
-                } } />
-        </div>
+        <table>
+            <tr>
+                <td>
+                    <label>Game ID:</label>
+                </td>
+                <td>
+                    <input
+                    type="text"
+                    name="gameid"
+                    value={gameid}
+                    onChange={(e) => {
+                        setGameid(e.target.value.trim());
+                    } } />
+                </td>
+            </tr>
+        </table>
         {gameid && <div>
             <button
                 className="fybLobbyButton"
@@ -269,6 +283,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
                 SUBMIT
             </button>
         </div>}
+        <div className="fivepxdivider">&nbsp;</div>
         {!gameid &&
             <div className="fybInputWarning">
                 <p>Game ID is required</p>
