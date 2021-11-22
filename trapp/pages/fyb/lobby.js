@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 //import Link from "next/link";
 import * as c from '../../lib/fyb/constants';
+import { scrollToLeft } from "../../lib/scrollToLeft";
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
     const [snat, setSnat] = useState('');
@@ -11,6 +12,9 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
         let msg = wsmessage;
         if (msg !== '') processLobbyMessage(msg);
     },[wsmessage]);
+    useEffect(() => {
+        scrollToLeft("fybLobby");
+    },[nickname]);
     function processLobbyMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
@@ -52,7 +56,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     }
 
     return (
-        <div className="fybLobby">
+        <div className="fybLobby" id="fybLobby">
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>

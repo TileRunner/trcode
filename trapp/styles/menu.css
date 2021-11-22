@@ -7,7 +7,7 @@
     border-color: green;
     border-style: groove;
     padding-top: 5px;
-    max-width: 340px;
+    max-width: var(--commonMobileMaxWidth);
 }
 .menuHeaderDiv {
     padding-left: 5px;

@@ -19,7 +19,7 @@
     border-color: green;
     border-style: groove;
     padding-top: 5px;
-    max-width: 340px;
+    max-width: var(--commonMobileMaxWidth);
 }
 .fybLobbyButton {
     margin-left: 10px;
@@ -61,7 +61,7 @@
     border-color: green;
     border-style: groove;
     padding-top: 5px;
-    max-width: 350px;
+    max-width: var(--commonMobileMaxWidth);
 }
 .fybGameSectionHeader {
     background-color: black;
