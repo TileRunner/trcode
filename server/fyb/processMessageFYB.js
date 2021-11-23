@@ -375,7 +375,7 @@ function wordAllowed(checkword, movesThisRound) {
         if (pw === checkword) {
             return false;
         }
-        if (pw + 'S' === checkword && pw.substring(pw.length-1) !== 'S' && movesThisRound[i].valid) {
+        if (pw + 's' === checkword && pw.substring(pw.length-1) !== 's' && movesThisRound[i].valid) {
             return false;
         }
     }
