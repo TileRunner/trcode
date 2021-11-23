@@ -250,7 +250,7 @@ const processPbJoinGame = (wss, pm) => {
                     gname: pm.gname
                 };
                 // We want to update caller client and clients in the lobby (lobby needs gname)
-                handleJoinGame(wss, pm.gameid, jProvideGname, joinClient); // Send guards name to data API and update lobby clients, send game to joiner
+                handleJoinGame(wss, pm.gameid, jProvideGname); // Send guards name to data API and update lobby clients, send game to all players in game
             } else {
                 // We already have the gname so just get the game and send it to the caller. Should never get here though.
                 getGameThenUpdateClients(pm.gameid, [joinClient]);
@@ -377,7 +377,7 @@ const handleStartGame = (wss, jStartGame) => {
     });
 }
 
-const handleJoinGame = (wss, gameid, jProvideGname, joinClient) => { // Update data api and map, update lobby clients, get and send game to joiner
+const handleJoinGame = (wss, gameid, jProvideGname) => { // Update data api and map, update lobby clients, get and send game to joiner
     let gameApiInfo = getGameApiInfo(gameid);
     let dataApiId = gameApiInfo.dataApiId;
     axios({
@@ -393,7 +393,8 @@ const handleJoinGame = (wss, gameid, jProvideGname, joinClient) => { // Update d
     .then(function (response) {
         updateGameApiInfoObject(response.data); // Map gets gname
         updateLobbyClients(wss); // Lobby gets summary info for the game list
-        getGameThenUpdateClients(gameid, [joinClient]); // The caller joined so they need the entire game data
+        let gameClients = findGameClients(wss, clientType, gameid);
+        getGameThenUpdateClients(gameid, gameClients); // The caller joined so they need the entire game data, and the opponent needs the name of the joiner
     })
     .catch(error => {
         logApiError(error);

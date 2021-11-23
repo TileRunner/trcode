@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 //import Link from "next/link";
 import * as c from '../../lib/fyb/constants';
-import { scrollToLeft } from "../../lib/scrollToLeft";
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
     const [snat, setSnat] = useState('');
@@ -12,9 +11,6 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
         let msg = wsmessage;
         if (msg !== '') processLobbyMessage(msg);
     },[wsmessage]);
-    useEffect(() => {
-        scrollToLeft("fybLobby");
-    },[nickname]);
     function processLobbyMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
@@ -142,6 +138,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
             <span className="h2">Create Game</span>
         </div>
         <table>
+            <tbody>
             <tr>
                 <td><label>Game ID:</label></td>
                 <td><input
@@ -170,6 +167,7 @@ function createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlaye
                     onChange={(e) => { setGoal(e.target.value); } } 
                     /></td>
             </tr>
+            </tbody>
         </table>
         {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 &&
             <button
@@ -213,6 +211,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
             <span className="h2">Join Game</span>
         </div>
         <table>
+            <tbody>
             <tr>
                 <td>
                     <label>Game ID:</label>
@@ -227,6 +226,7 @@ function joinGame(client, thisisme, gameid, setGameid, nickname) {
                     } } />
                 </td>
             </tr>
+            </tbody>
         </table>
         {gameid && <div>
             <button
@@ -263,6 +263,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
             <span className="h2">Rejoin Game</span>
         </div>
         <table>
+            <tbody>
             <tr>
                 <td>
                     <label>Game ID:</label>
@@ -277,6 +278,7 @@ function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
                     } } />
                 </td>
             </tr>
+            </tbody>
         </table>
         {gameid && <div>
             <button

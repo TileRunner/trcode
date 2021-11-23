@@ -168,17 +168,21 @@ return (
       </div>
       <BrowserView>
         <table className="menuOptTable">
+          <tbody>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
             <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+            </tbody>
         </table>
       </BrowserView>
       <MobileOnlyView>
         <table className="menuOptTable">
+          <tbody>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+          </tbody>
         </table>
       </MobileOnlyView>
       {descWm && DescribeWordMastermind}
@@ -190,9 +194,11 @@ return (
           <h2 className="myHeadingFont">Special Thanks</h2>
         </div>
         <table className="menuAckTable">
+          <tbody>
           <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
           <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
           <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+          </tbody>
         </table>
         {descEnable2k && DescribeEnable2k}
         {descExtendsClass && DescribeExtendsClass}
