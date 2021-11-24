@@ -27,7 +27,7 @@ function removeGame(gameid) {
 }
 function processMessageFYB (wss, pm) {
     if (pm.func === "announce") {
-        processFybGetGameList(wss, pm);
+        processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
@@ -43,24 +43,33 @@ function processMessageFYB (wss, pm) {
     }
 }
 
-const processFybGetGameList = (wss, pm) => {
+const processFybAnnounce = (wss, pm) => {
     if (games.length > 0) {
         let callingClient = findLobbyClient(wss, pm.thisisme);
         if (callingClient) {
-            let gamelist = 'Game list:';
-            games.forEach((game, index) => {
-                gamelist = `${gamelist} ${game.players[0].nickname} created game ${game.gameid}`;
-                if (game.players.length === game.numPlayers) gamelist = gamelist + ' (full)';
-                if (index + 1 < games.length) gamelist = gamelist + ', ';
-            });
             let gamesJson = {
                 type: clientType,
                 func: 'gamelist',
-                gamelist: gamelist
+                gamelist: games
             };
             let gamesMessage = JSON.stringify(gamesJson);
             callingClient.send(gamesMessage);
         }
+    }
+}
+
+const updateLobbyClients = (wss) => {
+    let clientList = findLobbyClients(wss, clientType);
+    if (clientList) {
+        let gamesJson = {
+            type: clientType,
+            func: 'gamelist',
+            gamelist: games
+        };
+        let gamesMessage = JSON.stringify(gamesJson);
+        clientList.forEach((client) => {
+            client.send(gamesMessage);
+        })
     }
 }
 
@@ -97,19 +106,7 @@ const processFybCreateGame = (wss, pm) => {
             };
             games.push(game);
             sendGameData([callingClient], game, `Game created, waiting for others to join. ${wordlist.length} words available.`);
-            let lobbyClients = findLobbyClients(wss, clientType);
-            if (lobbyClients) {
-                let gameCreateJson = {
-                    type: clientType,
-                    func: 'GAME_CREATED',
-                    gameid: pm.gameid,
-                    nickname: pm.nickname
-                };
-                let gameCreateMessage = JSON.stringify(gameCreateJson);
-                lobbyClients.forEach((lobbyClient) => {
-                    lobbyClient.send(gameCreateMessage);
-                })
-            }
+            updateLobbyClients(wss);
         }
     }
 }
@@ -160,6 +157,7 @@ const processFybJoinGame = (wss, pm) => {
             foundGame.syncstamp = pm.datestamp;
             let gameClients = findGameClients(wss, clientType, pm.gameid);
             sendGameData(gameClients, foundGame, snat);
+            updateLobbyClients(wss);
         }
     }
 }
@@ -342,6 +340,7 @@ const processFybMove = (wss, pm) => {
         sendGameData(gameClients, foundGame, snat);
         if (foundGame.whoseturn === -1) { // game over
             removeGame(foundGame.gameid);
+            updateLobbyClients(wss);
         }
     }
 }

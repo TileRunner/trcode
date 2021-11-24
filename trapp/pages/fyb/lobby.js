@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 
 const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid, numPlayers, setNumPlayers}) => {
-    const [snat, setSnat] = useState('');
+    const [snat, setSnat] = useState('Welcome!');
+    const [gamelist, setGamelist] = useState([]);
     const [gotNickname, setGotNickname] = useState(false);
     const [mainAction, setMainAction] = useState('');
     const [goal, setGoal] = useState(11); // How many points needed to win
@@ -41,10 +42,8 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
                 setSnat('You are not in that game');
             } else if (messageData.func === 'otherclientfound') {
                 setSnat('That nickname is already in that game');
-            } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
-                setSnat(`${messageData.nickname} created game ${messageData.gameid}`);
             } else if (messageData.func === 'gamelist') {
-                setSnat(messageData.gamelist);
+                setGamelist(messageData.gamelist);
             } else {
                 setSnat(`Unhandled message: ${message}`);
             }
@@ -61,13 +60,58 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
             </div>
             <p>{snat}</p>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
+            {gotNickname && displayGamelist(gamelist, client, thisisme, nickname)}
             {gotNickname && !mainAction && getMainAction(setMainAction)}
             {gotNickname && mainAction === 'C' && createGame(client, thisisme, gameid, setGameid, numPlayers, setNumPlayers, goal, setGoal, nickname)}
-            {gotNickname && mainAction === 'J' && joinGame(client, thisisme, gameid, setGameid, nickname)}
-            {gotNickname && mainAction === 'R' && rejoinGame(client, thisisme, gameid, setGameid, nickname)}
             <div className="fivepxdivider">&nbsp;</div>
         </div>
     );
+}
+
+function displayGamelist(gamelist, client, thisisme, nickname) {
+    return <div className="fybGamelist">
+        <p>Game List:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ppl</th>
+                    <th>Pts</th>
+                    <th>By</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {gamelist.map((game,index) => (
+                    <tr>
+                        <td>{game.gameid}</td>
+                        <td>{game.players.length}/{game.numPlayers}</td>
+                        <td>{game.goal}</td>
+                        <td>{game.players[0].nickname}</td>
+                        <td>
+                            {
+                                game.players.length < game.numPlayers ?
+                                    <button
+                                        key={`joinButton${index}`}
+                                        type="submit"
+                                        onClick={() => {sendJoinGameRequest(client, thisisme, game.gameid, nickname);}}>
+                                        JOIN
+                                    </button>
+                                : isPlayerInArray(game.players, nickname) ?
+                                    <button
+                                        key={`rejoinButton${index}`}
+                                        type="submit"
+                                        onClick={() => {sendRejoinGameRequest(client, thisisme, game.gameid, nickname);}}>
+                                            REJOIN
+                                    </button>
+                                : 'In progress'
+                            }
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
 }
 
 function getNickname(nickname, setNickname, setGotNickname) {
@@ -97,38 +141,15 @@ function getNickname(nickname, setNickname, setGotNickname) {
 
 function getMainAction(setMainAction) {
     return <div>
-        <p>
-            <button
-                className="fybLobbyButton"
-                type="submit"
-                id="chooseCreateGame"
-                onClick={() => {
-                    setMainAction('C');
-                }}>
-                CREATE A GAME
-            </button>
-        </p>
-        <p>
-            <button
-                className="fybLobbyButton"
-                type="submit"
-                id="chooseJoinGame"
-                onClick={() => {
-                    setMainAction('J');
-                }}>
-                JOIN A GAME
-            </button>
-        </p>
-        <p>
-            <button type="submit"
-                className="fybLobbyButton"
-                id="chooseRejoinGame"
-                onClick={() => {
-                    setMainAction('R');
-                }}>
-                REJOIN A GAME
-            </button>
-        </p>
+        <button
+            className="fybLobbyButton"
+            type="submit"
+            id="chooseCreateGame"
+            onClick={() => {
+                setMainAction('C');
+            }}>
+            CREATE A GAME
+        </button>
     </div>;
 }
 
@@ -205,47 +226,6 @@ function sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickn
     });
 }
 
-function joinGame(client, thisisme, gameid, setGameid, nickname) {
-    return <div>
-        <div className="fybHeaderDiv">
-            <span className="h2">Join Game</span>
-        </div>
-        <table>
-            <tbody>
-            <tr>
-                <td>
-                    <label>Game ID:</label>
-                </td>
-                <td>
-                    <input
-                    type="text"
-                    name="gameid"
-                    value={gameid}
-                    onChange={(e) => {
-                        setGameid(e.target.value.trim());
-                    } } />
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        {gameid && <div>
-            <button
-                className="fybLobbyButton"
-                id="requestJoinGame"
-                type="submit"
-                onClick={() => {sendJoinGameRequest(client, thisisme, gameid, nickname);}}>
-                SUBMIT
-            </button>
-        </div>}
-        <div className="fivepxdivider">&nbsp;</div>
-        {!gameid &&
-            <div className="fybInputWarning">
-                <p>Game ID is required</p>
-            </div>
-        }
-    </div>;
-}
-
 function sendJoinGameRequest(client, thisisme, gameid, nickname) {
     client.send({
         type: c.CLIENT_TYPE_FYB,
@@ -257,47 +237,6 @@ function sendJoinGameRequest(client, thisisme, gameid, nickname) {
     });
 }
 
-function rejoinGame(client, thisisme, gameid, setGameid, nickname) {
-    return <div>
-        <div className="fybHeaderDiv">
-            <span className="h2">Rejoin Game</span>
-        </div>
-        <table>
-            <tbody>
-            <tr>
-                <td>
-                    <label>Game ID:</label>
-                </td>
-                <td>
-                    <input
-                    type="text"
-                    name="gameid"
-                    value={gameid}
-                    onChange={(e) => {
-                        setGameid(e.target.value.trim());
-                    } } />
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        {gameid && <div>
-            <button
-                className="fybLobbyButton"
-                id="requestRejoinGame"
-                type="submit"
-                onClick={() => {sendRejoinGameRequest(client, thisisme, gameid, nickname);}}>
-                SUBMIT
-            </button>
-        </div>}
-        <div className="fivepxdivider">&nbsp;</div>
-        {!gameid &&
-            <div className="fybInputWarning">
-                <p>Game ID is required</p>
-            </div>
-        }
-    </div>;
-}
-
 function sendRejoinGameRequest(client, thisisme, gameid, nickname) {
     client.send({
         type: c.CLIENT_TYPE_FYB,
@@ -307,6 +246,16 @@ function sendRejoinGameRequest(client, thisisme, gameid, nickname) {
         nickname: nickname,
         timestamp: Date.now()
     });
+}
+
+function isPlayerInArray(players, nickname) {
+    let found = false;
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].nickname === nickname) {
+            found = true;
+        }
+    }
+    return found;
 }
 
 export default Lobby;  
