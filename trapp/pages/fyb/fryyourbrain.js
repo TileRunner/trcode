@@ -11,7 +11,6 @@ const FryYourBrain = ({setWhereto}) => {
     const [wsmessage, setWsmessage] = useState(''); // Latest message from the websocket
     const [nickname, setNickname] = useState('');
     const [gameid, setGameid] = useState('');
-    const [numPlayers, setNumPlayers] = useState(2);
     let host = (process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000')
     + '/?clientType=fyb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
     const acceptMessage = (message) => {
@@ -36,8 +35,6 @@ const FryYourBrain = ({setWhereto}) => {
                 setNickname={setNickname}
                 gameid={gameid}
                 setGameid={setGameid}
-                numPlayers={numPlayers}
-                setNumPlayers={setNumPlayers}
              >
             </Lobby>}
         {participant === c.PARTY_TYPE_PLAYER &&
@@ -48,7 +45,6 @@ const FryYourBrain = ({setWhereto}) => {
                 wsmessage={wsmessage}
                 nickname={nickname}
                 gameid={gameid}
-                numPlayers={numPlayers}
              >
             </Game>}
         </>

@@ -26,6 +26,9 @@ function removeGame(gameid) {
     }
 }
 function processMessageFYB (wss, pm) {
+    if (pm.func !== "interval") {
+        console.log(`processMessageFYB: func=${pm.func} thisisme=${pm.thisisme} gameid=${pm.gameid}`);
+    }
     if (pm.func === "announce") {
         processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
@@ -49,10 +52,11 @@ const processFybAnnounce = (wss, pm) => {
         if (callingClient) {
             let gamesJson = {
                 type: clientType,
-                func: 'gamelist',
+                func: 'GAME_LIST',
                 gamelist: games
             };
             let gamesMessage = JSON.stringify(gamesJson);
+            console.log(`Announce sending games to ${callingClient.thisisme}`);
             callingClient.send(gamesMessage);
         }
     }
@@ -63,11 +67,12 @@ const updateLobbyClients = (wss) => {
     if (clientList) {
         let gamesJson = {
             type: clientType,
-            func: 'gamelist',
+            func: 'GAME_LIST',
             gamelist: games
         };
         let gamesMessage = JSON.stringify(gamesJson);
         clientList.forEach((client) => {
+            console.log(`UpdateLobbyClients sending gamelist to ${client.nickname}`);
             client.send(gamesMessage);
         })
     }
@@ -84,6 +89,7 @@ const processFybCreateGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let takenMessage = JSON.stringify(takenJson);
+            console.log(`CreateGame sending gameidtaken to ${callingClient.nickname}`);
             callingClient.send(takenMessage);
         } else {
             callingClient.gameid = pm.gameid;
@@ -122,6 +128,7 @@ const processFybJoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameUnknownMessage = JSON.stringify(gameUnknownJson);
+            console.log(`JoinGame sending gameidunknown to ${callingClient.nickname}`);
             callingClient.send(gameUnknownMessage);
         } else if (foundGame.numPlayers === foundGame.players.length) {
             let gameFullJson = {
@@ -130,6 +137,7 @@ const processFybJoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameFullMessage = JSON.stringify(gameFullJson);
+            console.log(`JoinGame sending gamefull to ${callingClient.nickname}`);
             callingClient.send(gameFullMessage);
         } else {
             callingClient.gameid = pm.gameid;
@@ -173,6 +181,7 @@ const processFybRejoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameUnknownMessage = JSON.stringify(gameUnknownJson);
+            console.log(`RejoinGame sending gameidunknown to ${callingClient.nickname}`);
             callingClient.send(gameUnknownMessage);
         } else {
             let foundPlayer = findPlayerInArray(foundGame.players, pm.nickname);
@@ -183,6 +192,7 @@ const processFybRejoinGame = (wss, pm) => {
                     gameid: pm.gameid
                 };
                 let notInThatGameMessage = JSON.stringify(notInThatGameJson);
+                console.log(`RejoinGame sending notinthatgame to ${callingClient.nickname}`);
                 callingClient.send(notInThatGameMessage);
             } else {
                 let otherClient;
@@ -199,6 +209,7 @@ const processFybRejoinGame = (wss, pm) => {
                         gameid: pm.gameid
                     };
                     let otherClientMessage = JSON.stringify(otherClientJson);
+                    console.log(`RejoinGame sending otherclientfound to ${callingClient.nickname}`);
                     callingClient.send(otherClientMessage);
                 } else {
                     callingClient.gameid = pm.gameid;
@@ -506,6 +517,7 @@ const sendGameData = (clients, game, snat) => {
             game: JSON.parse(JSON.stringify(game))
         };
         let gameMessage = JSON.stringify(gameJson);
+        console.log(`sendGameData sending game to ${client.nickname}`);
         client.send(gameMessage);
     });
 }
