@@ -38,10 +38,20 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     }
                 setGamedata(messageData.game);
                 setSyncstamp(messageData.game.syncstamp);
-            } else if (messageData.func = c.S2C_FUNC_GAMECREATED) {
+            } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
                 // Nothing to do, this is really for the lobby dwellers
             } else {
-                setSnat(`Unhandled message: ${message}`);
+                // I think this happens when a web socket connection drops and the new one loses the gameid on the server wss.clients
+                // So send a rejoin request to get the server back on track
+                client.send({
+                    type: c.CLIENT_TYPE_FYB,
+                    func: 'rejoin',
+                    thisisme: thisisme,
+                    gameid: gamedata.gameid,
+                    nickname: nickname,
+                    timestamp: Date.now()
+                });
+                setSnat(`From the author: Sorry about this note to self - sent rejoin to resync due to unexpected message: ${message}`);
             }
         }
     }
@@ -223,7 +233,10 @@ function showMoveList(moveListKey, moveArray) {
                 {move.pass ?
                     <span className="fybGameWord pass"> passed</span>
                 :
-                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'}`}>{move.word}</span>
+                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'}`}>
+                        {move.word}
+                        {move.earned && <span> ({move.earned} pts)</span>}
+                    </span>
                 }
                 </td>
             </tr>

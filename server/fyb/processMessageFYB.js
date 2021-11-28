@@ -26,9 +26,9 @@ function removeGame(gameid) {
     }
 }
 function processMessageFYB (wss, pm) {
-    if (pm.func !== "interval") {
-        console.log(`processMessageFYB: func=${pm.func} thisisme=${pm.thisisme} gameid=${pm.gameid}`);
-    }
+    // if (pm.func !== "interval") {
+    //     console.log(`processMessageFYB: func=${pm.func} thisisme=${pm.thisisme} gameid=${pm.gameid}`);
+    // }
     if (pm.func === "announce") {
         processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
@@ -273,6 +273,7 @@ const processFybMove = (wss, pm) => {
                     for (let i = 0; i < foundGame.freeforallMoves.length; i++) {
                         let move = foundGame.freeforallMoves[i];
                         if (move.valid && move.word.length === shortestAnswer) {
+                            move.earned = foundGame.fryLetters.length;
                             for (let j = 0; j < foundGame.players.length; j++) {
                                 if (foundGame.players[j].nickname === move.nickname) {
                                     foundGame.players[j].points = foundGame.players[j].points + foundGame.fryLetters.length;
@@ -285,6 +286,10 @@ const processFybMove = (wss, pm) => {
                         // When nobody gets a valid word in the free-for-all then the last valid play gets points
                         let winner = foundGame.whoseturn === 0 ? foundGame.numPlayers - 1 : foundGame.whoseturn - 1;
                         foundGame.players[winner].points = foundGame.players[winner].points + foundGame.fryLetters.length - 1;
+                        let lastvalidmoveindex = foundGame.movesThisRound.length - 2;
+                        if (lastvalidmoveindex > -1) {
+                            foundGame.movesThisRound[lastvalidmoveindex].earned = foundGame.fryLetters.length - 1;
+                        }
                     }
                 }
                 foundGame.freeforall = false;
