@@ -204,6 +204,9 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                             >{fl}</span>
                     ))}
                 </div>
+                <div className="fryAnswerCountDiv">
+                    <div className="fryAnswerCount">{gamedata.numPossibleAnswers}</div>
+                </div>
             </div>}
             {meToEnterWord() &&
                 getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
@@ -233,7 +236,7 @@ function showMoveList(moveListKey, moveArray) {
                 {move.pass ?
                     <span className="fybGameWord pass"> passed</span>
                 :
-                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'}`}>
+                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'} ${move.word.length > 10 && move.earned ? 'long' : move.word.length > 13 ? 'long' : ''}`}>
                         {move.word}
                         {move.earned && <span> ({move.earned} pts)</span>}
                     </span>

@@ -26,7 +26,7 @@ const CreateGame = ({
                         name="gameid"
                         value={gameid}
                         onChange={(e) => {
-                            setGameid(e.target.value.trim());
+                            setGameid(e.target.value);
                         } } /></td>
                 </tr>
                 <tr>
@@ -54,7 +54,11 @@ const CreateGame = ({
                     className="fybLobbyButton"
                     id="requestCreateGame"
                     type="submit"
-                    onClick={() => {sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);}}>
+                    onClick={() => {
+                        let trimmed = gameid.trim();
+                        setGameid(trimmed);
+                        sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);
+                        }}>
                     SUBMIT
                 </button>
             }

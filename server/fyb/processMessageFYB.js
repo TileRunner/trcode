@@ -56,7 +56,7 @@ const processFybAnnounce = (wss, pm) => {
                 gamelist: games
             };
             let gamesMessage = JSON.stringify(gamesJson);
-            console.log(`Announce sending games to ${callingClient.thisisme}`);
+            // console.log(`Announce sending games to ${callingClient.thisisme}`);
             callingClient.send(gamesMessage);
         }
     }
@@ -72,7 +72,7 @@ const updateLobbyClients = (wss) => {
         };
         let gamesMessage = JSON.stringify(gamesJson);
         clientList.forEach((client) => {
-            console.log(`UpdateLobbyClients sending gamelist to ${client.nickname}`);
+            // console.log(`UpdateLobbyClients sending gamelist to ${client.nickname}`);
             client.send(gamesMessage);
         })
     }
@@ -89,7 +89,7 @@ const processFybCreateGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let takenMessage = JSON.stringify(takenJson);
-            console.log(`CreateGame sending gameidtaken to ${callingClient.nickname}`);
+            // console.log(`CreateGame sending gameidtaken to ${callingClient.nickname}`);
             callingClient.send(takenMessage);
         } else {
             callingClient.gameid = pm.gameid;
@@ -128,7 +128,7 @@ const processFybJoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameUnknownMessage = JSON.stringify(gameUnknownJson);
-            console.log(`JoinGame sending gameidunknown to ${callingClient.nickname}`);
+            // console.log(`JoinGame sending gameidunknown to ${callingClient.nickname}`);
             callingClient.send(gameUnknownMessage);
         } else if (foundGame.numPlayers === foundGame.players.length) {
             let gameFullJson = {
@@ -137,7 +137,7 @@ const processFybJoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameFullMessage = JSON.stringify(gameFullJson);
-            console.log(`JoinGame sending gamefull to ${callingClient.nickname}`);
+            // console.log(`JoinGame sending gamefull to ${callingClient.nickname}`);
             callingClient.send(gameFullMessage);
         } else {
             callingClient.gameid = pm.gameid;
@@ -158,6 +158,7 @@ const processFybJoinGame = (wss, pm) => {
                 foundGame.whostarted = 0;
                 foundGame.round = 1;
                 foundGame.movesThisRound = [];
+                foundGame.numPossibleAnswers = countPossibleAnswers(tilespicked.picked, []);
                 snat = `Round ${foundGame.round} : ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
             } else {
                 snat = `${pm.nickname} just joined the game. Waiting for others to join.`;
@@ -181,7 +182,7 @@ const processFybRejoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameUnknownMessage = JSON.stringify(gameUnknownJson);
-            console.log(`RejoinGame sending gameidunknown to ${callingClient.nickname}`);
+            // console.log(`RejoinGame sending gameidunknown to ${callingClient.nickname}`);
             callingClient.send(gameUnknownMessage);
         } else {
             let foundPlayer = findPlayerInArray(foundGame.players, pm.nickname);
@@ -192,7 +193,7 @@ const processFybRejoinGame = (wss, pm) => {
                     gameid: pm.gameid
                 };
                 let notInThatGameMessage = JSON.stringify(notInThatGameJson);
-                console.log(`RejoinGame sending notinthatgame to ${callingClient.nickname}`);
+                // console.log(`RejoinGame sending notinthatgame to ${callingClient.nickname}`);
                 callingClient.send(notInThatGameMessage);
             } else {
                 let otherClient;
@@ -209,7 +210,7 @@ const processFybRejoinGame = (wss, pm) => {
                         gameid: pm.gameid
                     };
                     let otherClientMessage = JSON.stringify(otherClientJson);
-                    console.log(`RejoinGame sending otherclientfound to ${callingClient.nickname}`);
+                    // console.log(`RejoinGame sending otherclientfound to ${callingClient.nickname}`);
                     callingClient.send(otherClientMessage);
                 } else {
                     callingClient.gameid = pm.gameid;
@@ -249,23 +250,20 @@ const processFybMove = (wss, pm) => {
                         }
                     }
                 }
-                // Find a possible answer, shortest length
-                let possibleAnswer = '';
+                // Find all possible answers
                 let possibleAnswers = [];
                 wordlist.forEach((checkword) => {
                     if (wordHasFryLetters(foundGame.fryLetters, checkword) && wordAllowed(checkword, foundGame.movesThisRound)) {
                         possibleAnswers.push(checkword.toUpperCase());
                     }
                 });
+                // Pick top 10 possible answers, shortest length then alphabetical
                 if (possibleAnswers.length > 0) {
                     possibleAnswers.sort(function(a,b){return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1});
                     if (possibleAnswers.length > 10) {
                         possibleAnswers = possibleAnswers.slice(0,10);
                     }
-                    possibleAnswer = possibleAnswers.join(", ");
-                }
-                if (possibleAnswer) {
-                    snat = `Fry cook fried ${foundGame.fryLetters} with ${possibleAnswer}.`;
+                    snat = `Fry cook fried ${foundGame.fryLetters} with ${possibleAnswers.join(", ")}.`;
                 } else {
                     snat = `Fry cook could not fry ${foundGame.fryLetters}.`;
                 }
@@ -293,11 +291,14 @@ const processFybMove = (wss, pm) => {
                     }
                 }
                 foundGame.freeforall = false;
+                foundGame.movesPrevRound = [...foundGame.movesThisRound];
+                foundGame.movesThisRound = [];
                 let winners = countWinners(foundGame);
                 if (winners > 0) {
                     foundGame.whoseturn = -1;
                     foundGame.fryLetters = [];
                     foundGame.gameOver = true;
+                    foundGame.numPossibleAnswers = 0;
                 } else {
                     foundGame.round = foundGame.round + 1;
                     if (foundGame.whostarted + 1 === foundGame.numPlayers) {
@@ -309,8 +310,7 @@ const processFybMove = (wss, pm) => {
                     let tilespicked = pickInitialTiles();
                     foundGame.fryLetters = tilespicked.picked;
                     foundGame.tiles = tilespicked.tiles;
-                    foundGame.movesPrevRound = [...foundGame.movesThisRound];
-                    foundGame.movesThisRound = [];
+                    foundGame.numPossibleAnswers = countPossibleAnswers(foundGame.fryLetters, foundGame.movesThisRound);
                     snat = `${snat} Starting round ${foundGame.round}. ${foundGame.players[foundGame.whoseturn].nickname} to play.`;
                 }
             } else {
@@ -334,6 +334,7 @@ const processFybMove = (wss, pm) => {
                 let tilePicked = pickNextTile(foundGame.tiles, foundGame.fryLetters);
                 foundGame.tiles = [...tilePicked.newTiles];
                 foundGame.fryLetters = [...tilePicked.newFryLetters];
+                foundGame.numPossibleAnswers = countPossibleAnswers(foundGame.fryLetters, foundGame.movesThisRound);
                 if (foundGame.whoseturn + 1 === foundGame.numPlayers) {
                     foundGame.whoseturn = 0;
                 } else {
@@ -359,6 +360,16 @@ const processFybMove = (wss, pm) => {
             updateLobbyClients(wss);
         }
     }
+}
+
+function countPossibleAnswers(fryLetters, movesThisRound) {
+    let count = 0;
+    wordlist.forEach((checkword) => {
+        if (wordHasFryLetters(fryLetters, checkword) && wordAllowed(checkword, movesThisRound)) {
+            count++;
+        }
+    });
+    return count;
 }
 
 function wordHasFryLetters(fryLetters, checkword) {
@@ -414,6 +425,7 @@ const sendGameToCaller = (wss, pm, checksync) => {
 const processFybReplay = (wss, pm) => {
     let starter = pm.game.gamestarter + 1 === pm.game.numPlayers ? 0 : pm.game.gamestarter + 1; // this player goes first this game
     let tilespicked = pickInitialTiles();
+    let numPossibleAnswers = countPossibleAnswers(tilespicked.picked, []);
     let newGame = {
         gameid: pm.game.gameid,
         numPlayers: pm.game.numPlayers,
@@ -430,7 +442,8 @@ const processFybReplay = (wss, pm) => {
         tiles: tilespicked.tiles,
         movesThisRound: [],
         movesPrevRound: [],
-        freeforallMoves: []
+        freeforallMoves: [],
+        numPossibleAnswers: numPossibleAnswers
     };
     for (let i = 0; i < newGame.players.length; i++) {
         const player = newGame.players[i];
@@ -522,7 +535,7 @@ const sendGameData = (clients, game, snat) => {
             game: JSON.parse(JSON.stringify(game))
         };
         let gameMessage = JSON.stringify(gameJson);
-        console.log(`sendGameData sending game to ${client.nickname}`);
+        // console.log(`sendGameData sending game to ${client.nickname}`);
         client.send(gameMessage);
     });
 }

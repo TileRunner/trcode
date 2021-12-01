@@ -119,6 +119,10 @@
 .fybGameWord.invalid {
     background-color: red;
 }
+.fybGameWord.long {
+    font-size: x-small;
+    font-family: Arial, Helvetica, sans-serif;
+}
 .fybGameScore {
     color: whitesmoke;
     font-family: monospace;
@@ -172,6 +176,22 @@
     border-width: thick;
     border-color: blue;
     background-color: whitesmoke;
+}
+.fryAnswerCountDiv {
+    background-color: darkgray;
+    color: blue;
+    font-family: var(--commonHeaderFontFamily);
+    font-size: medium;
+    width: fit-content;
+    padding: 2px 10px 2px 2px;
+    margin: 0px 0px 5px 10px;
+    user-select: none;
+}
+.fryAnswerCount::before {
+    content: '(#Answers: ';
+}
+.fryAnswerCount::after {
+    content: ')';
 }
 .fybGameEnterWordLabel {
     margin: 0px 0px 2px 10px;

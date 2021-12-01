@@ -130,7 +130,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 name="nickname"
                 value={nickname}
                 onChange={(e) => {
-                    setNickname(e.target.value.trim());
+                    setNickname(e.target.value);
                 } } />
         </div>
         {nickname && <div>
@@ -138,6 +138,8 @@ function getNickname(nickname, setNickname, setGotNickname) {
                 className="fybLobbyButton"
                 type="submit"
                 onClick={() => {
+                    let trimmed = nickname.trim();
+                    setNickname(trimmed);
                     setGotNickname(true);
                 }}>
                 SUBMIT
