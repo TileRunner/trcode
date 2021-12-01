@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 import CreateGame from "./createGame";
 
-const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid}) => {
+const Lobby = ({ismobile, setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid}) => {
     const [snat, setSnat] = useState('Welcome!');
     const [gamelist, setGamelist] = useState([]);
     const [gotNickname, setGotNickname] = useState(false);
@@ -47,7 +47,7 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     }
 
     return (
-        <div className="fybLobby" id="fybLobby">
+        <div className={`fybLobby ${ismobile === "Y" ? "mobile" : "notmobile"}`} id="fybLobby">
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>

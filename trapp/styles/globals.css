@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
 :root {
   --commonMobileMaxWidth: 360px;
+  --commonNotMobileMaxWidth: 600px;
   --commonBorderColour: grey;/* blue; /*darkslateblue*/
   --commonTextBackgroundColour: black;
   --commonTextColour: whitesmoke;

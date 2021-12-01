@@ -19,7 +19,13 @@
     border-color: green;
     border-style: groove;
     padding-top: 5px;
+}
+.fybLobby.mobile {
     max-width: var(--commonMobileMaxWidth);
+}
+.fybLobby.notmobile {
+    padding: 25px;
+    max-width: var(--commonNotMobileMaxWidth);
 }
 .fybLobbyButton {
     margin-left: 5px;
@@ -87,7 +93,12 @@
     border-color: green;
     border-style: groove;
     padding-top: 5px;
+}
+.fybGame.mobile {
     max-width: var(--commonMobileMaxWidth);
+}
+.fybGame.notmobile {
+    max-width: var(--commonNotMobileMaxWidth);
 }
 .fybGameSectionHeader {
     background-color: black;
@@ -117,7 +128,13 @@
     font-family: monospace;
 }
 .fybGameWord.invalid {
-    background-color: red;
+    font-weight: bold;
+    background-color: whitesmoke;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.fybGameWord.invalid::after {
+    content: ' *';
 }
 .fybGameWord.long {
     font-size: x-small;
@@ -129,12 +146,14 @@
     padding: 1px 5px;
 }
 .fybWinner {
-    background-color: purple;
+    border-radius: 10px;
+    background-color: turquoise;
+    color: black;
     font-style: oblique;
     font-size: larger;
     letter-spacing: 1px;
     margin-left: 5px;
-    padding: 2px;
+    padding: 2px 5px;
 }
 .fybGame table {
     margin-left: 10px;

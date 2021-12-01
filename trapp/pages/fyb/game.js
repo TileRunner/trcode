@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 
-const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
+const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const [snat, setSnat] = useState('');
     const [gamedata, setGamedata] = useState({goal:99, whoseturn:-1, fryLetters:[], players:[{index: 0, nickname: 'Loading...'}]});
     const [word, setWord] = useState(''); // my word to submit
@@ -85,7 +85,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         }
     }
     return (
-        <div className="container fybGame">
+        <div className={`container fybGame ${ismobile === "Y" ? "mobile" : "notmobile"}`}>
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
