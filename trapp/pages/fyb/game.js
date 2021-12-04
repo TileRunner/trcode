@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
+import { usePrevious } from "../../lib/usePrevious";
 
 const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const [snat, setSnat] = useState('');
@@ -7,6 +8,8 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
     const [word, setWord] = useState(''); // my word to submit
     const [syncstamp, setSyncstamp] = useState('');
     const [selected, setSelected] = useState(-1);
+    const prevGamedata = usePrevious(gamedata);
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (gamedata.whoseturn > -1 && gamedata.players.length > 0) {
@@ -22,10 +25,21 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         }, c.PING_INTERVAL); // this many milliseconds between above code block executions
         return () => clearInterval(interval);
     });
+
     useEffect(() => {
         let msg = wsmessage;
         if (msg !== '') processGameMessage(msg);
-    },[wsmessage])
+    },[wsmessage]);
+
+    useEffect(() => {
+        if (gamedata.freeforall && !prevGamedata.freeforall) {
+            var myaudio = document.createElement('audio');
+            // Decide between Oops (phoney played) and Pass (player passed)
+            myaudio.src = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "https://tilerunner.github.io/Pass.m4a" : "https://tilerunner.github.io/Oops.m4a";
+            myaudio.play();
+        }
+      }, [gamedata]); // Play a sound when a rescue is made
+
     function processGameMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
@@ -315,6 +329,8 @@ function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, s
         gameid: gamedata.gameid,
         nickname: nickname,
         timestamp: Date.now(),
+        clientRound: gamedata.round, // for checking re-submissions
+        clientMovesLength: gamedata.movesThisRound.length, // for checking re-submissions
         word: fixedword
     });
     setWord('');

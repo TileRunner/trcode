@@ -319,12 +319,10 @@ const processFybMove = (wss, pm) => {
         } else { // In regular round
             // Sometimes client submits a word and does not get the reply and they can submit again!
             // Ignore resubmit but send game data again.
-            foundGame.movesThisRound.forEach((m) => {
-                if (m.nickname === pm.nickname) {
-                    sendGameToCaller(wss, pm, false);
-                    return;
-                }
-            });
+            if (foundGame.round > pm.clientRound || foundGame.movesThisRound.length > pm.clientMovesLength) {
+                sendGameToCaller(wss, pm, false);
+                return;
+            }
             // Clear previous results once a word is sent in this round
             foundGame.freeforallMoves = [];
             foundGame.movesPrevRound = [];
