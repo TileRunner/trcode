@@ -99,6 +99,9 @@ const processFybCreateGame = (wss, pm) => {
                 gamestarter: 0, // player going first in first round
                 whoseturn: -1, // nobody's turn until all players arrive
                 round: 0, // first round
+                movesPrevRound: [],
+                movesThisRound: [],
+                freeforallMoves: [],
                 freeforall: false, // not in free-for-all round
                 syncstamp: pm.timestamp,
                 gameid: pm.gameid,

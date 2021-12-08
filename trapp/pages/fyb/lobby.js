@@ -93,16 +93,7 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
                         <td>{game.players[0].nickname}</td>
                         <td>
                             {
-                                game.players.length < game.numPlayers ?
-                                    <button
-                                        key={`joinButton${index}`}
-                                        type="submit"
-                                        onClick={() => {
-                                            sendJoinGameRequest(client, thisisme, game.gameid, nickname);
-                                            }}>
-                                        JOIN
-                                    </button>
-                                : isPlayerInArray(game.players, nickname) ?
+                                isPlayerInArray(game.players, nickname) ?
                                     <button
                                         key={`rejoinButton${index}`}
                                         type="submit"
@@ -110,6 +101,15 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
                                             sendRejoinGameRequest(client, thisisme, game.gameid, nickname);
                                             }}>
                                             REJOIN
+                                    </button>
+                                : game.players.length < game.numPlayers ?
+                                    <button
+                                        key={`joinButton${index}`}
+                                        type="submit"
+                                        onClick={() => {
+                                            sendJoinGameRequest(client, thisisme, game.gameid, nickname);
+                                            }}>
+                                        JOIN
                                     </button>
                                 : 'In progress'
                             }

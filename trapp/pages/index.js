@@ -12,24 +12,6 @@ export default function Home() {
 
   return (
     <div>
-      <Head>
-        <title>Tile Runner</title>
-        <link rel="icon" href="/tileTR.ico" />
-        <meta name="description" content="Tile Runner - Fun with words" />
-        <meta property="og:title" content="Tile Runner" />
-        <meta property="og:description" content="A few word games and a word lookup feature" />
-        <meta property="og:image" content="/tileTR.png" />
-        <meta property="og:image:width" content="400" />
-        <meta property="og:image:height" content="400" />
-        <meta name="twitter:title" content="Tile Runner - Fun with words" />
-        <meta name="twitter:image" content="/tileTR.png" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:description" content="A few word games a and a word lookup feature" />
-        <meta property="og:url" content="https://tilerunner.herokuapp.com" />
-        <meat property="og:site_name" content="Tile Runner" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:type" content="website" />
-      </Head>
       {whereto === 'menu' && <MobileOnlyView><Menu ismobile="Y" setWhereto={setWhereto}></Menu></MobileOnlyView>}
       {whereto === 'menu' && <BrowserView><Menu ismobile="N" setWhereto={setWhereto}></Menu></BrowserView>}
       {whereto === 'wm' && <WordMastermind setWhereto={setWhereto}></WordMastermind>}

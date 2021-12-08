@@ -4,7 +4,16 @@ import { usePrevious } from "../../lib/usePrevious";
 
 const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const [snat, setSnat] = useState('');
-    const [gamedata, setGamedata] = useState({goal:99, whoseturn:-1, fryLetters:[], players:[{index: 0, nickname: 'Loading...'}]});
+    const [gamedata, setGamedata] = useState({
+        goal: 99
+        , gameindex: 0
+        , round: 0
+        , freeforall: false
+        , movesThisRound: []
+        , movesPrevRound: []
+        , whoseturn: -1
+        , fryLetters: []
+        , players: [{index: 0, nickname: 'Loading...'}]});
     const [word, setWord] = useState(''); // my word to submit
     const [syncstamp, setSyncstamp] = useState('');
     const [selected, setSelected] = useState(-1);
@@ -32,7 +41,11 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
     },[wsmessage]);
 
     useEffect(() => {
-        if (gamedata.freeforall && !prevGamedata.freeforall) {
+        // This sound will not play on some mobiles. Something about needing a user interaction (protecting cell data usage).
+        if (prevGamedata
+            && gamedata.gameindex === prevGamedata.gameindex
+            && gamedata.round === prevGamedata.round
+            && gamedata.freeforall && !prevGamedata.freeforall) {
             var myaudio = document.createElement('audio');
             // Decide between Oops (phoney played) and Pass (player passed)
             myaudio.src = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "https://tilerunner.github.io/Pass.m4a" : "https://tilerunner.github.io/Oops.m4a";
@@ -44,14 +57,27 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_GAMEDATA) {
-                setSnat(messageData.snat);
-                if (messageData.game.fryLetters &&
-                    gamedata.fryLetters &&
-                    messageData.game.fryLetters.join() !== gamedata.fryLetters.join()) {
-                        setSelected(-1);
-                    }
-                setGamedata(messageData.game);
-                setSyncstamp(messageData.game.syncstamp);
+                /* SERVER SENT GAME DATA
+                For a regular update due to player activity, this client needs the update.
+
+                For dropped connections which made this client send a rejoin to update server's
+                   info for this client, which makes the server sends game info to this client,
+                   this client is already up to date and does not need the update. We do not take
+                   the update so as not to upset the fry letter rearrangements this client may have
+                   made.
+                */
+                if (messageData.game.gameindex !== gamedata.gameindex
+                    || messageData.game.round !== gamedata.round
+                    || messageData.goal !== gamedata.goal
+                    || messageData.players.length !== gamedata.players.length
+                    || messageData.game.movesThisRound.length !== gamedata.movesThisRound.length
+                    )
+                {
+                    setSnat(messageData.snat);
+                    setSelected(-1);
+                    setGamedata(messageData.game);
+                    setSyncstamp(messageData.game.syncstamp);
+                }
             } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
                 // Nothing to do, this is really for the lobby dwellers
             } else {
@@ -65,7 +91,6 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     nickname: nickname,
                     timestamp: Date.now()
                 });
-                setSnat(`From the author: Sorry about this note to self - sent rejoin to resync due to unexpected message: ${message}`);
             }
         }
     }

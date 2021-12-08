@@ -1,22 +1,23 @@
 .menu {
     font-family: var(--commonFontFamily);
     color: var(--commmonTextColour);
-    border-width: 10px;
     border-color: green;
-    border-style: groove;
     padding-top: 5px;
 }
 .menu.mobile {
+    border-width: 5px;
+    border-style: groove;
     margin-left: 5px;
     margin-top: 5px;
     max-width: var(--commonMobileMaxWidth);
 }
 .menu.notmobile {
-    margin-left: 25px;
-    margin-top: 25px;
+    border-width: 10px;
+    border-style: none none none groove;
+    margin: 25px;
     padding-left: 25px;
     padding-bottom: 5px;
-    max-width: var(--commonMobileMaxWidth);
+    /* max-width: var(--commonMobileMaxWidth); */
 }
 .menuHeaderDiv {
     padding-left: 5px;
