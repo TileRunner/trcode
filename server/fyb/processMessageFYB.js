@@ -110,7 +110,8 @@ const processFybCreateGame = (wss, pm) => {
                 players: [{
                     index: 0,
                     nickname: pm.nickname,
-                    points: 0
+                    points: 0,
+                    wins: 0
                 }]
             };
             games.push(game);
@@ -149,7 +150,8 @@ const processFybJoinGame = (wss, pm) => {
             let newPlayer = {
                 index: playerIndex,
                 nickname: pm.nickname,
-                points: 0
+                points: 0,
+                wins: 0
             };
             foundGame.players.push(newPlayer);
             let snat;
@@ -298,6 +300,7 @@ const processFybMove = (wss, pm) => {
                 foundGame.movesThisRound = [];
                 let winners = countWinners(foundGame);
                 if (winners > 0) {
+                    creditWinners(foundGame);
                     foundGame.whoseturn = -1;
                     foundGame.fryLetters = [];
                     foundGame.gameOver = true;
@@ -501,7 +504,7 @@ function pickNextTile(tiles, fryLetters) {
     let newFryLetters = [...fryLetters];
     newFryLetters.push(picked);
     let newTiles = [...tiles];
-    tiles.splice(rand, 1);
+    newTiles.splice(rand, 1);
     return({newTiles: newTiles, newFryLetters: newFryLetters});
 }
 
@@ -523,6 +526,14 @@ function countWinners(game) {
         }
     }
     return winners;
+}
+
+function creditWinners(game) {
+    for (let i = 0; i < game.players.length; i++) {
+        if (game.players[i].points >= game.goal) {
+            game.players[i].wins = game.players[i].wins + 1;
+        }
+    }
 }
 
 const sendGameData = (clients, game, snat) => {

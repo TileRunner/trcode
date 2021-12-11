@@ -13,7 +13,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         , movesPrevRound: []
         , whoseturn: -1
         , fryLetters: []
-        , players: [{index: 0, nickname: 'Loading...'}]});
+        , players: [{index: 0, nickname: 'Loading...', wins: 0}]});
     const [word, setWord] = useState(''); // my word to submit
     const [syncstamp, setSyncstamp] = useState('');
     const [selected, setSelected] = useState(-1);
@@ -141,7 +141,12 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     </tr>
                     {gamedata.players.map((pl) => (
                         <tr key={`Player${pl.index}`}>
-                            <td className="fybGamePlayer">{pl.nickname}</td>
+                            <td className="fybGamePlayer">
+                                {pl.nickname}
+                                {pl.wins > 0 &&
+                                    <span> ({pl.wins})</span>
+                                }
+                            </td>
                             <td className="fybGameScore">
                                 {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
                                 {pl.points >= gamedata.goal && <span className="fybWinner">Winner!</span>}

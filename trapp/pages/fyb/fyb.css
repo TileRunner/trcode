@@ -15,19 +15,14 @@
 .fybLobby {
     margin-left: 5px;
     margin-top: 5px;
-    border-color: green;
     padding-top: 5px;
 }
 .fybLobby.mobile {
-    border-width: 5px;
-    border-style: groove;
     max-width: var(--commonMobileMaxWidth);
 }
 .fybLobby.notmobile {
-    border-width: 10px;
-    border-style: none none none groove;
     padding: 25px;
-    /* max-width: var(--commonNotMobileMaxWidth); */
+    max-width: var(--commonNotMobileMaxWidth);
 }
 .fybLobbyButton {
     margin-left: 5px;
@@ -91,16 +86,12 @@
      */
     margin-left: 5px;
     margin-top: 5px;
-    border-width: 10px;
-    border-color: green;
     padding-top: 5px;
 }
 .fybGame.mobile {
-    border-style: groove;
     max-width: var(--commonMobileMaxWidth);
 }
 .fybGame.notmobile {
-    border-style: none none none groove;
     max-width: var(--commonNotMobileMaxWidth);
 }
 .fybGameSectionHeader {
