@@ -220,7 +220,7 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                     </thead>
                     <tbody>
                       {gamelist.map((value, index) => (
-                        <tr key={`OtherGame${index}`} className="myCommonFont w3-hover-green">
+                        <tr key={`OtherGame${index}`} className="myCommonFont w3-grey w3-hover-green">
                           <td className="w3-border-right"><b>{value.gameid}</b></td>
                           {availableActionP(value) === availableActionReconnect ?
                             <td id={`PrisonersRejoin${index}`} className="w3-border-right">

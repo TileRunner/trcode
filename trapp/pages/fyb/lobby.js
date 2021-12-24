@@ -47,14 +47,16 @@ const Lobby = ({ismobile, setWhereto, client, thisisme, setParticipant, wsmessag
     }
 
     return (
-        <div className={`fybLobby ${ismobile === "Y" ? "mobile" : "notmobile"}`} id="fybLobby">
+        <div className={`fybLobby ${ismobile === "Y" ? "mobile" : ""}`} id="fybLobby">
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <p>{snat}</p>
+            <div>
+                <label>{snat}</label>
+            </div>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
             {gotNickname && displayGamelist(gamelist, client, thisisme, nickname)}
             {gotNickname && !mainAction && getMainAction(setMainAction)}

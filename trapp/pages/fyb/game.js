@@ -124,7 +124,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         }
     }
     return (
-        <div className={`container fybGame ${ismobile === "Y" ? "mobile" : "notmobile"}`}>
+        <div className={`container fybGame ${ismobile === "Y" ? "mobile" : ""}`}>
             <div className="fybHeaderDiv">
                 <span className="h2">Fry Your Brain</span>
                 <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>

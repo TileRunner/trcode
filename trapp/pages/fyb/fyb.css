@@ -20,10 +20,6 @@
 .fybLobby.mobile {
     max-width: var(--commonMobileMaxWidth);
 }
-.fybLobby.notmobile {
-    padding: 25px;
-    max-width: var(--commonNotMobileMaxWidth);
-}
 .fybLobbyButton {
     margin-left: 5px;
     border-radius: 50pc;
@@ -63,6 +59,14 @@
     border-width: 2px;
     border-color: var(--commonButtonBorderColour);
 }
+.fybGamelist th {
+    background-color: var(--commonThBackgroundColour);
+    color: var(--commonThTextColour);
+}
+.fybGamelist td {
+    background-color: var(--commonTdBackgroundColour);
+    color: var(--commonTdTextColour);
+}
 .fybGamelist tbody td:nth-child(2),td:nth-child(3) {
     text-align: center;
 }
@@ -91,9 +95,6 @@
 .fybGame.mobile {
     max-width: var(--commonMobileMaxWidth);
 }
-.fybGame.notmobile {
-    max-width: var(--commonNotMobileMaxWidth);
-}
 .fybGameSectionHeader {
     background-color: black;
     color: whitesmoke;
@@ -103,8 +104,8 @@
     padding: 2px;
 }
 .fybGamePlayer {
-    background-color: green;
-    color: whitesmoke;
+    background-color: var(--commonTdBackgroundColour);
+    color: var(--commonTdTextColour);
     padding: 1px 3px 1px 5px;
 }
 .fybGamePlayer::after {
@@ -112,8 +113,8 @@
 }
 .fybGameWord {
     padding: 1px 3px;
-    background-color: green;
-    color: whitesmoke;
+    background-color: var(--commonTdBackgroundColour);
+    color: var(--commonTdTextColour);
 }
 .fybGameWord.pass {
     background-color: red;
@@ -135,7 +136,8 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 .fybGameScore {
-    color: whitesmoke;
+    background-color: var(--commonTdBackgroundColour);
+    color: var(--commonTdTextColour);
     font-family: monospace;
     padding: 1px 5px;
 }

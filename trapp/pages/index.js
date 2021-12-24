@@ -145,10 +145,15 @@ const Menu = (props) => {
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
+  const MenuOptionKmMarkers = () => <div className="menuLinkOption">
+    Hamilton to Cambridge Rail Trail:
+    <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank"> Km Marker Videos</a>
+  </div>
+
 return (
     <div className={`menu ${props.ismobile === "Y" ? "mobile" : "notmobile"}`}>
       <div className="menuHeaderDiv">
-        <h1 className="myHeadingFont">Menu Options</h1>
+        <h2 className="myHeadingFont">Tile Stuff</h2>
       </div>
       <BrowserView>
         <table className="menuOptTable">
@@ -173,6 +178,10 @@ return (
       {descWi && DescribeWordInfo}
       {descPb && DescribePrisonBreak}
       {descFyb && DescribeFryYourBrain}
+      <div className="menuHeaderDiv">
+          <h2 className="myHeadingFont">Runner Stuff</h2>
+      </div>
+      <MenuOptionKmMarkers></MenuOptionKmMarkers>
       <div>
         <div className="menuHeaderDiv">
           <h2 className="myHeadingFont">Special Thanks</h2>

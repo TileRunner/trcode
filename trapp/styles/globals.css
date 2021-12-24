@@ -1,15 +1,18 @@
 @import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
 :root {
-  --commonMobileMaxWidth: 360px;
-  --commonNotMobileMaxWidth: 90%;
-  --commonBorderColour: grey;/* blue; /*darkslateblue*/
-  --commonTextBackgroundColour: black;
-  --commonTextColour: whitesmoke;
-  --commonHeaderFontFamily: Merriweather;
-  --commonFontFamily: 'Open Sans', sans-serif;
-  --commonButtonBackgroundColour: forestgreen;
-  --commonButtonTextColour: whitesmoke;
-  --commonButtonBorderColour: black;
+  --commonMobileMaxWidth: 360px; /* menu, fyb */
+  --commonBorderColour: grey;/* pb */
+  --commonTextBackgroundColour: black; /* pb */
+  --commonTextColour: whitesmoke; /* pb */
+  --commonHeaderFontFamily: Merriweather; /* menu, fyb, pb */
+  --commonFontFamily: 'Open Sans', sans-serif; /* menu, pb */
+  --commonButtonBackgroundColour: blue; /* menu, fyb */
+  --commonButtonTextColour: whitesmoke; /* menu, fyb */
+  --commonButtonBorderColour: black; /* menu, fyb */
+  --commonThBackgroundColour: blue; /* fyb */
+  --commonTdBackgroundColour: lightblue; /* fyb */
+  --commonThTextColour: whitesmoke; /* fyb */
+  --commonTdTextColour: black; /* fyb */
 }
 .commonHeaderFontFamily {
   font-family: var(--commonHeaderFontFamily);
@@ -19,8 +22,8 @@
 }
 html,
 body {
-  background-color: darkgrey;
-  color: black;
+  background-color: #404040;
+  color: burlywood;
   padding: 0;
   margin: 0;
   /* font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
