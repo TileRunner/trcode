@@ -1,172 +1,17 @@
-.fybHeaderDiv {
-    padding-left: 5px;
-    font-family: var(--commonHeaderFontFamily);
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-.fybHomeButton {
-    padding-top: 5px;
-    margin-left: 5px;
-    border-radius: 0pc;
-    background-color: var(--commonButtonBackgroundColour);
-    border-color: var(--commonButtonBorderColour);
-    color: var(--commonButtonTextColour);
-}
-.fybLobby {
-    margin-left: 5px;
-    margin-top: 5px;
-    padding-top: 5px;
-}
-.fybLobby.mobile {
-    max-width: var(--commonMobileMaxWidth);
-}
-.fybLobbyButton {
-    margin-left: 5px;
-    border-radius: 50pc;
-    border-width: 2px;
-    padding: 5px 10px;
-    background-color: var(--commonButtonBackgroundColour);
-    border-color: var(--commonButtonBorderColour);
-    color: var(--commonButtonTextColour);
-}
-.fybInputWarning {
-    background-color: whitesmoke;
-    color: red;
-    font-style: italic;
-    margin-left: 10px;
-    width: fit-content;
-}
-.fybLobby label {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-.fybLobby input {
-    background-color: var(--commonButtonBackgroundColour);
-    color: var(--commonButtonTextColour);
-}
 .heart {
     color: red;
-}
-.fybGamelist {
-    margin: 0px 5px;
-    margin-bottom: 5px;
-}
-.fybGamelist p {
-    font-weight: bold;
-}
-.fybGamelist td,th {
-    border-style: solid;
-    border-width: 2px;
-    border-color: var(--commonButtonBorderColour);
-}
-.fybGamelist th {
-    background-color: var(--commonThBackgroundColour);
-    color: var(--commonThTextColour);
-}
-.fybGamelist td {
-    background-color: var(--commonTdBackgroundColour);
-    color: var(--commonTdTextColour);
-}
-.fybGamelist tbody td:nth-child(2),td:nth-child(3) {
-    text-align: center;
-}
-.fybGamelist tbody td:nth-child(5) {
-    text-align: center;
-}
-.fybGamelist td:nth-child(5) button {
-    border-radius: 50pc;
-    border-width: 2px;
-    padding: 5px 10px;
-    background-color: var(--commonButtonBackgroundColour);
-    border-color: var(--commonButtonBorderColour);
-    color: var(--commonButtonTextColour);
-}
-.fybGame {
-    /*
-        There is an annoying mobile effect of auto scrolling down and right.
-        This puts some content out of view, slightly.
-        The margin left and padding top are my attempt to improve the mobile experience.
-        Using class name "container" along with "fryGame" seems helpful at least on device emulation.
-     */
-    margin-left: 5px;
-    margin-top: 5px;
-    padding-top: 5px;
-}
-.fybGame.mobile {
-    max-width: var(--commonMobileMaxWidth);
-}
-.fybGameSectionHeader {
-    background-color: black;
-    color: whitesmoke;
-    font-size: x-large;
-    font-family: var(--commonHeaderFontFamily);
-    width: fit-content;
-    padding: 2px;
-}
-.fybGamePlayer {
-    background-color: var(--commonTdBackgroundColour);
-    color: var(--commonTdTextColour);
-    padding: 1px 3px 1px 5px;
-}
-.fybGamePlayer::after {
-    content: ':';
-}
-.fybGameWord {
-    padding: 1px 3px;
-    background-color: var(--commonTdBackgroundColour);
-    color: var(--commonTdTextColour);
-}
-.fybGameWord.pass {
-    background-color: red;
-}
-.fybGameWord.valid {
-    font-family: monospace;
-}
-.fybGameWord.invalid {
-    font-weight: bold;
-    background-color: whitesmoke;
-    color: black;
-    font-family: Arial, Helvetica, sans-serif;
-}
-.fybGameWord.invalid::after {
-    content: ' *';
 }
 .fybGameWord.long {
     font-size: x-small;
     font-family: Arial, Helvetica, sans-serif;
 }
-.fybGameScore {
-    background-color: var(--commonTdBackgroundColour);
-    color: var(--commonTdTextColour);
-    font-family: monospace;
-    padding: 1px 5px;
-}
-.fybWinner {
-    border-radius: 10px;
-    background-color: turquoise;
-    color: black;
-    font-style: oblique;
-    font-size: larger;
-    letter-spacing: 1px;
-    margin-left: 5px;
-    padding: 2px 5px;
-}
-.fybGame table {
-    margin-left: 10px;
-    background-color: green;
-}
-.fybGameFryLettersLabel {
-    margin: 5px 0px 0px 10px;
-}
-.fybGameShuffleButton {
+.fryLetterActionButton {
     margin-left: 5px;
     border: none;
     padding: 0px 0px 0px 0px;
-    background-color: darkgrey;
-    color: blue;
 }
-.fybGameShuffleButtonIcon {
-    margin: 5px 0px 0px 5px;
+.fryLetterActionButtonIcon {
+    margin: 5px 0px 0px 0px;
 }
 .fryLetterDiv {
     background-color: black;
@@ -179,7 +24,6 @@
     user-select: none;
 }
 .fybFryLetter {
-    /* background-color: green; */
     font-family: monospace;
     font-size: xx-large;
     text-align: center;
@@ -191,54 +35,4 @@
     border-width: thick;
     border-color: blue;
     background-color: whitesmoke;
-}
-.fryAnswerCountDiv {
-    background-color: darkgray;
-    color: blue;
-    font-family: var(--commonHeaderFontFamily);
-    font-size: medium;
-    width: fit-content;
-    padding: 2px 10px 2px 2px;
-    margin: 0px 0px 5px 10px;
-    user-select: none;
-}
-.fryAnswerCount::before {
-    content: '(#Answers: ';
-}
-.fryAnswerCount::after {
-    content: ')';
-}
-.fybGameEnterWordLabel {
-    margin: 0px 0px 2px 10px;
-}
-.fybGame input {
-    margin: 0px 0px 5px 10px;
-    background-color: var(--commonButtonBackgroundColour);
-    color: var(--commonButtonTextColour);
-}
-.fybGameWordSubmitButton {
-    margin-left: 10px;
-    border-radius: 50pc;
-    border-width: 2px;
-    padding: 5px 10px;
-    background-color: var(--commonButtonBackgroundColour);
-    border-color: var(--commonButtonBorderColour);
-    color: var(--commonButtonTextColour);
-}
-.fybGameWordPassButton {
-    margin-left: 10px;
-    border-radius: 50pc;
-    border-width: 2px;
-    padding: 5px 10px;
-    background-color: red;
-    border-color: var(--commonButtonBorderColour);
-    color: var(--commonButtonTextColour);
-}
-.fybGameOver {
-    margin-top: 10px;
-    margin-left: 10px;
-}
-.fybSnat {
-    margin: 10px 0px 10px 10px;
-    font-style: italic;
 }

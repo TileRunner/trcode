@@ -1,23 +1,20 @@
 @import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
 :root {
-  --commonMobileMaxWidth: 360px; /* menu, fyb */
+  --commonMobileMaxWidth: 360px; /* fyb */
   --commonBorderColour: grey;/* pb */
   --commonTextBackgroundColour: black; /* pb */
   --commonTextColour: whitesmoke; /* pb */
-  --commonHeaderFontFamily: Merriweather; /* menu, fyb, pb */
-  --commonFontFamily: 'Open Sans', sans-serif; /* menu, pb */
-  --commonButtonBackgroundColour: blue; /* menu, fyb */
-  --commonButtonTextColour: whitesmoke; /* menu, fyb */
-  --commonButtonBorderColour: black; /* menu, fyb */
+  --commonHeaderFontFamily: Merriweather; /* fyb, pb */
+  --commonFontFamily: 'Open Sans', sans-serif; /* pb */
+  --commonButtonBackgroundColour: blue; /* fyb */
+  --commonButtonTextColour: whitesmoke; /* fyb */
+  --commonButtonBorderColour: black; /* fyb */
   --commonThBackgroundColour: blue; /* fyb */
   --commonTdBackgroundColour: lightblue; /* fyb */
   --commonThTextColour: whitesmoke; /* fyb */
   --commonTdTextColour: black; /* fyb */
 }
-.commonHeaderFontFamily {
-  font-family: var(--commonHeaderFontFamily);
-}
-.commonFontFamily {
+.commonFontFamily { /* pb */
   font-family: var(--commonFontFamily);
 }
 html,
@@ -38,13 +35,10 @@ a {
 * {
   box-sizing: border-box;
 }
-.myHeadingFont {
+.myHeadingFont { /* pb */
   font-family: var(--commonHeaderFontFamily);
 }
-.mySubHeadingFont {
-  font-family: var(--commonFontFamily);
-}
-.myCommonFont {
+.myCommonFont { /* pb */
   font-family: var(--commonFontFamily);
 }
 .mymaterialicon {
@@ -54,10 +48,7 @@ a {
 .mymaterialicon:focus {
   outline: none;
   }
-.textaligncenter {
-  text-align: center;
-}
-.fivepxdivider {
+.fivepxdivider { /* fyb */
   line-height: 5px;
 }
 /* Rules for using icons as white on a dark background. */

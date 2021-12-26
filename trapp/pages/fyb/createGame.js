@@ -14,10 +14,10 @@ const CreateGame = ({
 
     return (
         <div>
-            <div className="fybHeaderDiv">
-                <span className="h2">Create Game</span>
+            <div className="trSubtitle">
+                Create Game
             </div>
-            <table>
+            <table className="trTable">
                 <tbody>
                 <tr>
                     <td><label>Game ID:</label></td>
@@ -51,7 +51,7 @@ const CreateGame = ({
             </table>
             {gameid && numPlayers > 1 && numPlayers < 7 && goal > 2 && goal < 22 &&
                 <button
-                    className="fybLobbyButton"
+                    className="trButton"
                     id="requestCreateGame"
                     type="submit"
                     onClick={() => {
@@ -62,17 +62,15 @@ const CreateGame = ({
                     SUBMIT
                 </button>
             }
-            <div className="fybInputWarning">
-                {!gameid &&
-                    <p>Game ID is required</p>
-                }
-                {!(numPlayers > 1 && numPlayers < 7) &&
-                    <p># Players is 2-6</p>
-                }
-                {!(goal > 2 && goal < 22) &&
-                    <p>Pts to win is 3-21</p>
-                }
-            </div>
+            {!gameid &&
+                <div className="trWarning">Game ID is required</div>
+            }
+            {!(numPlayers > 1 && numPlayers < 7) &&
+                <div className="trWarning"># Players is 2-6</div>
+            }
+            {!(goal > 2 && goal < 22) &&
+                <div className="trWarning">Pts to win is 3-21</div>
+            }
         </div>
     );
 }

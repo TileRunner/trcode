@@ -124,38 +124,38 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         }
     }
     return (
-        <div className={`container fybGame ${ismobile === "Y" ? "mobile" : ""}`}>
-            <div className="fybHeaderDiv">
-                <span className="h2">Fry Your Brain</span>
-                <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
+        <div className="trBackground">
+            <div className="trTitle">
+                Fry Your Brain
+                <button className="trButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <div className="fybHeaderDiv">
-                <span className="h4">Game id: {gameid}</span>
+            <div className="trSubtitle">
+                Game id: {gameid}
             </div>
-            <table>
+            <table className="trTable">
                 <tbody>
                     <tr>
-                        <td colSpan="2" className="fybGameSectionHeader">First to {gamedata.goal} wins!</td>
+                        <th colSpan="2">First to {gamedata.goal} wins!</th>
                     </tr>
                     {gamedata.players.map((pl) => (
                         <tr key={`Player${pl.index}`}>
-                            <td className="fybGamePlayer">
+                            <td>
                                 {pl.nickname}
                                 {pl.wins > 0 &&
                                     <span> ({pl.wins})</span>
                                 }
                             </td>
-                            <td className="fybGameScore">
+                            <td>
                                 {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
-                                {pl.points >= gamedata.goal && <span className="fybWinner">Winner!</span>}
+                                {pl.points >= gamedata.goal && <span className="trEmphasis"> Winner!&nbsp;</span>}
                             </td>
                         </tr>
                     ))}
                     {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
                         <tr>
-                            <td className="fybGameSectionHeader" colSpan="2">Previous round:</td>
+                            <th colSpan="2">Previous round:</th>
                         </tr>
                     }
                     {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
@@ -163,7 +163,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     }
                     {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
                         <tr>
-                            <td className="fybGameSectionHeader" colSpan="2">This round:</td>
+                            <th colSpan="2">This round:</th>
                         </tr>
                     }
                     {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
@@ -171,7 +171,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     }
                     {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
                         <tr>
-                            <td className="fybGameSectionHeader" colSpan="2">Free-for-all:</td>
+                            <th colSpan="2">Free-for-all:</th>
                         </tr>
                     }
                     {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
@@ -181,8 +181,8 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
             </table>
             {gamedata.whoseturn > -1 &&
             <div>
-                <div className="fybGameFryLettersLabel">Fry Letters:
-                    <button className="fybGameShuffleButton" onClick={() => {
+                <div className="trParagraph">Fry Letters:
+                    <button className="trButton fryLetterActionButton" onClick={() => {
                         let shuffleSize = gamedata.fryLetters.length;
                         let beforeShuffle = [...gamedata.fryLetters];
                         let afterShuffle = [];
@@ -195,16 +195,16 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                         newGamedata.fryLetters = [...afterShuffle];
                         setGamedata(newGamedata);
                     }}>
-                        <i className="material-icons fybGameShuffleButtonIcon">cached</i>
+                        <i className="material-icons fryLetterActionButtonIcon">cached</i>
                     </button>
-                    <button className="fybGameShuffleButton" onClick={() => {
+                    <button className="trButton fryLetterActionButton" onClick={() => {
                         let sortwork = [...gamedata.fryLetters];
                         sortwork.sort();
                         let newGamedata = JSON.parse(JSON.stringify(gamedata));
                         newGamedata.fryLetters = [...sortwork];
                         setGamedata(newGamedata);
                     }}>
-                        <i className="material-icons fybGameShuffleButtonIcon">sort_by_alpha</i>
+                        <i className="material-icons fryLetterActionButtonIcon">sort_by_alpha</i>
                     </button>
                 </div>
                 <div className="fryLetterDiv">
@@ -248,24 +248,24 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                             >{fl}</span>
                     ))}
                 </div>
-                <div className="fryAnswerCountDiv">
-                    <div className="fryAnswerCount">{gamedata.numPossibleAnswers}</div>
+                <div className="trParagraph">
+                    (#Answers: {gamedata.numPossibleAnswers})
                 </div>
             </div>}
             {meToEnterWord() &&
                 getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
             }
             <div>
-            {gamedata.gameOver && <div className="fybGameOver">
-                <span className="fybGameSectionHeader">Game Over</span>
+            {gamedata.gameOver && <div className="trParagraph">
+                Game Over
                 <button
-                    className="fybGameWordSubmitButton"
+                    className="trButton"
                     onClick={() => {sendReplayRequest(client, thisisme, gamedata, nickname)}}
                 >
                     PLAY AGAIN
                 </button>
             </div>}
-            <p className="fybSnat">{snat}</p>
+            <div className="trParagraph trWarning">{snat}</div>
             </div>
         </div>
     );
@@ -275,12 +275,12 @@ function showMoveList(moveListKey, moveArray) {
     return (
         moveArray.map((move) => (
             <tr key={`${moveListKey}${move.nickname}`}>
-                <td className="fybGamePlayer">{move.nickname}</td>
-                <td className="fybGameWord">
+                <td>{move.nickname}</td>
+                <td>
                 {move.pass ?
-                    <span className="fybGameWord pass"> passed</span>
+                    <span className="trDanger"> passed</span>
                 :
-                    <span className={`fybGameWord ${move.valid ? 'valid' : 'invalid'} ${move.word.length > 10 && move.earned ? 'long' : move.word.length > 13 ? 'long' : ''}`}>
+                    <span className={`${move.valid ? '' : 'trDanger'} ${move.word.length > 10 && move.earned ? 'long' : move.word.length > 13 ? 'long' : ''}`}>
                         {move.word}
                         {move.earned && <span> ({move.earned} pts)</span>}
                     </span>
@@ -292,7 +292,7 @@ function showMoveList(moveListKey, moveArray) {
 
 function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname) {
     return <div onKeyDownCapture={handleKeyDown}>
-        <div className="fybGameEnterWordLabel">Enter Word:</div>
+        <div className="trEmphasis">Enter Word:</div>
         <input
             type="text" autoComplete="off" spellCheck="false"
             name="word"
@@ -302,13 +302,13 @@ function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, 
             } } />
         <div>
             {word.toUpperCase().trim().match("^[a-zA-Z]*$") && 
-                <button className="fybGameWordSubmitButton" key="submitWord"
+                <button className="trButton" key="submitWord"
                 onClick={() => {submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord)}}>
                     SUBMIT
                 </button>
             }
 
-            <button className="fybGameWordPassButton" key="passButton"
+            <button className="trButton" key="passButton"
             onClick={() => {submitPass(setSnat, client, thisisme, gamedata.gameid, nickname, setWord)}}>
                 PASS
             </button>

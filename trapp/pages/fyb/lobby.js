@@ -47,18 +47,18 @@ const Lobby = ({ismobile, setWhereto, client, thisisme, setParticipant, wsmessag
     }
 
     return (
-        <div className={`fybLobby ${ismobile === "Y" ? "mobile" : ""}`} id="fybLobby">
-            <div className="fybHeaderDiv">
-                <span className="h2">Fry Your Brain</span>
-                <button className="fybHomeButton" onClick={() => {setWhereto('menu');}}>
+        <div className="trBackground" id="fybLobby">
+            <div className="trTitle">
+                Fry Your Brain
+                <button className="trButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <div>
+            <div className="trParagraph">
                 <label>{snat}</label>
             </div>
             {!gotNickname && getNickname(nickname, setNickname, setGotNickname)}
-            {gotNickname && displayGamelist(gamelist, client, thisisme, nickname)}
+            {gotNickname && gamelist && gamelist.length > 0 && displayGamelist(gamelist, client, thisisme, nickname)}
             {gotNickname && !mainAction && getMainAction(setMainAction)}
             {gotNickname && mainAction === 'C' &&
                 <CreateGame
@@ -74,9 +74,9 @@ const Lobby = ({ismobile, setWhereto, client, thisisme, setParticipant, wsmessag
 }
 
 function displayGamelist(gamelist, client, thisisme, nickname) {
-    return <div className="fybGamelist">
-        <p>Game List:</p>
-        <table>
+    return <div>
+        <div className="trParagraph">Game List:</div>
+        <table className="trTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -96,7 +96,7 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
                         <td>
                             {
                                 isPlayerInArray(game.players, nickname) ?
-                                    <button
+                                    <button className="trButton"
                                         key={`rejoinButton${index}`}
                                         type="submit"
                                         onClick={() => {
@@ -105,7 +105,7 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
                                             REJOIN
                                     </button>
                                 : game.players.length < game.numPlayers ?
-                                    <button
+                                    <button className="trButton"
                                         key={`joinButton${index}`}
                                         type="submit"
                                         onClick={() => {
@@ -125,7 +125,7 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
 
 function getNickname(nickname, setNickname, setGotNickname) {
     return <div>
-        <div>
+        <div className="trParagraph">
             <label>Nickname:</label>
             <input
                 type="text"
@@ -137,7 +137,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
         </div>
         {nickname && <div>
             <button
-                className="fybLobbyButton"
+                className="trButton"
                 type="submit"
                 onClick={() => {
                     let trimmed = nickname.trim();
@@ -153,7 +153,7 @@ function getNickname(nickname, setNickname, setGotNickname) {
 function getMainAction(setMainAction) {
     return <div>
         <button
-            className="fybLobbyButton"
+            className="trButton"
             type="submit"
             id="chooseCreateGame"
             onClick={() => {

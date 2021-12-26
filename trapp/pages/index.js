@@ -42,14 +42,14 @@ const Menu = (props) => {
     return (
       <tr>
         <td>
-          <button className="menuButton"
+          <button className="trButton"
             onClick={() => {props.setWhereto(props.targetWhereto);}}
           >
             {props.optionText}
           </button>
         </td>
         <td>
-          <button id="toggleDescribeFlag" className={`menuToggleDescButton ${props.descFlag ? 'Y' : 'N'}`}
+          <button id="toggleDescribeFlag" className="trButton"
             onClick={() => toggleDescFlag()}
           >
             {props.descFlag ? "Hide info" : "Show info"}
@@ -59,9 +59,9 @@ const Menu = (props) => {
     )
   }
 
-  const DescribeWordMastermind = <div className="menuOptionDescDiv">
-    <ul className="commonFontFamily">
-      <li><h2 className="CommenHeaderFontFamily">Word Mastermind is a single player code cracking game.</h2></li>
+  const DescribeWordMastermind = <div className="trParagraph">
+    <div className="trSubtitle">Word Mastermind is a single player code cracking game.</div>
+    <ul>
       <li>The computer picks a random word.</li>
       <li>You enter guesses until you guess correctly.</li>
       <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
@@ -72,9 +72,9 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeWordInfo = <div className="menuOptionDescDiv">
-    <ul className="commonFontFamily">
-      <li><h2 className="commonHeaderFontFamily">Word Info is a utility to get information on words.</h2></li>
+  const DescribeWordInfo = <div className="trParagraph">
+    <div className="trSubtitle">Word Info is a utility to get information on words.</div>
+    <ul>
       <li>Anagrams - words that use the exact same letters.</li>
       <li>Inserts - words that can be made by inserting a single letter.</li>
       <li>Drops - words that can be made by dropping a single letter.</li>
@@ -82,9 +82,9 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribePrisonBreak = <div className="menuOptionDescDiv">
-    <ul className="commonFontFamily">
-      <li><h2 className="commonHeaderFontFamily">Prison Break is a two player crossword style game.</h2></li>
+  const DescribePrisonBreak = <div className="trParagraph">
+    <div className="trSubtitle">Prison Break is a two player crossword style game.</div>
+    <ul>
       <li>You play two games, one as the Prisoners and one as the Guards. Whoever frees the most prisoners wins.</li>
       <li>Prisoners always play first.</li>
       <li>The first word played must touch the centre square.</li>
@@ -97,9 +97,9 @@ const Menu = (props) => {
     </ul>
   </div>;
 
-  const DescribeFryYourBrain = <div className="menuOptionDescDiv">
-    <ul className="commonFontFamily">
-      <li><h2 className="commonHeaderFontFamily">Fry Your Brain is a word game that can be contested by two to six players.</h2></li>
+  const DescribeFryYourBrain = <div className="trParagraph">
+    <div className="trSubtitle">Fry Your Brain is a word game that can be contested by two to six players.</div>
+    <ul>
       <li>A tile pool is provided, starting with 3 letters. Players take turns.</li>
       <li>When it is your turn, make a word that has all the letters in the tile pool, plus any amount of additional letters.</li>
       <li>You cannot reuse a word from the same round.</li>
@@ -122,7 +122,7 @@ const Menu = (props) => {
             {props.ackText}
         </td>
         <td>
-          <button className={`menuToggleDescButton ${props.descFlag ? 'Y' : 'N'}`}
+          <button className="trButton"
             onClick={() => toggleDescFlag()}
           >
             {props.descFlag ? "Hide info" : "Show info"}
@@ -132,31 +132,31 @@ const Menu = (props) => {
     )
   }
 
-  const DescribeEnable2k = <div className="menuOptionDescDiv">
-    <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
+  const DescribeEnable2k = <div className="trParagraph">
+    This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.
   </div>
 
-  const DescribeExtendsClass = <div className="menuOptionDescDiv">
-    <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
+  const DescribeExtendsClass = <div className="trParagraph">
+    This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!
   </div>
 
-  const DescribeFriends = <div className="menuOptionDescDiv">
+  const DescribeFriends = <div className="trParagraph">
     <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
-  const MenuOptionKmMarkers = () => <div className="menuLinkOption">
+  const MenuOptionKmMarkers = () => <div className="trParagraph">
     Hamilton to Cambridge Rail Trail:
     <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank"> Km Marker Videos</a>
   </div>
 
 return (
-    <div className={`menu ${props.ismobile === "Y" ? "mobile" : "notmobile"}`}>
-      <div className="menuHeaderDiv">
-        <h2 className="myHeadingFont">Tile Stuff</h2>
+    <div className="trBackground">
+      <div className="trTitle">
+        Tile Stuff
       </div>
       <BrowserView>
-        <table className="menuOptTable">
+        <table className="trTable">
           <tbody>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
@@ -166,7 +166,7 @@ return (
         </table>
       </BrowserView>
       <MobileOnlyView>
-        <table className="menuOptTable">
+        <table className="trTable">
           <tbody>
             <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
@@ -178,15 +178,15 @@ return (
       {descWi && DescribeWordInfo}
       {descPb && DescribePrisonBreak}
       {descFyb && DescribeFryYourBrain}
-      <div className="menuHeaderDiv">
-          <h2 className="myHeadingFont">Runner Stuff</h2>
+      <div className="trTitle">
+          Runner Stuff
       </div>
       <MenuOptionKmMarkers></MenuOptionKmMarkers>
       <div>
-        <div className="menuHeaderDiv">
-          <h2 className="myHeadingFont">Special Thanks</h2>
+        <div className="trSubtitle">
+          Special Thanks
         </div>
-        <table className="menuAckTable">
+        <table className="trTable">
           <tbody>
           <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
           <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
