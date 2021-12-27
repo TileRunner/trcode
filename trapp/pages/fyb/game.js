@@ -4,6 +4,7 @@ import { usePrevious } from "../../lib/usePrevious";
 
 const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     const [snat, setSnat] = useState('');
+    const [warning, setWarning] = useState('');
     const [gamedata, setGamedata] = useState({
         goal: 99
         , gameindex: 0
@@ -77,6 +78,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     setSelected(-1);
                     setGamedata(messageData.game);
                     setSyncstamp(messageData.game.syncstamp);
+                    setWarning('');
                 }
             } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
                 // Nothing to do, this is really for the lobby dwellers
@@ -101,7 +103,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
         }
         if (event.key === "Enter") {
             event.preventDefault();
-            submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord);
+            submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname, setWord);
             return;
         }
     }
@@ -253,7 +255,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                 </div>
             </div>}
             {meToEnterWord() &&
-                getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname)
+                getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, client, thisisme, nickname)
             }
             <div>
             {gamedata.gameOver && <div className="trParagraph">
@@ -265,7 +267,8 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                     PLAY AGAIN
                 </button>
             </div>}
-            <div className="trParagraph trWarning">{snat}</div>
+            <div className="trParagraph">{snat}</div>
+            {warning && <div className="trParagraph trWarning">{warning}</div>}
             </div>
         </div>
     );
@@ -290,7 +293,7 @@ function showMoveList(moveListKey, moveArray) {
         )))
 }
 
-function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, thisisme, nickname) {
+function getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, client, thisisme, nickname) {
     return <div onKeyDownCapture={handleKeyDown}>
         <div className="trEmphasis">Enter Word:</div>
         <input
@@ -303,30 +306,30 @@ function getPlayerWord(handleKeyDown, word, setWord, gamedata, setSnat, client, 
         <div>
             {word.toUpperCase().trim().match("^[a-zA-Z]*$") && 
                 <button className="trButton" key="submitWord"
-                onClick={() => {submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord)}}>
+                onClick={() => {submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname, setWord)}}>
                     SUBMIT
                 </button>
             }
 
             <button className="trButton" key="passButton"
-            onClick={() => {submitPass(setSnat, client, thisisme, gamedata.gameid, nickname, setWord)}}>
+            onClick={() => {submitPass(setWarning, client, thisisme, gamedata.gameid, nickname, setWord)}}>
                 PASS
             </button>
         </div>
     </div>;
 }
 
-function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, setWord) {
+function submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname, setWord) {
     let fixedword = word.toUpperCase().trim();
     // Check if the word is allowed based on previous words this round
     for (let i = 0; i < gamedata.movesThisRound.length; i++) {
         const pw = gamedata.movesThisRound[i].word;
         if (pw === fixedword) {
-            setSnat(`You cannot reuse a previous word from this round (${pw}).`);
+            setWarning(`You cannot reuse a previous word from this round (${pw}).`);
             return;
         }
         if (pw + 'S' === fixedword && pw.substring(pw.length-1) !== 'S' && gamedata.movesThisRound[i].valid) {
-            setSnat(`You cannot add S to a previous valid word (${pw}) from this round unless it ends with S.`);
+            setWarning(`You cannot add S to a previous valid word (${pw}) from this round unless it ends with S.`);
             return;
         }
     }
@@ -345,12 +348,12 @@ function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, s
             }
         }
         if (actualLetterCount < letterCountRequired) {
-            setSnat(`You need the letter ${gamedata.fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
+            setWarning(`You need the letter ${gamedata.fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
             return;
         }
     }
     // If you get here they have all the required letters. Send the guess to the server.
-    setSnat(`Checking your word ... shouldn't take long. If it does, please try rejoining the game.`);
+    setWarning(`Checking your word ... shouldn't take long. If it does, please try rejoining the game.`);
     client.send({
         type: c.CLIENT_TYPE_FYB,
         func: 'move',
@@ -366,9 +369,9 @@ function submitPlayerWord(word, gamedata, setSnat, client, thisisme, nickname, s
     setWord('');
 }
 
-function submitPass(setSnat, client, thisisme, gameid, nickname, setWord) {
+function submitPass(setWarning, client, thisisme, gameid, nickname, setWord) {
     // If you get here they have all the required letters. Send the guess to the server.
-    setSnat(`Sending PASS ... shouldn't take long.`);
+    setWarning(`Sending PASS ... shouldn't take long.`);
     client.send({
         type: c.CLIENT_TYPE_FYB,
         func: 'move',
