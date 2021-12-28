@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import ShowInsertsForOnePosition from './showInsertsForOnePosition';
+import ShowSwapsForOnePosition from './showSwapsForOnePosition';
+import ShowAnagramsForOneWord from './showAnagramsForOneWord';
 
 export default function Showinfo( props ) {
     const [info, setInfo] = useState([])
@@ -18,32 +21,27 @@ export default function Showinfo( props ) {
     },[])
 
     return (
-        <div className="wibody">
-            {loaded ?
-                <table><tbody>
+        loaded ?
+            <table className="trTable">
+                <tbody>
                     {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
                     {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
                     {displayWordRow()}
                     {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
-                    <tr className="divider"><td colSpan={props.word.length + props.word.length + 3}>&nbsp;</td></tr>
-                </tbody></table>
-            :
-                <p>Loading ...</p>
-            }
-        </div>
+                </tbody>
+            </table>
+        :
+            <div className="trEmphasis">Loading ...</div>
+        
     );
 
     function displayInsertsRow(inserts) {
         return(
-            <tr key={`inserts.${props.word}`}>
-                {inserts.map(i => (
+            <tr key={`insertsRow.${props.word}`}>
+                {inserts.map((i,index) => (
                     <>
-                        {i === '' ?
-                            <td></td>
-                            :
-                            <td className="insertCount" data-toggle="tooltip" title={i}>{i.length}
-                            </td>
-                        }
+                        <ShowInsertsForOnePosition insertLetters={i} key={`insertsBallon.${index}`}>
+                        </ShowInsertsForOnePosition>
                         <td></td>
                     </>
                 ))}
@@ -61,12 +59,8 @@ export default function Showinfo( props ) {
                     :
                         <td className="balloonstring">➻</td>
                     }
-                    {s === '' ?
-                        <td></td>
-                        :
-                        <td className="swapCount" data-toggle="tooltip" title={s}>{s.length}
-                        </td>
-                    }
+                    <ShowSwapsForOnePosition swapLetters={s} key={`swapsBallon.${index}`}>
+                    </ShowSwapsForOnePosition>
                 </>
             ))}
             </tr>
@@ -77,28 +71,24 @@ export default function Showinfo( props ) {
         const key1 = props.word;
         const key2 = props.word + '2';
         return(
-            <tr className="displayWordRow" key={`word.${props.word}`}>
-                <td className="insertCountSpacer"></td>
-                {props.word?.toUpperCase().split("").map((l, index) => (
+            <tr key={`word.${props.word}`}>
+                <td></td>
+                {props.word?.toUpperCase().split("").map(l => (
                     <>
-                        <td className={info.valid ? "letter" : "letterInvalidWord"}>{l}</td>
-                        <td className="facevalue"><sub>{letterValue(l)}</sub></td>
+                        <td>{l}</td>
+                        <td></td>
                     </>
                 ))}
                 <td key={key1}>
-                {props.showAnagrams === "Y" &&
+                {props.showAnagrams === "Y" && info.anagrams.length > 0 &&
                     <span key={info.anagrams}>
-                    {info.anagrams.length > 0 &&
-                        <span className="anagramCount" data-toggle="tooltip" title={info.anagrams}>{info.anagrams.length}</span>
-                    }
+                        <ShowAnagramsForOneWord anagrams={info.anagrams}></ShowAnagramsForOneWord>
                     </span>
                 }
                 </td>
                 <td key={key2}>
-                    {info.valid === 'Y' ?
-                        <span className="wordIsValid">Valid word</span>
-                    :
-                        <span className="wordIsNotValid">Not a recognized word</span>
+                    {info.valid !== 'Y' &&
+                        <span className="trDanger">Not a recognized word</span>
                     }
                 </td>
             </tr>
@@ -122,50 +112,5 @@ export default function Showinfo( props ) {
         )
     }
 
-    function displayAnagramsRow(anagrams) {
-        return(
-            <tr key={`anagrams.${props.word}`}>
-                <td>{`Anagrams: ${anagrams}`}</td>
-            </tr>
-        )
-    }
-
-    function letterValue(letter) {
-        switch(letter) {
-            case 'D':
-                return(2);
-            case 'G':
-                return(2);
-            case 'B':
-                return(3);
-            case 'C':
-                return(3);
-            case 'M':
-                return(3);
-            case 'P':
-                return(3);
-            case 'F':
-                return(4);
-            case 'H':
-                return(4);
-            case 'V':
-                return(4);
-            case 'W':
-                return(4);
-            case 'Y':
-                return(4);
-            case 'K':
-                return(5);
-            case 'J':
-                return(8);
-            case 'X':
-                return(8);
-            case 'Q':
-                return(10);
-            case 'Z':
-                return(10);
-        }
-        return(1);
-    }
 }
 

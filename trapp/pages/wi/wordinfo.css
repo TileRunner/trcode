@@ -123,8 +123,10 @@
   line-height: 5px;
 }
 .dropIndicator {
-  color: black;
-  text-align: center;
+  color: black !important;
+  text-align: left;
+  padding-left: 2px;
+  padding-bottom: 2px;
   vertical-align: top;
   font-weight: bolder;
   font-size: x-large;
