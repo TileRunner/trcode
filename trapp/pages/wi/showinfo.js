@@ -88,7 +88,7 @@ export default function Showinfo( props ) {
                 </td>
                 <td key={key2}>
                     {info.valid !== 'Y' &&
-                        <span className="trDanger">Not a recognized word</span>
+                        <span className="trDanger">Invalid word</span>
                     }
                 </td>
             </tr>

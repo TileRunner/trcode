@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link'
 import Showinfo from '../wi/showinfo'
 import {BrowserView} from 'react-device-detect'
 
@@ -15,22 +14,19 @@ const WordMastermind = ({setWhereto}) => {
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
     return (
-        <div className="Mastermind">
+        <div className="trBackground">
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-11 wmtitle">
+                    <div className="trTitle">
                         Word Mastermind
-                        <span className="material-icons">psychology</span>
-                    </div>
-                    <div className="col-1 wmhomelink">
-                        <button className="w3-button" onClick={() => {setWhereto('menu');}}>
+                        <button className="trButton" onClick={() => {setWhereto('menu');}}>
                             <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                         </button>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-11">
-                        <p className="wmp">Cycle through 2-8 letter words per set.</p>
+                        <p className="trParagraph">Cycle through 2-8 letter words per set.</p>
                     </div>
                 </div>
                 <div className="row">
@@ -38,35 +34,39 @@ const WordMastermind = ({setWhereto}) => {
                         <div className="row">
                             <div className="col-lg-6">
                                 <div className="Outertable">
-                                    <h3 className="wmh3 AlignLeft">Guesses this word: {guesses.length}</h3>
-                                    <h3 className="wmh3 AlignLeft">Guesses this set: {setGuessCount}</h3>
-                                    {setSolveCounts.length === 0 ?
-                                        <p className="AlignLeft">No completed sets yet</p>
-                                    :
-                                        <p className="AlignLeft">Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
-                                    }
+                                    <div className="trParagraph AlignLeft">
+                                        <p>Guesses this word: {guesses.length}</p>
+                                        <p>Guesses this set: {setGuessCount}</p>
+                                        {setSolveCounts.length === 0 ?
+                                            <p>No completed sets yet</p>
+                                        :
+                                            <p>Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-lg-6">
                                 <div className="Outertable">
                                     {secretWord === '' ? pickRandomWord() : ''}
-                                    <h3 className="wmh3">Secret Word: {solved ? secretWord : secretDisplay}</h3>
-                                    {secretWord === '' ?
-                                        <h1 className="wmh1">Loading ...</h1>
-                                    :
-                                        solved ?
-                                            promptForPlayAgain
+                                    <div className="trParagraph">
+                                        <h3 className="AlignCenter">Secret Word: {solved ? secretWord : secretDisplay}</h3>
+                                        {secretWord === '' ?
+                                            <h1>Loading ...</h1>
                                         :
-                                            promptForGuess
-                                    }
-                                    {solved ?
-                                        <br></br>
-                                        :
-                                        guesses.length === 0 ?
-                                            <p className="wmp">Start guessing</p>
+                                            solved ?
+                                                promptForPlayAgain
                                             :
-                                            <p className="wmp">Keep guessing</p>
-                                    }
+                                                promptForGuess
+                                        }
+                                        {solved ?
+                                            <br></br>
+                                            :
+                                            guesses.length === 0 ?
+                                                <p className="AlignCenter">Start guessing</p>
+                                                :
+                                                <p className="AlignCenter">Keep guessing</p>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +83,7 @@ const WordMastermind = ({setWhereto}) => {
                     <div className="col-lg-4">
                         <div className="Outertable">
                             {guesses.length === 0 ?
-                                <p>No guesses yet</p> 
+                                <p className="trParagraph">No guesses yet</p> 
                                 :
                                 displayGuesses
                             }
@@ -95,9 +95,9 @@ const WordMastermind = ({setWhereto}) => {
     );
 
     function showPlayAgainPrompt() {
-        return <div>
-            <h2 className="wmh2">Solved in {guesses.length} moves!</h2>
-            <button className="wmbutton"
+        return <div className="trParagraph">
+            <h2 className="trEmphasis">Solved in {guesses.length} moves!</h2>
+            <button className="trButton"
             onClick={function () {
                 pickRandomWord();
                 setGuess('');
@@ -111,11 +111,11 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessPrompt() {
-        return <div className="form-group">
+        return <div className="form-group trParagraph">
             {guesses.length === 0 ?
-                <label className="wmlabel">First guess:</label>
+                <label>First guess:</label>
                 :
-                <label className="wmlabel">Next guess:</label>
+                <label>Next guess:</label>
             }
             <input className="form-control"
                 name="guess"
@@ -142,20 +142,20 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessesTable() {
-        return <table className="Guesstable">
+        return <table className="trTable">
             <thead>
                 <tr>
-                    <th className="wmth">Guess</th>
-                    <th className="wmth">Correct Letter</th>
-                    <th className="wmth">Correct Position</th>
+                    <th>Guess</th>
+                    <th>Correct Letter</th>
+                    <th>Correct Position</th>
                 </tr>
             </thead>
             <tbody>
                 {guesses.map((g) => (
                     <tr>
-                        <td className="wmtd">{g}</td>
-                        <td className="wmtd AlignCenter">{calcCorrectLetterCount(g)}</td>
-                        <td className="wmtd AlignCenter">{calcCorrectPositionCount(g)}</td>
+                        <td>{g}</td>
+                        <td className="AlignCenter">{calcCorrectLetterCount(g)}</td>
+                        <td className="AlignCenter">{calcCorrectPositionCount(g)}</td>
                     </tr>
                 )
                 )}

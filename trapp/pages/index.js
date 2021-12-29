@@ -132,15 +132,15 @@ const Menu = (props) => {
     )
   }
 
-  const DescribeEnable2k = <div className="trParagraph">
-    This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.
+  const DescribeEnable2k = <div className="trParagraph trEmphasis">
+    <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
   </div>
 
-  const DescribeExtendsClass = <div className="trParagraph">
-    This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!
+  const DescribeExtendsClass = <div className="trParagraph trEmphasis">
+    <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
   </div>
 
-  const DescribeFriends = <div className="trParagraph">
+  const DescribeFriends = <div className="trParagraph trEmphasis">
     <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
@@ -152,50 +152,56 @@ const Menu = (props) => {
 
 return (
     <div className="trBackground">
-      <div className="trTitle">
-        Tile Stuff
+      <div className="trParagraph">
+        <div className="trTitle">Tile Stuff</div>
       </div>
-      <BrowserView>
-        <table className="trTable">
-          <tbody>
-            <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
-            <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
-            <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
-            <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+      <div className="trParagraph">
+        <BrowserView>
+          <table>
+            <tbody>
+              <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
+              <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
+              <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
+              <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+              </tbody>
+          </table>
+        </BrowserView>
+        <MobileOnlyView>
+          <table>
+            <tbody>
+              <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
+              <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
+              <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
             </tbody>
-        </table>
-      </BrowserView>
-      <MobileOnlyView>
-        <table className="trTable">
-          <tbody>
-            <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
-            <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
-            <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
-          </tbody>
-        </table>
-      </MobileOnlyView>
-      {descWm && DescribeWordMastermind}
-      {descWi && DescribeWordInfo}
-      {descPb && DescribePrisonBreak}
-      {descFyb && DescribeFryYourBrain}
-      <div className="trTitle">
-          Runner Stuff
+          </table>
+        </MobileOnlyView>
+        {descWm && DescribeWordMastermind}
+        {descWi && DescribeWordInfo}
+        {descPb && DescribePrisonBreak}
+        {descFyb && DescribeFryYourBrain}
       </div>
-      <MenuOptionKmMarkers></MenuOptionKmMarkers>
+      <div className="trParagraph">
+        <div className="trTitle">
+            Runner Stuff
+        </div>
+        <MenuOptionKmMarkers></MenuOptionKmMarkers>
+      </div>
       <div>
-        <div className="trSubtitle">
+        <div className="trTitle">
           Special Thanks
         </div>
-        <table className="trTable">
-          <tbody>
-          <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
-          <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
-          <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
-          </tbody>
-        </table>
-        {descEnable2k && DescribeEnable2k}
-        {descExtendsClass && DescribeExtendsClass}
-        {descFriends && DescribeFriends}
+        <div className="trParagraph">
+          <table>
+            <tbody>
+            <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+            <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
+            <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+            </tbody>
+          </table>
+          {descEnable2k && DescribeEnable2k}
+          {descExtendsClass && DescribeExtendsClass}
+          {descFriends && DescribeFriends}
+        </div>
       </div>
     </div>
   )

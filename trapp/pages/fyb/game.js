@@ -148,6 +148,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                                 {pl.wins > 0 &&
                                     <span> ({pl.wins})</span>
                                 }
+                                <span className="floatright">:</span>
                             </td>
                             <td>
                                 {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
@@ -259,7 +260,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
             }
             <div>
             {gamedata.gameOver && <div className="trParagraph">
-                Game Over
+                Game Over&nbsp;
                 <button
                     className="trButton"
                     onClick={() => {sendReplayRequest(client, thisisme, gamedata, nickname)}}
@@ -278,7 +279,7 @@ function showMoveList(moveListKey, moveArray) {
     return (
         moveArray.map((move) => (
             <tr key={`${moveListKey}${move.nickname}`}>
-                <td>{move.nickname}</td>
+                <td>{move.nickname}<span className="floatright">:</span></td>
                 <td>
                 {move.pass ?
                     <span className="trDanger"> passed</span>

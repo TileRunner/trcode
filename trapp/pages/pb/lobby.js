@@ -4,7 +4,7 @@ import Chat from '../pb/chatSection';
 import * as c from '../../lib/pb/prisonBreakConstants';
 import { scrollToBottom } from "../../lib/scrollToBottom";
 
-const buttonClassName = 'w3-button w3-border w3-blue w3-hover-black w3-round';
+const buttonClassName = 'trButton';
 // There is no availableActionStart because there is a specific Start button in the Prisoners row
 const availableActionNone = 0;
 const availableActionJoin = 1;
@@ -79,27 +79,25 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
       setRacksize(newRacksize);
     }
     return (
-      <div>
-        <div className="w3-container w3-teal w3-bar">
-          <h1 className="w3-bar-item w3-centre myHeadingFont">Prison Break Lobby</h1>
-          <div className="w3-bar-item w3-right">
-            <button className="w3-button" onClick={() => {setWhereto('menu');}}>
-                <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-            </button>
-          </div>
+      <div className="trBackground">
+        <div className="trTitle">
+          Prison Break Lobby&nbsp;
+          <button className="trButton" onClick={() => {setWhereto('menu');}}>
+              <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+          </button>
         </div>
         <div className="w3-row">
           <div className="w3-col s9">
             <div className="w3-container">
               <div className="w3-bar">
                 <div className="w3-bar-item">
-                  <h3><span className="pbPlayerTitle">All Participants ~</span></h3>
+                  <h3><span className="trEmphasis">All Participants &gt;</span></h3>
                 </div>
                 <div className="w3-bar-item">
-                  <h3><b>Nickname:</b></h3>
+                  <label className="h3 trParagraph">Nickname:</label>
                 </div>
                 <div className="w3-bar-item">
-                  <input className="w3-input w3-border w3-blue myCommonFont" type="text"
+                  <input className="trParagraph" type="text"
                     name="nickname"
                     value={nickname}
                     onChange={(e) => {
@@ -111,13 +109,13 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
             <div className="w3-container">
               <div className="w3-bar">
                   <div className="w3-bar-item">
-                    <h3><span className="pbPlayerTitle">Prisoners ~</span></h3>
+                    <h3><span className="trEmphasis">Prisoners &gt;</span></h3>
                   </div>
                   <div className="w3-bar-item">
-                    <h3><b>Game ID:</b></h3>
+                    <label className="h3 trParagraph">Game ID:</label>
                   </div>
                   <div className="w3-bar-item">
-                    <input className="w3-input w3-border w3-blue myCommonFont"
+                    <input className="trParagraph"
                       type="text"
                       name="gameid"
                       value={gameid}
@@ -126,7 +124,7 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                       } } />
                   </div>
                   <div className="w3-bar-item">
-                    <h3><b>Rack Size:</b></h3>
+                    <label className="h3 trParagraph">Rack Size:</label>
                   </div>
                   <div className="w3-bar-item">
                     <div className="w3-row">
@@ -157,7 +155,7 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                       </button>
                     </div>
                     <div className="w3-row">
-                      <span className="pbLobbyCellBlockInfo">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
+                      <span className="trParagraph">{racksize} letter racks, {racksize*2+1} x {racksize*2+1} board.</span>
                     </div>
                     </div>
                   <div className="w3-bar-item">
@@ -184,27 +182,24 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
             <div className="w3-container">
               <div className="w3-bar">
                 <div className="w3-bar-item">
-                  <h3><span className="pbPlayerTitle">Guards ~</span></h3>
+                  <h3><span className="trEmphasis">Guards &gt;</span></h3>
                 </div>
                 <div className="w3-bar-item">
-                  <span className="myCommonFont"><h2>Find and click the "Join Game" button for your game.</h2></span>
-                </div>
-              </div>
-            </div>
-            <div className="w3-container">
-              <div className="w3-bar">
-                <div className="w3-bar-item">
-                  <h1><i className="material-icons w3-right">report_problem</i></h1>
-                </div>
-                <div className="w3-bar-item">
-                  <h3 className="myCommonFont">If you lost connection, find and click the "Reconnect" button for your nickname.</h3>
+                  <span className="trParagraph"><h2>Find and click the "Join Game" button for your game.</h2></span>
                 </div>
               </div>
             </div>
             <div className="w3-container">
               <div className="w3-bar">
                 <div className="w3-bar-item">
-                  <h3 className="myCommonFont"><b>Game list:</b></h3>
+                  <h3 className="trWarning">If you lost connection, find and click the "Reconnect" button for your nickname.</h3>
+                </div>
+              </div>
+            </div>
+            <div className="w3-container">
+              <div className="w3-bar">
+                <div className="w3-bar-item">
+                  <span className="trParagraph h3">Game list:</span>
                 </div>
                 <div className="w3-bar-item">
                   <table className="w3-table-all w3-card-4">
@@ -326,7 +321,7 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
             <Chat client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs}/>
           </div>
         </div>
-        <div className="w3-container w3-teal">
+        <div className="trParagraph">
           <h1>Have fun!</h1>
         </div>
       </div>
