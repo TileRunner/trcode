@@ -16,7 +16,7 @@ import { usePrevious } from "../../lib/usePrevious";
 
 const Game = ({setWhereto
     , isrejoin
-    , participant // Prisoners, Guards, or Observer (not implemented)
+    , participant // Prisoners, Guards, Observer, Examiner
     , gameid
     , nickname='' // Give it a default for Build
     , wsmessage
@@ -414,7 +414,7 @@ const Game = ({setWhereto
         window.alert("Need " + racksize + " tiles in the bag to exchange")
         return;
       }
-      setSnat(`Swapping rack.`);
+      addSnat(`Swapping rack.`);
       let newPlayerTiles = [];
       let newTiles = [...tiles];
       while (newPlayerTiles.length < racksize && newTiles.length > 0) {

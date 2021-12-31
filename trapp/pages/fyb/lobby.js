@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as c from '../../lib/fyb/constants';
 import CreateGame from "./createGame";
 
-const Lobby = ({ismobile, setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid}) => {
+const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nickname, setNickname, gameid, setGameid}) => {
     const [snat, setSnat] = useState('Welcome!');
     const [gamelist, setGamelist] = useState([]);
     const [gotNickname, setGotNickname] = useState(false);

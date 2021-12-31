@@ -233,26 +233,27 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
    observer     observer    send        Same gameid
    examiner     examiner    send        Same gameid
 */
-    wss.clients.forEach((client) => {
-        if (client.clientType === pm.type) { // Same type of game
-            if (client.thisisme === pm.thisisme) { // This is the client that sent the message
-                // Don't send the chat back to the caller
-            } else if (pm.gameid) { // Sent from within a game, not from lobby
-                if (pm.gameid === client.gameid) { // Client is in same game as sender
-                    if (pm.type !== 'pb'
-                    || (pm.sender === 'O' && client.participant === 'O') // Observers chat
-                    || (pm.sender === 'E' && client.participant === 'E') // Examiners chat
-                    || (pm.sender === 'P' && client.participant === 'G') // Prisoners to Guards
-                    || (pm.sender === 'G' && client.participant === 'P') // Guards to Prisoners
-                    ) {
-                        client.send(message);
-                    }
-                }
-            } else { // Sent from lobby, not from within a game
-                if (!client.gameid) { // Client is in lobby - send message from lobby
-                    client.send(message);
-                }
-            }
+  wss.clients.forEach((client) => {
+    if (client.clientType === pm.type) { // Same type of game
+      if (client.thisisme === pm.thisisme) { // This is the client that sent the message
+        // Don't send the chat back to the caller
+      } else if (pm.gameid) { // Sent from within a game, not from lobby
+        if (pm.gameid === client.gameid) { // Client is in same game as sender
+          if (pm.type !== 'pb'
+          || (pm.sender === 'O' && client.participant === 'O') // Observers chat
+          || (pm.sender === 'E' && client.participant === 'E') // Examiners chat
+          || (pm.sender === 'P' && client.participant === 'G') // Prisoners to Guards
+          || (pm.sender === 'G' && client.participant === 'P') // Guards to Prisoners
+          ) {
+            console.log(`Sending`);
+            client.send(message);
+          }
         }
-    });
+      } else { // Sent from lobby, not from within a game
+        if (!client.gameid) { // Client is in lobby - send message from lobby
+          client.send(message);
+        }
+      }
+    }
+  });
 }

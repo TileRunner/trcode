@@ -30,10 +30,6 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
-                <link /* I added GoogleFonts using Font Pairings mentioned as popular on W3CSchools */
-                    rel="stylesheet"
-                    href="https://fonts.googleapis.com/css?family=Open Sans|Merriweather"
-                    />
                 <link /* I added w3.css */
                     rel="stylesheet"
                     href="https://www.w3schools.com/w3css/4/w3.css"

@@ -4,6 +4,11 @@ import Showinfo from './showinfo'
 const WordInfo = ({setWhereto}) => {
     const [word, setWord] = useState('');
     const [words, setWords] = useState([]);
+    function removeEntry(index) {
+        let newwords = JSON.parse(JSON.stringify(words)); // This deals with any depth issues using [...words]
+        newwords.splice(index,1);
+        setWords(newwords);
+    }
     return (
         <div className="trBackground">
             <div className="trTitle">
@@ -93,7 +98,7 @@ const WordInfo = ({setWhereto}) => {
             </div>
             {words.map((w,wi) => (
                 w === '' ? <></> :
-                <Showinfo key={`${words.length - wi}.${w}`} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"/>
+                <Showinfo key={`${words.length - wi}.${w}`} word={w} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y" removeEntry={removeEntry} entryIndex={wi}/>
             ))}
         </div>
         );

@@ -16,8 +16,6 @@
 .fryLetterDiv {
     background-color: black;
     color: whitesmoke;
-    font-family: var(--commonHeaderFontFamily);
-    font-size: x-large;
     width: fit-content;
     padding: 2px 10px 2px 2px;
     margin: 0px 0px 10px 10px;

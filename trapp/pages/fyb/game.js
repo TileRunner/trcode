@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
+import {BrowserView, MobileOnlyView} from 'react-device-detect';
 import * as c from '../../lib/fyb/constants';
 import { usePrevious } from "../../lib/usePrevious";
+import Chat from "../pb/chatSection";
+import { scrollToBottom } from "../../lib/scrollToBottom";
 
-const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
+const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
+    const [chatmsgs, setChatmsgs] = useState([]);
     const [snat, setSnat] = useState('');
     const [warning, setWarning] = useState('');
     const [gamedata, setGamedata] = useState({
@@ -20,6 +24,10 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
     const [selected, setSelected] = useState(-1);
     const prevGamedata = usePrevious(gamedata);
 
+    useEffect(() => {
+        scrollToBottom("ScrollableChat");
+      },[chatmsgs])
+  
     useEffect(() => {
         const interval = setInterval(() => {
             if (gamedata.whoseturn > -1 && gamedata.players.length > 0) {
@@ -57,7 +65,10 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
     function processGameMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
-            if (messageData.func === c.S2C_FUNC_GAMEDATA) {
+            if (messageData.func === "chat") { // Server decided whether this chat was for me
+                let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
+                setChatmsgs(newChatmsgs);
+            } else if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 /* SERVER SENT GAME DATA
                 For a regular update due to player activity, this client needs the update.
 
@@ -125,64 +136,50 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
             return (nickname === gamedata.players[gamedata.whoseturn].nickname);
         }
     }
-    return (
-        <div className="trBackground">
-            <div className="trTitle">
-                Fry Your Brain
-                <button className="trButton" onClick={() => {setWhereto('menu');}}>
-                    <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-                </button>
-            </div>
-            <div className="trSubtitle">
-                Game id: {gameid}
-            </div>
-            <table className="trTable">
-                <tbody>
-                    <tr>
-                        <th colSpan="2">First to {gamedata.goal} wins!</th>
+    const GameSection = <div>
+        <div className="trSubtitle">
+            {gameid}, {nickname}
+        </div>
+        <table className="trTable">
+            <tbody>
+                <tr>
+                    <th colSpan="2">First to {gamedata.goal} wins!</th>
+                </tr>
+                {gamedata.players.map((pl) => (
+                    <tr key={`Player${pl.index}`}>
+                        <td>
+                            {pl.nickname}
+                            {pl.wins > 0 &&
+                                <span> ({pl.wins})</span>}
+                            <span className="floatright">:</span>
+                        </td>
+                        <td>
+                            {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
+                            {pl.points >= gamedata.goal && <span className="trEmphasis"> Winner!&nbsp;</span>}
+                        </td>
                     </tr>
-                    {gamedata.players.map((pl) => (
-                        <tr key={`Player${pl.index}`}>
-                            <td>
-                                {pl.nickname}
-                                {pl.wins > 0 &&
-                                    <span> ({pl.wins})</span>
-                                }
-                                <span className="floatright">:</span>
-                            </td>
-                            <td>
-                                {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
-                                {pl.points >= gamedata.goal && <span className="trEmphasis"> Winner!&nbsp;</span>}
-                            </td>
-                        </tr>
-                    ))}
-                    {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
-                        <tr>
-                            <th colSpan="2">Previous round:</th>
-                        </tr>
-                    }
-                    {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
-                        showMoveList('movesPrevRound', gamedata.movesPrevRound)
-                    }
-                    {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
-                        <tr>
-                            <th colSpan="2">This round:</th>
-                        </tr>
-                    }
-                    {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
-                        showMoveList('movesThisRound', gamedata.movesThisRound)
-                    }
-                    {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
-                        <tr>
-                            <th colSpan="2">Free-for-all:</th>
-                        </tr>
-                    }
-                    {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
-                        showMoveList('ffaMoves', gamedata.freeforallMoves)
-                    }
-                </tbody>
-            </table>
-            {gamedata.whoseturn > -1 &&
+                ))}
+                {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
+                    <tr>
+                        <th colSpan="2">Previous round:</th>
+                    </tr>}
+                {gamedata.movesPrevRound && gamedata.movesPrevRound.length > 0 &&
+                    showMoveList('movesPrevRound', gamedata.movesPrevRound)}
+                {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
+                    <tr>
+                        <th colSpan="2">This round:</th>
+                    </tr>}
+                {gamedata.movesThisRound && gamedata.movesThisRound.length > 0 &&
+                    showMoveList('movesThisRound', gamedata.movesThisRound)}
+                {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
+                    <tr>
+                        <th colSpan="2">Free-for-all:</th>
+                    </tr>}
+                {!gamedata.freeforall && gamedata.freeforallMoves && gamedata.freeforallMoves.length > 0 &&
+                    showMoveList('ffaMoves', gamedata.freeforallMoves)}
+            </tbody>
+        </table>
+        {gamedata.whoseturn > -1 &&
             <div>
                 <div className="trParagraph">Fry Letters:
                     <button className="trButton fryLetterActionButton" onClick={() => {
@@ -197,7 +194,7 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                         let newGamedata = JSON.parse(JSON.stringify(gamedata));
                         newGamedata.fryLetters = [...afterShuffle];
                         setGamedata(newGamedata);
-                    }}>
+                    } }>
                         <i className="material-icons fryLetterActionButtonIcon">cached</i>
                     </button>
                     <button className="trButton fryLetterActionButton" onClick={() => {
@@ -206,24 +203,24 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                         let newGamedata = JSON.parse(JSON.stringify(gamedata));
                         newGamedata.fryLetters = [...sortwork];
                         setGamedata(newGamedata);
-                    }}>
+                    } }>
                         <i className="material-icons fryLetterActionButtonIcon">sort_by_alpha</i>
                     </button>
                 </div>
                 <div className="fryLetterDiv">
-                    {gamedata.fryLetters.map((fl,i) => (
+                    {gamedata.fryLetters.map((fl, i) => (
                         <span key={`FryLetter${i}`}
-                            className={i === selected ? "fybFryLetter Selected":"fybFryLetter"}
+                            className={i === selected ? "fybFryLetter Selected" : "fybFryLetter"}
                             onDoubleClick={() => {
                                 let moveLetter = gamedata.fryLetters[i];
                                 let shiftedLetters = [...gamedata.fryLetters];
-                                shiftedLetters.splice(i,1);
+                                shiftedLetters.splice(i, 1);
                                 shiftedLetters.push(moveLetter);
                                 let newGamedata = JSON.parse(JSON.stringify(gamedata));
                                 newGamedata.fryLetters = [...shiftedLetters];
                                 setGamedata(newGamedata);
                                 setSelected(-1);
-                            }}
+                            } }
                             onClick={() => {
                                 if (selected === -1) {
                                     setSelected(i);
@@ -247,30 +244,52 @@ const Game = ({ismobile, setWhereto, client, thisisme, wsmessage, nickname, game
                                     setGamedata(newGamedata);
                                     setSelected(-1);
                                 }
-                            }}
-                            >{fl}</span>
+                            } }
+                        >{fl}</span>
                     ))}
                 </div>
                 <div className="trParagraph">
                     (#Answers: {gamedata.numPossibleAnswers})
                 </div>
             </div>}
-            {meToEnterWord() &&
-                getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, client, thisisme, nickname)
-            }
-            <div>
-            {gamedata.gameOver && <div className="trParagraph">
-                Game Over&nbsp;
-                <button
-                    className="trButton"
-                    onClick={() => {sendReplayRequest(client, thisisme, gamedata, nickname)}}
-                >
-                    PLAY AGAIN
-                </button>
-            </div>}
+        {meToEnterWord() &&
+            getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, client, thisisme, nickname)}
+        <div>
+            {gamedata.gameOver &&
+                <div className="trParagraph">
+                    Game Over&nbsp;
+                    <button
+                        className="trButton"
+                        onClick={() => { sendReplayRequest(client, thisisme, gamedata, nickname); } }
+                    >
+                        PLAY AGAIN
+                    </button>
+                </div>}
             <div className="trParagraph">{snat}</div>
             {warning && <div className="trParagraph trWarning">{warning}</div>}
+        </div>
+    </div>;
+    return (
+        <div className="trBackground">
+            <div className="trTitle">
+                Fry Your Brain
+                <button className="trButton" onClick={() => {setWhereto('menu');}}>
+                    <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                </button>
             </div>
+            <MobileOnlyView>{GameSection}</MobileOnlyView>
+            <BrowserView>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-6">
+                            {GameSection}
+                        </div>
+                        <div className="col-6">
+                            <Chat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs}/>
+                        </div>
+                    </div>
+                </div>
+            </BrowserView>
         </div>
     );
 }

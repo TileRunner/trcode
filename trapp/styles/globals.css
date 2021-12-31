@@ -1,22 +1,3 @@
-@import url("https://fonts.googleapis.com/css?family=Merriweather|Open Sans");
-:root {
-  --commonMobileMaxWidth: 360px; /* fyb */
-  --commonBorderColour: grey;/* pb */
-  --commonTextBackgroundColour: black; /* pb */
-  --commonTextColour: whitesmoke; /* pb */
-  --commonHeaderFontFamily: Merriweather; /* fyb, pb */
-  --commonFontFamily: 'Open Sans', sans-serif; /* pb */
-  --commonButtonBackgroundColour: blue; /* fyb */
-  --commonButtonTextColour: whitesmoke; /* fyb */
-  --commonButtonBorderColour: black; /* fyb */
-  --commonThBackgroundColour: blue; /* fyb */
-  --commonTdBackgroundColour: lightblue; /* fyb */
-  --commonThTextColour: whitesmoke; /* fyb */
-  --commonTdTextColour: black; /* fyb */
-}
-.commonFontFamily { /* pb */
-  font-family: var(--commonFontFamily);
-}
 html,
 body {
   background-color: #404040;

@@ -1,23 +1,3 @@
-.wititle {
-  background-color: grey;
-  font-size: 2.8em;
-  text-align: center;
-  font-family: cursive;
-  font-style: italic;
-  color:black;
-}
-.wihomelink {
-  background-color: grey;
-  color: black;
-  text-align: right;
-}
-.wibody {
-  /* Without the margins you see a useless vertical scrollbar */
-  margin-top: 10px;
-  margin-bottom: 10px;
-  background-color: darkgray;
-  color: whitesmoke;
-}
 .tooltip {
   position: top;
   display: inline-block;
@@ -42,56 +22,6 @@
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
-}
-.displayWordRow {
-  line-height: 100%;
-}
-.divider {
-  line-height: 5px;
-  border-bottom: cyan;
-  border-bottom-style: ridge;
-}
-.letterInput {
-  border: 1px solid black;
-  background-color: darkgreen;
-  color: azure;
-  text-align: left;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: large;
-}
-.letter {
-  border: 1px solid black;
-  background-color: darkgreen;
-  color: azure;
-  text-align: center;
-  font-family: 'Courier New', Courier, monospace;
-  width: 30px;
-  font-size: larger;
-}
-.letterInvalidWord {
-  border: 1px solid black;
-  background-color: red;
-  color: azure;
-  text-align: center;
-  font-family: 'Courier New', Courier, monospace;
-  width: 30px;
-  font-size: larger;
-}
-.facevalue {
-  text-align: left;
-  vertical-align: bottom;
-  width: 20px;
-}
-.wordIsValid {
-  vertical-align: middle;
-  color: blue;
-  margin-left: 10px;
-}
-.wordIsNotValid {
-  vertical-align: middle;
-  color: red;
-  font-style: italic;
-  margin-left: 10px;
 }
 .insertCount {
   background-color: teal;
@@ -136,4 +66,16 @@
   vertical-align: top;
   color: white;
   transform: rotate(90deg);  
+}
+.closeme {
+  vertical-align: top;
+}
+.closemebutton {
+  border: none;
+  margin: auto;
+  color: red;
+  background-color: var(--trcssPageBG);
+}
+.closemebutton::before {
+  content: '\22A0'; /* X in a box */
 }

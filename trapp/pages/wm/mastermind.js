@@ -3,16 +3,33 @@ import Showinfo from '../wi/showinfo'
 import {BrowserView} from 'react-device-detect'
 
 const WordMastermind = ({setWhereto}) => {
-    const [setSolveCounts, setSetSolveCounts] = useState([]) // how many guesses to solve each set
-    const [setGuessCount, setSetGuessCount] = useState(0) // total guess count for the 2-8 letter set
-    const [secretWord, setSecretWord] = useState('')
-    const [secretDisplay, setSecretDisplay] = useState('')
-    const [guess, setGuess] = useState('')
-    const [guesses, setGuesses] = useState([])
-    const [solved, setSolved] = useState(false)
+    const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
+    const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the 2-8 letter set
+    const [secretWord, setSecretWord] = useState('');
+    const [secretDisplay, setSecretDisplay] = useState('');
+    const [guess, setGuess] = useState('');
+    const [guesses, setGuesses] = useState([]);
+    const [solved, setSolved] = useState(false);
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
+    const [hidehints, setHidehints] = useState([]);
+    function hintshidden(checkword) {
+        for (let index = 0; index < hidehints.length; index++) {
+            const hideword = hidehints[index];
+            if (hideword === checkword) {
+                return true;
+            }
+        }
+        return false;
+    }
+    function removeEntry(index) {
+        if (!hintshidden(guesses[index])) {
+            let newhidehints = [...hidehints];
+            newhidehints.push(guesses[index]);
+            setHidehints(newhidehints);  
+        }
+    }
     return (
         <div className="trBackground">
             <div className="container-fluid">
@@ -49,7 +66,7 @@ const WordMastermind = ({setWhereto}) => {
                                 <div className="Outertable">
                                     {secretWord === '' ? pickRandomWord() : ''}
                                     <div className="trParagraph">
-                                        <h3 className="AlignCenter">Secret Word: {solved ? secretWord : secretDisplay}</h3>
+                                        <h3>Secret Word: {solved ? secretWord : secretDisplay}</h3>
                                         {secretWord === '' ?
                                             <h1>Loading ...</h1>
                                         :
@@ -73,8 +90,14 @@ const WordMastermind = ({setWhereto}) => {
                         <BrowserView>
                             <div className="row">
                                 <div className="col-lg-12">
+                                    {guesses.length > 0 &&
+                                        <div className="trSubtitle">
+                                            Guess info:
+                                        </div>
+                                    }
                                     {guesses.map((g,gi) => (
-                                        <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N"/>
+                                        !hintshidden(g) &&
+                                            <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi}/>
                                     ))}
                                 </div>
                             </div>
@@ -102,6 +125,7 @@ const WordMastermind = ({setWhereto}) => {
                 pickRandomWord();
                 setGuess('');
                 setGuesses([]);
+                setHidehints([]);
                 setSolved(false);
             } }
             >

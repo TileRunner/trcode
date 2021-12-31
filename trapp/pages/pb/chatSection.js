@@ -14,7 +14,7 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
           {
             gameid: gameid, // the id for the game (blank if in lobby)
             nickname: nickname, // player nickname
-            type: "pb", // prisonbreak
+            type: client.clientType, // type of client
             func: "chat", // send chat message
             sender: participant, // who sent it
             sendmsg: sendmsg // the message typed in the chat

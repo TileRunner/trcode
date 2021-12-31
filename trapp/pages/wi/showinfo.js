@@ -13,7 +13,6 @@ export default function Showinfo( props ) {
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)
             let response = await fetch(url + props.word)
             let jdata = await response.json()
-            console.log(`swaps=${JSON.stringify(jdata.swaps)}`)
             setInfo(jdata)
             setLoaded(true)
         }
@@ -22,12 +21,23 @@ export default function Showinfo( props ) {
 
     return (
         loaded ?
-            <table className="trTable">
+            <table>
                 <tbody>
-                    {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
-                    {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
-                    {displayWordRow()}
-                    {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
+                    <tr>
+                        <td>
+                            <table className="trTable">
+                                <tbody>
+                                    {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
+                                    {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
+                                    {displayWordRow(props.removeEntry, props.entryIndex)}
+                                    {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
+                                </tbody>
+                            </table>
+                        </td>
+                        <td className="closeme">
+                            <button className="closemebutton" onClick={() => props.removeEntry(props.entryIndex)}></button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         :

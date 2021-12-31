@@ -12,13 +12,11 @@ export default function Home() {
 
   return (
     <div>
-      {whereto === 'menu' && <MobileOnlyView><Menu ismobile="Y" setWhereto={setWhereto}></Menu></MobileOnlyView>}
-      {whereto === 'menu' && <BrowserView><Menu ismobile="N" setWhereto={setWhereto}></Menu></BrowserView>}
+      {whereto === 'menu' && <Menu setWhereto={setWhereto}></Menu>}
       {whereto === 'wm' && <WordMastermind setWhereto={setWhereto}></WordMastermind>}
       {whereto === 'wi' && <WordInfo setWhereto={setWhereto}></WordInfo>}
       {whereto === 'pb' && <PrisonBreak setWhereto={setWhereto}></PrisonBreak>}
-      {whereto === 'fyb' && <MobileOnlyView><FryYourBrain ismobile="Y" setWhereto={setWhereto}></FryYourBrain></MobileOnlyView>}
-      {whereto === 'fyb' && <BrowserView><FryYourBrain ismobile="N" setWhereto={setWhereto}></FryYourBrain></BrowserView>}
+      {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
     </div>
   )
 }
