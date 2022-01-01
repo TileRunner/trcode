@@ -29,7 +29,6 @@ const Menu = (props) => {
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
-  const [descExtendsClass, setDescExtendsClass] = useState(false); // describe extendsclass.com
   const [descFriends, setDescFriends] = useState(false); // describe friends
 
   const MenuOption = (props) => {
@@ -134,10 +133,6 @@ const Menu = (props) => {
     <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
   </div>
 
-  const DescribeExtendsClass = <div className="trParagraph trEmphasis">
-    <p>This site uses Free JSON storage made available by Cyril Bois from France. <a href='https://extendsclass.com/contact'>Click here for more info</a>. Thanks Cyril!</p>
-  </div>
-
   const DescribeFriends = <div className="trParagraph trEmphasis">
     <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
@@ -192,12 +187,10 @@ return (
           <table>
             <tbody>
             <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
-            <Acknowledge ackText='extendsclass.com' descFlag={descExtendsClass} setDescFlag={setDescExtendsClass}/>
             <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
             </tbody>
           </table>
           {descEnable2k && DescribeEnable2k}
-          {descExtendsClass && DescribeExtendsClass}
           {descFriends && DescribeFriends}
         </div>
       </div>

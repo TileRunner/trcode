@@ -9,7 +9,7 @@ import Chat from '../pb/chatSection';
 import * as c from '../../lib/pb/prisonBreakConstants';
 import { initialSquareArray } from '../../lib/pb/initialSquareArray';
 import { anyUnusedEscapeHatches } from "../../lib/pb/anyUnusedEscapeHatches";
-import { buildGamedataFromApidata } from "../../lib/pb/buildGamedataFromApidata";
+import { buildGamedataFromGameJson } from "../../lib/pb/buildGamedataFromGameJson";
 import { isDoublePass } from "../../lib/pb/isDoublePass";
 import { scrollToBottom } from "../../lib/scrollToBottom";
 import { usePrevious } from "../../lib/usePrevious";
@@ -196,7 +196,7 @@ const Game = ({setWhereto
       if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
         addSnat(`Getting message: func=${messageData.func}`);
         if (messageData.func === "providegamedata") {
-          let gd = buildGamedataFromApidata(messageData.apidata);
+          let gd = buildGamedataFromGameJson(messageData.apidata);
           // Server providing game data
           setSyncstamp(gd.syncstamp);
           // No opponent name for observers

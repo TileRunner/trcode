@@ -6,7 +6,7 @@ import ShowMoves from '../pb/movesSection';
 import ShowRescues from '../pb/rescuesSection';
 import Chat from '../pb/chatSection';
 import * as c from '../../lib/pb/prisonBreakConstants';
-import { buildExamineDataFromApidata } from "../../lib/pb/buildExamineDataFromApidata";
+import { buildExamineDataFromGameJson } from "../../lib/pb/buildExamineDataFromGameJson";
 import { scrollToBottom } from "../../lib/scrollToBottom";
 
 // I am setting up a default skeleton so the build does not try reference properties of undefined objects
@@ -37,7 +37,7 @@ const Examine = ({setWhereto, client, wsmessage, gameid, nickname, participant})
         let messageData = JSON.parse(message);
         if (messageData.gameid === gameid && messageData.type === "pb") { // This instance of a prison break game
             if (messageData.func === "providegamedata") {
-                let ed = buildExamineDataFromApidata(messageData.apidata);
+                let ed = buildExamineDataFromGameJson(messageData.apidata);
                 setExamineData(ed);
             }
             if (messageData.func === "chat") { // Server decided whether this chat was for me
