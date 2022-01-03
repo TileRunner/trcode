@@ -15,7 +15,9 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
     function processLobbyMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
-            if (messageData.func === c.S2C_FUNC_GAMELIST) {
+            if (messageData.func === c.S2C_FUNC_CHATDATA) {
+                return; // No lobby chat
+            } else if (messageData.func === c.S2C_FUNC_GAMELIST) {
                 setGamelist(messageData.gamelist);
             } else if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 /*

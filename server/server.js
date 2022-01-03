@@ -6,11 +6,14 @@ const path = require("path");
 const PORT = process.env.PORT || 5000;
 require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
+const clientTypeFryYourBrain = 'fyb';
+const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB } = require('./fyb/processMessageFYB');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 const clubdata = readclubdata();
+const chats = [];
 
 function readclubdata() {
   let scdata = {};
@@ -271,7 +274,7 @@ const wss = new Server({ server });
 
 wss.on("connection", (ws, req) => {
     let urlParams = new URLSearchParams(req.url.slice(1)); // Need to remove leading /
-    let clientType= urlParams.get('clientType'); // pb=Prison Break
+    let clientType= urlParams.get('clientType');
     let thisisme = urlParams.get('thisisme');
     ws.thisisme = thisisme;
     ws.clientType = clientType;
@@ -285,18 +288,61 @@ wss.on("connection", (ws, req) => {
 
 const processMessage = (message) => {
     let pm = JSON.parse(message);
+    let needchatupdate = false;
     if (pm.func === "chat") {
         handleChatMessages(pm, message);
     }
-    else if (pm.type === "pb") {
+    else if (pm.type === clientTypePrisonBreak) {
         processMessagePB(wss, pm, message);
     }
-    else if (pm.type = "fyb") {
-        processMessageFYB(wss, pm);
+    else if (pm.type = clientTypeFryYourBrain) {
+        needchatupdate = processMessageFYB(wss, pm);
+    }
+    if (needchatupdate) {
+      updateGameChatClients(pm);
     }
 }
 
+const updateGameChatClients = (pm) => {
+  for (let index = 0; index < chats.length; index++) {
+    const chat = chats[index];
+    if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
+      let jsend = {
+        type: pm.clientType,
+        gameid: pm.gameid,
+        func: 'CHAT_DATA',
+        msgs: chat.msgs
+      };
+      let tsend = JSON.stringify(jsend);
+      wss.clients.forEach((client) => {
+        if (client.clientType === pm.type && client.gameid === pm.gameid) {
+          client.send(tsend);
+        }
+      });
+    }
+  }
+}
+
 const handleChatMessages = (pm, message) => { // pm=json object, message=string of json
+  // For fyb, chat is only within a game. Keep the chat array here so people can see
+  // chats from before they entered the game.
+  if (pm.clientType === clientTypeFryYourBrain) {
+    let chatfound = false;
+    let msg = {from: pm.nickname, msg: pm.sendmsg};
+    for (let index = 0; index < chats.length; index++) {
+      const chat = chats[index];
+      if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
+        chatfound = true;
+        chat.msgs.push(msg);
+      }
+    }
+    if (!chatfound) {
+      const chat = {clientType: pm.clientType, gameid: pm.gameid, msgs: [msg]};
+      chats.push(chat);
+    }
+    updateGameChatClients(pm);
+    return;
+  }
 /* Send the chat message to clients that need it
    Overall rule - only send message to clients with the same client type (e.g. 'pb' for Prison Break)
    Overall rule - do not send message back to sender
@@ -316,13 +362,12 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
         // Don't send the chat back to the caller
       } else if (pm.gameid) { // Sent from within a game, not from lobby
         if (pm.gameid === client.gameid) { // Client is in same game as sender
-          if (pm.type !== 'pb'
+          if (pm.type !== clientTypePrisonBreak
           || (pm.sender === 'O' && client.participant === 'O') // Observers chat
           || (pm.sender === 'E' && client.participant === 'E') // Examiners chat
           || (pm.sender === 'P' && client.participant === 'G') // Prisoners to Guards
           || (pm.sender === 'G' && client.participant === 'P') // Guards to Prisoners
           ) {
-            console.log(`Sending`);
             client.send(message);
           }
         }

@@ -26,17 +26,16 @@ function removeGame(gameid) {
     }
 }
 function processMessageFYB (wss, pm) {
-    // if (pm.func !== "interval") {
-    //     console.log(`processMessageFYB: func=${pm.func} thisisme=${pm.thisisme} gameid=${pm.gameid}`);
-    // }
     if (pm.func === "announce") {
         processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
         processFybJoinGame(wss, pm);
+        return true; // need chat update
     } else if (pm.func === "rejoin") {
         processFybRejoinGame(wss, pm);
+        return true; // need chat update
     } else if (pm.func === "move") {
         processFybMove(wss, pm);
     } else if (pm.func === "interval") {
@@ -44,6 +43,7 @@ function processMessageFYB (wss, pm) {
     } else if (pm.func === "replay") {
         processFybReplay(wss, pm);
     }
+    return false; // Do not need chat update
 }
 
 const processFybAnnounce = (wss, pm) => {

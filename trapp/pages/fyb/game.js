@@ -66,9 +66,8 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     function processGameMessage(message) {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
-            if (messageData.func === "chat") { // Server decided whether this chat was for me
-                let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
-                setChatmsgs(newChatmsgs);
+            if (messageData.func === c.S2C_FUNC_CHATDATA) {
+                setChatmsgs(messageData.msgs);
             } else if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 /* SERVER SENT GAME DATA
                 For a regular update due to player activity, this client needs the update.
@@ -139,7 +138,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     }
     const GameSection = <div>
         <div className="trSubtitle">
-            {gameid}, {nickname}
+            {gameid}: {nickname}
         </div>
         <table className="trTable">
             <tbody>
@@ -149,13 +148,19 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 {gamedata.players.map((pl) => (
                     <tr key={`Player${pl.index}`}>
                         <td>
-                            {pl.nickname}
-                            {pl.wins > 0 &&
-                                <span> ({pl.wins})</span>}
-                            <span className="floatright">:</span>
+                            <BrowserView>
+                                {pl.nickname}
+                                {pl.wins > 0 && <span> (Won {pl.wins})</span>}
+                                <span className="floatright">:</span>
+                            </BrowserView>
+                            <MobileOnlyView>
+                                {pl.nickname}
+                                {pl.wins > 0 && <span> ({pl.wins})</span>}
+                                <span className="floatright">:</span>
+                            </MobileOnlyView>
                         </td>
                         <td>
-                            {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}
+                            {pl.points < 10 ? <span>&nbsp;</span> : ''}{pl.points}&nbsp;
                             {pl.points >= gamedata.goal && <span className="trEmphasis"> Winner!&nbsp;</span>}
                         </td>
                     </tr>
@@ -315,10 +320,20 @@ function showMoveList(moveListKey, moveArray) {
                 {move.pass ?
                     <span className="trDanger"> passed</span>
                 :
+                <>
+                <BrowserView>
+                    <span className={`${move.valid ? '' : 'trDanger'}`}>
+                        {move.word}
+                        {move.earned && <span> ({move.earned} pts)</span>}
+                    </span>
+                </BrowserView>
+                <MobileOnlyView>
                     <span className={`${move.valid ? '' : 'trDanger'} ${move.word.length > 10 && move.earned ? 'long' : move.word.length > 13 ? 'long' : ''}`}>
                         {move.word}
                         {move.earned && <span> ({move.earned} pts)</span>}
                     </span>
+                </MobileOnlyView>
+                </>
                 }
                 </td>
             </tr>
