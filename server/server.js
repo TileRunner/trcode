@@ -340,7 +340,7 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
   // chats from before they entered the game.
   if (pm.clientType === clientTypeFryYourBrain) {
     let chatfound = false;
-    let msg = {from: pm.nickname, msg: pm.sendmsg};
+    let msg = {from: pm.nickname, msg: pm.sendmsg, created: Date.now()};
     for (let index = 0; index < chats.length; index++) {
       const chat = chats[index];
       if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
@@ -352,7 +352,20 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
       const chat = {clientType: pm.clientType, gameid: pm.gameid, msgs: [msg]};
       chats.push(chat);
     }
-    updateGameChatClients(pm);
+    // Clean up all chats
+    let cutoff = Date.now() - 600000; // this many milliseconds ago
+    for (let index = chats.length - 1; index > -1; index--) {
+      const chat = chats[index];
+      // Only keep messages for so long
+      while (chat.msgs.length > 0 && chat.msgs[0].created < cutoff) {
+        chat.msgs.splice(0,1);
+      }
+      // Remove if empty
+      if (chat.msgs.length === 0) {
+        chats.splice(index,1);
+      }
+    };
+    updateGameChatClients(pm);   
     return;
   }
 /* Send the chat message to clients that need it

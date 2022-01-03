@@ -28,6 +28,17 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
         setNextmsg(newNextmsg);
       }
     }
+    const formatTime = (t) => {
+      let d = new Date(t);
+      let h = d.getHours();
+      let m = d.getMinutes();
+      let f = '@'; 
+      if (h < 10) { f = '0' + f;}
+      f = f + h.toString() + ':';
+      if (m < 10) { f = '0' + f;}
+      f = f + m.toString();
+      return f;
+    }
   
     return (
       <div id="ScrollableChat" className="pbChat">
@@ -35,7 +46,7 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
           <tbody>
             {msgs.map((value, index) => (
               <tr key={`ChatMessage${index}`}>
-                <td className="pbChatFrom">{value.from}</td>
+                <td className="pbChatFrom">{formatTime(value.created)} {value.from}</td>
                 <td className="pbChatMsg">{value.msg}</td>
               </tr>
             ))}
