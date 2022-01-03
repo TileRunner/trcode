@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {BrowserView, MobileOnlyView} from 'react-device-detect';
 import * as c from '../../lib/fyb/constants';
 import { usePrevious } from "../../lib/usePrevious";
+import ThinChat from "./thinChatSection";
 import Chat from "../pb/chatSection";
 import { scrollToBottom } from "../../lib/scrollToBottom";
 
@@ -277,7 +278,18 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <MobileOnlyView>{GameSection}</MobileOnlyView>
+            <MobileOnlyView>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-8">
+                            {GameSection}
+                        </div>
+                        <div className="col-4">
+                            <ThinChat gameid={gameid} client={client} nickname={nickname} msgs={chatmsgs} setMsgs={setChatmsgs}/>
+                        </div>
+                    </div>
+                </div>
+            </MobileOnlyView>
             <BrowserView>
                 <div className="container-fluid">
                     <div className="row">

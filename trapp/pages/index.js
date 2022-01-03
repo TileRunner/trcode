@@ -6,6 +6,7 @@ import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
 import FryYourBrain from './fyb/fryyourbrain';
+import ScrabbleClub from './sc/scrabbleclub';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
@@ -17,6 +18,7 @@ export default function Home() {
       {whereto === 'wi' && <WordInfo setWhereto={setWhereto}></WordInfo>}
       {whereto === 'pb' && <PrisonBreak setWhereto={setWhereto}></PrisonBreak>}
       {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
+      {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
     </div>
   )
 }
@@ -27,6 +29,7 @@ const Menu = (props) => {
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
+  const [descSc, setDescSc] = useState(false); // describe scrabble club
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -108,6 +111,10 @@ const Menu = (props) => {
     </ul>
   </div>;
 
+  const DescribeScrabbleClub = <div className="trParagraph">
+    <div className="trSubtitle">The Scrabble Club page is Scrabble Club stuff</div>
+  </div>;
+
   const Acknowledge = (props) => {
     const toggleDescFlag = () => {
       props.setDescFlag(!props.descFlag);
@@ -156,6 +163,7 @@ return (
               <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
               <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+              <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
               </tbody>
           </table>
         </BrowserView>
@@ -172,6 +180,7 @@ return (
         {descWi && DescribeWordInfo}
         {descPb && DescribePrisonBreak}
         {descFyb && DescribeFryYourBrain}
+        {descSc && DescribeScrabbleClub}
       </div>
       <div className="trParagraph">
         <div className="trTitle">

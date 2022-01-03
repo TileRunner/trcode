@@ -35,6 +35,15 @@ a {
 .floatright {
   float: right;
 }
+.textcenter {
+  text-align: center;
+}
+.textright {
+  text-align: right;
+}
+.equispaced {
+  font-family: monospace;
+}
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }

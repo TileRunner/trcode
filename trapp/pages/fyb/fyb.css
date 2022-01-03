@@ -34,3 +34,38 @@
     border-color: blue;
     background-color: whitesmoke;
 }
+.thinChat {
+    border: none;
+    max-height: 600px;
+    overflow-y: scroll;
+}
+.thinChatFrom {
+    background-color: black;
+    color: white;
+}
+.thinChatFrom::before {
+    content: ">";
+    color: yellow;
+}
+.thinChatFrom::after {
+    content: ":";
+    color: yellow;
+    font-size: small;
+}
+.thinChatMsg {
+    font-style: italic;
+    color:whitesmoke;
+    background-color: black;
+}
+.thinChatInput {
+    font-style: italic;
+    color:whitesmoke;
+    background-color: blue;
+    width: 100%;
+}
+.thinChatInputEmpty {
+    background-color: whitesmoke;
+    width: 100%;
+    max-block-size: 30px;
+    cursor: text;
+}

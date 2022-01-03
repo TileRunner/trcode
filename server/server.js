@@ -8,9 +8,31 @@ require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB } = require('./fyb/processMessageFYB');
+var clubdata = {gotdata: false};
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
+readclubdata();
 
+function readclubdata() {
+  try {
+    var path = "C:\\MyData\\ScrabbleClubData.js";
+    data = fs.readFileSync(path).toString();
+    clubdata = JSON.parse(data);
+    clubdata.gotdata = true;
+    console.log(`Read club data okay:`);
+    console.log(`${clubdata.clubList.length} clubs`);
+    console.log(`${clubdata.clubFinancialEntryList.length} club financial entries`);
+    console.log(`${clubdata.clubMemberList.length} club members`);
+    console.log(`${clubdata.clubNightList.length} club nights`);
+    console.log(`${clubdata.clubPlayerStatsList.length} club player stats`);
+    console.log(`${clubdata.clubWinsCertList.length} club wins certs`);
+    console.log(`${clubdata.clubGameList.length} club games`);
+    console.log(`${clubdata.playerList.length} players`);
+  }
+  catch (e) {
+    console.log(`Error reading club data ${e}`);
+  }
+}
 function readWordList() {
     let data = '';
     try
@@ -101,6 +123,52 @@ const server = express()
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json({test: 'value', evtest: evtest, lextest: `${allwords.length.toString()} words read from ENABLE2K`});
     })
+    // Handle request for club list
+    .get("/clubdata/clublist", (_req, res) => {
+        // Handle who can call this
+        res.header("Access-Control-Allow-Origin", allowedCaller);
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        // Return the club list
+        res.json(clubdata.clubList);
+        return;
+    })
+    // Handle request for player list
+    .get("/clubdata/playerlist", (_req, res) => {
+      // Handle who can call this
+      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      // Return the player list
+      res.json(clubdata.playerList);
+      return;
+    })
+    // Handle request for club night list for a club
+    .get("/clubdata/clubnightlist", (req, res) => {
+      // Handle who can call this
+      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      // Get the club night list for the club
+      let clubid = parseInt(req.query.clubid);
+      let clubnights = clubdata.clubNightList.filter(function (e) {
+        return e.ClubId === clubid;
+      });
+      // Return the club night list
+      res.json(clubnights);
+      return;
+    })
+    // Handle request for club game list for a club night
+    .get("/clubdata/clubgamelist", (req, res) => {
+      // Handle who can call this
+      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      // Get the club game list for the club night
+      let clubnightid = parseInt(req.query.clubnightid);
+      let clubgames = clubdata.clubGameList.filter(function (e) {
+        return e.ClubNightId === clubnightid;
+      });
+      // Return the club game list
+      res.json(clubgames);
+      return;
+    })
     .get("/ENABLE2K", (req, res) => {
         // Handle who can call this
         res.header("Access-Control-Allow-Origin", allowedCaller);
@@ -185,7 +253,7 @@ const server = express()
         res.status(404).send('What are you asking?');
     })
     .listen(PORT, () => {
-        console.log(`Listening on ${PORT}`);
+        console.log(`Listening on ${PORT} in mode ${process.env.MODE_ENV === "production" ? "production" : "development"}`);
         pbInitialize();
         fybInitialize(allwords);
     });
