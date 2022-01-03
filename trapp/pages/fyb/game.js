@@ -67,7 +67,18 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         let messageData = JSON.parse(message);
         if (messageData.type === c.CLIENT_TYPE_FYB) {
             if (messageData.func === c.S2C_FUNC_CHATDATA) {
-                setChatmsgs(messageData.msgs);
+                // It's goofy, but I delete chat when game ends, then someone can start a new game with the same gameid
+                // So remove messages not from a player in this game. I might have to make a chat id to properly handle
+                let newmsgs = messageData.msgs.filter(function(e) {
+                    for (let index = 0; index < gamedata.players.length; index++) {
+                        const player = gamedata.players[index];
+                        if (player.nickname === e.from) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                setChatmsgs(newmsgs);
             } else if (messageData.func === c.S2C_FUNC_GAMEDATA) {
                 /* SERVER SENT GAME DATA
                 For a regular update due to player activity, this client needs the update.

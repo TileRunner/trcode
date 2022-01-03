@@ -26,24 +26,26 @@ function removeGame(gameid) {
     }
 }
 function processMessageFYB (wss, pm) {
+    let needchatremove = false;
+    let needchatupdate = false;
     if (pm.func === "announce") {
         processFybAnnounce(wss, pm);
     } else if (pm.func === "create") {
         processFybCreateGame(wss, pm);
     } else if (pm.func === "join") {
         processFybJoinGame(wss, pm);
-        return true; // need chat update
+        needchatupdate = true; // need chat update
     } else if (pm.func === "rejoin") {
         processFybRejoinGame(wss, pm);
-        return true; // need chat update
+        needchatupdate = true; // need chat update
     } else if (pm.func === "move") {
-        processFybMove(wss, pm);
+        needchatremove = processFybMove(wss, pm);
     } else if (pm.func === "interval") {
         processFybInterval(wss, pm);
     } else if (pm.func === "replay") {
         processFybReplay(wss, pm);
     }
-    return false; // Do not need chat update
+    return {needchatremove: needchatremove, needchatupdate: needchatupdate};
 }
 
 const processFybAnnounce = (wss, pm) => {
@@ -239,7 +241,7 @@ const processFybMove = (wss, pm) => {
             foundGame.freeforallMoves.forEach((m) => {
                 if (m.nickname === pm.nickname) {
                     sendGameToCaller(wss, pm, false);
-                    return;
+                    return false;
                 }
             });
             foundGame.freeforallMoves.push({nickname: pm.nickname, valid: isvalid, word: pm.word, pass: pm.pass});
@@ -327,7 +329,7 @@ const processFybMove = (wss, pm) => {
             // Ignore resubmit but send game data again.
             if (foundGame.round > pm.clientRound || foundGame.movesThisRound.length > pm.clientMovesLength) {
                 sendGameToCaller(wss, pm, false);
-                return;
+                return false;
             }
             // Clear previous results once a word is sent in this round
             foundGame.freeforallMoves = [];
@@ -362,8 +364,10 @@ const processFybMove = (wss, pm) => {
         if (foundGame.whoseturn === -1) { // game over
             removeGame(foundGame.gameid);
             updateLobbyClients(wss);
+            return true;
         }
     }
+    return false;
 }
 
 function countPossibleAnswers(fryLetters, movesThisRound) {

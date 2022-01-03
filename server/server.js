@@ -288,7 +288,7 @@ wss.on("connection", (ws, req) => {
 
 const processMessage = (message) => {
     let pm = JSON.parse(message);
-    let needchatupdate = false;
+    let chatactions = {needchatremove: false, needchatupdate: false};
     if (pm.func === "chat") {
         handleChatMessages(pm, message);
     }
@@ -296,11 +296,23 @@ const processMessage = (message) => {
         processMessagePB(wss, pm, message);
     }
     else if (pm.type = clientTypeFryYourBrain) {
-        needchatupdate = processMessageFYB(wss, pm);
+        chatactions = processMessageFYB(wss, pm);
     }
-    if (needchatupdate) {
+    if (chatactions.needchatremove) {
+      removeGameChat(pm);
+    } else if (chatactions.needchatupdate) {
       updateGameChatClients(pm);
     }
+}
+
+const removeGameChat = (pm) => {
+  for (let index = 0; index < chats.length; index++) {
+    const chat = chats[index];
+    if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
+      chats.splice(index,1);
+      return;
+    }
+  }
 }
 
 const updateGameChatClients = (pm) => {
