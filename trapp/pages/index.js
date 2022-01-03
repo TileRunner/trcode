@@ -1,5 +1,3 @@
-import Head from 'next/head'
-// import styles from '../styles/Home.module.css'
 import {BrowserView, MobileOnlyView} from 'react-device-detect'
 import React, { useState } from 'react';
 import WordMastermind from './wm/mastermind';
@@ -164,7 +162,7 @@ return (
               <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
               <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
-              </tbody>
+            </tbody>
           </table>
         </BrowserView>
         <MobileOnlyView>

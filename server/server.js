@@ -8,31 +8,40 @@ require('dotenv').config(); // For reading environment variables
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB } = require('./fyb/processMessageFYB');
-var clubdata = {gotdata: false};
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
-readclubdata();
+const clubdata = readclubdata();
 
 function readclubdata() {
+  let scdata = {};
   try {
-    var path = "C:\\MyData\\ScrabbleClubData.js";
-    data = fs.readFileSync(path).toString();
-    clubdata = JSON.parse(data);
-    clubdata.gotdata = true;
+    var wpath = path.join(__dirname, "ScrabbleClubData.js");
+    data = fs.readFileSync(wpath).toString();
+    scdata = JSON.parse(data);
     console.log(`Read club data okay:`);
-    console.log(`${clubdata.clubList.length} clubs`);
-    console.log(`${clubdata.clubFinancialEntryList.length} club financial entries`);
-    console.log(`${clubdata.clubMemberList.length} club members`);
-    console.log(`${clubdata.clubNightList.length} club nights`);
-    console.log(`${clubdata.clubPlayerStatsList.length} club player stats`);
-    console.log(`${clubdata.clubWinsCertList.length} club wins certs`);
-    console.log(`${clubdata.clubGameList.length} club games`);
-    console.log(`${clubdata.playerList.length} players`);
   }
   catch (e) {
     console.log(`Error reading club data ${e}`);
+    scdata.clubList = [];
+    scdata.clubFinancialEntryList = [];
+    scdata.clubMemberList = [];
+    scdata.clubNightList = [];
+    scdata.clubPlayerStatsList = [];
+    scdata.clubGameList = [];
+    scdata.clubWinsCertList = [];
+    scdata.playerList = [];
   }
+  console.log(`${scdata.clubList.length} clubs`);
+  console.log(`${scdata.clubFinancialEntryList.length} club financial entries`);
+  console.log(`${scdata.clubMemberList.length} club members`);
+  console.log(`${scdata.clubNightList.length} club nights`);
+  console.log(`${scdata.clubPlayerStatsList.length} club player stats`);
+  console.log(`${scdata.clubWinsCertList.length} club wins certs`);
+  console.log(`${scdata.clubGameList.length} club games`);
+  console.log(`${scdata.playerList.length} players`);
+  return scdata;
 }
+
 function readWordList() {
     let data = '';
     try
