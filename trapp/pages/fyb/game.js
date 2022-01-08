@@ -17,7 +17,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         , freeforall: false
         , movesThisRound: []
         , movesPrevRound: []
-        , whoseturn: -1
+        , whoseturn: []
         , fryLetters: []
         , players: [{index: 0, nickname: 'Loading...', wins: 0}]});
     const [word, setWord] = useState(''); // my word to submit
@@ -31,7 +31,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
   
     useEffect(() => {
         const interval = setInterval(() => {
-            if (gamedata.whoseturn > -1 && gamedata.players.length > 0) {
+            if (gamedata.whoseturn.length > 0 && gamedata.players.length > 0) {
                 client.send({
                     type: c.CLIENT_TYPE_FYB,
                     func: 'interval',
@@ -131,22 +131,13 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     }
 
     const meToEnterWord = () => {
-        if (gamedata.whoseturn < 0) { // Game has not started or has ended
-            return false;
-        } else if (gamedata.freeforall) { // In free-for-all round
-            if (gamedata.excludedPlayer === nickname) {
-                return false;
-            }
-            for (let i = 0; i < gamedata.freeforallMoves.length; i++) {
-                if (gamedata.freeforallMoves[i].nickname === nickname) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return (nickname === gamedata.players[gamedata.whoseturn].nickname);
-        }
+        return (gamedata.whoseturn.indexOf(nickname) > -1);
     }
+
+    const dropper = () => {
+        return gamedata.players.filter(p => {return p.nickname === nickname && p.dropped;}).length > 0;
+    }
+
     const GameSection = <div>
         <div className="trSubtitle">
             {gameid}: {nickname}
@@ -156,10 +147,11 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 <tr>
                     <th colSpan="2">First to {gamedata.goal} wins!</th>
                 </tr>
-                {gamedata.players.map((pl) => (
-                    <tr key={`Player${pl.index}`}>
+                {gamedata.players.map((pl,index) => (
+                    <tr key={`Player.${index}.${pl.nickname}`}>
                         <td>
                             <BrowserView>
+                                {pl.dropped && <span className="trDanger"></span>}
                                 {pl.nickname}
                                 {pl.wins > 0 && <span> (Won {pl.wins})</span>}
                                 <span className="floatright">:</span>
@@ -196,7 +188,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     showMoveList('ffaMoves', gamedata.freeforallMoves)}
             </tbody>
         </table>
-        {gamedata.whoseturn > -1 &&
+        {gamedata.whoseturn.length > 0 &&
             <div>
                 <div className="trParagraph">Fry Letters:
                     <button className="trButton fryLetterActionButton" onClick={() => {
@@ -275,12 +267,14 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             {gamedata.gameOver &&
                 <div className="trParagraph">
                     Game Over&nbsp;
-                    <button
-                        className="trButton"
-                        onClick={() => { sendReplayRequest(client, thisisme, gamedata, nickname); } }
-                    >
-                        PLAY AGAIN
-                    </button>
+                    {!dropper() && gamedata.players.filter(p => {return !p.dropped;}).length > 1 &&
+                        <button
+                            className="trButton"
+                            onClick={() => { sendReplayRequest(client, thisisme, gamedata, nickname); } }
+                        >
+                            PLAY AGAIN
+                        </button>
+                    }
                 </div>}
             <div className="trParagraph">{snat}</div>
             {warning && <div className="trParagraph trWarning">{warning}</div>}
@@ -318,6 +312,12 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </div>
                 </div>
             </BrowserView>
+            {!dropper() && !gamedata.gameOver &&
+                <button className="trButton" key="dropButton"
+                    onClick={() => {submitDrop(setWarning, client, thisisme, gamedata.gameid, nickname)}}>
+                    QUIT
+                </button>
+            }
         </div>
     );
 }
@@ -373,6 +373,7 @@ function getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, clien
             onClick={() => {submitPass(setWarning, client, thisisme, gamedata.gameid, nickname, setWord)}}>
                 PASS
             </button>
+
         </div>
     </div>;
 }
@@ -444,12 +445,25 @@ function submitPass(setWarning, client, thisisme, gameid, nickname, setWord) {
     setWord('');
 }
 
+function submitDrop(setWarning, client, thisisme, gameid, nickname) {
+    setWarning(`Sending DROP ... shouldn't take long.`);
+    client.send({
+        type: c.CLIENT_TYPE_FYB,
+        func: 'drop',
+        thisisme: thisisme,
+        gameid: gameid,
+        nickname: nickname,
+        timestamp: Date.now()
+    });
+}
+
 function sendReplayRequest(client, thisisme, gamedata, nickname) {
     client.send({
         type: c.CLIENT_TYPE_FYB,
         func: 'replay',
         thisisme: thisisme,
         game: gamedata,
+        gameid: gamedata.gameid,
         nickname: nickname,
         timestamp: Date.now()
     });

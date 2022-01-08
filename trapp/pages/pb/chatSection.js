@@ -33,9 +33,9 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
       let h = d.getHours();
       let m = d.getMinutes();
       let f = '@'; 
-      if (h < 10) { f = '0' + f;}
+      if (h < 10) { f = f +'0';}
       f = f + h.toString() + ':';
-      if (m < 10) { f = '0' + f;}
+      if (m < 10) { f = f + '0';}
       f = f + m.toString();
       return f;
     }
