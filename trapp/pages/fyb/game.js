@@ -279,6 +279,14 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             <div className="trParagraph">{snat}</div>
             {warning && <div className="trParagraph trWarning">{warning}</div>}
         </div>
+        {!dropper() && !gamedata.gameOver &&
+            <div className="trParagraph">
+                <button className="trButton" key="dropButton"
+                    onClick={() => {submitDrop(setWarning, client, thisisme, gamedata.gameid, nickname)}}>
+                    QUIT
+                </button>
+            </div>
+        }
     </div>;
     return (
         <div className="trBackground">
@@ -312,12 +320,6 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     </div>
                 </div>
             </BrowserView>
-            {!dropper() && !gamedata.gameOver &&
-                <button className="trButton" key="dropButton"
-                    onClick={() => {submitDrop(setWarning, client, thisisme, gamedata.gameid, nickname)}}>
-                    QUIT
-                </button>
-            }
         </div>
     );
 }

@@ -14,6 +14,7 @@ const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 const clubdata = readclubdata();
 const chats = [];
+const logmsgs = ['Server start'];
 
 function readclubdata() {
   let scdata = {};
@@ -21,7 +22,6 @@ function readclubdata() {
     var wpath = path.join(__dirname, "ScrabbleClubData.js");
     data = fs.readFileSync(wpath).toString();
     scdata = JSON.parse(data);
-    console.log(`Read club data okay:`);
   }
   catch (e) {
     console.log(`Error reading club data ${e}`);
@@ -34,14 +34,6 @@ function readclubdata() {
     scdata.clubWinsCertList = [];
     scdata.playerList = [];
   }
-  console.log(`${scdata.clubList.length} clubs`);
-  console.log(`${scdata.clubFinancialEntryList.length} club financial entries`);
-  console.log(`${scdata.clubMemberList.length} club members`);
-  console.log(`${scdata.clubNightList.length} club nights`);
-  console.log(`${scdata.clubPlayerStatsList.length} club player stats`);
-  console.log(`${scdata.clubWinsCertList.length} club wins certs`);
-  console.log(`${scdata.clubGameList.length} club games`);
-  console.log(`${scdata.playerList.length} players`);
   return scdata;
 }
 
@@ -51,7 +43,6 @@ function readWordList() {
     {
       var wpath = path.join(__dirname, "ENABLE2K_word_list.txt");
       data = fs.readFileSync(wpath).toString();
-      console.log(`Read word list ok`);
     }
     catch (e)
     {
@@ -282,12 +273,19 @@ wss.on("connection", (ws, req) => {
     ws.on("close", () => console.log("Client disconnected"));
 
     ws.on("message", (message) => {
+      try {
         processMessage(message);
+      } catch (error) {
+        logmsgs.forEach(l => {console.log(l);});
+        console.log(error);
+      }
     });
 });
 
 const processMessage = (message) => {
     let pm = JSON.parse(message);
+    logmsgs.push(`${pm.type} ${pm.func} ${pm.gameid} ${pm.nickname} ${pm.thisisme}`);
+    if (logmsgs.length > 20) {logmsgs.splice(0,1);}
     let chatactions = {needchatremove: false, needchatupdate: false};
     if (pm.func === "chat") {
         handleChatMessages(pm, message);
