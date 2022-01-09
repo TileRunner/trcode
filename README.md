@@ -14,4 +14,6 @@
 * From trapp folder, npm run dev to run the app
 * From trapp folder, npm run build and npm run export to build and export the app for production, then git push, then heroku deploy
 * From trapp folder, npm start to run the app in production mode
-
+* Per [heroku devcenter](https://devcenter.heroku.com/articles/logging), to see console.log output from deployed app:
+<br>**heroku logs --app tilerunner --source app**
+<br>To see the last N entries (20 in this example), add parameter **-n 20**

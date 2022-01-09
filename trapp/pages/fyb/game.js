@@ -51,17 +51,28 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     },[wsmessage]);
 
     useEffect(() => {
-        // This sound will not play on some mobiles. Something about needing a user interaction (protecting cell data usage).
-        if (prevGamedata
-            && gamedata.gameindex === prevGamedata.gameindex
-            && gamedata.round === prevGamedata.round
-            && gamedata.freeforall && !prevGamedata.freeforall) {
-            var myaudio = document.createElement('audio');
-            // Decide between Oops (phoney played) and Pass (player passed)
-            myaudio.src = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "https://tilerunner.github.io/Pass.m4a" : "https://tilerunner.github.io/Oops.m4a";
-            myaudio.play();
+        // Sounds will not play on some mobiles. Something about needing a user interaction (protecting cell data usage).
+        // Only play sound if gamedata update didn't jump to a different game or round
+        if (prevGamedata && gamedata.gameindex === prevGamedata.gameindex && gamedata.round === prevGamedata.round) {
+            let soundname;
+            // Play a sound when free for all mode is entered
+            if (gamedata.freeforall && !prevGamedata.freeforall) {
+                // Decide between Oops (phoney played) and Pass (player passed)
+                soundname = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "https://tilerunner.github.io/Pass.m4a" : "https://tilerunner.github.io/Oops.m4a";
+            } else if (prevGamedata.players.filter(p => {return p.dropped;}).length < gamedata.players.filter(p => {return p.dropped;}).length) {
+                // Someone dropped
+                soundname = "ByeBye";
+            } else if (prevGamedata.whoseturn.indexOf(nickname) < 0 && gamedata.whoseturn.indexOf(nickname) > -1) {
+                // My turn
+                soundname = "YourTurn";
+            }
+            if (soundname) {
+                var myaudio = document.createElement('audio');
+                myaudio.src = `https://tilerunner.github.io/${soundname}.m4a`;
+                myaudio.play();
+            }
         }
-      }, [gamedata]); // Play a sound when a rescue is made
+      }, [gamedata]);
 
     function processGameMessage(message) {
         let messageData = JSON.parse(message);
