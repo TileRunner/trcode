@@ -58,7 +58,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
             // Play a sound when free for all mode is entered
             if (gamedata.freeforall && !prevGamedata.freeforall) {
                 // Decide between Oops (phoney played) and Pass (player passed)
-                soundname = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "https://tilerunner.github.io/Pass.m4a" : "https://tilerunner.github.io/Oops.m4a";
+                soundname = gamedata.movesThisRound[gamedata.movesThisRound.length-1].pass ? "Pass" : "Oops";
             } else if (prevGamedata.players.filter(p => {return p.dropped;}).length < gamedata.players.filter(p => {return p.dropped;}).length) {
                 // Someone dropped
                 soundname = "ByeBye";

@@ -214,14 +214,62 @@ const server = express()
           // Handle who can call this
           res.header("Access-Control-Allow-Origin", "*"); // Anybody for this call
           res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-          let fryLetters = req.query.letters;
-          let possibleAnswers = allwords.filter(w => {return wordHasFryLetters(fryLetters.toUpperCase(), w);});
-          let numWanted = req.query.count;
-          if (possibleAnswers.length > numWanted) {
-            possibleAnswers.sort(function (a, b) { return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1; });
-            possibleAnswers = possibleAnswers.slice(0, numWanted);
+          let notes = []; // Error notes
+          let jret = {func: 'topfry'}; // Response json
+          // Validate parameters
+          let letters = /^[A-Za-z]+$/;
+          let fryLetters = '';
+          if (!req.query.letters || req.query.letters.length < 3 || !req.query.letters.match(letters)) {
+            notes.push('&letters must be 3 or more letters.');
+          } else {
+            fryLetters = req.query.letters.toUpperCase();
+            jret.fryLetters = fryLetters;
           }
-          res.send({fryLetters: fryLetters, numWanted: numWanted, answers: possibleAnswers});
+          let numWanted = 0;
+          if (!req.query.count) {
+            notes.push('Parameter &count is required.');
+          } else if (isNaN(req.query.count)) {
+            notes.push('Value of &count should be numeric.');
+          } else if (req.query.count > 50) {
+            notes.push('Maximum value of &count is 50.');
+          } else if (req.query.count < 1) {
+            notes.push('Minimum value of &count is 1.');
+          } else {
+            numWanted = req.query.count;
+            jret.numWanted = numWanted;
+          }
+          let numSeen = 0;
+          if (req.query.seen) {
+            if (isNaN(req.query.seen)) {
+              notes.push('Parameter &seen should be numeric if specified.');
+            } else if (req.query.seen < 0) {
+              notes.push('Parameter &seen should not be negative.');
+            } else {
+              numSeen = req.query.seen;
+              jret.numSeen = numSeen;
+            }
+          }
+          if (notes.length > 0) {
+            jret.notes = notes;
+            res.send(jret);
+            return;
+          }
+          let possibleAnswers = allwords.filter(w => {return wordHasFryLetters(fryLetters, w);});
+          let numPossibleAnswers = possibleAnswers.length;
+          jret.numPossibleAnswers = numPossibleAnswers;
+          if (numSeen >= numPossibleAnswers) {
+            possibleAnswers = []; // Already seen all answers
+          } else {
+            possibleAnswers.sort(function (a, b) { return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1; });
+            if (numSeen > 0) {
+              possibleAnswers.splice(0, numSeen); // Remove the ones already seen
+            }
+          }
+          if (possibleAnswers.length > numWanted) {
+            possibleAnswers.splice(numWanted); // Take only the number wanted
+          }
+          jret.answers = possibleAnswers;
+          res.send(jret);
           return;
         }
         // Handle who can call this
