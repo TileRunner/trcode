@@ -4,6 +4,7 @@ import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
 import FryYourBrain from './fyb/fryyourbrain';
+import FryYourBrainSolo from './fyb/fybSolo';
 import ScrabbleClub from './sc/scrabbleclub';
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       {whereto === 'wi' && <WordInfo setWhereto={setWhereto}></WordInfo>}
       {whereto === 'pb' && <PrisonBreak setWhereto={setWhereto}></PrisonBreak>}
       {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
+      {whereto === 'fybsolo' && <FryYourBrainSolo setWhereto={setWhereto}></FryYourBrainSolo>}
       {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
     </div>
   )
@@ -27,6 +29,7 @@ const Menu = (props) => {
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
+  const [descFybsolo, setDescFybsolo] = useState(false); // describe fry your brain solo
   const [descSc, setDescSc] = useState(false); // describe scrabble club
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
@@ -109,6 +112,18 @@ const Menu = (props) => {
     </ul>
   </div>;
 
+  const DescribeFryYourBrainSolo = <div className="trParagraph">
+    <div className="trSubtitle">Fry Your Brain Solo is a practise ground for Fry Your Brain</div>
+    <ul>
+      <li>A new tile pool is started with 3 letters.</li>
+      <li>Make a word that has all the letters in the tile pool, plus any additional letters, or pass.</li>
+      <li>A letter will be added to the pool after each word or pass, or a new tile pool will be started.</li>
+      <li>The display will indicate whether each made word is valid or not.</li>
+      <li>The display will show the shortest answer, using alphabetical order as the tiebreak.</li>
+      <li>Unlike regular Fry Your Brain, you may reuse a word or simply add or remove an S at the end.</li>
+    </ul>
+  </div>;
+
   const DescribeScrabbleClub = <div className="trParagraph">
     <div className="trSubtitle">The Scrabble Club page is Scrabble Club stuff</div>
   </div>;
@@ -139,7 +154,7 @@ const Menu = (props) => {
   </div>
 
   const DescribeFriends = <div className="trParagraph trEmphasis">
-    <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, ...</p>
+    <p>Danielle, Emese, Cesar, Lennon, Bev, Noah, Rach, Sarah, Rod, Sonya, Nolan, Shyrai, Agnes, Jessica, Cheryl, ...</p>
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
@@ -161,6 +176,7 @@ return (
               <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
               <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+              <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
               <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
             </tbody>
           </table>
@@ -171,6 +187,7 @@ return (
               <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
               <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+              <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
             </tbody>
           </table>
         </MobileOnlyView>
@@ -178,6 +195,7 @@ return (
         {descWi && DescribeWordInfo}
         {descPb && DescribePrisonBreak}
         {descFyb && DescribeFryYourBrain}
+        {descFybsolo && DescribeFryYourBrainSolo}
         {descSc && DescribeScrabbleClub}
       </div>
       <div className="trParagraph">

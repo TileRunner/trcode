@@ -10,6 +10,7 @@ const clientTypeFryYourBrain = 'fyb';
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
+const { fybPrepickTiles} = require('./fyb/functions/pickLetters');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 const clubdata = readclubdata();
@@ -209,11 +210,11 @@ const server = express()
       return;
     })
     .get("/ENABLE2K", (req, res) => {
+        // Handle who can call this
+        res.header("Access-Control-Allow-Origin", allowedCaller);
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         // Handle request for top answers for fry letters
         if (req.query.topfry) {
-          // Handle who can call this
-          res.header("Access-Control-Allow-Origin", "*"); // Anybody for this call
-          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
           let notes = []; // Error notes
           let jret = {func: 'topfry'}; // Response json
           // Validate parameters
@@ -272,9 +273,35 @@ const server = express()
           res.send(jret);
           return;
         }
-        // Handle who can call this
-        res.header("Access-Control-Allow-Origin", allowedCaller);
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        // Handle request to prepick a set of fyb letters
+        if (req.query.prepickfry) {
+          let notes = []; // Error notes
+          let jret = {func: 'prepickfry'}; // Response json
+          // Validate parameters
+          let guarantee = 0;
+          if (!req.query.guarantee) {
+            notes.push('Parameter &guarantee is required.');
+          } else if (isNaN(req.query.guarantee)) {
+            notes.push('Value of &guarantee should be numeric.');
+          } else if (req.query.guarantee > 15) {
+            notes.push('Maximum value of &guarantee is 15.');
+          } else if (req.query.guarantee < 3) {
+            notes.push('Minimum value of &guarantee is 3.');
+          } else {
+            guarantee = req.query.guarantee;
+            jret.guarantee = guarantee;
+          }
+          if (notes.length > 0) {
+            jret.notes = notes;
+            res.send(jret);
+            return;
+          }
+          // Pick the letters
+          let fryLetters = fybPrepickTiles(allwords, guarantee);
+          jret.fryLetters = fryLetters;
+          res.send(jret);
+          return;
+        }
         // Handle picking random word for Word Mastermind
         if (req.query.random) {
             // The desired word length is passed in 'random'

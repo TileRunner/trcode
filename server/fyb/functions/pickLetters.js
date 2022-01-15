@@ -46,4 +46,24 @@ function pickNextTile(tiles, fryLetters) {
     return({newTiles: newTiles, newFryLetters: newFryLetters});
 }
 
-module.exports = {pickInitialTiles, pickNextTile};
+function fybPrepickTiles(words=[], guarantee=6) {
+    // Pick all fry letters at once.
+    // Param: words is the list of valid words
+    // Param: guarantee is the minimum number of fry letters (see disclaimer below)
+    // Technique: pick a random word of at least length 'guarantee' then pick randomly from that
+    // Disclaimer: The rules about not adding/removing S or reusing a word are not considered,
+    //             so classic fyb play may not be able to get to the full array of fry letters
+    //             returned. To mitigate, the caller can pass a bigger value for guarantee.
+    let candidates = words.filter(w => {return w.length >= guarantee;});
+    let rand = Math.floor(Math.random() * candidates.length);
+    let tiles = Array.from(candidates[rand]);
+    let fryLetters = [];
+    while (tiles.length > 0) {
+        let picked = pickNextTile(tiles, fryLetters);
+        tiles = [...picked.newTiles];
+        fryLetters = [...picked.newFryLetters];
+    }
+    return fryLetters;
+}
+
+module.exports = {pickInitialTiles, pickNextTile, fybPrepickTiles};
