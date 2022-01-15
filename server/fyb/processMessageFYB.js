@@ -202,7 +202,6 @@ const processFybRejoinGame = (wss, pm) => {
                 gameid: pm.gameid
             };
             let gameUnknownMessage = JSON.stringify(gameUnknownJson);
-            // console.log(`RejoinGame sending gameidunknown to ${callingClient.nickname}`);
             callingClient.send(gameUnknownMessage);
         } else {
             let foundPlayer = findPlayerInArray(foundGame.players, pm.nickname);
@@ -213,24 +212,16 @@ const processFybRejoinGame = (wss, pm) => {
                     gameid: pm.gameid
                 };
                 let notInThatGameMessage = JSON.stringify(notInThatGameJson);
-                // console.log(`RejoinGame sending notinthatgame to ${callingClient.nickname}`);
                 callingClient.send(notInThatGameMessage);
             } else {
-                let otherClient;
-                for (let i = 0; i < wss.clients.length; i++) {
-                    const checkClient = wss.clients[i];
-                    if (checkClient.clientType === clientType && checkClient.gameid === pm.gameid && checkClient.nickname === pm.nickname) {
-                        otherClient = checkClient;
-                    }
-                }
-                if (otherClient) {
+                // Cannot rejoin as someone who is already in the game with a connection
+                if (wss.clients.filter(c => {return c.clientType === clientType && c.gameid === pm.gameid && c.nickname === pm.nickname;}).length > 0) {
                     let otherClientJson = {
                         type: clientType,
                         func: 'otherclientfound',
                         gameid: pm.gameid
                     };
                     let otherClientMessage = JSON.stringify(otherClientJson);
-                    // console.log(`RejoinGame sending otherclientfound to ${callingClient.nickname}`);
                     callingClient.send(otherClientMessage);
                 } else {
                     callingClient.gameid = pm.gameid;
@@ -700,4 +691,4 @@ const sendGameData = (clients, game, snat) => {
     });
 }
 
-module.exports = { fybInitialize, processMessageFYB };
+module.exports = { fybInitialize, processMessageFYB, wordHasFryLetters };

@@ -5,7 +5,7 @@ const ClubGameList = ({clubGames=[], clubDate=''}) => {
     };
     const myTableScroll = {
         height: '100%',
-        overflowY: 'scroll'
+        overflowY: 'auto'
     };
     const getTotals = () => {
         let totals = [];

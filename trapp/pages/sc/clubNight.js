@@ -8,7 +8,7 @@ const ClubNightList = ({clubNights=[], clubName='', getClubGames}) => {
     };
     const myTableScroll = {
         height: '100%',
-        overflowY: 'scroll'
+        overflowY: 'auto'
     };
     return (<div className="trBackground">
         <div className="trSubtitle">
@@ -21,6 +21,10 @@ const ClubNightList = ({clubNights=[], clubName='', getClubGames}) => {
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th>#Players</th>
+                            <th>Winner</th>
+                            <th>Wins</th>
+                            <th>Spread</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -28,6 +32,10 @@ const ClubNightList = ({clubNights=[], clubName='', getClubGames}) => {
                         {clubNights.map(clubNight => (
                             <tr key={`night${clubNight.Id}`}>
                                 <td>{clubNight.Date}</td>
+                                <td>{clubNight.numPlayers}</td>
+                                <td>{clubNight.numPlayers > 0 && <>{clubNight.winner.Name}</>}</td>
+                                <td>{clubNight.numPlayers > 0 && <>{clubNight.winner.wins}</>}</td>
+                                <td>{clubNight.numPlayers > 0 && <>{clubNight.winner.spread}</>}</td>
                                 <td>
                                     <button className="trButton"
                                         onClick={function() {

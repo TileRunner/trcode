@@ -113,8 +113,6 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                     setSyncstamp(messageData.game.syncstamp);
                     setWarning('');
                 }
-            } else if (messageData.func === c.S2C_FUNC_GAMECREATED) {
-                // Nothing to do, this is really for the lobby dwellers
             } else {
                 // I think this happens when a web socket connection drops and the new one loses the gameid on the server wss.clients
                 // So send a rejoin request to get the server back on track

@@ -9,7 +9,7 @@ const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunn
 const clientTypeFryYourBrain = 'fyb';
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
-const { fybInitialize, processMessageFYB } = require('./fyb/processMessageFYB');
+const { fybInitialize, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 const clubdata = readclubdata();
@@ -154,6 +154,42 @@ const server = express()
       let clubnights = clubdata.clubNightList.filter(function (e) {
         return e.ClubId === clubid;
       });
+      // Calculate some stuff about the club night
+      clubnights.forEach(clubnight => {
+        const clubgames = clubdata.clubGameList.filter(g => {return g.ClubNightId === clubnight.Id;});
+        clubnight.numGames = clubgames.length;
+        const players = [];
+        clubgames.forEach(g => {
+          let foundPlayer = false; // found player
+          let foundOpponent = false; // found opponent
+          for (let i = 0; i < players.length; i++) {
+            const p = players[i];
+            if (g.PlayerId === p.Id) {
+              foundPlayer = true;
+              p.wins = p.wins + (g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore > g.OpponentScore ? 1 : 0);
+              p.spread = p.spread + g.PlayerScore - g.OpponentScore;
+            }
+            if (g.OpponentId === p.Id) {
+              foundOpponent = true;
+              p.wins = p.wins + (g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore < g.OpponentScore ? 1 : 0);
+              p.spread = p.spread - g.PlayerScore + g.OpponentScore;
+            }
+          }
+          if (!foundPlayer) {
+            players.push({Id: g.PlayerId, wins: g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore > g.OpponentScore ? 1 : 0, spread: g.PlayerScore - g.OpponentScore});
+          }
+          if (!foundOpponent) {
+            players.push({Id: g.OpponentId, wins: g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore < g.OpponentScore ? 1 : 0, spread: g.OpponentScore - g.PlayerScore});
+          }
+        });
+        clubnight.numPlayers = players.length;
+        if (players.length > 0) {
+          players.sort((a,b) => a.wins > b.wins ? -1 : a.wins < b.wins ? 1 : b.spread - a.spread);
+          let winner = players[0];
+          winner.Name = clubdata.playerList.filter(p => {return p.Id === players[0].Id;})[0].Name;
+          clubnight.winner = winner;
+        }
+    })
       // Return the club night list
       res.json(clubnights);
       return;
@@ -173,6 +209,21 @@ const server = express()
       return;
     })
     .get("/ENABLE2K", (req, res) => {
+        // Handle request for top answers for fry letters
+        if (req.query.topfry) {
+          // Handle who can call this
+          res.header("Access-Control-Allow-Origin", "*"); // Anybody for this call
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+          let fryLetters = req.query.letters;
+          let possibleAnswers = allwords.filter(w => {return wordHasFryLetters(fryLetters.toUpperCase(), w);});
+          let numWanted = req.query.count;
+          if (possibleAnswers.length > numWanted) {
+            possibleAnswers.sort(function (a, b) { return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1; });
+            possibleAnswers = possibleAnswers.slice(0, numWanted);
+          }
+          res.send({fryLetters: fryLetters, numWanted: numWanted, answers: possibleAnswers});
+          return;
+        }
         // Handle who can call this
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -270,7 +321,8 @@ wss.on("connection", (ws, req) => {
     ws.thisisme = thisisme;
     ws.clientType = clientType;
 
-    ws.on("close", () => console.log("Client disconnected"));
+    // When I am trying to look at logs from prod, I don't want to see the message below.
+    // ws.on("close", () => console.log("Client disconnected"));
 
     ws.on("message", (message) => {
       try {
