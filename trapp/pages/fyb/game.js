@@ -403,7 +403,7 @@ function submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname
             return;
         }
     }
-    // Check if the have all the fry letters
+    // Check if they have all the fry letters
     for (let i = 0; i < gamedata.fryLetters.length; i++) {
         let letterCountRequired = 0;
         let actualLetterCount = 0;

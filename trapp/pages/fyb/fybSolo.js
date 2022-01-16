@@ -7,6 +7,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
     const [word, setWord] = useState('');
     const [selected, setSelected] = useState(-1); // Used for letting the user move fry letters around
     const [moves, setMoves] = useState([]);
+    const [warning, setWarning] = useState('Practice session.');
 
     useEffect(() => {
         pickAllFryLetters();
@@ -45,6 +46,27 @@ const FryYourBrainSolo = ({setWhereto}) => {
     }
 
     const submitPlayerWord = async() => {
+        let fixedword = word.toUpperCase().trim();
+        // Check if they have all the fry letters
+        //TODO: See if you can use a routine shared by server and front end
+        for (let i = 0; i < fryLetters.length; i++) {
+            let letterCountRequired = 0;
+            let actualLetterCount = 0;
+            for (let j = 0; j < fryLetters.length; j++) {
+                if (fryLetters[i] === fryLetters[j]) {
+                    letterCountRequired = letterCountRequired + 1;
+                }
+            }
+            for (let j = 0; j < fixedword.length; j++) {
+                if (fryLetters[i] === fixedword[j]) {
+                    actualLetterCount = actualLetterCount + 1;
+                }
+            }
+            if (actualLetterCount < letterCountRequired) {
+                setWarning(`You need the letter ${fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
+                return;
+            }
+        }
         let valid = await isWordValid();
         let move = {pass:false, word: word, valid: valid};
         await finishMoveAndMoveOn(move);
@@ -68,9 +90,11 @@ const FryYourBrainSolo = ({setWhereto}) => {
         if (fryLetters.length === pickedLetters.length) {
             await pickAllFryLetters();
             setWord('');
+            setWarning('New fry letters picked.')
         } else {
             let newFryLetters = pickedLetters.slice(0, fryLetters.length + 1);
             setFryLetters(newFryLetters);
+            setWarning('');
         }
     }
 
@@ -101,7 +125,8 @@ const FryYourBrainSolo = ({setWhereto}) => {
                                     {!m.pass && <>{m.word}</>}
                                 </td>
                                 <td>
-                                    {!m.pass && m.valid && <>Valid</>}
+                                    {!m.pass && m.valid && m.word.length === m.chefsPick.length && <span className="trEmphasis">Shortest!</span>}
+                                    {!m.pass && m.valid && m.word.length > m.chefsPick.length && <>Valid</>}
                                     {!m.pass && !m.valid && <span className="trDanger">Phoney</span>}
                                 </td>
                                 <td>{m.chefsPick}</td>
@@ -195,6 +220,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
                     </div>
                 </div>
             </div>}
+            {warning && <div className="trWarning">{warning}</div>}
         </div>
     );
 }

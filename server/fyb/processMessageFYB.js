@@ -385,7 +385,7 @@ function updateGameClients(wss, pm, foundGame) {
 
 function handleLastFreeForAllMove(foundGame) {
     let snat = 'Oops';
-    // Find shortest answer
+    // Find shortest valid player entry
     let anyValidAnswers = false;
     let shortestAnswer = 0;
     for (let i = 0; i < foundGame.freeforallMoves.length; i++) {
