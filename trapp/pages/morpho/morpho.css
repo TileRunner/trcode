@@ -1,0 +1,30 @@
+.morphoCell {
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    vertical-align: middle;
+    color: black;
+}
+.morphoCellStatic { /* Provided by the puzzle */
+    font-weight: bold;
+    background-image: url('../../public/tile.png');
+    background-size: cover;
+}
+.morphoCellNoLetter {
+    background-color: burlywood;
+}
+.morphoCellLetterOnPartiallyFilledInRow {
+    background-image: url('../../public/tileLarvalStage.png');
+    background-size: cover;
+}
+.morphoCellLetterOnFullyFilledInRow {
+    background-image: url('../../public/tileCocoonStage.png');
+    background-size: cover;
+}
+.morphoCellSelected {
+    border: 3px solid black;
+}
+.morphoCellSolution {
+    background-image: url('../../public/tileButterflyStage.png');
+    background-size: cover;
+}

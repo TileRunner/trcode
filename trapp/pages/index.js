@@ -6,6 +6,7 @@ import PrisonBreak from './pb/prisonbreak';
 import FryYourBrain from './fyb/fryyourbrain';
 import FryYourBrainSolo from './fyb/fybSolo';
 import ScrabbleClub from './sc/scrabbleclub';
+import Morpho from './morpho/morpho';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
@@ -19,6 +20,7 @@ export default function Home() {
       {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
       {whereto === 'fybsolo' && <FryYourBrainSolo setWhereto={setWhereto}></FryYourBrainSolo>}
       {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
+      {whereto === 'morpho' && <Morpho setWhereto={setWhereto}></Morpho>}
     </div>
   )
 }
@@ -31,6 +33,7 @@ const Menu = (props) => {
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
   const [descFybsolo, setDescFybsolo] = useState(false); // describe fry your brain solo
   const [descSc, setDescSc] = useState(false); // describe scrabble club
+  const [descMorpho, setDescMorpho] = useState(false); // describe morpho
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -128,6 +131,10 @@ const Menu = (props) => {
     <div className="trSubtitle">The Scrabble Club page is Scrabble Club stuff</div>
   </div>;
 
+  const DescribeMorpho = <div className="trParagraph">
+    <h1>UNDER CONSTRUCTION</h1>
+  </div>
+
   const Acknowledge = (props) => {
     const toggleDescFlag = () => {
       props.setDescFlag(!props.descFlag);
@@ -178,6 +185,7 @@ return (
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
               <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
               <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
+              <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
             </tbody>
           </table>
         </BrowserView>
@@ -188,6 +196,7 @@ return (
               <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
               <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
+              <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
             </tbody>
           </table>
         </MobileOnlyView>
@@ -197,6 +206,7 @@ return (
         {descFyb && DescribeFryYourBrain}
         {descFybsolo && DescribeFryYourBrainSolo}
         {descSc && DescribeScrabbleClub}
+        {descMorpho && DescribeMorpho}
       </div>
       <div className="trParagraph">
         <div className="trTitle">

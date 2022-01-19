@@ -210,6 +210,46 @@ const server = express()
       return;
     })
     .get("/ENABLE2K", (req, res) => {
+        // Handle request for a morpho puzzle
+        if (req.query.morpho) {
+          // Handle who can call this
+          res.header("Access-Control-Allow-Origin", "*");
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+          let notes = [];
+          let jret = {func:'morpho'};
+          // Validate parameters
+          let numCols = 0;
+          let numRows = 0;
+          if (!req.query.len) {
+            notes.push('Parameter &len is required.');
+          } else if (isNaN(req.query.len)) {
+            notes.push('Value of &len should be numeric.');
+          } else {
+            numCols = Number(req.query.len);
+            if (numCols > 7) {
+              notes.push('Maximum value of &len is 7.');
+            } else if (numCols < 2) {
+              notes.push('Minimum value of &len is 2.');
+            } else {
+              numRows = numCols + 1;
+              jret.numRows = numCols;
+              jret.numCols = numCols;
+            }
+          }
+          if (notes.length > 0) {
+            jret.notes = notes;
+            res.send(jret);
+            return;
+          }
+          let morpho = createMorphoPuzzle(numRows, numCols);
+          if (morpho.fail) {
+            jret.fail = morpho.notes = [fail];
+          } else {
+            jret.puzzle = morpho.puzzle;
+          }
+          res.send(jret);
+          return;
+        }
         // Handle who can call this
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -528,4 +568,61 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
       }
     }
   });
+}
+
+const createMorphoPuzzle = (numRows=3, numCols=3) => {
+  let fail = '';
+  let wordssamelength = allwords.filter(function (e) {
+    return e.length === numCols;
+  });
+  let protector = 0;
+  let protectorMax = 5000;
+  let puzzle = Array(numRows);
+  let candidatesByRow = Array(numRows);
+  let rowIndex = 0;
+  candidatesByRow[rowIndex] = [...wordssamelength];
+  while (rowIndex > -1 && rowIndex < numRows && protector < protectorMax) {
+    protector++;
+    if (candidatesByRow[rowIndex].length === 0) { // Ran out of candidates for this row index
+      rowIndex--; // try again from the previous row
+    } else {
+      let rand = Math.floor(Math.random() * candidatesByRow[rowIndex].length);
+      let newRow = candidatesByRow[rowIndex][rand];
+      candidatesByRow[rowIndex].splice(rand,1);
+      puzzle[rowIndex] = newRow;
+      rowIndex++; // Ends the loop if all rows were filled
+      if (rowIndex < numRows) {
+        // Prep candidates for next row
+        candidatesByRow[rowIndex] = wordssamelength.filter((w) => {return validNextMorph(puzzle[0], rowIndex, puzzle[rowIndex-1], w);});
+      }
+    }
+  }
+  if (protector === protectorMax) {
+    fail = 'Program quit to protect against infinite looping.';
+  } else if (rowIndex < 0) {
+    fail = `Cannot seem to make a puzzle ${numRows} rows by ${numCols} columns.`;
+  }
+  return {puzzle: puzzle, fail: fail};
+}
+
+const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, currentWord) => {
+  // Start word is row index 0
+  // Word at row index 1 must have 1 letter swap
+  // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
+  // Word at row index 3 must have 3 letter swaps relative to the start word, and 1 relative to previous word
+  // Etc. So pass row index to requiredDiffLetterCount.
+  let startLetters = Array.from(startWord);
+  let previousLetters = Array.from(previousWord);
+  let currentLetters = Array.from(currentWord);
+  let diffFromStartCount = 0;
+  let diffFromPreviousCount = 0;
+  for (let i = 0; i < currentLetters.length; i++) {
+    if (currentLetters[i] !== startLetters[i]) {
+      diffFromStartCount++;
+    }
+    if (currentLetters[i] !== previousLetters[i]) {
+      diffFromPreviousCount++;
+    }
+  }
+  return (diffFromStartCount === requiredDiffLetterCount && diffFromPreviousCount === 1);
 }
