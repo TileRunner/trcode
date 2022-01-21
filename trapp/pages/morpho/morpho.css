@@ -1,30 +1,40 @@
+.morphoDiv {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+.morphoSolvedDiv {
+    background-image: url('../../public/tileButterflyStage.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-top: 10px;
+    margin-left: 10px;
+}
 .morphoCell {
     height: 50px;
-    width: 50px;
+    width: 70px;
     text-align: center;
     vertical-align: middle;
     color: black;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 .morphoCellStatic { /* Provided by the puzzle */
     font-weight: bold;
     background-image: url('../../public/tile.png');
-    background-size: cover;
 }
 .morphoCellNoLetter {
     background-color: burlywood;
 }
-.morphoCellLetterOnPartiallyFilledInRow {
+.morphoCellLarva {
     background-image: url('../../public/tileLarvalStage.png');
-    background-size: cover;
 }
-.morphoCellLetterOnFullyFilledInRow {
+.morphoCellCocoon {
     background-image: url('../../public/tileCocoonStage.png');
-    background-size: cover;
 }
 .morphoCellSelected {
     border: 3px solid black;
 }
-.morphoCellSolution {
-    background-image: url('../../public/tileButterflyStage.png');
-    background-size: cover;
+.morphoCellButterfly {
+    color: whitesmoke;
+    font-weight: bold;
 }
