@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { countSwaps, isWordValid } from '../../lib/wordfunctions';
 
 const Morpho = ({setWhereto}) => {
     const numRows = 6;
@@ -84,6 +85,18 @@ const Morpho = ({setWhereto}) => {
         handleInputLetter(event.key);
     }
 
+    const copyDownLetter = () => {
+        let rowIndex = selected.row;
+        let colIndex = selected.col;
+        if (rowIndex < 1 || rowIndex >= numRows - 1) {
+            return;
+        }
+        if (colIndex < 0 || rowIndex >= numCols) {
+            return;
+        }
+        handleInputLetter(board[rowIndex-1].colArray[colIndex].letter);
+    }
+    
     const handleInputLetter = (letter) => {
         let rowIndex = selected.row;
         let colIndex = selected.col;
@@ -91,6 +104,10 @@ const Morpho = ({setWhereto}) => {
             return;
         }
         if (colIndex < 0 || rowIndex >= numCols) {
+            return;
+        }
+        if (filledin && letter === "Enter") {
+            checkSolution();
             return;
         }
         let lettertest = /^[A-Za-z\?]$/; // single letter or question mark key pressed
@@ -219,10 +236,6 @@ const Morpho = ({setWhereto}) => {
     const checkSolution = async() => {
         setChecking(true);
         let result = true;
-        let startWord = "";
-        for (let colIndex = 0; colIndex < numCols; colIndex++) {
-            startWord = startWord + board[0].colArray[colIndex].letter;
-        }
         for(let rowIndex = 1; result && rowIndex < numRows; rowIndex++) {
             let prevWord = "";
             let currWord = "";
@@ -230,7 +243,7 @@ const Morpho = ({setWhereto}) => {
                 prevWord = prevWord + board[rowIndex-1].colArray[colIndex].letter;
                 currWord = currWord + board[rowIndex].colArray[colIndex].letter;
             }
-            if (!validNextMorph(startWord, rowIndex, prevWord, currWord)) {
+            if (countSwaps(prevWord, currWord) !== 1) {
                 alert(`${prevWord} to ${currWord} is not a valid move`);
                 result = false;
             }
@@ -241,38 +254,6 @@ const Morpho = ({setWhereto}) => {
         }
         setChecking(false);
         setPuzzleSolved(result);
-        if (result) {
-            alert("Success!");
-        }
-    }
-
-    const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, currentWord) => {
-        // Start word is row index 0
-        // Word at row index 1 must have 1 letter swap
-        // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
-        // Word at row index 3 must have 3 letter swaps relative to the start word, and 1 relative to previous word
-        // Etc. So pass row index to requiredDiffLetterCount.
-        let startLetters = Array.from(startWord);
-        let previousLetters = Array.from(previousWord);
-        let currentLetters = Array.from(currentWord);
-        let diffFromStartCount = 0;
-        let diffFromPreviousCount = 0;
-        for (let i = 0; i < currentLetters.length; i++) {
-          if (currentLetters[i] !== startLetters[i]) {
-            diffFromStartCount++;
-          }
-          if (currentLetters[i] !== previousLetters[i]) {
-            diffFromPreviousCount++;
-          }
-        }
-        return (diffFromStartCount === requiredDiffLetterCount && diffFromPreviousCount === 1);
-      }
-
-    async function isWordValid(word) {
-        let url = `${baseurl}/ENABLE2K?exists=${word.toLowerCase()}`;
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return jdata.exists;
     }
 
     return (
@@ -304,24 +285,59 @@ const Morpho = ({setWhereto}) => {
                 </table>
                 <div className="trParagraph">
                     {!loading && !checking && !puzzleSolved && <div>
-                        <span>Next Letter:</span>
-                        <input type="text" name="getnextletter" value=""
-                            onChange={(e) => {handleInputLetter(e.target.value);}}
-                        />
                         <p>Change one letter at a time to get from {firstWord} to {lastWord}.</p>
                         <p>Each interim word must be a valid word.</p>
+                        <div className="morphoKeyboard">
+                            <div className="morphoKeyrow1">
+                                <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="morphoKey">Q</button>
+                                <button key="keyW" onClick={() => {handleInputLetter('W');}} className="morphoKey">W</button>
+                                <button key="keyE" onClick={() => {handleInputLetter('E');}} className="morphoKey">E</button>
+                                <button key="keyR" onClick={() => {handleInputLetter('R');}} className="morphoKey">R</button>
+                                <button key="keyT" onClick={() => {handleInputLetter('T');}} className="morphoKey">T</button>
+                                <button key="keyY" onClick={() => {handleInputLetter('Y');}} className="morphoKey">Y</button>
+                                <button key="keyU" onClick={() => {handleInputLetter('U');}} className="morphoKey">U</button>
+                                <button key="keyI" onClick={() => {handleInputLetter('I');}} className="morphoKey">I</button>
+                                <button key="keyO" onClick={() => {handleInputLetter('O');}} className="morphoKey">O</button>
+                                <button key="keyP" onClick={() => {handleInputLetter('P');}} className="morphoKey">P</button>
+                            </div>
+                            <div className="morphoKeyrow2">
+                                <button key="keyA" onClick={() => {handleInputLetter('A');}} className="morphoKey">A</button>
+                                <button key="keyS" onClick={() => {handleInputLetter('S');}} className="morphoKey">S</button>
+                                <button key="keyD" onClick={() => {handleInputLetter('D');}} className="morphoKey">D</button>
+                                <button key="keyF" onClick={() => {handleInputLetter('F');}} className="morphoKey">F</button>
+                                <button key="keyG" onClick={() => {handleInputLetter('G');}} className="morphoKey">G</button>
+                                <button key="keyH" onClick={() => {handleInputLetter('H');}} className="morphoKey">H</button>
+                                <button key="keyJ" onClick={() => {handleInputLetter('J');}} className="morphoKey">J</button>
+                                <button key="keyK" onClick={() => {handleInputLetter('K');}} className="morphoKey">K</button>
+                                <button key="keyL" onClick={() => {handleInputLetter('L');}} className="morphoKey">L</button>
+                            </div>
+                            <div className="morphoKeyrow3">
+                                <button key="keyZ" onClick={() => {handleInputLetter('Z');}} className="morphoKey">Z</button>
+                                <button key="keyX" onClick={() => {handleInputLetter('X');}} className="morphoKey">X</button>
+                                <button key="keyC" onClick={() => {handleInputLetter('C');}} className="morphoKey">C</button>
+                                <button key="keyV" onClick={() => {handleInputLetter('V');}} className="morphoKey">V</button>
+                                <button key="keyB" onClick={() => {handleInputLetter('B');}} className="morphoKey">B</button>
+                                <button key="keyN" onClick={() => {handleInputLetter('N');}} className="morphoKey">N</button>
+                                <button key="keyM" onClick={() => {handleInputLetter('M');}} className="morphoKey">M</button>
+                                <button key="keyCopydown" onClick={() => {copyDownLetter();}} className="morphoCopydownKey">COPYDOWN</button>
+                            </div>
+                        </div>
                     </div>}
-                    <button className="trButton" onClick={() => {toggleShowSolution();}}>
-                        {`${showSolution ? 'HIDE SOLUTION' : 'SHOW A SOLUTION'}`}
-                    </button>
+                    {puzzleSolved ?
+                        <div>
+                            <h1 className="trEmphasis">Success!</h1>
+                            <button className="trButton" onClick={() => {setInitialBoard();}}>
+                                GENERATE ANOTHER PUZZLE
+                            </button>
+                        </div>
+                    :
+                        <button className="trButton" onClick={() => {toggleShowSolution();}}>
+                            {`${showSolution ? 'HIDE SOLUTION' : 'SHOW A SOLUTION'}`}
+                        </button>
+                    }
                     {!puzzleSolved && filledin && <div>
                         <button className="trButton" onClick={() => {checkSolution();}}>
                             SUBMIT YOUR SOLUTION
-                        </button>
-                    </div>}
-                    {puzzleSolved && <div>
-                        <button className="trButton" onClick={() => {setInitialBoard();}}>
-                            GENERATE ANOTHER PUZZLE
                         </button>
                     </div>}
                 </div>

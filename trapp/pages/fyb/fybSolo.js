@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { isWordValid } from "../../lib/wordfunctions";
 
 const FryYourBrainSolo = ({setWhereto}) => {
     const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
@@ -22,13 +23,6 @@ const FryYourBrainSolo = ({setWhereto}) => {
         setPickedLetters(newPick);
         setFryLetters(newPick.slice(0,3));
     };
-
-    async function isWordValid() {
-        let url = `${baseurl}/ENABLE2K?exists=${word.toLowerCase()}`;
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return jdata.exists;
-    }
 
     async function getChefsPick() {
         let url = `${baseurl}/ENABLE2K?topfry=true&letters=${fryLetters.join('')}&count=1`;
@@ -67,7 +61,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
                 return;
             }
         }
-        let valid = await isWordValid();
+        let valid = await isWordValid(word);
         let move = {pass:false, word: word, valid: valid};
         await finishMoveAndMoveOn(move);
     }

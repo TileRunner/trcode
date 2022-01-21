@@ -38,3 +38,31 @@
     color: whitesmoke;
     font-weight: bold;
 }
+.morphoKeyboard {
+    background-color: blue;
+    color: whitesmoke;
+    width: fit-content;
+    margin-bottom: 5px;
+}
+.morphoKeyrow1 {
+    margin-left: 5px;
+}
+.morphoKeyrow2 {
+    margin-left: 14px;
+}
+.morphoKeyrow3 {
+    margin-left: 25px;
+}
+.morphoKey {
+    border-width: 2px;
+    border-radius: 100%;
+    border-color: black;
+    margin: 5px;
+    width: 30px;
+}
+.morphoCopydownKey {
+    border-width: 2px;
+    border-color: black;
+    margin-left: 10px;
+    margin-right: 5px;
+}
