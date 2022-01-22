@@ -8,6 +8,8 @@
     background-size: contain;
     margin-top: 10px;
     margin-left: 10px;
+    width: 350px;
+    height: 400px;
 }
 .morphoCell {
     height: 50px;
@@ -27,9 +29,13 @@
 }
 .morphoCellLarva {
     background-image: url('../../public/tileLarvalStage.png');
+    color: whitesmoke;
+    font-weight: bold;
 }
 .morphoCellCocoon {
     background-image: url('../../public/tileCocoonStage.png');
+    color: whitesmoke;
+    font-weight: bold;
 }
 .morphoCellSelected {
     border: 3px solid black;
@@ -41,26 +47,41 @@
 .morphoKeyboard {
     background-color: blue;
     color: whitesmoke;
-    width: fit-content;
+    width: 350px;
     margin-bottom: 5px;
 }
 .morphoKeyrow1 {
-    margin-left: 5px;
+    margin-left: 1px;
 }
 .morphoKeyrow2 {
-    margin-left: 14px;
+    margin-left: 10px;
 }
 .morphoKeyrow3 {
-    margin-left: 25px;
+    margin-left: 21px;
+}
+.morphoKeyrow4 {
+    text-align: center;
+    padding-bottom: 2px;
 }
 .morphoKey {
     border-width: 2px;
     border-radius: 100%;
     border-color: black;
-    margin: 5px;
-    width: 30px;
+    margin: 3px;
+    width: 28px;
 }
 .morphoCopydownKey {
+    border-width: 2px;
+    border-color: black;
+    margin-right: 40px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.morphoCopyupKey {
+    border-width: 2px;
+    border-color: black;
+}
+.morphoSubmitKey {
     border-width: 2px;
     border-color: black;
     margin-left: 10px;

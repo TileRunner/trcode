@@ -97,6 +97,18 @@ const Morpho = ({setWhereto}) => {
         handleInputLetter(board[rowIndex-1].colArray[colIndex].letter);
     }
     
+    const copyUpLetter = () => {
+        let rowIndex = selected.row;
+        let colIndex = selected.col;
+        if (rowIndex < 1 || rowIndex >= numRows - 1) {
+            return;
+        }
+        if (colIndex < 0 || rowIndex >= numCols) {
+            return;
+        }
+        handleInputLetter(board[numRows-1].colArray[colIndex].letter);
+    }
+    
     const handleInputLetter = (letter) => {
         let rowIndex = selected.row;
         let colIndex = selected.col;
@@ -285,10 +297,8 @@ const Morpho = ({setWhereto}) => {
                 </table>
                 <div className="trParagraph">
                     {!loading && !checking && !puzzleSolved && <div>
-                        <p>Change one letter at a time to get from {firstWord} to {lastWord}.</p>
-                        <p>Each interim word must be a valid word.</p>
                         <div className="morphoKeyboard">
-                            <div className="morphoKeyrow1">
+                            {/* <div className="morphoKeyrow1">
                                 <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="morphoKey">Q</button>
                                 <button key="keyW" onClick={() => {handleInputLetter('W');}} className="morphoKey">W</button>
                                 <button key="keyE" onClick={() => {handleInputLetter('E');}} className="morphoKey">E</button>
@@ -319,9 +329,21 @@ const Morpho = ({setWhereto}) => {
                                 <button key="keyB" onClick={() => {handleInputLetter('B');}} className="morphoKey">B</button>
                                 <button key="keyN" onClick={() => {handleInputLetter('N');}} className="morphoKey">N</button>
                                 <button key="keyM" onClick={() => {handleInputLetter('M');}} className="morphoKey">M</button>
-                                <button key="keyCopydown" onClick={() => {copyDownLetter();}} className="morphoCopydownKey">COPYDOWN</button>
+                            </div> */}
+                            <div className="morphoKeyrow4">
+                                <button key="keyCopydown" onClick={() => {copyDownLetter();}} className="morphoCopydownKey">COPY DOWN</button>
+                                <button key="keyCopyup" onClick={() => {copyUpLetter();}} className="morphoCopyupKey">COPY UP</button>
                             </div>
+                            {!puzzleSolved && filledin && <div className="morphoKeyrow4">
+                                <button className="trButton" onClick={() => {checkSolution();}}>
+                                    SUBMIT YOUR SOLUTION
+                                </button>
+                            </div>}
                         </div>
+                        <p>Change one letter at a time to get from {firstWord} to {lastWord}.</p>
+                        <p>Each interim word must be a valid word.</p>
+                        <p>COPY DOWN copies a letter down from the row above.</p>
+                        <p>COPY UP copies a letter up from the bottom row.</p>
                     </div>}
                     {puzzleSolved ?
                         <div>
@@ -335,11 +357,6 @@ const Morpho = ({setWhereto}) => {
                             {`${showSolution ? 'HIDE SOLUTION' : 'SHOW A SOLUTION'}`}
                         </button>
                     }
-                    {!puzzleSolved && filledin && <div>
-                        <button className="trButton" onClick={() => {checkSolution();}}>
-                            SUBMIT YOUR SOLUTION
-                        </button>
-                    </div>}
                 </div>
             </div>}
         </div>
