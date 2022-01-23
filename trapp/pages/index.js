@@ -167,9 +167,11 @@ const Menu = (props) => {
   </div>
 
   const DescribePhotos = <div className="trParagraph trEmphasis">
-    <p>Morpho larva Photo by Egor Kamelev from Pexels</p>
-    <p>Morpho cocoon (part of) Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
-    <p>Morpho butterlfy Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
+    Photos may be cropped and/or resized. Follow links to see more about the photographers.
+    <p/>
+    <p>Morpho larva Photo by <a href="https://www.pexels.com/@ekamelev?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels">Egor Kamelev from Pexels</a></p>
+    <p>Morpho cocoon Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
+    <p>Morpho butterlfy Photo by <a href="https://www.pexels.com/@fotostudio-all-eyes-on-you-134458509?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels">Fotostudio - All Eyes On You</a> from Pexels</p>
   </div>
 
   const MenuOptionKmMarkers = () => <div className="trParagraph">

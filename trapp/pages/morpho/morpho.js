@@ -64,10 +64,32 @@ const Morpho = ({setWhereto}) => {
     }
 
     const handleSelection = (rowIndex, colIndex) => {
-        if (rowIndex < 1 || rowIndex >= numRows - 1) {
+        if (colIndex < 0 || colIndex >= numCols) {
             return;
         }
-        if (colIndex < 0 || rowIndex >= numCols) {
+        if (rowIndex === numRows - 1 && selected.row > 0 && selected.row < numRows - 1) {
+            // If they click on a bottom row tile then copy it up and copy down the rest of the row
+            let newBoard = JSON.parse(JSON.stringify(board));
+            for (let ci = 0; ci < numCols; ci++) {
+                if (ci === colIndex) {
+                    // This is the column they clicked on
+                    newBoard[selected.row].colArray[ci].letter = newBoard[numRows-1].colArray[ci].letter;
+                } else {
+                    newBoard[selected.row].colArray[ci].letter = newBoard[selected.row - 1].colArray[ci].letter;
+                }
+                newBoard[selected.row].colArray[ci].className = cssCocoon;               
+            }
+            newBoard[selected.row].filledin = true;
+            let newSelected = {row:selected.row+1,col:0};
+            setSelected(newSelected);
+            setBoard(newBoard);
+            if (newBoard.filter(r => {return !r.filledin;}).length === 0) {
+                // All letters are filled in
+                setFilledin(true);
+            }
+                return;
+        }
+        if (rowIndex < 1 || rowIndex >= numRows - 1) {
             return;
         }
         setSelected({row:rowIndex,col:colIndex});
@@ -269,7 +291,7 @@ const Morpho = ({setWhereto}) => {
     }
 
     return (
-        <div className="trBackground" onKeyDown={(e) => {handleKeyDown(e);}} tabindex={-1}>
+        <div className="trBackground" onKeyDown={(e) => {handleKeyDown(e);}} tabIndex={-1}>
             <div className="trTitle">
                 Morpho
                 <button className="trButton" onClick={() => {setWhereto('menu');}}>
@@ -278,7 +300,7 @@ const Morpho = ({setWhereto}) => {
             </div>
             {loading && <div className="trEmphasis">Creating puzzle, please be patient...</div>}
             {!loading && <div className={puzzleSolved ? "morphoSolvedDiv" : "morphoDiv"}>
-                <table>
+                <table><tbody>
                 {board.map((boardRow, rowIndex) => (
                     <tr key={`BoardRow.${rowIndex}`}>
                         {boardRow.colArray.map((cell, colIndex) => (
@@ -294,7 +316,7 @@ const Morpho = ({setWhereto}) => {
                         ))}
                     </tr>
                 ))}
-                </table>
+                </tbody></table>
                 <div className="trParagraph">
                     {!loading && !checking && !puzzleSolved && <div>
                         <div className="morphoKeyboard">
@@ -344,6 +366,7 @@ const Morpho = ({setWhereto}) => {
                         Each interim word must be a valid word.</p>
                         <p>COPY DOWN copies a letter down from the row above.
                         COPY UP copies a letter up from the bottom row.</p>
+                        <p>Click a letter on the bottom row to use it as the swap on the selected row.</p>
                     </div>}
                     {puzzleSolved ?
                         <div>
