@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { BrowserView, MobileOnlyView } from 'react-device-detect';
 import { countSwaps, isWordValid } from '../../lib/wordfunctions';
 
 const Morpho = ({setWhereto}) => {
-    const numRows = 6;
-    const numCols = 5;
+    const [numRows, setNumRows] = useState(6);
+    const [numCols, setNumCols] = useState(5);
+    const [nextNumCols, setNextNumCols] = useState(5);
     const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
     const cssPresetLetter = "morphoCellStatic";
     const cssNoLetter = "morphoCellNoLetter";
@@ -21,32 +23,36 @@ const Morpho = ({setWhereto}) => {
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState({row:1, col:0}); // Natural place to start entering letters
     useEffect(() => {
-        setInitialBoard();
+        setInitialBoard(nextNumCols);
     },[]);
-    const setInitialBoard = async() => { // Initial board of given size
+    const setInitialBoard = async(wordLength) => { // Initial board of given size
+        let numberOfRows = wordLength + 1;
+        let numberOfCols = wordLength;
         setLoading(true);
         setChecking(false);
         setShowSolution(false);
         setFilledin(false);
         setPuzzleSolved(false);
+        setNumCols(wordLength);
+        setNumRows(wordLength+1);
         let rowArray = [];
-        let url = `${baseurl}/ENABLE2K?morpho=true&len=${numCols}`;
+        let url = `${baseurl}/ENABLE2K?morpho=true&len=${wordLength}`;
         const response = await fetch(url);
         const data = await response.json();
         if (!data.notes || data.notes.length === 0) { // Ok result
-            for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
+            for (let rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
                 const rowWord = data.puzzle[rowIndex].toUpperCase();
                 if (rowIndex === 0) {
                     setFirstWord(rowWord);
-                } else if (rowIndex === numRows - 1) {
+                } else if (rowIndex === numberOfRows - 1) {
                     setLastWord(rowWord);
                 }
                 const rowLetters = [...Array.from(rowWord)];
-                let rowFilledIn = rowIndex === 0 || rowIndex === numRows - 1;
+                let rowFilledIn = rowIndex === 0 || rowIndex === numberOfRows - 1;
                 let colArray = [];
-                for (let colIndex = 0; colIndex < numCols; colIndex++) {
+                for (let colIndex = 0; colIndex < numberOfCols; colIndex++) {
                     let cell = {letter:'?',solution:rowLetters[colIndex],className:'?'};
-                    if (rowIndex === 0 || rowIndex === numRows - 1) {
+                    if (rowIndex === 0 || rowIndex === numberOfRows - 1) {
                         cell.letter = rowLetters[colIndex];
                         cell.className = cssPresetLetter;
                     } else {
@@ -57,13 +63,21 @@ const Morpho = ({setWhereto}) => {
                 }
                 rowArray.push({filledin:rowFilledIn, colArray:colArray});
             }
+            setBoard(rowArray);
+            setSelected({row:1,col:0});
+            setLoading(false);
+        } else {
+            alert(`Problem generating puzzle: ${data.notes}\nBest to click Home then rechoose Morpho.`);
         }
-        setBoard(rowArray);
-        setSelected({row:1,col:0});
-        setLoading(false);
     }
 
     const handleSelection = (rowIndex, colIndex) => {
+        if (checking) {
+            return; // No modes while checking solution
+        }
+        if (puzzleSolved) {
+            return; // Puzzle already solved
+        }
         if (colIndex < 0 || colIndex >= numCols) {
             return;
         }
@@ -108,6 +122,12 @@ const Morpho = ({setWhereto}) => {
     }
 
     const copyDownLetter = () => {
+        if (checking) {
+            return; // No modes while checking solution
+        }
+        if (puzzleSolved) {
+            return; // Puzzle already solved
+        }
         let rowIndex = selected.row;
         let colIndex = selected.col;
         if (rowIndex < 1 || rowIndex >= numRows - 1) {
@@ -120,6 +140,12 @@ const Morpho = ({setWhereto}) => {
     }
     
     const copyUpLetter = () => {
+        if (checking) {
+            return; // No modes while checking solution
+        }
+        if (puzzleSolved) {
+            return; // Puzzle already solved
+        }
         let rowIndex = selected.row;
         let colIndex = selected.col;
         if (rowIndex < 1 || rowIndex >= numRows - 1) {
@@ -291,16 +317,17 @@ const Morpho = ({setWhereto}) => {
     }
 
     return (
-        <div className="trBackground" onKeyDown={(e) => {handleKeyDown(e);}} tabIndex={-1}>
+        <div className="trBackground">
             <div className="trTitle">
                 Morpho
                 <button className="trButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            {loading && <div className="trEmphasis">Creating puzzle, please be patient...</div>}
-            {!loading && <div className={puzzleSolved ? "morphoSolvedDiv" : "morphoDiv"}>
-                <table><tbody>
+            {loading && <div key="pleasewait" className="trEmphasis">Creating puzzle, please be patient...</div>}
+            {!loading && <div key="showboard" className={puzzleSolved ? `morphoSolvedDiv l${numCols}` : "morphoDiv"}
+            >
+                <table  onKeyDown={(e) => {handleKeyDown(e);}} tabIndex={-1}><tbody>
                 {board.map((boardRow, rowIndex) => (
                     <tr key={`BoardRow.${rowIndex}`}>
                         {boardRow.colArray.map((cell, colIndex) => (
@@ -308,9 +335,9 @@ const Morpho = ({setWhereto}) => {
                             onClick={() => {handleSelection(rowIndex,colIndex);}}
                             className={`col morphoCell ${showSolution ? cssPresetLetter : puzzleSolved ? cssButterfly : cell.className + (rowIndex === selected.row && colIndex === selected.col ? cssSelectedCell : "")}`}>
                                 {showSolution ?
-                                    <span>{cell.solution}</span>
+                                    <span key={`BoardCellS.${rowIndex}.${colIndex}`}>{cell.solution}</span>
                                 :
-                                    <span>{cell.letter}</span>
+                                    <span key={`BoardCellL.${rowIndex}.${colIndex}`}>{cell.letter}</span>
                                 }
                             </td>
                         ))}
@@ -370,10 +397,33 @@ const Morpho = ({setWhereto}) => {
                     </div>}
                     {puzzleSolved ?
                         <div>
-                            <h1 className="trEmphasis">Success!</h1>
-                            <button className="trButton" onClick={() => {setInitialBoard();}}>
-                                GENERATE ANOTHER PUZZLE
-                            </button>
+                            <h3 className="trEmphasis">Success!</h3>
+                            <MobileOnlyView>
+                                <button key="genMobile" className="trButton" onClick={() => {
+                                    setInitialBoard(nextNumCols);
+                                }}>
+                                    GENERATE {nextNumCols} LETTER PUZZLE
+                                </button>
+                                {nextNumCols < 5 && <button key="longerPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
+                                    setNextNumCols(nextNumCols+1);
+                                }}>+</button>}
+                                {nextNumCols > 3 && <button key="shorterPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
+                                    setNextNumCols(nextNumCols-1);
+                                }}>-</button>}
+                            </MobileOnlyView>
+                            <BrowserView>
+                                <button key="genBrowser" className="trButton" onClick={() => {
+                                    setInitialBoard(nextNumCols);
+                                    }}>
+                                    GENERATE {nextNumCols} LETTER PUZZLE
+                                </button>
+                                {nextNumCols < 7 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
+                                    setNextNumCols(nextNumCols+1);
+                                }}>+</button>}
+                                {nextNumCols > 3 && <button key="shorterPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
+                                    setNextNumCols(nextNumCols-1);
+                                }}>-</button>}
+                            </BrowserView>
                         </div>
                     :
                         <button className="trButton" onClick={() => {toggleShowSolution();}}>

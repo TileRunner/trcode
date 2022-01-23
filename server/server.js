@@ -611,6 +611,11 @@ const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, curren
   // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
   // Word at row index 3 must have 3 letter swaps relative to the start word, and 1 relative to previous word
   // Etc. So pass row index to requiredDiffLetterCount.
+  // Try to avoid nasty words, kids might be seeing this.
+  let familyUnfriendly = /(unt)|(uck)|(wat)/
+  if (currentWord.match(familyUnfriendly) || previousWord.match(familyUnfriendly)) {
+    return false;
+  }
   let startLetters = Array.from(startWord);
   let previousLetters = Array.from(previousWord);
   let currentLetters = Array.from(currentWord);

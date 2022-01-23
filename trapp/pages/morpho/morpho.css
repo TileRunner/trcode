@@ -1,15 +1,34 @@
 .morphoDiv {
     margin-top: 10px;
     margin-left: 10px;
+    outline: none;
 }
 .morphoSolvedDiv {
+    outline: none;
     background-image: url('../../public/tileButterflyStage.png');
     background-repeat: no-repeat;
     background-size: cover;
     margin-top: 10px;
     margin-left: 10px;
     width: 350px;
+    height: 550px;
+}
+.morphoSolvedDiv.l3 {
+    width: 200px;
+    height: 280px;
+}
+.morphoSolvedDiv.l4 {
+    width: 250px;
+    height: 350px;
+}
+.morphoSolvedDiv.l5 {
     height: 400px;
+}
+.morphoSolvedDiv.l6 {
+    height: 480px;
+}
+.morphoSolvedDiv.l7 {
+    height: 550px;
 }
 .morphoCell {
     height: 70px;
@@ -25,7 +44,7 @@
     background-image: url('../../public/tile.png');
 }
 .morphoCellNoLetter {
-    background-image: url('../../public/tile.png');
+    background-image: url('../../public/tileLarvalStage.png');
     color: whitesmoke;
     opacity: 50%;
 }
@@ -88,4 +107,13 @@
     border-color: black;
     margin-left: 10px;
     margin-right: 5px;
+}
+.morphoPuzzleSizeKey {
+    border-width: 2px;
+    border-radius: 100%;
+    border-color: whitesmoke;
+    background-color: blue;
+    color: whitesmoke;
+    margin: 3px;
+    width: 28px;
 }
