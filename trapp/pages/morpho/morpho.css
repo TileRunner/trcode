@@ -5,14 +5,14 @@
 .morphoSolvedDiv {
     background-image: url('../../public/tileButterflyStage.png');
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     margin-top: 10px;
     margin-left: 10px;
     width: 350px;
     height: 400px;
 }
 .morphoCell {
-    height: 50px;
+    height: 70px;
     width: 70px;
     text-align: center;
     vertical-align: middle;
@@ -25,7 +25,9 @@
     background-image: url('../../public/tile.png');
 }
 .morphoCellNoLetter {
-    background-color: burlywood;
+    background-image: url('../../public/tile.png');
+    color: whitesmoke;
+    opacity: 50%;
 }
 .morphoCellLarva {
     background-image: url('../../public/tileLarvalStage.png');
@@ -38,7 +40,7 @@
     font-weight: bold;
 }
 .morphoCellSelected {
-    border: 3px solid black;
+    border: 1px solid cyan;
 }
 .morphoCellButterfly {
     color: whitesmoke;

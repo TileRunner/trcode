@@ -37,6 +37,7 @@ const Menu = (props) => {
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
+  const [descPhotos, setDescPhotos] = useState(false); // describe photo takers
 
   const MenuOption = (props) => {
     const toggleDescFlag = () => {
@@ -165,6 +166,12 @@ const Menu = (props) => {
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
+  const DescribePhotos = <div className="trParagraph trEmphasis">
+    <p>Morpho larva Photo by Egor Kamelev from Pexels</p>
+    <p>Morpho cocoon (part of) Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
+    <p>Morpho butterlfy Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
+  </div>
+
   const MenuOptionKmMarkers = () => <div className="trParagraph">
     Hamilton to Cambridge Rail Trail:
     <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank"> Km Marker Videos</a>
@@ -221,12 +228,14 @@ return (
         <div className="trParagraph">
           <table>
             <tbody>
-            <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
-            <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+              <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+              <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+              <Acknowledge ackText='Photos By' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
             </tbody>
           </table>
           {descEnable2k && DescribeEnable2k}
           {descFriends && DescribeFriends}
+          {descPhotos && DescribePhotos}
         </div>
       </div>
     </div>

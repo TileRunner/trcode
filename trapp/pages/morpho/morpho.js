@@ -340,10 +340,10 @@ const Morpho = ({setWhereto}) => {
                                 </button>
                             </div>}
                         </div>
-                        <p>Change one letter at a time to get from {firstWord} to {lastWord}.</p>
-                        <p>Each interim word must be a valid word.</p>
-                        <p>COPY DOWN copies a letter down from the row above.</p>
-                        <p>COPY UP copies a letter up from the bottom row.</p>
+                        <p>Change one letter at a time to get from {firstWord} to {lastWord}.
+                        Each interim word must be a valid word.</p>
+                        <p>COPY DOWN copies a letter down from the row above.
+                        COPY UP copies a letter up from the bottom row.</p>
                     </div>}
                     {puzzleSolved ?
                         <div>
