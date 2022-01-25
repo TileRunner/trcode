@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserView, MobileOnlyView } from 'react-device-detect';
 import { countSwaps, isWordValid } from '../../lib/wordfunctions';
 
 const Morpho = ({setWhereto}) => {
+    const [starting, setStarting] = useState(true);
     const [numRows, setNumRows] = useState(6);
     const [numCols, setNumCols] = useState(5);
     const [nextNumCols, setNextNumCols] = useState(5);
@@ -22,12 +23,10 @@ const Morpho = ({setWhereto}) => {
     const [lastWord, setLastWord] = useState('');
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState({row:1, col:0}); // Natural place to start entering letters
-    useEffect(() => {
-        setInitialBoard(nextNumCols);
-    },[]);
     const setInitialBoard = async(wordLength) => { // Initial board of given size
         let numberOfRows = wordLength + 1;
         let numberOfCols = wordLength;
+        setStarting(false);
         setLoading(true);
         setChecking(false);
         setShowSolution(false);
@@ -316,6 +315,115 @@ const Morpho = ({setWhereto}) => {
         setPuzzleSolved(result);
     }
 
+    const promptForPuzzleGeneration = <div>
+        <MobileOnlyView>
+            <button key="genMobile" className="trButton" onClick={() => {
+                setInitialBoard(nextNumCols);
+            } }>
+                GENERATE {nextNumCols} LETTER PUZZLE
+            </button>
+            {nextNumCols < 5 && <button key="longerPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
+                setNextNumCols(nextNumCols + 1);
+            } }>+</button>}
+            {nextNumCols > 3 && <button key="shorterPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
+                setNextNumCols(nextNumCols - 1);
+            } }>-</button>}
+        </MobileOnlyView>
+        <BrowserView>
+            <button key="genBrowser" className="trButton" onClick={() => {
+                setInitialBoard(nextNumCols);
+            } }>
+                GENERATE {nextNumCols} LETTER PUZZLE
+            </button>
+            {nextNumCols < 7 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
+                setNextNumCols(nextNumCols + 1);
+            } }>+</button>}
+            {nextNumCols > 3 && <button key="shorterPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
+                setNextNumCols(nextNumCols - 1);
+            } }>-</button>}
+        </BrowserView>
+    </div>;
+
+    const renderThePuzzle = <div key="showboard" className={puzzleSolved ? `morphoSolvedDiv l${numCols}` : "morphoDiv"}>
+        <table onKeyDown={(e) => { handleKeyDown(e); } } tabIndex={-1}><tbody>
+            {board.map((boardRow, rowIndex) => (
+                <tr key={`BoardRow.${rowIndex}`}>
+                    {boardRow.colArray.map((cell, colIndex) => (
+                        <td key={`BoardCell.${rowIndex}.${colIndex}`}
+                            onClick={() => { handleSelection(rowIndex, colIndex); } }
+                            className={`col morphoCell ${showSolution ? cssPresetLetter : puzzleSolved ? cssButterfly : cell.className + (rowIndex === selected.row && colIndex === selected.col ? cssSelectedCell : "")}`}>
+                            {showSolution ?
+                                <span key={`BoardCellS.${rowIndex}.${colIndex}`}>{cell.solution}</span>
+                                :
+                                <span key={`BoardCellL.${rowIndex}.${colIndex}`}>{cell.letter}</span>}
+                        </td>
+                    ))}
+                </tr>
+            ))}
+        </tbody></table>
+        <div className="trParagraph">
+            {!loading && !checking && !puzzleSolved && <div>
+                <div className="morphoKeyboard">
+                    {/* <div className="morphoKeyrow1">
+            <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="morphoKey">Q</button>
+            <button key="keyW" onClick={() => {handleInputLetter('W');}} className="morphoKey">W</button>
+            <button key="keyE" onClick={() => {handleInputLetter('E');}} className="morphoKey">E</button>
+            <button key="keyR" onClick={() => {handleInputLetter('R');}} className="morphoKey">R</button>
+            <button key="keyT" onClick={() => {handleInputLetter('T');}} className="morphoKey">T</button>
+            <button key="keyY" onClick={() => {handleInputLetter('Y');}} className="morphoKey">Y</button>
+            <button key="keyU" onClick={() => {handleInputLetter('U');}} className="morphoKey">U</button>
+            <button key="keyI" onClick={() => {handleInputLetter('I');}} className="morphoKey">I</button>
+            <button key="keyO" onClick={() => {handleInputLetter('O');}} className="morphoKey">O</button>
+            <button key="keyP" onClick={() => {handleInputLetter('P');}} className="morphoKey">P</button>
+        </div>
+        <div className="morphoKeyrow2">
+            <button key="keyA" onClick={() => {handleInputLetter('A');}} className="morphoKey">A</button>
+            <button key="keyS" onClick={() => {handleInputLetter('S');}} className="morphoKey">S</button>
+            <button key="keyD" onClick={() => {handleInputLetter('D');}} className="morphoKey">D</button>
+            <button key="keyF" onClick={() => {handleInputLetter('F');}} className="morphoKey">F</button>
+            <button key="keyG" onClick={() => {handleInputLetter('G');}} className="morphoKey">G</button>
+            <button key="keyH" onClick={() => {handleInputLetter('H');}} className="morphoKey">H</button>
+            <button key="keyJ" onClick={() => {handleInputLetter('J');}} className="morphoKey">J</button>
+            <button key="keyK" onClick={() => {handleInputLetter('K');}} className="morphoKey">K</button>
+            <button key="keyL" onClick={() => {handleInputLetter('L');}} className="morphoKey">L</button>
+        </div>
+        <div className="morphoKeyrow3">
+            <button key="keyZ" onClick={() => {handleInputLetter('Z');}} className="morphoKey">Z</button>
+            <button key="keyX" onClick={() => {handleInputLetter('X');}} className="morphoKey">X</button>
+            <button key="keyC" onClick={() => {handleInputLetter('C');}} className="morphoKey">C</button>
+            <button key="keyV" onClick={() => {handleInputLetter('V');}} className="morphoKey">V</button>
+            <button key="keyB" onClick={() => {handleInputLetter('B');}} className="morphoKey">B</button>
+            <button key="keyN" onClick={() => {handleInputLetter('N');}} className="morphoKey">N</button>
+            <button key="keyM" onClick={() => {handleInputLetter('M');}} className="morphoKey">M</button>
+        </div> */}
+                    <div className="morphoKeyrow4">
+                        <button key="keyCopydown" onClick={() => { copyDownLetter(); } } className="morphoCopydownKey">COPY DOWN</button>
+                        <button key="keyCopyup" onClick={() => { copyUpLetter(); } } className="morphoCopyupKey">COPY UP</button>
+                    </div>
+                    {!puzzleSolved && filledin && <div className="morphoKeyrow4">
+                        <button className="trButton" onClick={() => { checkSolution(); } }>
+                            SUBMIT YOUR SOLUTION
+                        </button>
+                    </div>}
+                </div>
+                <p>Change one letter at a time to get from {firstWord} to {lastWord}.
+                    Each interim word must be a valid word.</p>
+                <p>COPY DOWN copies a letter down from the row above.
+                    COPY UP copies a letter up from the bottom row.</p>
+                <p>Click a letter on the bottom row to use it as the swap on the selected row.</p>
+            </div>}
+            {puzzleSolved ?
+                <div>
+                    <h3 className="trEmphasis">Success!</h3>
+                    {promptForPuzzleGeneration}
+                </div>
+                :
+                <button className="trButton" onClick={() => { toggleShowSolution(); } }>
+                    {`${showSolution ? 'HIDE SOLUTION' : 'SHOW A SOLUTION'}`}
+                </button>}
+        </div>
+    </div>;
+
     return (
         <div className="trBackground">
             <div className="trTitle">
@@ -324,114 +432,14 @@ const Morpho = ({setWhereto}) => {
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            {loading && <div key="pleasewait" className="trEmphasis">Creating puzzle, please be patient...</div>}
-            {!loading && <div key="showboard" className={puzzleSolved ? `morphoSolvedDiv l${numCols}` : "morphoDiv"}
-            >
-                <table  onKeyDown={(e) => {handleKeyDown(e);}} tabIndex={-1}><tbody>
-                {board.map((boardRow, rowIndex) => (
-                    <tr key={`BoardRow.${rowIndex}`}>
-                        {boardRow.colArray.map((cell, colIndex) => (
-                            <td key={`BoardCell.${rowIndex}.${colIndex}`}
-                            onClick={() => {handleSelection(rowIndex,colIndex);}}
-                            className={`col morphoCell ${showSolution ? cssPresetLetter : puzzleSolved ? cssButterfly : cell.className + (rowIndex === selected.row && colIndex === selected.col ? cssSelectedCell : "")}`}>
-                                {showSolution ?
-                                    <span key={`BoardCellS.${rowIndex}.${colIndex}`}>{cell.solution}</span>
-                                :
-                                    <span key={`BoardCellL.${rowIndex}.${colIndex}`}>{cell.letter}</span>
-                                }
-                            </td>
-                        ))}
-                    </tr>
-                ))}
-                </tbody></table>
-                <div className="trParagraph">
-                    {!loading && !checking && !puzzleSolved && <div>
-                        <div className="morphoKeyboard">
-                            {/* <div className="morphoKeyrow1">
-                                <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="morphoKey">Q</button>
-                                <button key="keyW" onClick={() => {handleInputLetter('W');}} className="morphoKey">W</button>
-                                <button key="keyE" onClick={() => {handleInputLetter('E');}} className="morphoKey">E</button>
-                                <button key="keyR" onClick={() => {handleInputLetter('R');}} className="morphoKey">R</button>
-                                <button key="keyT" onClick={() => {handleInputLetter('T');}} className="morphoKey">T</button>
-                                <button key="keyY" onClick={() => {handleInputLetter('Y');}} className="morphoKey">Y</button>
-                                <button key="keyU" onClick={() => {handleInputLetter('U');}} className="morphoKey">U</button>
-                                <button key="keyI" onClick={() => {handleInputLetter('I');}} className="morphoKey">I</button>
-                                <button key="keyO" onClick={() => {handleInputLetter('O');}} className="morphoKey">O</button>
-                                <button key="keyP" onClick={() => {handleInputLetter('P');}} className="morphoKey">P</button>
-                            </div>
-                            <div className="morphoKeyrow2">
-                                <button key="keyA" onClick={() => {handleInputLetter('A');}} className="morphoKey">A</button>
-                                <button key="keyS" onClick={() => {handleInputLetter('S');}} className="morphoKey">S</button>
-                                <button key="keyD" onClick={() => {handleInputLetter('D');}} className="morphoKey">D</button>
-                                <button key="keyF" onClick={() => {handleInputLetter('F');}} className="morphoKey">F</button>
-                                <button key="keyG" onClick={() => {handleInputLetter('G');}} className="morphoKey">G</button>
-                                <button key="keyH" onClick={() => {handleInputLetter('H');}} className="morphoKey">H</button>
-                                <button key="keyJ" onClick={() => {handleInputLetter('J');}} className="morphoKey">J</button>
-                                <button key="keyK" onClick={() => {handleInputLetter('K');}} className="morphoKey">K</button>
-                                <button key="keyL" onClick={() => {handleInputLetter('L');}} className="morphoKey">L</button>
-                            </div>
-                            <div className="morphoKeyrow3">
-                                <button key="keyZ" onClick={() => {handleInputLetter('Z');}} className="morphoKey">Z</button>
-                                <button key="keyX" onClick={() => {handleInputLetter('X');}} className="morphoKey">X</button>
-                                <button key="keyC" onClick={() => {handleInputLetter('C');}} className="morphoKey">C</button>
-                                <button key="keyV" onClick={() => {handleInputLetter('V');}} className="morphoKey">V</button>
-                                <button key="keyB" onClick={() => {handleInputLetter('B');}} className="morphoKey">B</button>
-                                <button key="keyN" onClick={() => {handleInputLetter('N');}} className="morphoKey">N</button>
-                                <button key="keyM" onClick={() => {handleInputLetter('M');}} className="morphoKey">M</button>
-                            </div> */}
-                            <div className="morphoKeyrow4">
-                                <button key="keyCopydown" onClick={() => {copyDownLetter();}} className="morphoCopydownKey">COPY DOWN</button>
-                                <button key="keyCopyup" onClick={() => {copyUpLetter();}} className="morphoCopyupKey">COPY UP</button>
-                            </div>
-                            {!puzzleSolved && filledin && <div className="morphoKeyrow4">
-                                <button className="trButton" onClick={() => {checkSolution();}}>
-                                    SUBMIT YOUR SOLUTION
-                                </button>
-                            </div>}
-                        </div>
-                        <p>Change one letter at a time to get from {firstWord} to {lastWord}.
-                        Each interim word must be a valid word.</p>
-                        <p>COPY DOWN copies a letter down from the row above.
-                        COPY UP copies a letter up from the bottom row.</p>
-                        <p>Click a letter on the bottom row to use it as the swap on the selected row.</p>
-                    </div>}
-                    {puzzleSolved ?
-                        <div>
-                            <h3 className="trEmphasis">Success!</h3>
-                            <MobileOnlyView>
-                                <button key="genMobile" className="trButton" onClick={() => {
-                                    setInitialBoard(nextNumCols);
-                                }}>
-                                    GENERATE {nextNumCols} LETTER PUZZLE
-                                </button>
-                                {nextNumCols < 5 && <button key="longerPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
-                                    setNextNumCols(nextNumCols+1);
-                                }}>+</button>}
-                                {nextNumCols > 3 && <button key="shorterPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
-                                    setNextNumCols(nextNumCols-1);
-                                }}>-</button>}
-                            </MobileOnlyView>
-                            <BrowserView>
-                                <button key="genBrowser" className="trButton" onClick={() => {
-                                    setInitialBoard(nextNumCols);
-                                    }}>
-                                    GENERATE {nextNumCols} LETTER PUZZLE
-                                </button>
-                                {nextNumCols < 7 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
-                                    setNextNumCols(nextNumCols+1);
-                                }}>+</button>}
-                                {nextNumCols > 3 && <button key="shorterPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
-                                    setNextNumCols(nextNumCols-1);
-                                }}>-</button>}
-                            </BrowserView>
-                        </div>
-                    :
-                        <button className="trButton" onClick={() => {toggleShowSolution();}}>
-                            {`${showSolution ? 'HIDE SOLUTION' : 'SHOW A SOLUTION'}`}
-                        </button>
-                    }
-                </div>
-            </div>}
+            {starting ?
+                promptForPuzzleGeneration
+            :
+            loading ?
+                <div key="pleasewait" className="trEmphasis">Creating puzzle, please be patient...</div>
+            :
+                renderThePuzzle
+            }
         </div>
     )
 }
