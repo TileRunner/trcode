@@ -611,9 +611,10 @@ const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, curren
   // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
   // Word at row index 3 must have 3 letter swaps relative to the start word, and 1 relative to previous word
   // Etc. So pass row index to requiredDiffLetterCount.
-  // Try to avoid nasty words, kids might be seeing this.
-  let familyUnfriendly = /(unt)|(uck)|(wat)/
-  if (currentWord.match(familyUnfriendly) || previousWord.match(familyUnfriendly)) {
+  // Try to avoid nasty words, kids might be seeing this. Some innocent words will be omitted.
+  // Avoid words ending in S to make the puzzles more interesting / challenging.
+  let avoidThese = /(cunt)|(fuck)|(suck)|(spick)|(twat)|(shit)|(wog)|(nigger)|(arsehole)|(dick)|(bitch)|(tits)|(cock)|(blowjob)|(slut)|(butt)|(whore)|(booty)|(dyke)|(boob)|(cum)|(jism)|(jizz)|(sex)|(rape)|(dildo)|(clit)|(dark)|(pale)|(honk)|(black)|(white)|(piss)|(fag)|(porn)|(boy)|(girl)|(man)|(men)|(s\b)/
+  if (currentWord.match(avoidThese) || previousWord.match(avoidThese)) {
     return false;
   }
   let startLetters = Array.from(startWord);

@@ -45,8 +45,8 @@
 }
 .morphoCellNoLetter {
     background-image: url('../../public/tileLarvalStage.png');
-    color: whitesmoke;
-    opacity: 50%;
+    color: whitescmoke;
+    /* opacity: 50%; */
 }
 .morphoCellLarva {
     background-image: url('../../public/tileLarvalStage.png');
@@ -56,7 +56,7 @@
 .morphoCellCocoon {
     background-image: url('../../public/tileCocoonStage.png');
     color: whitesmoke;
-    font-weight: bold;
+    font-weight: bolder;
 }
 .morphoCellSelected {
     border: 1px solid cyan;
