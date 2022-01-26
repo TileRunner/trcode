@@ -23,6 +23,19 @@ const Morpho = ({setWhereto}) => {
     const [lastWord, setLastWord] = useState('');
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState({row:1, col:0}); // Natural place to start entering letters
+
+    const callForPuzzle = async(wordLength) => {
+        let data = {};
+        try {
+            let url = `${baseurl}/ENABLE2K?morpho=true&len=${wordLength}`;
+            const response = await fetch(url);
+            data = await response.json();                
+        } catch (error) {
+            data.notes = "Problem with the server. Sorry about that.";
+            console.log(error);
+        }
+        return data;
+    }
     const setInitialBoard = async(wordLength) => { // Initial board of given size
         let numberOfRows = wordLength + 1;
         let numberOfCols = wordLength;
@@ -35,9 +48,7 @@ const Morpho = ({setWhereto}) => {
         setNumCols(wordLength);
         setNumRows(wordLength+1);
         let rowArray = [];
-        let url = `${baseurl}/ENABLE2K?morpho=true&len=${wordLength}`;
-        const response = await fetch(url);
-        const data = await response.json();
+        const data = await callForPuzzle(wordLength);
         if (!data.notes || data.notes.length === 0) { // Ok result
             for (let rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
                 const rowWord = data.puzzle[rowIndex].toUpperCase();
