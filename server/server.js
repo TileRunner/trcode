@@ -615,8 +615,8 @@ const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, curren
   // Avoid words ending in S for shorter puzzles to make the puzzles more interesting / challenging.
   // Allow it for longer puzzles so it finds a puzzle sooner.
   let currentLetters = Array.from(currentWord);
-  if (currentLetters.len < 6 && currentLetters[currentLetters.length-1] === "s") {
-    return;
+  if (currentLetters.length < 6 && currentLetters[currentLetters.length-1] === "s") {
+    return false;
   }
   let startLetters = Array.from(startWord);
   let previousLetters = Array.from(previousWord);
