@@ -37,19 +37,17 @@ const Morpho = ({setWhereto}) => {
         return data;
     }
     const setInitialBoard = async(wordLength) => { // Initial board of given size
-        let numberOfRows = wordLength + 1;
-        let numberOfCols = wordLength;
         setStarting(false);
         setLoading(true);
         setChecking(false);
         setShowSolution(false);
         setFilledin(false);
         setPuzzleSolved(false);
-        setNumCols(wordLength);
-        setNumRows(wordLength+1);
         let rowArray = [];
         const data = await callForPuzzle(wordLength);
         if (!data.notes || data.notes.length === 0) { // Ok result
+            let numberOfRows = data.numRows;
+            let numberOfCols = data.numCols;
             for (let rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
                 const rowWord = data.puzzle[rowIndex].toUpperCase();
                 if (rowIndex === 0) {
@@ -73,6 +71,8 @@ const Morpho = ({setWhereto}) => {
                 }
                 rowArray.push({filledin:rowFilledIn, colArray:colArray});
             }
+            setNumCols(numberOfCols);
+            setNumRows(numberOfRows);
             setBoard(rowArray);
             setSelected({row:1,col:0});
             setLoading(false);
@@ -104,7 +104,10 @@ const Morpho = ({setWhereto}) => {
                 newBoard[selected.row].colArray[ci].className = cssCocoon;               
             }
             newBoard[selected.row].filledin = true;
-            let newSelected = {row:selected.row+1,col:0};
+            let newSelected = {row: selected.row + 1, col: 0};
+            if (newSelected.row >= numRows - 1) {
+                newSelected.row = 1;
+            }
             setSelected(newSelected);
             setBoard(newBoard);
             if (newBoard.filter(r => {return !r.filledin;}).length === 0) {
@@ -346,12 +349,13 @@ const Morpho = ({setWhereto}) => {
             } }>
                 GENERATE {nextNumCols} LETTER PUZZLE
             </button>
-            {nextNumCols < 7 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
+            {nextNumCols < 8 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
                 setNextNumCols(nextNumCols + 1);
             } }>+</button>}
             {nextNumCols > 3 && <button key="shorterPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
                 setNextNumCols(nextNumCols - 1);
             } }>-</button>}
+            <p className="trWarning">8 letter puzzles can take a while to generate.</p>
         </BrowserView>
     </div>;
 

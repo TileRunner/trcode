@@ -226,13 +226,16 @@ const server = express()
             notes.push('Value of &len should be numeric.');
           } else {
             numCols = Number(req.query.len);
-            if (numCols > 7) {
-              notes.push('Maximum value of &len is 7.');
+            if (numCols > 8) {
+              notes.push('Maximum value of &len is 8.');
             } else if (numCols < 2) {
               notes.push('Minimum value of &len is 2.');
             } else {
               numRows = numCols + 1;
-              jret.numRows = numCols;
+              if (numCols === 8) {
+                numRows = 8; // The most I ever saw it get was rowIndex 7 after many thousands of iterations
+              }
+              jret.numRows = numRows;
               jret.numCols = numCols;
             }
           }
@@ -243,7 +246,7 @@ const server = express()
           }
           let morpho = createMorphoPuzzle(numRows, numCols);
           if (morpho.fail) {
-            jret.fail = morpho.notes = [fail];
+            jret.notes = [morpho.fail];
           } else {
             jret.puzzle = morpho.puzzle;
           }
@@ -576,11 +579,16 @@ const createMorphoPuzzle = (numRows=3, numCols=3) => {
     return e.length === numCols;
   });
   let protector = 0;
-  let protectorMax = 5000;
+  let protectorMax = 200000;
   let puzzle = Array(numRows);
   let candidatesByRow = Array(numRows);
   let rowIndex = 0;
   candidatesByRow[rowIndex] = [...wordssamelength];
+  // Avoid words ending in S for shorter puzzles to make the puzzles more interesting / challenging.
+  // Allow it for longer puzzles so it finds a puzzle sooner.
+  if (numCols < 6) {
+    candidatesByRow[0] = candidatesByRow[0].filter(w => {return w[numCols-1] !== 's';});
+  }
   while (rowIndex > -1 && rowIndex < numRows && protector < protectorMax) {
     protector++;
     if (candidatesByRow[rowIndex].length === 0) { // Ran out of candidates for this row index
@@ -601,11 +609,22 @@ const createMorphoPuzzle = (numRows=3, numCols=3) => {
     fail = 'Program quit to protect against infinite looping.';
   } else if (rowIndex < 0) {
     fail = `Cannot seem to make a puzzle ${numRows} rows by ${numCols} columns.`;
+  } else {
+    console.log(`Morpho puzzle protector count ${protector} for ${numRows} rows by ${numCols} cols.`);
+    console.log(puzzle);
   }
   return {puzzle: puzzle, fail: fail};
 }
 
-const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, currentWord) => {
+/**
+ * Determine whether the current word is a valid moved from the previous word when generating a Morpho puzzle
+ * @param {string} startWord The first word in the puzzle
+ * @param {number} requiredDiffLetterCount How many letters must be different between startWord and currentWord
+ * @param {string} previousWord The previous word in the puzzle
+ * @param {string} currentWord The current word in the puzzle
+ * @returns Whether the current word is a valid move from the previous word
+ */
+const validNextMorph = (startWord="", requiredDiffLetterCount=0, previousWord="", currentWord="") => {
   // Start word is row index 0
   // Word at row index 1 must have 1 letter swap
   // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
@@ -614,19 +633,16 @@ const validNextMorph = (startWord, requiredDiffLetterCount, previousWord, curren
 
   // Avoid words ending in S for shorter puzzles to make the puzzles more interesting / challenging.
   // Allow it for longer puzzles so it finds a puzzle sooner.
-  let currentLetters = Array.from(currentWord);
-  if (currentLetters.length < 6 && currentLetters[currentLetters.length-1] === "s") {
+  if (currentWord.length < 6 && currentWord[currentWord.length-1] === "s") {
     return false;
   }
-  let startLetters = Array.from(startWord);
-  let previousLetters = Array.from(previousWord);
   let diffFromStartCount = 0;
   let diffFromPreviousCount = 0;
-  for (let i = 0; i < currentLetters.length; i++) {
-    if (currentLetters[i] !== startLetters[i]) {
+  for (let i = 0; i < currentWord.length; i++) {
+    if (currentWord[i] !== startWord[i]) {
       diffFromStartCount++;
     }
-    if (currentLetters[i] !== previousLetters[i]) {
+    if (currentWord[i] !== previousWord[i]) {
       diffFromPreviousCount++;
     }
   }
