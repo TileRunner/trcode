@@ -11,8 +11,30 @@ const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
 const { fybPrepickTiles} = require('./fyb/functions/pickLetters');
+const { getAnagrams, getSwaps, getDrops, getInserts, createMorphoPuzzle, createTransmogrifyPuzzle} = require('./wordstuff/wordfunctions');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
+// 2 letters words at [2] .... 8 letter words at [8].
+const wordsByLength = [
+  [],[] // No zero or one letter words
+  , allwords.filter(w => {return w.length === 2;})
+  , allwords.filter(w => {return w.length === 3;})
+  , allwords.filter(w => {return w.length === 4;})
+  , allwords.filter(w => {return w.length === 5;})
+  , allwords.filter(w => {return w.length === 6;})
+  , allwords.filter(w => {return w.length === 7;})
+  , allwords.filter(w => {return w.length === 8;})
+  ];
+const alphagramsByLength = [
+  [],[] // No zero or one letter words
+  , []//makeAlphagramList(wordsByLength[2])
+  , []//makeAlphagramList(wordsByLength[3])
+  , makeAlphagramList(wordsByLength[4])
+  , makeAlphagramList(wordsByLength[5])
+  , makeAlphagramList(wordsByLength[6])
+  , []//makeAlphagramList(wordsByLength[7])
+  , []//makeAlphagramList(wordsByLength[8])
+  ];
 const clubdata = readclubdata();
 const chats = [];
 const logmsgs = ['Server start'];
@@ -51,74 +73,28 @@ function readWordList() {
     }
     return data;
 }
+
+function makeAlphagramList(wordlist) {
+  let alphagrams = [];
+  let anagrams = [];
+  wordlist.forEach(word => {
+    let a = Array.from(word);
+    a.sort();
+    let alphagram = a.join('');
+    let i = alphagrams.indexOf(alphagram);
+    if (i < 0) {
+      alphagrams.push(alphagram);
+      anagrams.push([word]);
+    } else {
+      anagrams[i].push(word);
+    }
+  });
+  return {alphagrams: alphagrams, anagrams: anagrams};
+}
+
 function getValid(word, wordssamelength) {
     return wordssamelength.indexOf(word) > -1 ? 'Y' : 'N'
 }
-function getAnagrams(word, wordssamelength) {
-    let anagrams = []
-    let alphagramarray = word.split('')
-    alphagramarray.sort()
-    let alphagram = alphagramarray.join()
-    let checkword = ''
-    for (checkword of wordssamelength) {
-      if (checkword !== word) {
-        let newalphagram = checkword.split('')
-        newalphagram.sort()
-        let calphagram = newalphagram.join()
-        if (alphagram === calphagram) {
-          anagrams = [...anagrams, checkword]
-        }
-      }
-    }
-    return anagrams
-}
-  
-function getSwaps(word, wordssamelength) {
-    let swaps = []
-    let alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    for (var i = 0; i < word.length; i++) {
-      let swap = ''
-      for (var j = 0; j < 26; j++) {
-        if (word[i] !== alphabet[j]) {
-          let testword = [...word]
-          testword[i] = alphabet[j]
-          let checkword = testword.join('')
-          if (wordssamelength.indexOf(checkword) > -1) {
-            swap = swap + alphabet[j]
-          }
-        }
-      }
-      swaps = [...swaps, swap]
-    }
-    return swaps
-}
-function getDrops(word, wordsonelesslength) {
-    let drops = []
-    for (var i = 0; i < word.length; i++) {
-      let testword = word.split('').filter((el,index) => {return index !== i;})
-      let checkword = testword.join('')
-      let drop = wordsonelesslength.indexOf(checkword) > -1 ? 'Y' : 'N'
-      drops = [...drops, drop]
-    }
-    return drops
-}
-function getInserts(word, wordsonelonger) {
-    let inserts = []
-    let alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    for (var i = 0; i <= word.length; i++) {
-      let insert = ''
-      for (var j = 0; j < 26; j++) {
-        let testword = word.split('')
-        testword.splice(i, 0, alphabet[j])
-        let checkword = testword.join('')
-        if (wordsonelonger.indexOf(checkword) > -1) {
-          insert = insert + alphabet[j]
-        }
-    }
-      inserts = [...inserts, insert]
-    }
-    return inserts
-}  
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
     .get("/evtest", (_req, res) => {
@@ -244,11 +220,48 @@ const server = express()
             res.send(jret);
             return;
           }
-          let morpho = createMorphoPuzzle(numRows, numCols);
+          let morpho = createMorphoPuzzle(allwords, numRows, numCols);
           if (morpho.fail) {
             jret.notes = [morpho.fail];
           } else {
             jret.puzzle = morpho.puzzle;
+          }
+          res.send(jret);
+          return;
+        }
+        // Handle request for a transmogrify puzzle
+        if (req.query.transmogrify) {
+          // Handle who can call this
+          res.header("Access-Control-Allow-Origin", "*");
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+          let notes = [];
+          let jret = {func:'transmogrify'};
+          // Validate parameters
+          if (!req.query.numMoves) {
+            notes.push('Parameter &numMoves is required.');
+          } else if (isNaN(req.query.numMoves)) {
+            notes.push('Value of &numMoves should be numeric.');
+          } else {
+            let numMoves = Number(req.query.numMoves);
+            if (numMoves > 5) {
+              notes.push('Maximum value of &numMoves is 5.');
+            } else if (numMoves < 2) {
+              notes.push('Minimum value of &numMoves is 2.');
+            } else {
+              jret.numMoves = numMoves;
+            }
+          }
+          if (notes.length > 0) {
+            jret.notes = notes;
+            res.send(jret);
+            return;
+          }
+          let tm = createTransmogrifyPuzzle(wordsByLength, alphagramsByLength, jret.numMoves);
+          if (tm.fail) {
+            jret.notes = [tm.fail];
+          } else {
+            jret.startWord = tm.startWord;
+            jret.targetWord = tm.targetWord;
           }
           res.send(jret);
           return;
@@ -571,80 +584,4 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
       }
     }
   });
-}
-
-const createMorphoPuzzle = (numRows=3, numCols=3) => {
-  let fail = '';
-  let wordssamelength = allwords.filter(function (e) {
-    return e.length === numCols;
-  });
-  let protector = 0;
-  let protectorMax = 200000;
-  let puzzle = Array(numRows);
-  let candidatesByRow = Array(numRows);
-  let rowIndex = 0;
-  candidatesByRow[rowIndex] = [...wordssamelength];
-  // Avoid words ending in S for shorter puzzles to make the puzzles more interesting / challenging.
-  // Allow it for longer puzzles so it finds a puzzle sooner.
-  if (numCols < 6) {
-    candidatesByRow[0] = candidatesByRow[0].filter(w => {return w[numCols-1] !== 's';});
-  }
-  while (rowIndex > -1 && rowIndex < numRows && protector < protectorMax) {
-    protector++;
-    if (candidatesByRow[rowIndex].length === 0) { // Ran out of candidates for this row index
-      rowIndex--; // try again from the previous row
-    } else {
-      let rand = Math.floor(Math.random() * candidatesByRow[rowIndex].length);
-      let newRow = candidatesByRow[rowIndex][rand];
-      candidatesByRow[rowIndex].splice(rand,1);
-      puzzle[rowIndex] = newRow;
-      rowIndex++; // Ends the loop if all rows were filled
-      if (rowIndex < numRows) {
-        // Prep candidates for next row
-        candidatesByRow[rowIndex] = wordssamelength.filter((w) => {return validNextMorph(puzzle[0], rowIndex, puzzle[rowIndex-1], w);});
-      }
-    }
-  }
-  if (protector === protectorMax) {
-    fail = 'Program quit to protect against infinite looping.';
-  } else if (rowIndex < 0) {
-    fail = `Cannot seem to make a puzzle ${numRows} rows by ${numCols} columns.`;
-  } else {
-    console.log(`Morpho puzzle protector count ${protector} for ${numRows} rows by ${numCols} cols.`);
-    console.log(puzzle);
-  }
-  return {puzzle: puzzle, fail: fail};
-}
-
-/**
- * Determine whether the current word is a valid moved from the previous word when generating a Morpho puzzle
- * @param {string} startWord The first word in the puzzle
- * @param {number} requiredDiffLetterCount How many letters must be different between startWord and currentWord
- * @param {string} previousWord The previous word in the puzzle
- * @param {string} currentWord The current word in the puzzle
- * @returns Whether the current word is a valid move from the previous word
- */
-const validNextMorph = (startWord="", requiredDiffLetterCount=0, previousWord="", currentWord="") => {
-  // Start word is row index 0
-  // Word at row index 1 must have 1 letter swap
-  // Word at row index 2 must have 2 letter swaps relative to the start word, and 1 relative to previous word
-  // Word at row index 3 must have 3 letter swaps relative to the start word, and 1 relative to previous word
-  // Etc. So pass row index to requiredDiffLetterCount.
-
-  // Avoid words ending in S for shorter puzzles to make the puzzles more interesting / challenging.
-  // Allow it for longer puzzles so it finds a puzzle sooner.
-  if (currentWord.length < 6 && currentWord[currentWord.length-1] === "s") {
-    return false;
-  }
-  let diffFromStartCount = 0;
-  let diffFromPreviousCount = 0;
-  for (let i = 0; i < currentWord.length; i++) {
-    if (currentWord[i] !== startWord[i]) {
-      diffFromStartCount++;
-    }
-    if (currentWord[i] !== previousWord[i]) {
-      diffFromPreviousCount++;
-    }
-  }
-  return (diffFromStartCount === requiredDiffLetterCount && diffFromPreviousCount === 1);
 }

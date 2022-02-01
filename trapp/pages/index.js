@@ -7,6 +7,7 @@ import FryYourBrain from './fyb/fryyourbrain';
 import FryYourBrainSolo from './fyb/fybSolo';
 import ScrabbleClub from './sc/scrabbleclub';
 import Morpho from './morpho/morpho';
+import Transmogrify from './tm/tm';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
@@ -21,6 +22,7 @@ export default function Home() {
       {whereto === 'fybsolo' && <FryYourBrainSolo setWhereto={setWhereto}></FryYourBrainSolo>}
       {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
       {whereto === 'morpho' && <Morpho setWhereto={setWhereto}></Morpho>}
+      {whereto === 'tm' && <Transmogrify setWhereto={setWhereto}></Transmogrify>}
     </div>
   )
 }
@@ -34,6 +36,7 @@ const Menu = (props) => {
   const [descFybsolo, setDescFybsolo] = useState(false); // describe fry your brain solo
   const [descSc, setDescSc] = useState(false); // describe scrabble club
   const [descMorpho, setDescMorpho] = useState(false); // describe morpho
+  const [descTm, setDescTm] = useState(false); // describe transmogrify
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -133,7 +136,12 @@ const Menu = (props) => {
   </div>;
 
   const DescribeMorpho = <div className="trParagraph">
-    <h1>UNDER CONSTRUCTION</h1>
+    <p>This is a single player puzzle where you swap one letter at a time to get from one word to another. Each interim word must be valid.</p>
+  </div>
+
+  const DescribeTransmogrify = <div className="trParagraph">
+    <p>Under construction.</p>
+    <p>Like Morpho, but you can also insert a letter, drop a letter, or anagram the word.</p>
   </div>
 
   const Acknowledge = (props) => {
@@ -159,6 +167,7 @@ const Menu = (props) => {
 
   const DescribeEnable2k = <div className="trParagraph trEmphasis">
     <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
+    <p>I took some words out to try and keep things family friendly, but there still could be some bad words.</p>
   </div>
 
   const DescribeFriends = <div className="trParagraph trEmphasis">
@@ -195,6 +204,7 @@ return (
               <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
               <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
               <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
+              <MenuOption descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
             </tbody>
           </table>
         </BrowserView>
@@ -206,6 +216,7 @@ return (
               <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
               <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
               <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
+              <MenuOption descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
             </tbody>
           </table>
         </MobileOnlyView>
@@ -216,6 +227,7 @@ return (
         {descFybsolo && DescribeFryYourBrainSolo}
         {descSc && DescribeScrabbleClub}
         {descMorpho && DescribeMorpho}
+        {descTm && DescribeTransmogrify}
       </div>
       <div className="trParagraph">
         <div className="trTitle">
