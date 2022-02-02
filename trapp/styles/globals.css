@@ -47,3 +47,32 @@ a {
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+.artworkDiv {
+  color: black;
+  background-color: whitesmoke;
+  width: 350px;
+}
+.artwork {
+  border: 1px solid greenyellow;
+  background-image: url('../public/MorphoCaterpillar.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 350px;
+  width: 350px;
+}
+.artwork2 {
+  border: 1px solid greenyellow;
+  background-image: url('../public/MorphoCocoon.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 350px;
+  width: 350px;
+}
+.artwork3 {
+  border: 1px solid greenyellow;
+  background-image: url('../public/MorphoButterfly.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 350px;
+  width: 350px;
+}

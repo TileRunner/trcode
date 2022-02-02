@@ -175,12 +175,11 @@ const Menu = (props) => {
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
-  const DescribePhotos = <div className="trParagraph trEmphasis">
-    Photos may be cropped and/or resized. Follow links to see more about the photographers.
-    <p/>
-    <p>Morpho larva Photo by <a href="https://www.pexels.com/@ekamelev?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels">Egor Kamelev from Pexels</a></p>
-    <p>Morpho cocoon Photo by <a href="https://unsplash.com/@scw1217?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Suzanne D. Williams</a> on <a href="https://unsplash.com/s/photos/morpho-cocoon?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
-    <p>Morpho butterlfy Photo by <a href="https://www.pexels.com/@fotostudio-all-eyes-on-you-134458509?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels">Fotostudio - All Eyes On You</a> from Pexels</p>
+  const DescribePhotos = <div className="artworkDiv">
+    Butterflies drawn by Lennon Sykes.
+    <div className="artwork"></div>
+    <div className="artwork2"></div>
+    <div className="artwork3"></div>
   </div>
 
   const MenuOptionKmMarkers = () => <div className="trParagraph">
@@ -244,7 +243,7 @@ return (
             <tbody>
               <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
               <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
-              <Acknowledge ackText='Photos By' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
+              <Acknowledge ackText='Art Work' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
             </tbody>
           </table>
           {descEnable2k && DescribeEnable2k}
