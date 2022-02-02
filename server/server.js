@@ -26,15 +26,25 @@ const wordsByLength = [
   , allwords.filter(w => {return w.length === 8;})
   ];
 const alphagramsByLength = [
-  [],[] // No zero or one letter words
-  , []//makeAlphagramList(wordsByLength[2])
-  , []//makeAlphagramList(wordsByLength[3])
+  {},{} // No zero or one letter words
+  , {}//makeAlphagramList(wordsByLength[2])
+  , {}//makeAlphagramList(wordsByLength[3])
   , makeAlphagramList(wordsByLength[4])
   , makeAlphagramList(wordsByLength[5])
   , makeAlphagramList(wordsByLength[6])
-  , []//makeAlphagramList(wordsByLength[7])
-  , []//makeAlphagramList(wordsByLength[8])
+  , {}//makeAlphagramList(wordsByLength[7])
+  , {}//makeAlphagramList(wordsByLength[8])
   ];
+const anagramsByLength = [
+  {},{} // No zero or one letter words
+  , {}//makeAnagramList(wordsByLength[2])
+  , {}//makeAnagramList(wordsByLength[3])
+  , makeAnagramList(wordsByLength[4])
+  , makeAnagramList(wordsByLength[5])
+  , makeAnagramList(wordsByLength[6])
+  , {}//makeAnagramList(wordsByLength[7])
+  , {}//makeAnagramList(wordsByLength[8])
+]
 const clubdata = readclubdata();
 const chats = [];
 const logmsgs = ['Server start'];
@@ -74,22 +84,25 @@ function readWordList() {
     return data;
 }
 
+function makeAnagramList(wordlist) {
+  let anagrams = Object.assign({}, ...wordlist.map(w => ({[w]: true})));
+  return anagrams;
+}
+
 function makeAlphagramList(wordlist) {
-  let alphagrams = [];
-  let anagrams = [];
+  let alphagrams = {};
   wordlist.forEach(word => {
     let a = Array.from(word);
     a.sort();
     let alphagram = a.join('');
-    let i = alphagrams.indexOf(alphagram);
-    if (i < 0) {
-      alphagrams.push(alphagram);
-      anagrams.push([word]);
-    } else {
-      anagrams[i].push(word);
+    let anagrams = [];
+    if (alphagrams[alphagram]) {
+      anagrams = alphagrams[alphagram].anagrams;
     }
+    anagrams.push(word);
+    alphagrams = Object.assign(alphagrams, {[alphagram]: {anagrams: anagrams}});
   });
-  return {alphagrams: alphagrams, anagrams: anagrams};
+  return alphagrams;
 }
 
 function getValid(word, wordssamelength) {
@@ -243,8 +256,8 @@ const server = express()
             notes.push('Value of &numMoves should be numeric.');
           } else {
             let numMoves = Number(req.query.numMoves);
-            if (numMoves > 5) {
-              notes.push('Maximum value of &numMoves is 5.');
+            if (numMoves > 9) {
+              notes.push('Maximum value of &numMoves is 9.');
             } else if (numMoves < 2) {
               notes.push('Minimum value of &numMoves is 2.');
             } else {
@@ -256,7 +269,7 @@ const server = express()
             res.send(jret);
             return;
           }
-          let tm = createTransmogrifyPuzzle(wordsByLength, alphagramsByLength, jret.numMoves);
+          let tm = createTransmogrifyPuzzle(anagramsByLength, alphagramsByLength, jret.numMoves);
           if (tm.fail) {
             jret.notes = [tm.fail];
           } else {
