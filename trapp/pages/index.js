@@ -175,12 +175,32 @@ const Menu = (props) => {
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
-  const DescribePhotos = <div className="artworkDiv">
-    Butterflies drawn by Lennon Sykes.
-    <div className="artwork"></div>
-    <div className="artwork2"></div>
-    <div className="artwork3"></div>
-  </div>
+  const DescribePhotos = () => {
+    const [artindex, setArtindex] = useState(1);
+    const artindexMax = 3;
+    function moveLeft() {
+      if (artindex === 1) {
+        setArtindex(artindexMax);
+      } else {
+        setArtindex(artindex-1);
+      }
+    }
+    function moveRight() {
+      if (artindex === artindexMax) {
+        setArtindex(1);
+      } else {
+        setArtindex(artindex+1);
+      }
+    }
+    return (<div className="artworkDiv">
+    <div>
+      Drawings by Lennon Sykes.
+      <button onClick={() => {moveLeft();}} className="moveLeftButton">&lt;</button>
+      <button onClick={() => {moveLeft();}} className="moveRightButton">&gt;</button>
+    </div>
+    <div className={`artwork${artindex}`}></div>
+  </div>);
+  }
 
   const MenuOptionKmMarkers = () => <div className="trParagraph">
     Hamilton to Cambridge Rail Trail:
@@ -248,7 +268,7 @@ return (
           </table>
           {descEnable2k && DescribeEnable2k}
           {descFriends && DescribeFriends}
-          {descPhotos && DescribePhotos}
+          {descPhotos && <DescribePhotos/>}
         </div>
       </div>
     </div>
