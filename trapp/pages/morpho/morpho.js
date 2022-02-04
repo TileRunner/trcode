@@ -334,7 +334,7 @@ const Morpho = ({setWhereto}) => {
             <button key="genMobile" className="trButton" onClick={() => {
                 setInitialBoard(nextNumCols);
             } }>
-                GENERATE {nextNumCols} LETTER PUZZLE
+                {nextNumCols} LETTER PUZZLE
             </button>
             {nextNumCols < 5 && <button key="longerPuzzleMobile" className="morphoPuzzleSizeKey" onClick={() => {
                 setNextNumCols(nextNumCols + 1);
@@ -347,7 +347,7 @@ const Morpho = ({setWhereto}) => {
             <button key="genBrowser" className="trButton" onClick={() => {
                 setInitialBoard(nextNumCols);
             } }>
-                GENERATE {nextNumCols} LETTER PUZZLE
+                {nextNumCols} LETTER PUZZLE
             </button>
             {nextNumCols < 8 && <button key="longerPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
                 setNextNumCols(nextNumCols + 1);
@@ -355,7 +355,6 @@ const Morpho = ({setWhereto}) => {
             {nextNumCols > 3 && <button key="shorterPuzzle" className="morphoPuzzleSizeKey" onClick={() => {
                 setNextNumCols(nextNumCols - 1);
             } }>-</button>}
-            <p className="trWarning">8 letter puzzles can take a while to generate.</p>
         </BrowserView>
     </div>;
 

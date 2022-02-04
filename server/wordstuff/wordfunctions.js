@@ -173,16 +173,14 @@ function getInserts(word, wordsonelonger) {
 /**
  * Create a morpho puzzle. The rules of the puzzle are to go from the first word to the last by swapping one letter at a time.
  * Each interim word must be a valid word.
- * @param {string[]} allwords A word list (lexicon)
+ * @param {object} anagrams An object where the properties are the words of length numCols.
  * @param {int} numRows How many rows to generate
  * @param {int} numCols How many columns to generate (word length)
  * @returns A json object. 'fail' is the reason for failing, if any. 'puzzle' is the generated puzzle with a possible solution filled in.
  */
-function createMorphoPuzzle (allwords=[], numRows=3, numCols=3) {
+function createMorphoPuzzle (anagrams, numRows=3, numCols=3) {
     let fail = '';
-    let wordssamelength = allwords.filter(function (e) {
-      return e.length === numCols;
-    });
+    let wordssamelength = Object.keys(anagrams);
     let protector = 0;
     let protectorMax = 200000;
     let puzzle = Array(numRows);
@@ -207,7 +205,8 @@ function createMorphoPuzzle (allwords=[], numRows=3, numCols=3) {
         rowIndex++; // Ends the loop if all rows were filled
         if (rowIndex < numRows) {
           // Prep candidates for next row
-          candidatesByRow[rowIndex] = wordssamelength.filter((w) => {return validNextMorph(puzzle[0], rowIndex, puzzle[rowIndex-1], w);});
+          let swaps = getSwapWords(puzzle[rowIndex-1], anagrams);
+          candidatesByRow[rowIndex] = swaps.filter((w) => {return validNextMorph(puzzle[0], rowIndex, puzzle[rowIndex-1], w);});
         }
       }
     }

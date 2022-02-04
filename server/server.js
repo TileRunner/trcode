@@ -27,23 +27,23 @@ const wordsByLength = [
   ];
 const alphagramsByLength = [
   {},{} // No zero or one letter words
-  , {}//makeAlphagramList(wordsByLength[2])
-  , {}//makeAlphagramList(wordsByLength[3])
+  , makeAlphagramList(wordsByLength[2])
+  , makeAlphagramList(wordsByLength[3])
   , makeAlphagramList(wordsByLength[4])
   , makeAlphagramList(wordsByLength[5])
   , makeAlphagramList(wordsByLength[6])
-  , {}//makeAlphagramList(wordsByLength[7])
-  , {}//makeAlphagramList(wordsByLength[8])
+  , makeAlphagramList(wordsByLength[7])
+  , makeAlphagramList(wordsByLength[8])
   ];
 const anagramsByLength = [
   {},{} // No zero or one letter words
-  , {}//makeAnagramList(wordsByLength[2])
-  , {}//makeAnagramList(wordsByLength[3])
+  , makeAnagramList(wordsByLength[2])
+  , makeAnagramList(wordsByLength[3])
   , makeAnagramList(wordsByLength[4])
   , makeAnagramList(wordsByLength[5])
   , makeAnagramList(wordsByLength[6])
-  , {}//makeAnagramList(wordsByLength[7])
-  , {}//makeAnagramList(wordsByLength[8])
+  , makeAnagramList(wordsByLength[7])
+  , makeAnagramList(wordsByLength[8])
 ]
 const clubdata = readclubdata();
 const chats = [];
@@ -233,7 +233,7 @@ const server = express()
             res.send(jret);
             return;
           }
-          let morpho = createMorphoPuzzle(allwords, numRows, numCols);
+          let morpho = createMorphoPuzzle(anagramsByLength[numCols], numRows, numCols);
           if (morpho.fail) {
             jret.notes = [morpho.fail];
           } else {
