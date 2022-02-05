@@ -1,0 +1,66 @@
+.numMovesDiv {
+    background-color: blue;
+    color: whitesmoke;
+    padding: 5px 5px;
+    width: fit-content;
+    text-align: center;
+}
+.numMovesSelected {
+    background-color: whitesmoke;
+    color: black;
+    margin-right: 2px;
+}
+.numMovesSelected:focus {
+    outline: none;
+}
+.numMovesUnselected {
+    background-color: black;
+    color: whitesmoke;
+    outline: none;
+    margin-right: 2px;
+}
+.numMovesUnselected:focus {
+    outline: none;
+}
+.startPuzzleDiv {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+.puzzleDiv {
+    padding: 2px 35px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: blue;
+    color: whitesmoke;
+    width: fit-content;
+}
+.puzzleDiv span:nth-child(1)::after {
+    content: '....... ';
+    color: blue;
+}
+.puzzleDiv span:nth-child(3)::after {
+    content: '..... ';
+    color: blue;
+}
+.puzzleDiv span:nth-child(5)::after {
+    content: '.';
+    color: blue;
+}
+.puzzleDiv span:nth-child(odd) {
+    background-color: blue;
+    margin-right: 5px;
+}
+.puzzleDiv span:nth-child(even) {
+    background-color: black;
+    color: whitesmoke;
+    text-transform: uppercase;
+    text-align: right;
+}
+.puzzleDiv span:nth-child(even)::after {
+    content: '\A';
+    white-space: pre;
+}
+.puzzleDiv p {
+    margin-top: 15px;
+}

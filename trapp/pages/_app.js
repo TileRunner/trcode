@@ -4,6 +4,7 @@ import './wm/mastermind.css'
 import './pb/prisonbreak.css'
 import './fyb/fyb.css'
 import './morpho/morpho.css'
+import './tm/tm.css'
 import Head from 'next/head'
 
 function MyApp({Component,pageProps}) {
