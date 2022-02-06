@@ -26,13 +26,13 @@ const Transmogrify = ({setWhereto}) => {
     }
     const acceptNextWord = async(e) => {
         e.preventDefault();
-        let prevWord = words.length === 0 ? puzzle.startWord : words[words.length - 1];
-        let newWord = nextWord.trim();
+        let prevWord = (words.length === 0 ? puzzle.startWord : words[words.length - 1]).toLowerCase();
+        let newWord = nextWord.trim().toLowerCase();
         if (validMove(newWord, prevWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
             } else {
-                let lastWord = puzzle.targetWord;
+                let lastWord = puzzle.targetWord.toLowerCase();
                 let newWords = [...words];
                 newWords.push(newWord);
                 setWords(newWords);
@@ -46,7 +46,7 @@ const Transmogrify = ({setWhereto}) => {
         }
     }
     const validMove = (prevWord="", newWord="") => {
-        if (prevWord.toLowerCase() === newWord.toLowerCase()) {
+        if (prevWord === newWord) {
             return false;
         }
         return (areAnagrams(prevWord, newWord)
