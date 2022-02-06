@@ -1,8 +1,7 @@
 .tm_numMovesDiv {
-    margin-top: 5px;
+    padding-bottom: 2px;
     background-color: blue;
     color: whitesmoke;
-    padding: 5px 5px;
     text-align: center;
 }
 .tm_numMovesSelected {
@@ -28,18 +27,18 @@
     text-align: center;
 }
 .tm_puzzleDiv {
+    text-align: center;
     padding: 5px;
     margin-top: 5px;
-    margin-bottom: 5px;
     background-color: blue;
     color: whitesmoke;
 }
-.tm_puzzleDiv td:nth-child(odd) {
+.tm_puzzleDiv span:nth-child(even) {
     background-color: blue;
     padding-right: 10px;
 }
-.tm_puzzleDiv td:nth-child(even) {
-    background-color: black;
+.tm_puzzleDiv span:nth-child(1) {
+    background-color: green;
     padding: 0px 5px;
     color: whitesmoke;
     text-transform: uppercase;
@@ -47,8 +46,28 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: larger;
 }
+.tm_puzzleDiv span:nth-child(2) {
+    padding-left: 10px;
+}
+.tm_puzzleDiv span:nth-child(3) {
+    background-color: green;
+    padding: 0px 5px;
+    color: whitesmoke;
+    text-transform: uppercase;
+    text-align: right;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+}
+.tm_puzzleDiv span:nth-child(6) {
+    padding-left: 10px;
+}
 .tm_puzzleDiv p {
-    margin-top: 15px;
+    margin-top: 5px;
+}
+.tm_solutionOuterDiv {
+    margin-top: 5px;
+    background-color: blue;
+    padding-top: 2px;
 }
 .tm_solutionDiv {
     background-color: blue;
@@ -57,6 +76,7 @@
 }
 .tm_solutionDiv table {
     text-align: center;
+    margin-top: 5px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -64,8 +84,33 @@
     text-transform: uppercase;
 }
 .tm_solutionDiv tr:first-child {
-    background-color: black;
+    background-color: green;
+
 }
 .tm_solutionDiv tr:last-child {
-    background-color: black;
+    background-color: green;
+}
+.tm_form {
+    margin-top: 5px;
+    color: whitesmoke;
+}
+.tm_lastbuttons {
+    margin-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+}
+.tm_undo {
+    margin-left: 5px;
+}
+.tm_reset {
+    margin-left: 5px;
+}
+.tm_help {
+    margin-left: 5px;
+}
+.tm_congrats {
+    margin-top: 5px;
+    text-align: center;
+    color: aqua;
+    font-style: italic;
 }

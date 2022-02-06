@@ -58,7 +58,7 @@ function getInsertWords(word, wordsonelonger) {
 }  
 
 /**
- * Determine how many swaps between two words of equal length.
+ * Determine how many swaps between two words of equal length. Case insensitive.
  * @param {string} word1 A word
  * @param {string} word2 Another word of the same length
  * @returns The number of positions at which the letter is different between the two words, -1 if unequal length words.
@@ -81,29 +81,13 @@ function countSwaps(word1="", word2="") {
 }
 
 /**
-* Determine whether two words are anagrams.
+* Determine whether two words are anagrams, case insensitive.
 * @param {string} word1 A word
 * @param {string} word2 Another word
-* @returns Whether the two words are anagrams, case insensitive.
+* @returns Whether the two words are anagrams.
 */
 function areAnagrams(word1="", word2="") {
   return Array.from(word1).sort().join('').toLowerCase() === Array.from(word2).sort().join('').toLowerCase();
-}
-
-function isAnInsert(fromWord="", toWord="") {
-  if (fromWord.length + 1 !== toWord.length) {
-    return false; // An insert goes to a word with one more letter
-  }
-  let fw = fromWord.toLowerCase();
-  let tw = toWord.toLowerCase();
-  for (let i = 0; i < tw.length; i++) {
-    let checkword = Array.from(tw);
-    checkword.splice(i,1);
-    if (checkword.every((value, index) => value === fw[index])) {
-      return true;
-    }
-  }
-  return false;
 }
 
 /* Public methods to be exported */

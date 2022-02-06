@@ -2,7 +2,7 @@ import { useState } from "react";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
 
 const Transmogrify = ({setWhereto}) => {
-    const [numMoves, setNumMoves] = useState(4);
+    const [numMoves, setNumMoves] = useState(2);
     const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
     const numMovesArray = [2,3,4,5,6,7,8,9];
     const [puzzle, setPuzzle] = useState({});
@@ -26,13 +26,13 @@ const Transmogrify = ({setWhereto}) => {
     }
     const acceptNextWord = async(e) => {
         e.preventDefault();
-        let prevWord = (words.length === 0 ? puzzle.startWord : words[words.length - 1]).toLowerCase();
-        let newWord = nextWord.trim().toLowerCase();
+        let prevWord = (words.length === 0 ? puzzle.startWord : words[words.length - 1]);
+        let newWord = nextWord.trim();
         if (validMove(newWord, prevWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
             } else {
-                let lastWord = puzzle.targetWord.toLowerCase();
+                let lastWord = puzzle.targetWord;
                 let newWords = [...words];
                 newWords.push(newWord);
                 setWords(newWords);
@@ -71,45 +71,45 @@ const Transmogrify = ({setWhereto}) => {
         </div>
     </div>;
     const PuzzleSection = <div className="tm_puzzleDiv">
-        <table>
-            <tbody>
-                <tr>
-                    <td>Start Word:</td>
-                    <td>{puzzle.startWord}</td>
-                </tr>
-                <tr>
-                    <td>Target Word:</td>
-                    <td>{puzzle.targetWord}</td>
-                </tr>
-                <tr>
-                    <td>Minimum Moves:</td>
-                    <td>{puzzle.numMoves}</td>
-                </tr>
-            </tbody>
-        </table>
+        <span>{puzzle.startWord}</span>
+        <span>to</span>
+        <span>{puzzle.targetWord}</span>
+        <br/>
+        <span>Target:</span>
+        <span>{puzzle.numMoves}</span>
+        <span>moves</span>
     </div>;
-    const SolutionSection = <div className="tm_solutionDiv">
-        <table>
-            <tbody>
-                <tr><td>{puzzle.startWord}</td></tr>
-                {words.map((w,i) => (
-                    <tr key={`userWord${i}`}><td>{w}</td></tr>
-                ))}
-                {!solved && <tr><td>...</td></tr>}
-                <tr><td>{puzzle.targetWord}</td></tr>
-            </tbody>
-        </table>
+    const SolutionSection = <div className="tm_solutionOuterDiv">
+        <div className="tm_solutionDiv">
+            <table>
+                <tbody>
+                    <tr><td>{puzzle.startWord}</td></tr>
+                    {words.map((w,i) => (
+                        <tr key={`userWord${i}`}><td>{w}</td></tr>
+                    ))}
+                    {!solved && <tr><td>...</td></tr>}
+                    <tr><td>{puzzle.targetWord}</td></tr>
+                </tbody>
+            </table>
+        </div>
         {solved ?
-            <p className="trEmphasis">Congratulations! Solved in {words.length + 1} moves.</p>
+            <p className="tm_congrats">👏🏽 Solved in {words.length + 1} moves 👏🏽</p>
         :
-            <form>
-                Next Word:
-                <input value={nextWord}
-                    onChange={(e) => {setNextWord(e.target.value);}}
-                    onKeyPress={(e) => {e.keyCode === 13 && acceptNextWord;}}
-                    ></input>
-                <button type="submit" onClick={acceptNextWord}>GO</button>
-            </form>
+            <div>
+                <form className="tm_form">
+                    Next Word:
+                    <input value={nextWord}
+                        onChange={(e) => {setNextWord(e.target.value);}}
+                        onKeyPress={(e) => {e.keyCode === 13 && acceptNextWord;}}
+                        ></input>
+                    <button type="submit" onClick={acceptNextWord}>GO</button>
+                </form>
+                <div className="tm_lastbuttons">
+                    {words.length > 0 && <button className="tm_undo" onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}>UNDO</button>}
+                    {words.length > 0 && <button className="tm_reset" onClick={() => {setWords([]); setNextWord('');}}>RESET</button>}
+                    <button className="tm_help" onClick={() => {alert('Valid next word options:\nSwap one letter, e.g. CAT to COT\nDrop one letter, e.g. SWIG to WIG\nInsert one letter, e.g. MAT to MATH, or HIP to WHIP\nAnagram, e.g. ACT to CAT');}}>HELP</button>
+                </div>
+            </div>
         }
     </div>
     return (
