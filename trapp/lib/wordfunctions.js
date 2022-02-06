@@ -34,6 +34,28 @@ export function areAnagrams(word1="", word2="") {
 }
 
 /**
+ * Determine where dropping any one letter from the longer word forms the shorter word
+ * @param {string} longword The longer word
+ * @param {string} shortword The shorter word
+ * @returns {bool} Whether you can drop a letter from the longer word to get the shorter word, case insensitive
+ */
+export function isDrop(longword="", shortword="") {
+    if (longword.length !== shortword.length + 1) {
+        return false; // Must be 1 fewer letter to be a drop
+    }
+    let lw = longword.toLowerCase();
+    let sw = shortword.toLowerCase();
+    for (let i = 0; i < lw.length; i++) {
+        let cw = Array.from(lw);
+        cw.splice(i,1);
+        if (cw.join('') === sw) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Determine whether a word is in the ENABLE2K lexicon
  * @param {string} word A word
  * @returns Whether the word is in the ENABLE2K lexicon

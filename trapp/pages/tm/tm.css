@@ -1,66 +1,71 @@
-.numMovesDiv {
+.tm_numMovesDiv {
+    margin-top: 5px;
     background-color: blue;
     color: whitesmoke;
     padding: 5px 5px;
-    width: fit-content;
     text-align: center;
 }
-.numMovesSelected {
+.tm_numMovesSelected {
     background-color: whitesmoke;
     color: black;
     margin-right: 2px;
 }
-.numMovesSelected:focus {
+.tm_numMovesSelected:focus {
     outline: none;
 }
-.numMovesUnselected {
+.tm_numMovesUnselected {
     background-color: black;
     color: whitesmoke;
     outline: none;
     margin-right: 2px;
 }
-.numMovesUnselected:focus {
+.tm_numMovesUnselected:focus {
     outline: none;
 }
-.startPuzzleDiv {
+.tm_startPuzzleDiv {
     margin-top: 5px;
     margin-bottom: 5px;
     text-align: center;
 }
-.puzzleDiv {
-    padding: 2px 35px;
+.tm_puzzleDiv {
+    padding: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
     background-color: blue;
     color: whitesmoke;
-    width: fit-content;
 }
-.puzzleDiv span:nth-child(1)::after {
-    content: '....... ';
-    color: blue;
-}
-.puzzleDiv span:nth-child(3)::after {
-    content: '..... ';
-    color: blue;
-}
-.puzzleDiv span:nth-child(5)::after {
-    content: '.';
-    color: blue;
-}
-.puzzleDiv span:nth-child(odd) {
+.tm_puzzleDiv td:nth-child(odd) {
     background-color: blue;
-    margin-right: 5px;
+    padding-right: 10px;
 }
-.puzzleDiv span:nth-child(even) {
+.tm_puzzleDiv td:nth-child(even) {
     background-color: black;
+    padding: 0px 5px;
     color: whitesmoke;
     text-transform: uppercase;
     text-align: right;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
 }
-.puzzleDiv span:nth-child(even)::after {
-    content: '\A';
-    white-space: pre;
-}
-.puzzleDiv p {
+.tm_puzzleDiv p {
     margin-top: 15px;
+}
+.tm_solutionDiv {
+    background-color: blue;
+    color: whitesmoke;
+    align-items: center;
+}
+.tm_solutionDiv table {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+.tm_solutionDiv td {
+    text-transform: uppercase;
+}
+.tm_solutionDiv tr:first-child {
+    background-color: black;
+}
+.tm_solutionDiv tr:last-child {
+    background-color: black;
 }

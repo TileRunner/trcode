@@ -263,8 +263,8 @@ function createTransmogrifyPuzzle(anagramsByLength=[], alphagramsByLength=[], mi
   let protector = 0;
   let protectorMax = 200;
   let puzzle = Array(numRows).fill([]);
-  let minWordLength = 4;
-  let maxWordLength = 6;
+  let minWordLength = 2;
+  let maxWordLength = 8;
   let untriedFirstWords = Object.keys(anagramsByLength[5]); // Always start with a 5 for now.
   let madePuzzle = false;
   let startWord = '';
