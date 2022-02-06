@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BrowserView, MobileOnlyView } from "react-device-detect";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
 
 const Transmogrify = ({setWhereto}) => {
@@ -24,10 +25,22 @@ const Transmogrify = ({setWhereto}) => {
         setNextWord('');
         setSolved(false);
     }
+    const handleInputLetter = (letter) => {
+        let sofar = nextWord + letter;
+        setNextWord(sofar);
+    }
+    const handleDeleteLetter = () => {
+        if (nextWord.length > 0) {
+            let sofar = Array.from(nextWord);
+            sofar.pop();
+            let newsofar = sofar.join('');
+            setNextWord(newsofar);
+        }
+    }
     const acceptNextWord = async(e) => {
         e.preventDefault();
         let prevWord = (words.length === 0 ? puzzle.startWord : words[words.length - 1]);
-        let newWord = nextWord.trim();
+        let newWord = nextWord;
         if (validMove(newWord, prevWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
@@ -46,6 +59,8 @@ const Transmogrify = ({setWhereto}) => {
         }
     }
     const validMove = (prevWord="", newWord="") => {
+        prevWord = prevWord.trim().toLowerCase();
+        newWord = newWord.trim().toLowerCase();
         if (prevWord === newWord) {
             return false;
         }
@@ -96,18 +111,75 @@ const Transmogrify = ({setWhereto}) => {
             <p className="tm_congrats">👏🏽 Solved in {words.length + 1} moves 👏🏽</p>
         :
             <div>
-                <form className="tm_form">
-                    Next Word:
-                    <input value={nextWord}
-                        onChange={(e) => {setNextWord(e.target.value);}}
-                        onKeyPress={(e) => {e.keyCode === 13 && acceptNextWord;}}
-                        ></input>
-                    <button type="submit" onClick={acceptNextWord}>GO</button>
-                </form>
+                <MobileOnlyView>
+                    <div className="tm_Keyboard">
+                        <div className="tm_Keyrow1">
+                            <button key="keyZ" onClick={() => {handleInputLetter('Z');}} className="tm_Key">Z</button>
+                            <button key="keyA" onClick={() => {handleInputLetter('A');}} className="tm_Key">A</button>
+                            <button key="keyP" onClick={() => {handleInputLetter('P');}} className="tm_Key">P</button>
+                            <button key="keyS" onClick={() => {handleInputLetter('S');}} className="tm_Key">S</button>
+                            <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="tm_Key">Q</button>
+                            <button key="keyI" onClick={() => {handleInputLetter('I');}} className="tm_Key">I</button>
+                            <button key="keyG" onClick={() => {handleInputLetter('G');}} className="tm_Key">G</button>
+                            <button key="keyY" onClick={() => {handleInputLetter('Y');}} className="tm_Key">Y</button>
+                            <button key="keyM" onClick={() => {handleInputLetter('M');}} className="tm_Key">M</button>
+                        </div>
+                        <div className="tm_Keyrow2">
+                            <button key="keyC" onClick={() => {handleInputLetter('C');}} className="tm_Key">C</button>
+                            <button key="keyR" onClick={() => {handleInputLetter('R');}} className="tm_Key">R</button>
+                            <button key="keyW" onClick={() => {handleInputLetter('W');}} className="tm_Key">W</button>
+                            <button key="keyT" onClick={() => {handleInputLetter('T');}} className="tm_Key">T</button>
+                            <button key="keyH" onClick={() => {handleInputLetter('H');}} className="tm_Key">H</button>
+                            <button key="keyV" onClick={() => {handleInputLetter('V');}} className="tm_Key">V</button>
+                            <button key="keyO" onClick={() => {handleInputLetter('O');}} className="tm_Key">O</button>
+                            <button key="keyX" onClick={() => {handleInputLetter('X');}} className="tm_Key">X</button>
+                        </div>
+                        <div className="tm_Keyrow3">
+                            <button key="keyF" onClick={() => {handleInputLetter('F');}} className="tm_Key">F</button>
+                            <button key="keyJ" onClick={() => {handleInputLetter('J');}} className="tm_Key">J</button>
+                            <button key="keyE" onClick={() => {handleInputLetter('E');}} className="tm_Key">E</button>
+                            <button key="keyL" onClick={() => {handleInputLetter('L');}} className="tm_Key">L</button>
+                            <button key="keyD" onClick={() => {handleInputLetter('D');}} className="tm_Key">D</button>
+                            <button key="keyB" onClick={() => {handleInputLetter('B');}} className="tm_Key">B</button>
+                            <button key="keyU" onClick={() => {handleInputLetter('U');}} className="tm_Key">U</button>
+                            <button key="keyN" onClick={() => {handleInputLetter('N');}} className="tm_Key">N</button>
+                            <button key="keyK" onClick={() => {handleInputLetter('K');}} className="tm_Key">K</button>
+                        </div>
+                        {nextWord.length > 0 && <div className="textcenter">
+                            <button key="keyBack" onClick={() => {handleDeleteLetter();}} className="tm_KeyBack">←</button>
+                            &nbsp;{nextWord}&nbsp;
+                            <button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">GO</button>
+                        </div>}
+                    </div>
+                </MobileOnlyView>
+                <BrowserView>
+                    <form className="tm_form">
+                        Next Word:
+                        <input value={nextWord}
+                            onChange={(e) => {setNextWord(e.target.value);}}
+                            onKeyPress={(e) => {e.keyCode === 13 && acceptNextWord;}}
+                            ></input>
+                        <button type="submit" onClick={acceptNextWord}>GO</button>
+                    </form>
+                </BrowserView>
                 <div className="tm_lastbuttons">
-                    {words.length > 0 && <button className="tm_undo" onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}>UNDO</button>}
-                    {words.length > 0 && <button className="tm_reset" onClick={() => {setWords([]); setNextWord('');}}>RESET</button>}
-                    <button className="tm_help" onClick={() => {alert('Valid next word options:\nSwap one letter, e.g. CAT to COT\nDrop one letter, e.g. SWIG to WIG\nInsert one letter, e.g. MAT to MATH, or HIP to WHIP\nAnagram, e.g. ACT to CAT');}}>HELP</button>
+                    {words.length > 0 && 
+                    <button className="tm_undo" onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}
+                    data-toggle="tooltip" title="Remove last entered word"
+                    >
+                        UNDO
+                    </button>}
+                    {words.length > 0 &&
+                    <button className="tm_reset" onClick={() => {setWords([]); setNextWord('');}}
+                    data-toggle="tooltip" title="Remove all enter words"
+                    >
+                        RESET
+                    </button>}
+                    <button className="tm_help" onClick={() => {alert('Valid next word options:\nSwap one letter, e.g. CAT to COT\nDrop one letter, e.g. SWIG to WIG\nInsert one letter, e.g. MAT to MATH, or HIP to WHIP\nAnagram, e.g. ACT to CAT');}}
+                    data-toggle="tooltip" title="Show instructions"
+                    >
+                        HELP
+                    </button>
                 </div>
             </div>
         }

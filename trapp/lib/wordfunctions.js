@@ -1,6 +1,18 @@
 const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
 
 /**
+ * Get the alphagram for the given word, trimmed and converted to lower case.
+ * @param {string} word A word that you want the alphagram for, trimmed and converted to lower case.
+ * @returns The alphagram
+ */
+function getAlphagram(word="") {
+    let a = Array.from(word.trim().toLowerCase());
+    a.sort();
+    let alphagram = a.join('');
+    return alphagram;
+}
+
+/**
  * Determine how many swaps between two words of equal length, case insensitive.
  * @param {string} word1 A word
  * @param {string} word2 Another word of the same length
@@ -24,13 +36,15 @@ export function countSwaps(word1="", word2="") {
 }
 
 /**
- * Determine whether two words are anagrams, case insensitive.
+ * Determine whether two words are anagrams, case insensitive. If they are the same word it will still return true.
  * @param {string} word1 A word
  * @param {string} word2 Another word
  * @returns Whether the two words are anagrams.
  */
 export function areAnagrams(word1="", word2="") {
-    return Array.from(word1).sort().join('').toLowerCase() === Array.from(word2).sort().join('').toLowerCase();
+    let alphagram1 = getAlphagram(word1);
+    let alphagram2 = getAlphagram(word2);
+    return alphagram1 === alphagram2;
 }
 
 /**
