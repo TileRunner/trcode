@@ -112,42 +112,42 @@ const Transmogrify = ({setWhereto}) => {
         :
             <div>
                 <MobileOnlyView>
-                    <div className="tm_Keyboard">
-                        <div className="tm_Keyrow1">
-                            <button key="keyZ" onClick={() => {handleInputLetter('Z');}} className="tm_Key">Z</button>
-                            <button key="keyA" onClick={() => {handleInputLetter('A');}} className="tm_Key">A</button>
-                            <button key="keyP" onClick={() => {handleInputLetter('P');}} className="tm_Key">P</button>
-                            <button key="keyS" onClick={() => {handleInputLetter('S');}} className="tm_Key">S</button>
-                            <button key="keyQ" onClick={() => {handleInputLetter('Q');}} className="tm_Key">Q</button>
-                            <button key="keyI" onClick={() => {handleInputLetter('I');}} className="tm_Key">I</button>
-                            <button key="keyG" onClick={() => {handleInputLetter('G');}} className="tm_Key">G</button>
-                            <button key="keyY" onClick={() => {handleInputLetter('Y');}} className="tm_Key">Y</button>
-                            <button key="keyM" onClick={() => {handleInputLetter('M');}} className="tm_Key">M</button>
+                    <div class="trKeyboard">
+                        <div>
+                            <span onClick={() => {handleInputLetter('Q');}}>Q</span>
+                            <span onClick={() => {handleInputLetter('W');}}>W</span>
+                            <span onClick={() => {handleInputLetter('E');}}>E</span>
+                            <span onClick={() => {handleInputLetter('R');}}>R</span>
+                            <span onClick={() => {handleInputLetter('T');}}>T</span>
+                            <span onClick={() => {handleInputLetter('Y');}}>Y</span>
+                            <span onClick={() => {handleInputLetter('U');}}>U</span>
+                            <span onClick={() => {handleInputLetter('I');}}>I</span>
+                            <span onClick={() => {handleInputLetter('O');}}>O</span>
+                            <span onClick={() => {handleInputLetter('P');}}>P</span>
                         </div>
-                        <div className="tm_Keyrow2">
-                            <button key="keyC" onClick={() => {handleInputLetter('C');}} className="tm_Key">C</button>
-                            <button key="keyR" onClick={() => {handleInputLetter('R');}} className="tm_Key">R</button>
-                            <button key="keyW" onClick={() => {handleInputLetter('W');}} className="tm_Key">W</button>
-                            <button key="keyT" onClick={() => {handleInputLetter('T');}} className="tm_Key">T</button>
-                            <button key="keyH" onClick={() => {handleInputLetter('H');}} className="tm_Key">H</button>
-                            <button key="keyV" onClick={() => {handleInputLetter('V');}} className="tm_Key">V</button>
-                            <button key="keyO" onClick={() => {handleInputLetter('O');}} className="tm_Key">O</button>
-                            <button key="keyX" onClick={() => {handleInputLetter('X');}} className="tm_Key">X</button>
+                        <div>
+                            <span onClick={() => {handleInputLetter('A');}}>A</span>
+                            <span onClick={() => {handleInputLetter('S');}}>S</span>
+                            <span onClick={() => {handleInputLetter('D');}}>D</span>
+                            <span onClick={() => {handleInputLetter('F');}}>F</span>
+                            <span onClick={() => {handleInputLetter('G');}}>G</span>
+                            <span onClick={() => {handleInputLetter('H');}}>H</span>
+                            <span onClick={() => {handleInputLetter('J');}}>J</span>
+                            <span onClick={() => {handleInputLetter('K');}}>K</span>
+                            <span onClick={() => {handleInputLetter('L');}}>L</span>
                         </div>
-                        <div className="tm_Keyrow3">
-                            <button key="keyF" onClick={() => {handleInputLetter('F');}} className="tm_Key">F</button>
-                            <button key="keyJ" onClick={() => {handleInputLetter('J');}} className="tm_Key">J</button>
-                            <button key="keyE" onClick={() => {handleInputLetter('E');}} className="tm_Key">E</button>
-                            <button key="keyL" onClick={() => {handleInputLetter('L');}} className="tm_Key">L</button>
-                            <button key="keyD" onClick={() => {handleInputLetter('D');}} className="tm_Key">D</button>
-                            <button key="keyB" onClick={() => {handleInputLetter('B');}} className="tm_Key">B</button>
-                            <button key="keyU" onClick={() => {handleInputLetter('U');}} className="tm_Key">U</button>
-                            <button key="keyN" onClick={() => {handleInputLetter('N');}} className="tm_Key">N</button>
-                            <button key="keyK" onClick={() => {handleInputLetter('K');}} className="tm_Key">K</button>
+                        <div>
+                            <span onClick={() => {handleInputLetter('Z');}}>Z</span>
+                            <span onClick={() => {handleInputLetter('X');}}>X</span>
+                            <span onClick={() => {handleInputLetter('C');}}>C</span>
+                            <span onClick={() => {handleInputLetter('V');}}>V</span>
+                            <span onClick={() => {handleInputLetter('B');}}>B</span>
+                            <span onClick={() => {handleInputLetter('N');}}>N</span>
+                            <span onClick={() => {handleInputLetter('M');}}>M</span>
+                            {nextWord.length > 0 && <span  onClick={() => {handleDeleteLetter();}} class="trBackspace"></span>}
                         </div>
                         {nextWord.length > 0 && <div className="textcenter">
-                            <button key="keyBack" onClick={() => {handleDeleteLetter();}} className="tm_KeyBack">←</button>
-                            &nbsp;{nextWord}&nbsp;
+                            {nextWord}&nbsp;
                             <button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">GO</button>
                         </div>}
                     </div>
