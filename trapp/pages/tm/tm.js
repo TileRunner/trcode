@@ -10,12 +10,15 @@ const Transmogrify = ({setWhereto}) => {
     const [nextWord, setNextWord] = useState('');
     const [words, setWords] = useState([]); // Users words
     const [solved, setSolved] = useState(false);
+    const [solving, setSolving] = useState(false);
     const callForPuzzle = async() => {
         let data = {};
+        let newSolving = false;
         try {
             let url = `${baseurl}/ENABLE2K?transmogrify=true&numMoves=${numMoves}`;
             const response = await fetch(url);
             data = await response.json();                
+            newSolving = true;
         } catch (error) {
             data.notes = ["Problem with the server. Sorry about that."];
             console.log(error);
@@ -24,6 +27,10 @@ const Transmogrify = ({setWhereto}) => {
         setWords([]);
         setNextWord('');
         setSolved(false);
+        setSolving(newSolving);
+    }
+    const quitThisPuzzle = () => {
+        setSolving(false);
     }
     const handleInputLetter = (letter) => {
         let sofar = nextWord + letter;
@@ -94,7 +101,7 @@ const Transmogrify = ({setWhereto}) => {
         <span>{puzzle.numMoves}</span>
         <span>moves</span>
     </div>;
-    const ShowKeyboard = <div class="tm_Keyboard container">
+    const ShowKeyboard = <div class="tm_Keyboard">
         <div>
             <span onClick={() => { handleInputLetter('Q'); } }>Q</span>
             <span onClick={() => { handleInputLetter('W'); } }>W</span>
@@ -126,12 +133,14 @@ const Transmogrify = ({setWhereto}) => {
             <span onClick={() => { handleInputLetter('B'); } }>B</span>
             <span onClick={() => { handleInputLetter('N'); } }>N</span>
             <span onClick={() => { handleInputLetter('M'); } }>M</span>
-            {nextWord.length > 0 && <span onClick={() => { handleDeleteLetter(); } } class="tm_Backspace"></span>}
+            <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
         </div>
-        {nextWord.length > 0 && <div>
+        {nextWord.length > 0 &&
             <div className="tm_KeyedWord">{nextWord}</div>
+        }
+        {nextWord.length > 0 &&
             <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
-        </div>}
+        }
     </div>;
     const SolutionSection = <div className="tm_solutionOuterDiv">
         <div className="tm_solutionDiv">
@@ -166,21 +175,26 @@ const Transmogrify = ({setWhereto}) => {
                 </BrowserView>
                 <div className="tm_lastbuttons">
                     {words.length > 0 && 
-                    <button className="tm_undo" onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}
+                    <button onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}
                     data-toggle="tooltip" title="Remove last entered word"
                     >
                         UNDO
                     </button>}
                     {words.length > 0 &&
-                    <button className="tm_reset" onClick={() => {setWords([]); setNextWord('');}}
+                    <button onClick={() => {setWords([]); setNextWord('');}}
                     data-toggle="tooltip" title="Remove all enter words"
                     >
                         RESET
                     </button>}
-                    <button className="tm_help" onClick={() => {alert('Valid next word options:\nSwap one letter, e.g. CAT to COT\nDrop one letter, e.g. SWIG to WIG\nInsert one letter, e.g. MAT to MATH, or HIP to WHIP\nAnagram, e.g. ACT to CAT');}}
+                    <button onClick={() => {alert('Valid next word options:\nSwap one letter, e.g. CAT to COT\nDrop one letter, e.g. SWIG to WIG\nInsert one letter, e.g. MAT to MATH, or HIP to WHIP\nAnagram, e.g. ACT to CAT');}}
                     data-toggle="tooltip" title="Show instructions"
                     >
                         HELP
+                    </button>
+                    <button className="tm_quit" onClick={() => {quitThisPuzzle();}}
+                    data-toggle="tooltip" title="Quit this puzzle. You can start another."
+                    >
+                        QUIT
                     </button>
                 </div>
             </div>
@@ -196,7 +210,7 @@ const Transmogrify = ({setWhereto}) => {
             </div>
             <table>
                 <tbody>
-                    <tr><td>{GameStartSection}</td></tr>
+                    {(solved || !solving) && <tr><td>{GameStartSection}</td></tr>}
                     {puzzle && puzzle.startWord && <tr><td>{PuzzleSection}</td></tr>}
                     {puzzle && puzzle.startWord && <tr><td>{SolutionSection}</td></tr>}
                 </tbody>
