@@ -25078,6 +25078,87 @@
       "OpponentId": 77,
       "PlayerScore": 352,
       "OpponentScore": 330
+    },
+    {
+      "Id": 2729,
+      "ClubNightId": 228,
+      "Round": 1,
+      "PlayerId": 103,
+      "OpponentId": 118,
+      "PlayerScore": 310,
+      "OpponentScore": 365
+    },
+    {
+      "Id": 2730,
+      "ClubNightId": 228,
+      "Round": 1,
+      "PlayerId": 77,
+      "OpponentId": 75,
+      "PlayerScore": 312,
+      "OpponentScore": 401
+    },
+    {
+      "Id": 2731,
+      "ClubNightId": 228,
+      "Round": 1,
+      "PlayerId": 72,
+      "OpponentId": 81,
+      "PlayerScore": 364,
+      "OpponentScore": 333
+    },
+    {
+      "Id": 2732,
+      "ClubNightId": 228,
+      "Round": 2,
+      "PlayerId": 72,
+      "OpponentId": 118,
+      "PlayerScore": 428,
+      "OpponentScore": 368
+    },
+    {
+      "Id": 2733,
+      "ClubNightId": 228,
+      "Round": 2,
+      "PlayerId": 75,
+      "OpponentId": 81,
+      "PlayerScore": 432,
+      "OpponentScore": 344
+    },
+    {
+      "Id": 2734,
+      "ClubNightId": 228,
+      "Round": 2,
+      "PlayerId": 103,
+      "OpponentId": 77,
+      "PlayerScore": 482,
+      "OpponentScore": 274
+    },
+    {
+      "Id": 2735,
+      "ClubNightId": 228,
+      "Round": 3,
+      "PlayerId": 75,
+      "OpponentId": 72,
+      "PlayerScore": 363,
+      "OpponentScore": 443
+    },
+    {
+      "Id": 2736,
+      "ClubNightId": 228,
+      "Round": 3,
+      "PlayerId": 103,
+      "OpponentId": 81,
+      "PlayerScore": 325,
+      "OpponentScore": 385
+    },
+    {
+      "Id": 2737,
+      "ClubNightId": 228,
+      "Round": 3,
+      "PlayerId": 118,
+      "OpponentId": 77,
+      "PlayerScore": 377,
+      "OpponentScore": 334
     }
   ],
   "clubMemberList": [
@@ -26801,6 +26882,13 @@
       "Id": 227,
       "ClubId": 3,
       "Date": "2022-02-04",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 228,
+      "ClubId": 3,
+      "Date": "2022-02-11",
       "BingoLetter": "",
       "BingoLetterGotPlayed": ""
     }

@@ -88,3 +88,129 @@ a {
   height: 350px;
   width: 350px;
 }
+/* Custom keyboards */
+/* Version 1 */
+.customKeyboardV1 {
+  margin-top: 5px;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px 0px;
+  background-color: white;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  width: 100%;
+}
+.customKeyboardV1 div:first-child {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+.customKeyboardV1 div:nth-child(2) {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.customKeyboardV1 div:nth-child(3) {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  margin-left: 20px;
+  margin-right: 10px;
+}
+.customKeyboardV1 span {
+  text-align: center;
+  margin: 0px 1px;
+  padding: 5px 8px;
+  font-size: large;
+}
+
+.ckv1 {
+  background-size: cover;
+  width: 35px;
+  height: 35px;
+}
+.ckv1.A {
+  background-image: url('../public/Keyboards/v1/A.jpg'); 
+}
+.ckv1.B {
+  background-image: url('../public/Keyboards/v1/B.jpg'); 
+}
+.ckv1.C {
+  background-image: url('../public/Keyboards/v1/C.jpg'); 
+}
+.ckv1.D {
+  background-image: url('../public/Keyboards/v1/D.jpg'); 
+}
+.ckv1.E {
+  background-image: url('../public/Keyboards/v1/E.jpg'); 
+}
+.ckv1.F {
+  background-image: url('../public/Keyboards/v1/F.jpg'); 
+}
+.ckv1.G { 
+  background-image: url('../public/Keyboards/v1/G.jpg'); 
+}
+.ckv1.H {
+  background-image: url('../public/Keyboards/v1/H.jpg');
+}
+.ckv1.I {
+  background-image: url('../public/Keyboards/v1/I.jpg');
+}
+.ckv1.J {
+  background-image: url('../public/Keyboards/v1/J.jpg');
+}
+.ckv1.K {
+  background-image: url('../public/Keyboards/v1/K.jpg');
+}
+.ckv1.L {
+  background-image: url('../public/Keyboards/v1/L.jpg');
+}
+.ckv1.M {
+  background-image: url('../public/Keyboards/v1/M.jpg'); 
+}
+.ckv1.N {
+  background-image: url('../public/Keyboards/v1/N.jpg'); 
+}
+.ckv1.O {
+  background-image: url('../public/Keyboards/v1/O.jpg'); 
+}
+.ckv1.P {
+  background-image: url('../public/Keyboards/v1/P.jpg'); 
+}
+.ckv1.Q {
+  background-image: url('../public/Keyboards/v1/Q.jpg');
+}
+.ckv1.R {
+  background-image: url('../public/Keyboards/v1/R.jpg');
+}
+.ckv1.S {
+  background-image: url('../public/Keyboards/v1/S.jpg');
+}
+.ckv1.T {
+  background-image: url('../public/Keyboards/v1/T.jpg');
+}
+.ckv1.U {
+  background-image: url('../public/Keyboards/v1/U.jpg');
+}
+.ckv1.V {
+  background-image: url('../public/Keyboards/v1/V.jpg');
+}
+.ckv1.W {
+  background-image: url('../public/Keyboards/v1/W.jpg');
+}
+.ckv1.X {
+  background-image: url('../public/Keyboards/v1/X.jpg');
+}
+.ckv1.Y {
+  background-image: url('../public/Keyboards/v1/Y.jpg');
+}
+.ckv1.Z {
+  background-image: url('../public/Keyboards/v1/Z.jpg');
+}
+.ckv1Word {
+  display: flex;
+  justify-content: center;
+}

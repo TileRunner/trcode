@@ -3,6 +3,7 @@ import { BrowserView, MobileOnlyView } from "react-device-detect";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
 
 const Transmogrify = ({setWhereto}) => {
+    const [keyboardVersion, setKeyboardVersion] = useState('ckv1');
     const [numMoves, setNumMoves] = useState(2);
     const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
     const numMovesArray = [2,3,4,5,6,7,8,9];
@@ -101,45 +102,85 @@ const Transmogrify = ({setWhereto}) => {
         <span>{puzzle.numMoves}</span>
         <span>moves</span>
     </div>;
-    const ShowKeyboard = <div class="tm_Keyboard">
-        <div>
-            <span onClick={() => { handleInputLetter('Q'); } }>Q</span>
-            <span onClick={() => { handleInputLetter('W'); } }>W</span>
-            <span onClick={() => { handleInputLetter('E'); } }>E</span>
-            <span onClick={() => { handleInputLetter('R'); } }>R</span>
-            <span onClick={() => { handleInputLetter('T'); } }>T</span>
-            <span onClick={() => { handleInputLetter('Y'); } }>Y</span>
-            <span onClick={() => { handleInputLetter('U'); } }>U</span>
-            <span onClick={() => { handleInputLetter('I'); } }>I</span>
-            <span onClick={() => { handleInputLetter('O'); } }>O</span>
-            <span onClick={() => { handleInputLetter('P'); } }>P</span>
-        </div>
-        <div>
-            <span onClick={() => { handleInputLetter('A'); } }>A</span>
-            <span onClick={() => { handleInputLetter('S'); } }>S</span>
-            <span onClick={() => { handleInputLetter('D'); } }>D</span>
-            <span onClick={() => { handleInputLetter('F'); } }>F</span>
-            <span onClick={() => { handleInputLetter('G'); } }>G</span>
-            <span onClick={() => { handleInputLetter('H'); } }>H</span>
-            <span onClick={() => { handleInputLetter('J'); } }>J</span>
-            <span onClick={() => { handleInputLetter('K'); } }>K</span>
-            <span onClick={() => { handleInputLetter('L'); } }>L</span>
-        </div>
-        <div>
-            <span onClick={() => { handleInputLetter('Z'); } }>Z</span>
-            <span onClick={() => { handleInputLetter('X'); } }>X</span>
-            <span onClick={() => { handleInputLetter('C'); } }>C</span>
-            <span onClick={() => { handleInputLetter('V'); } }>V</span>
-            <span onClick={() => { handleInputLetter('B'); } }>B</span>
-            <span onClick={() => { handleInputLetter('N'); } }>N</span>
-            <span onClick={() => { handleInputLetter('M'); } }>M</span>
-            <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
-        </div>
-        {nextWord.length > 0 &&
-            <div className="tm_KeyedWord">{nextWord}</div>
-        }
-        {nextWord.length > 0 &&
-            <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
+    const ShowKeyboard = <div>
+        {keyboardVersion === 'ckv1' ?
+            <div class="customKeyboardV1">
+                <div>
+                    <span onClick={() => { handleInputLetter('Q'); } } className="ckv1 Q"></span>
+                    <span onClick={() => { handleInputLetter('W'); } } className="ckv1 W"></span>
+                    <span onClick={() => { handleInputLetter('E'); } } className="ckv1 E"></span>
+                    <span onClick={() => { handleInputLetter('R'); } } className="ckv1 R"></span>
+                    <span onClick={() => { handleInputLetter('T'); } } className="ckv1 T"></span>
+                    <span onClick={() => { handleInputLetter('Y'); } } className="ckv1 Y"></span>
+                    <span onClick={() => { handleInputLetter('U'); } } className="ckv1 U"></span>
+                    <span onClick={() => { handleInputLetter('I'); } } className="ckv1 I"></span>
+                    <span onClick={() => { handleInputLetter('O'); } } className="ckv1 O"></span>
+                    <span onClick={() => { handleInputLetter('P'); } } className="ckv1 P"></span>
+                </div>
+                <div>
+                    <span onClick={() => { handleInputLetter('A'); } } className="ckv1 A"></span>
+                    <span onClick={() => { handleInputLetter('S'); } } className="ckv1 S"></span>
+                    <span onClick={() => { handleInputLetter('D'); } } className="ckv1 D"></span>
+                    <span onClick={() => { handleInputLetter('F'); } } className="ckv1 F"></span>
+                    <span onClick={() => { handleInputLetter('G'); } } className="ckv1 G"></span>
+                    <span onClick={() => { handleInputLetter('H'); } } className="ckv1 H"></span>
+                    <span onClick={() => { handleInputLetter('J'); } } className="ckv1 J"></span>
+                    <span onClick={() => { handleInputLetter('K'); } } className="ckv1 K"></span>
+                    <span onClick={() => { handleInputLetter('L'); } } className="ckv1 L"></span>
+                </div>
+                <div>
+                    <span onClick={() => { handleInputLetter('Z'); } } className="ckv1 Z"></span>
+                    <span onClick={() => { handleInputLetter('X'); } } className="ckv1 X"></span>
+                    <span onClick={() => { handleInputLetter('C'); } } className="ckv1 C"></span>
+                    <span onClick={() => { handleInputLetter('V'); } } className="ckv1 V"></span>
+                    <span onClick={() => { handleInputLetter('B'); } } className="ckv1 B"></span>
+                    <span onClick={() => { handleInputLetter('N'); } } className="ckv1 N"></span>
+                    <span onClick={() => { handleInputLetter('M'); } } className="ckv1 M"></span>
+                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
+                </div>
+                {nextWord.length > 0 &&
+                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
+                }         
+            </div>
+        : 
+            <div class="tm_Keyboard">
+                <div>
+                    <span onClick={() => { handleInputLetter('Q'); } }>Q</span>
+                    <span onClick={() => { handleInputLetter('W'); } }>W</span>
+                    <span onClick={() => { handleInputLetter('E'); } }>E</span>
+                    <span onClick={() => { handleInputLetter('R'); } }>R</span>
+                    <span onClick={() => { handleInputLetter('T'); } }>T</span>
+                    <span onClick={() => { handleInputLetter('Y'); } }>Y</span>
+                    <span onClick={() => { handleInputLetter('U'); } }>U</span>
+                    <span onClick={() => { handleInputLetter('I'); } }>I</span>
+                    <span onClick={() => { handleInputLetter('O'); } }>O</span>
+                    <span onClick={() => { handleInputLetter('P'); } }>P</span>
+                </div>
+                <div>
+                    <span onClick={() => { handleInputLetter('A'); } }>A</span>
+                    <span onClick={() => { handleInputLetter('S'); } }>S</span>
+                    <span onClick={() => { handleInputLetter('D'); } }>D</span>
+                    <span onClick={() => { handleInputLetter('F'); } }>F</span>
+                    <span onClick={() => { handleInputLetter('G'); } }>G</span>
+                    <span onClick={() => { handleInputLetter('H'); } }>H</span>
+                    <span onClick={() => { handleInputLetter('J'); } }>J</span>
+                    <span onClick={() => { handleInputLetter('K'); } }>K</span>
+                    <span onClick={() => { handleInputLetter('L'); } }>L</span>
+                </div>
+                <div>
+                    <span onClick={() => { handleInputLetter('Z'); } }>Z</span>
+                    <span onClick={() => { handleInputLetter('X'); } }>X</span>
+                    <span onClick={() => { handleInputLetter('C'); } }>C</span>
+                    <span onClick={() => { handleInputLetter('V'); } }>V</span>
+                    <span onClick={() => { handleInputLetter('B'); } }>B</span>
+                    <span onClick={() => { handleInputLetter('N'); } }>N</span>
+                    <span onClick={() => { handleInputLetter('M'); } }>M</span>
+                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
+                </div>
+                {nextWord.length > 0 &&
+                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
+                }
+            </div>
         }
     </div>;
     const SolutionSection = <div className="tm_solutionOuterDiv">
@@ -150,6 +191,14 @@ const Transmogrify = ({setWhereto}) => {
                     {words.map((w,i) => (
                         <tr key={`userWord${i}`}><td>{w}</td></tr>
                     ))}
+                    {!solved && <tr><td>...</td></tr>}
+                    {!solved && nextWord.length > 0 &&
+                        <div className="tm_KeyedWord container">
+                            {Array.from(nextWord).map((l,i) => (
+                                <span key={`nxwd${i}`}>{l}</span>
+                            ))}
+                        </div>
+                    }
                     {!solved && <tr><td>...</td></tr>}
                     <tr><td>{puzzle.targetWord}</td></tr>
                 </tbody>

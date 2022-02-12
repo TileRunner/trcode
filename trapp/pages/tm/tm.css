@@ -134,6 +134,9 @@
     padding: 5px 8px;
     font-size: large;
 }
+.tm_Backspace {
+    background-color: blue;
+}
 .tm_Backspace::before {
     content: '\003Cx';
 }
