@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { BrowserView, MobileOnlyView } from "react-device-detect";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
+import Showinfo from '../wi/showinfo'
 
 const Transmogrify = ({setWhereto}) => {
     const [keyboardVersion, setKeyboardVersion] = useState('ckv1');
@@ -64,6 +64,13 @@ const Transmogrify = ({setWhereto}) => {
             }
         } else {
             alert('Only anagrams, drops, swaps and inserts allowed.');
+        }
+    }
+    const removeWords =(wi) => {
+        if (wi < words.length) {
+            let newWords = [...words];
+            newWords.splice(wi);
+            setWords(newWords);
         }
     }
     const validMove = (prevWord="", newWord="") => {
@@ -236,6 +243,24 @@ const Transmogrify = ({setWhereto}) => {
             </div>
         }
     </div>
+    const HintSection = <div>
+        <Showinfo key={`hint${puzzle.startWord}`} word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+             removeEntry={() => {}} entryIndex={-1}/>
+        {words.map((g,gi) => (
+            <Showinfo key={`hint${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+             removeEntry={() => {removeWords(gi);}} entryIndex={gi+1}/>
+        ))}
+        <Showinfo key={`hint${puzzle.targetWord}`} word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+             removeEntry={() => {}} entryIndex={-1}/>
+        <ul className="trParagraph">
+            <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>
+            <li><span className="swapCount">&nbsp;2&nbsp;</span>Shows swaps counts/letters</li>
+            <li><span className="anagramCount">3</span>Shows anagram counts/words</li>
+            <li>Click to toggle between count and info</li>
+            <li>The black dot represents a drop</li>
+            <li>Click the <span className="closemebutton"></span> to remove</li>
+        </ul>
+    </div>
     return (
         <div className="trBackground">
             <div className="trTitle">
@@ -249,6 +274,7 @@ const Transmogrify = ({setWhereto}) => {
                     {(solved || !solving) && <tr><td>{GameStartSection}</td></tr>}
                     {puzzle && puzzle.startWord && <tr><td>{PuzzleSection}</td></tr>}
                     {puzzle && puzzle.startWord && <tr><td>{SolutionSection}</td></tr>}
+                    {puzzle && puzzle.startWord && !solved && <tr><td>{HintSection}</td></tr>}
                 </tbody>
             </table>
             <div>

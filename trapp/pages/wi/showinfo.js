@@ -29,14 +29,14 @@ export default function Showinfo( props ) {
                                 <tbody>
                                     {props.showInserts === "Y" && info.inserts.length > 0 && displayInsertsRow(info.inserts)}
                                     {props.showSwaps === "Y" && info.swaps.length > 0 && displaySwapsRow(info.swaps)}
-                                    {displayWordRow(props.removeEntry, props.entryIndex)}
+                                    {displayWordRow()}
                                     {props.showDrops === "Y" && info.drops.length > 0 && displayDropsRow(info.drops)}
                                 </tbody>
                             </table>
                         </td>
-                        <td className="closeme">
+                        {props.entryIndex > -1 && <td className="closeme">
                             <button className="closemebutton" onClick={() => props.removeEntry(props.entryIndex)}></button>
-                        </td>
+                        </td>}
                     </tr>
                 </tbody>
             </table>

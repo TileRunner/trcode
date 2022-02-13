@@ -102,7 +102,7 @@ a {
   background-color: white;
   color: white;
   font-family: 'Courier New', Courier, monospace;
-  width: 100%;
+  width: 370px;
 }
 .ckv1Row1 {
   display: flex;
@@ -227,7 +227,7 @@ a {
     background-color: var(--trcssPageBG);
     color: white;
     font-family: 'Courier New', Courier, monospace;
-    width: 100%;
+    width: 370px;
 }
 .ckv2Row1 {
     display: flex;
@@ -254,7 +254,7 @@ a {
     border-radius: 5px;
     background-color: blue;
     text-align: center;
-    margin: 0px 1px;
+    margin: 0px 2px;
     padding: 5px 8px;
     font-size: large;
 }
