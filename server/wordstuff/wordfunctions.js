@@ -84,10 +84,17 @@ function countSwaps(word1="", word2="") {
 * Determine whether two words are anagrams, case insensitive.
 * @param {string} word1 A word
 * @param {string} word2 Another word
-* @returns Whether the two words are anagrams.
+* @returns Whether the two words are anagrams. False if the same word.
 */
 function areAnagrams(word1="", word2="") {
-  return Array.from(word1).sort().join('').toLowerCase() === Array.from(word2).sort().join('').toLowerCase();
+  let w1 = word1.toLowerCase();
+  let w2 = word2.toLowerCase();
+  if (w1 === w2) {
+      return false;
+  }
+  let a1 = Array.from(w1).sort();
+  let a2 = Array.from(w2).sort();
+  return a1.join('') === a2.join('');
 }
 
 /* Public methods to be exported */
@@ -95,6 +102,7 @@ function areAnagrams(word1="", word2="") {
 function getAnagrams(word, wordssamelength) {
   let wlc = word.toLowerCase();
   let anagrams = wordssamelength.filter((w) => {return areAnagrams(wlc, w);});
+  return anagrams;
 }
 /**
  * Determine the words that can be reached by swapping one letter in the provided word.

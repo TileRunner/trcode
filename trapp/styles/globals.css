@@ -89,6 +89,10 @@ a {
   width: 350px;
 }
 /* Custom keyboards */
+.switchkb {
+  display: flex;
+  justify-content: center;
+}
 /* Version 1 */
 .customKeyboardV1 {
   margin-top: 5px;
@@ -100,20 +104,20 @@ a {
   font-family: 'Courier New', Courier, monospace;
   width: 100%;
 }
-.customKeyboardV1 div:first-child {
+.ckv1Row1 {
   display: flex;
   justify-content: space-between;
   margin-top: 5px;
   margin-bottom: 15px;
 }
-.customKeyboardV1 div:nth-child(2) {
+.ckv1Row2 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
   margin-left: 10px;
   margin-right: 10px;
 }
-.customKeyboardV1 div:nth-child(3) {
+.ckv1Row3 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
@@ -213,4 +217,44 @@ a {
 .ckv1Word {
   display: flex;
   justify-content: center;
+}
+/* Version 2 */
+.customKeyboardV2 {
+    margin-top: 5px;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px 0px;
+    background-color: var(--trcssPageBG);
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+}
+.ckv2Row1 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+.ckv2Row2 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.ckv2Row3 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    margin-left: 20px;
+    margin-right: 10px;
+}
+.customKeyboardV2 span {
+    border: 1px solid white;
+    border-radius: 5px;
+    background-color: blue;
+    text-align: center;
+    margin: 0px 1px;
+    padding: 5px 8px;
+    font-size: large;
 }

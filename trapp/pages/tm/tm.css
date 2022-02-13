@@ -95,58 +95,11 @@
 }
 
 
-.tm_Keyboard {
-    margin-top: 5px;
-    border: 1px solid white;
-    border-radius: 5px;
-    padding: 5px 0px;
-    background-color: var(--trcssPageBG);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    width: 100%;
-}
-.tm_Keyboard div:first-child {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-    margin-bottom: 15px;
-}
-.tm_Keyboard div:nth-child(2) {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-.tm_Keyboard div:nth-child(3) {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    margin-left: 20px;
-    margin-right: 10px;
-}
-.tm_Keyboard span {
-    border: 1px solid white;
-    border-radius: 5px;
-    background-color: blue;
-    text-align: center;
-    margin: 0px 1px;
-    padding: 5px 8px;
-    font-size: large;
-}
 .tm_Backspace {
     background-color: blue;
 }
 .tm_Backspace::before {
     content: '\003Cx';
-}
-.tm_KeyedWord {
-    display: flex;
-    justify-content: center;
-    font-size: x-large;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
 }
 .tm_KeyGoDiv {
     display: flex;
@@ -158,14 +111,6 @@
     color: white;
     border-radius: 5px;
     font-size: larger;
-}
-
-.tm_form {
-    margin-top: 5px;
-    color: whitesmoke;
-}
-.tm_form input {
-    text-transform: uppercase;
 }
 .tm_lastbuttons {
     display: flex;

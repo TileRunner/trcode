@@ -104,8 +104,11 @@ const Transmogrify = ({setWhereto}) => {
     </div>;
     const ShowKeyboard = <div>
         {keyboardVersion === 'ckv1' ?
-            <div class="customKeyboardV1">
-                <div>
+            <div className="customKeyboardV1">
+                <div className="switchkb">
+                    <button key="switchbkv1" onClick={() => {setKeyboardVersion('ckv2');}}>switch keyboard</button>
+                </div>
+                <div className="ckv1Row1">
                     <span onClick={() => { handleInputLetter('Q'); } } className="ckv1 Q"></span>
                     <span onClick={() => { handleInputLetter('W'); } } className="ckv1 W"></span>
                     <span onClick={() => { handleInputLetter('E'); } } className="ckv1 E"></span>
@@ -117,7 +120,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('O'); } } className="ckv1 O"></span>
                     <span onClick={() => { handleInputLetter('P'); } } className="ckv1 P"></span>
                 </div>
-                <div>
+                <div className="ckv1Row2">
                     <span onClick={() => { handleInputLetter('A'); } } className="ckv1 A"></span>
                     <span onClick={() => { handleInputLetter('S'); } } className="ckv1 S"></span>
                     <span onClick={() => { handleInputLetter('D'); } } className="ckv1 D"></span>
@@ -128,7 +131,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('K'); } } className="ckv1 K"></span>
                     <span onClick={() => { handleInputLetter('L'); } } className="ckv1 L"></span>
                 </div>
-                <div>
+                <div className="ckv1Row3">
                     <span onClick={() => { handleInputLetter('Z'); } } className="ckv1 Z"></span>
                     <span onClick={() => { handleInputLetter('X'); } } className="ckv1 X"></span>
                     <span onClick={() => { handleInputLetter('C'); } } className="ckv1 C"></span>
@@ -143,8 +146,11 @@ const Transmogrify = ({setWhereto}) => {
                 }         
             </div>
         : 
-            <div class="tm_Keyboard">
-                <div>
+            <div className="customKeyboardV2 ">
+                <div className="switchkb">
+                    <button key="switchbkv2" onClick={() => {setKeyboardVersion('ckv1');}}>switch keyboard</button>
+                </div>
+                <div className="ckv2Row1">
                     <span onClick={() => { handleInputLetter('Q'); } }>Q</span>
                     <span onClick={() => { handleInputLetter('W'); } }>W</span>
                     <span onClick={() => { handleInputLetter('E'); } }>E</span>
@@ -156,7 +162,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('O'); } }>O</span>
                     <span onClick={() => { handleInputLetter('P'); } }>P</span>
                 </div>
-                <div>
+                <div className="ckv2Row2">
                     <span onClick={() => { handleInputLetter('A'); } }>A</span>
                     <span onClick={() => { handleInputLetter('S'); } }>S</span>
                     <span onClick={() => { handleInputLetter('D'); } }>D</span>
@@ -167,7 +173,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('K'); } }>K</span>
                     <span onClick={() => { handleInputLetter('L'); } }>L</span>
                 </div>
-                <div>
+                <div className="ckv2Row3">
                     <span onClick={() => { handleInputLetter('Z'); } }>Z</span>
                     <span onClick={() => { handleInputLetter('X'); } }>X</span>
                     <span onClick={() => { handleInputLetter('C'); } }>C</span>
@@ -192,13 +198,7 @@ const Transmogrify = ({setWhereto}) => {
                         <tr key={`userWord${i}`}><td>{w}</td></tr>
                     ))}
                     {!solved && <tr><td>...</td></tr>}
-                    {!solved && nextWord.length > 0 &&
-                        <div className="tm_KeyedWord container">
-                            {Array.from(nextWord).map((l,i) => (
-                                <span key={`nxwd${i}`}>{l}</span>
-                            ))}
-                        </div>
-                    }
+                    {!solved && nextWord.length > 0 && <tr><td>{nextWord}</td></tr>}
                     {!solved && <tr><td>...</td></tr>}
                     <tr><td>{puzzle.targetWord}</td></tr>
                 </tbody>
@@ -208,20 +208,7 @@ const Transmogrify = ({setWhereto}) => {
             <p className="tm_congrats">👏🏽 Solved in {words.length + 1} moves 👏🏽</p>
         :
             <div>
-                <MobileOnlyView>
-                    {ShowKeyboard}
-                </MobileOnlyView>
-                <BrowserView>
-                    {ShowKeyboard}
-                    <form className="tm_form">
-                        Next Word:
-                        <input value={nextWord}
-                            onChange={(e) => {setNextWord(e.target.value);}}
-                            onKeyPress={(e) => {e.keyCode === 13 && acceptNextWord;}}
-                            ></input>
-                        <button type="submit" onClick={acceptNextWord}>SUBMIT</button>
-                    </form>
-                </BrowserView>
+                {ShowKeyboard}
                 <div className="tm_lastbuttons">
                     {words.length > 0 && 
                     <button onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}
