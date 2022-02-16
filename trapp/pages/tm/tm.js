@@ -9,7 +9,8 @@ const Transmogrify = ({setWhereto}) => {
     const numMovesArray = [2,3,4,5,6,7,8,9];
     const [puzzle, setPuzzle] = useState({});
     const [nextWord, setNextWord] = useState('');
-    const [words, setWords] = useState([]); // Users words
+    const [downWords, setDownWords] = useState([]); // Users words going down from the start word
+    const [upWords, setUpWords] = useState([]); // Users words going up from the target word
     const [solved, setSolved] = useState(false);
     const [solving, setSolving] = useState(false);
     const callForPuzzle = async() => {
@@ -25,7 +26,8 @@ const Transmogrify = ({setWhereto}) => {
             console.log(error);
         }
         setPuzzle(data);
-        setWords([]);
+        setDownWords([]);
+        setUpWords([]);
         setNextWord('');
         setSolved(false);
         setSolving(newSolving);
@@ -47,30 +49,57 @@ const Transmogrify = ({setWhereto}) => {
     }
     const acceptNextWord = async(e) => {
         e.preventDefault();
-        let prevWord = (words.length === 0 ? puzzle.startWord : words[words.length - 1]);
+        if (nextWord.length === 0) {
+            return;
+        }
+        // Is the word valid in the down direction?
+        let prevWord = (downWords.length === 0 ? puzzle.startWord : downWords[downWords.length - 1]);
         let newWord = nextWord;
-        if (validMove(newWord, prevWord)) {
+        if (validMove(prevWord, newWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
             } else {
-                let lastWord = puzzle.targetWord;
-                let newWords = [...words];
-                newWords.push(newWord);
-                setWords(newWords);
+                let wordBelowNewWord = (upWords.length === 0 ? puzzle.targetWord : upWords[0]);
+                let newDownWords = [...downWords];
+                newDownWords.push(newWord);
+                setDownWords(newDownWords);
                 setNextWord('');    
-                if (validMove(newWord, lastWord)) {
+                if (validMove(newWord, wordBelowNewWord)) {
                     setSolved(true);
                 }
             }
         } else {
-            alert('Only anagrams, drops, swaps and inserts allowed.');
+            // Is the word valid in the up direction?
+            prevWord = (upWords.length === 0 ? puzzle.targetWord : upWords[0]);
+            if (validMove(prevWord, newWord)) {
+                if (!await isWordValid(newWord)) {
+                    alert(`${newWord} is not a valid word`);
+                } else {
+                    let wordAboveNewWord = (downWords.length === 0 ? puzzle.startWord : downWords[downWords.length-1]);
+                    let newUpWords = [newWord,...upWords];
+                    setUpWords(newUpWords);
+                    setNextWord('');    
+                    if (validMove(newWord, wordAboveNewWord)) {
+                        setSolved(true);
+                    }                        
+                }
+            } else {
+                alert('Only anagrams, drops, swaps and inserts allowed.');
+            }
         }
     }
-    const removeWords =(wi) => {
-        if (wi < words.length) {
-            let newWords = [...words];
+    const removeDownWords =(wi) => {
+        if (wi < downWords.length) {
+            let newWords = [...downWords];
             newWords.splice(wi);
-            setWords(newWords);
+            setDownWords(newWords);
+        }
+    }
+    const removeUpWords =(wi) => {
+        if (wi < upWords.length) {
+            let newUpWords = [...upWords];
+            newUpWords.splice(0,wi+1);
+            setUpWords(newUpWords);
         }
     }
     const validMove = (prevWord="", newWord="") => {
@@ -109,6 +138,11 @@ const Transmogrify = ({setWhereto}) => {
         <span>{puzzle.numMoves}</span>
         <span>moves</span>
     </div>;
+    const SubmitWordDiv = <div className="tm_KeyGoDiv">
+        <button key="keyGo" onClick={acceptNextWord} className={`tm_KeyGo ${nextWord.length > 0 ? "" : "disabled"}`}>
+            SUBMIT WORD
+        </button>
+    </div>;
     const ShowKeyboard = <div>
         {keyboardVersion === 'ckv1' ?
             <div className="customKeyboardV1">
@@ -146,11 +180,9 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('B'); } } className="ckv1 B"></span>
                     <span onClick={() => { handleInputLetter('N'); } } className="ckv1 N"></span>
                     <span onClick={() => { handleInputLetter('M'); } } className="ckv1 M"></span>
-                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
+                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="ckv1 Backspace"></span>
                 </div>
-                {nextWord.length > 0 &&
-                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
-                }         
+                {SubmitWordDiv}
             </div>
         : keyboardVersion === 'ckv2' ?
             <div className="customKeyboardV2 ">
@@ -190,9 +222,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('M'); } }>M</span>
                     <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
                 </div>
-                {nextWord.length > 0 &&
-                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
-                }
+                {SubmitWordDiv}
             </div>
         :
             <div className="customKeyboardV3">
@@ -232,9 +262,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('M'); } } className="ckv3 M"></span>
                     <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
                 </div>
-                {nextWord.length > 0 &&
-                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
-                }         
+                {SubmitWordDiv}
             </div>
         }
     </div>;
@@ -243,30 +271,25 @@ const Transmogrify = ({setWhereto}) => {
             <table>
                 <tbody>
                     <tr><td>{puzzle.startWord}</td></tr>
-                    {words.map((w,i) => (
-                        <tr key={`userWord${i}`}><td>{w}</td></tr>
+                    {downWords.map((w,i) => (
+                        <tr key={`userDownWord${i}`}><td><span className="tm_arrow">↧</span>{w}</td></tr>
                     ))}
-                    {!solved && <tr><td>...</td></tr>}
-                    {!solved && nextWord.length > 0 && <tr><td>{nextWord}</td></tr>}
-                    {!solved && <tr><td>...</td></tr>}
+                    {!solved && <tr><td><span className="tm_nextword">&nbsp;{nextWord}&nbsp;</span></td></tr>}
+                    {upWords.map((w,i) => (
+                        <tr key={`userUpWord${i}`}><td>{w}<span className="tm_arrow">↥</span></td></tr>
+                    ))}
                     <tr><td>{puzzle.targetWord}</td></tr>
                 </tbody>
             </table>
         </div>
         {solved ?
-            <p className="tm_congrats">👏🏽 Solved in {words.length + 1} moves 👏🏽</p>
+            <p className="tm_congrats">👏🏽 Solved in {downWords.length + upWords.length + 1} moves 👏🏽</p>
         :
             <div>
                 {ShowKeyboard}
                 <div className="tm_lastbuttons">
-                    {words.length > 0 && 
-                    <button onClick={() => {let newWords = [...words]; newWords.pop(); setWords(newWords);}}
-                    data-toggle="tooltip" title="Remove last entered word"
-                    >
-                        UNDO
-                    </button>}
-                    {words.length > 0 &&
-                    <button onClick={() => {setWords([]); setNextWord('');}}
+                    {downWords.length + upWords.length > 0 &&
+                    <button onClick={() => {setDownWords([]); setUpWords([]); setNextWord('');}}
                     data-toggle="tooltip" title="Remove all enter words"
                     >
                         RESET
@@ -286,13 +309,17 @@ const Transmogrify = ({setWhereto}) => {
         }
     </div>
     const HintSection = <div>
-        <Showinfo key={`hint${puzzle.startWord}`} word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+        <Showinfo key={`hintstartword${puzzle.startWord}`} word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
-        {words.map((g,gi) => (
-            <Showinfo key={`hint${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
-             removeEntry={() => {removeWords(gi);}} entryIndex={gi+1}/>
+        {downWords.map((g,gi) => (
+            <Showinfo key={`hintdownword${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+             removeEntry={() => {removeDownWords(gi);}} entryIndex={gi+1}/>
         ))}
-        <Showinfo key={`hint${puzzle.targetWord}`} word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+        {upWords.map((g,gi) => (
+            <Showinfo key={`hintupword${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+             removeEntry={() => {removeUpWords(gi);}} entryIndex={gi+1}/>
+        ))}
+        <Showinfo key={`hinttargetword${puzzle.targetWord}`} word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
         <ul className="trParagraph">
             <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>

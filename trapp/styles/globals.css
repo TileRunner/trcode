@@ -44,6 +44,10 @@ a {
 .equispaced {
   font-family: monospace;
 }
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
@@ -213,6 +217,9 @@ a {
 }
 .ckv1.Z {
   background-image: url('../public/Keyboards/v1/Z.jpg');
+}
+.ckv1.Backspace {
+  background-image: url('../public/Keyboards/v1/backspace.jpg');
 }
 .ckv1Word {
   display: flex;

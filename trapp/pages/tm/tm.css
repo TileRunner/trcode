@@ -68,17 +68,17 @@
 }
 .tm_solutionOuterDiv {
     margin-top: 5px;
-    background-color: blue;
-    padding-top: 2px;
 }
 .tm_solutionDiv {
-    background-color: blue;
-    color: whitesmoke;
+    background-image: url('../../public/transmogrify.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
     align-items: center;
+    min-height: 225px;
+    min-width: 370px;
 }
 .tm_solutionDiv table {
     text-align: center;
-    margin-top: 5px;
     margin-left: auto;
     margin-right: auto;
     letter-spacing: 1px;
@@ -86,12 +86,26 @@
 .tm_solutionDiv td {
     text-transform: uppercase;
 }
+.tm_solutionDiv tr:not(:first-child):not(:last-child) {
+    color: yellow;
+    text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;
+    font-weight: bold;
+}
+.tm_nextword {
+    font-size: x-large;
+}
+.tm_arrow {
+    color: cyan;
+    text-shadow: none;
+    background-color: black;
+}
 .tm_solutionDiv tr:first-child {
     background-color: green;
-
+    color: whitesmoke !important;
 }
 .tm_solutionDiv tr:last-child {
     background-color: green;
+    color: whitesmoke;
 }
 
 
