@@ -152,10 +152,10 @@ const Transmogrify = ({setWhereto}) => {
                     <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
                 }         
             </div>
-        : 
+        : keyboardVersion === 'ckv2' ?
             <div className="customKeyboardV2 ">
                 <div className="switchkb">
-                    <button key="switchbkv2" onClick={() => {setKeyboardVersion('ckv1');}}>switch keyboard</button>
+                    <button key="switchbkv2" onClick={() => {setKeyboardVersion('ckv3');}}>switch keyboard</button>
                 </div>
                 <div className="ckv2Row1">
                     <span onClick={() => { handleInputLetter('Q'); } }>Q</span>
@@ -193,6 +193,48 @@ const Transmogrify = ({setWhereto}) => {
                 {nextWord.length > 0 &&
                     <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
                 }
+            </div>
+        :
+            <div className="customKeyboardV3">
+                <div className="switchkb">
+                    <button key="switchbkv3" onClick={() => {setKeyboardVersion('ckv1');}}>switch keyboard</button>
+                </div>
+                <div className="ckv3Row1">
+                    <span onClick={() => { handleInputLetter('Q'); } } className="ckv3 Q"></span>
+                    <span onClick={() => { handleInputLetter('W'); } } className="ckv3 W"></span>
+                    <span onClick={() => { handleInputLetter('E'); } } className="ckv3 E"></span>
+                    <span onClick={() => { handleInputLetter('R'); } } className="ckv3 R"></span>
+                    <span onClick={() => { handleInputLetter('T'); } } className="ckv3 T"></span>
+                    <span onClick={() => { handleInputLetter('Y'); } } className="ckv3 Y"></span>
+                    <span onClick={() => { handleInputLetter('U'); } } className="ckv3 U"></span>
+                    <span onClick={() => { handleInputLetter('I'); } } className="ckv3 I"></span>
+                    <span onClick={() => { handleInputLetter('O'); } } className="ckv3 O"></span>
+                    <span onClick={() => { handleInputLetter('P'); } } className="ckv3 P"></span>
+                </div>
+                <div className="ckv3Row2">
+                    <span onClick={() => { handleInputLetter('A'); } } className="ckv3 A"></span>
+                    <span onClick={() => { handleInputLetter('S'); } } className="ckv3 S"></span>
+                    <span onClick={() => { handleInputLetter('D'); } } className="ckv3 D"></span>
+                    <span onClick={() => { handleInputLetter('F'); } } className="ckv3 F"></span>
+                    <span onClick={() => { handleInputLetter('G'); } } className="ckv3 G"></span>
+                    <span onClick={() => { handleInputLetter('H'); } } className="ckv3 H"></span>
+                    <span onClick={() => { handleInputLetter('J'); } } className="ckv3 J"></span>
+                    <span onClick={() => { handleInputLetter('K'); } } className="ckv3 K"></span>
+                    <span onClick={() => { handleInputLetter('L'); } } className="ckv3 L"></span>
+                </div>
+                <div className="ckv3Row3">
+                    <span onClick={() => { handleInputLetter('Z'); } } className="ckv3 Z"></span>
+                    <span onClick={() => { handleInputLetter('X'); } } className="ckv3 X"></span>
+                    <span onClick={() => { handleInputLetter('C'); } } className="ckv3 C"></span>
+                    <span onClick={() => { handleInputLetter('V'); } } className="ckv3 V"></span>
+                    <span onClick={() => { handleInputLetter('B'); } } className="ckv3 B"></span>
+                    <span onClick={() => { handleInputLetter('N'); } } className="ckv3 N"></span>
+                    <span onClick={() => { handleInputLetter('M'); } } className="ckv3 M"></span>
+                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
+                </div>
+                {nextWord.length > 0 &&
+                    <div className="tm_KeyGoDiv"><button key="keyGo" onClick={acceptNextWord} className="tm_KeyGo">SUBMIT WORD</button></div>
+                }         
             </div>
         }
     </div>;

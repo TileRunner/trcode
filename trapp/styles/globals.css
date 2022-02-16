@@ -258,3 +258,128 @@ a {
     padding: 5px 8px;
     font-size: large;
 }
+/* Version 3 */
+.customKeyboardV3 {
+  margin-top: 5px;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px 0px;
+  background-color: white;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  width: 370px;
+}
+.ckv3Row1 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+.ckv3Row2 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.ckv3Row3 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  margin-left: 20px;
+  margin-right: 10px;
+}
+.customKeyboardV3 span {
+  text-align: center;
+  margin: 0px 1px;
+  padding: 5px 8px;
+  font-size: large;
+}
+
+.ckv3 {
+  background-size: cover;
+  width: 35px;
+  height: 35px;
+}
+.ckv3.A {
+  background-image: url('../public/Keyboards/v3/A.png'); 
+}
+.ckv3.B {
+  background-image: url('../public/Keyboards/v3/B.png'); 
+}
+.ckv3.C {
+  background-image: url('../public/Keyboards/v3/C.png'); 
+}
+.ckv3.D {
+  background-image: url('../public/Keyboards/v3/D.png'); 
+}
+.ckv3.E {
+  background-image: url('../public/Keyboards/v3/E.png'); 
+}
+.ckv3.F {
+  background-image: url('../public/Keyboards/v3/F.png'); 
+}
+.ckv3.G { 
+  background-image: url('../public/Keyboards/v3/G.png'); 
+}
+.ckv3.H {
+  background-image: url('../public/Keyboards/v3/H.png');
+}
+.ckv3.I {
+  background-image: url('../public/Keyboards/v3/I.png');
+}
+.ckv3.J {
+  background-image: url('../public/Keyboards/v3/J.png');
+}
+.ckv3.K {
+  background-image: url('../public/Keyboards/v3/K.png');
+}
+.ckv3.L {
+  background-image: url('../public/Keyboards/v3/L.png');
+}
+.ckv3.M {
+  background-image: url('../public/Keyboards/v3/M.png'); 
+}
+.ckv3.N {
+  background-image: url('../public/Keyboards/v3/N.png'); 
+}
+.ckv3.O {
+  background-image: url('../public/Keyboards/v3/O.png'); 
+}
+.ckv3.P {
+  background-image: url('../public/Keyboards/v3/P.png'); 
+}
+.ckv3.Q {
+  background-image: url('../public/Keyboards/v3/Q.png');
+}
+.ckv3.R {
+  background-image: url('../public/Keyboards/v3/R.png');
+}
+.ckv3.S {
+  background-image: url('../public/Keyboards/v3/S.png');
+}
+.ckv3.T {
+  background-image: url('../public/Keyboards/v3/T.png');
+}
+.ckv3.U {
+  background-image: url('../public/Keyboards/v3/U.png');
+}
+.ckv3.V {
+  background-image: url('../public/Keyboards/v3/V.png');
+}
+.ckv3.W {
+  background-image: url('../public/Keyboards/v3/W.png');
+}
+.ckv3.X {
+  background-image: url('../public/Keyboards/v3/X.png');
+}
+.ckv3.Y {
+  background-image: url('../public/Keyboards/v3/Y.png');
+}
+.ckv3.Z {
+  background-image: url('../public/Keyboards/v3/Z.png');
+}
+.ckv3Word {
+  display: flex;
+  justify-content: center;
+}
