@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserView, MobileOnlyView } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
 import Showinfo from '../wi/showinfo'
 
@@ -360,7 +360,14 @@ const Transmogrify = ({setWhereto}) => {
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <BrowserView>
+            {isMobile ?
+            <div>
+                {MainSection}
+                {puzzle && puzzle.startWord && !solved && {HintSection}}
+                {puzzle && puzzle.startWord && !solved && ExplainHints}
+            </div>
+            :
+            <div>
                 <table onKeyDown={(e) => { handleKeyDown(e); } } tabIndex={-1}>
                     <tbody>
                         <tr>
@@ -386,12 +393,8 @@ const Transmogrify = ({setWhereto}) => {
                         </tr>
                     </tbody>
                 </table>
-            </BrowserView>
-            <MobileOnlyView>
-                {MainSection}
-                {puzzle && puzzle.startWord && !solved && {HintSection}}
-                {puzzle && puzzle.startWord && !solved && ExplainHints}
-            </MobileOnlyView>
+            </div>
+            }
             <div>
                 {puzzle && puzzle.notes && puzzle.notes.length > 0 &&
                 <div className="trDanger">
