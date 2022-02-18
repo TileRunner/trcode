@@ -322,7 +322,7 @@ const Transmogrify = ({setWhereto}) => {
                 </div>
             </div>
         }
-    </div>
+    </div>;
     const ExplainHints = <ul className="trParagraph">
         <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>
         <li><span className="swapCount">&nbsp;2&nbsp;</span>Shows swaps counts/letters</li>
@@ -332,19 +332,19 @@ const Transmogrify = ({setWhereto}) => {
         <li>Click the <span className="closemebutton"></span> to remove your word</li>
     </ul>;
     const HintSection = <div>
-        <Showinfo key={`hintstartword${puzzle.startWord}`} word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+        <Showinfo word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
         {downWords.map((g,gi) => (
-            <Showinfo key={`hintdownword${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+            <Showinfo key={`hintdownword${gi}${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {removeDownWords(gi);}} entryIndex={gi+1}/>
         ))}
         {upWords.map((g,gi) => (
-            <Showinfo key={`hintupword${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+            <Showinfo key={`hintupword${gi}${g}`} word={g} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {removeUpWords(gi);}} entryIndex={gi+1}/>
         ))}
-        <Showinfo key={`hinttargetword${puzzle.targetWord}`} word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
+        <Showinfo word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
-    </div>
+    </div>;
     const MainSection = <table>
         <tbody>
             {(solved || !solving) && <tr><td>{GameStartSection}</td></tr>}
@@ -363,7 +363,7 @@ const Transmogrify = ({setWhereto}) => {
             {isMobile ?
             <div>
                 {MainSection}
-                {puzzle && puzzle.startWord && !solved && {HintSection}}
+                {puzzle && puzzle.startWord && !solved && HintSection}
                 {puzzle && puzzle.startWord && !solved && ExplainHints}
             </div>
             :
@@ -374,8 +374,8 @@ const Transmogrify = ({setWhereto}) => {
                             <td className="aligntop">
                                 {MainSection}
                                 {puzzle && puzzle.startWord && !solved && <div>
-                                <p>If your computer keyboard is not responding,</p>
-                                <p>click the transmogrify picture and try again.</p>
+                                    <p>If your computer keyboard is not responding,</p>
+                                    <p>click the transmogrify picture and try again.</p>
                                 </div>}
                             </td>
                             {puzzle && puzzle.startWord && !solved && <td className="aligntop">
