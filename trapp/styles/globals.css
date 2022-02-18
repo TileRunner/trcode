@@ -41,6 +41,9 @@ a {
 .textright {
   text-align: right;
 }
+.aligntop {
+  vertical-align: top;
+}
 .equispaced {
   font-family: monospace;
 }
@@ -385,6 +388,9 @@ a {
 }
 .ckv3.Z {
   background-image: url('../public/Keyboards/v3/Z.png');
+}
+.ckv3.Backspace {
+  background-image: url('../public/Keyboards/v3/Backspace.png');
 }
 .ckv3Word {
   display: flex;

@@ -145,3 +145,14 @@
     color: aqua;
     font-style: italic;
 }
+.tm_hintsheader {
+    border-top: 8px solid;
+    border-bottom: 8px solid;
+    width: 370px;
+    height: 58px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    background-color: blue;
+    color: whitesmoke;
+}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BrowserView, MobileOnlyView } from "react-device-detect";
 import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
 import Showinfo from '../wi/showinfo'
 
@@ -34,6 +35,20 @@ const Transmogrify = ({setWhereto}) => {
     }
     const quitThisPuzzle = () => {
         setSolving(false);
+    }
+    const handleKeyDown = async(event) => {
+        if (event.key === "F12") {return;}
+        if (event.key === "Enter") {
+            acceptNextWord(event);
+            return;
+        }
+        event.preventDefault();
+        let k = event.key.toUpperCase();
+        if (k === "BACKSPACE") {
+            handleDeleteLetter();
+        } else if (/^[A-Z]$/.test(k)) { // Is a letter
+            handleInputLetter(k);
+        }
     }
     const handleInputLetter = (letter) => {
         let sofar = nextWord + letter;
@@ -260,7 +275,7 @@ const Transmogrify = ({setWhereto}) => {
                     <span onClick={() => { handleInputLetter('B'); } } className="ckv3 B"></span>
                     <span onClick={() => { handleInputLetter('N'); } } className="ckv3 N"></span>
                     <span onClick={() => { handleInputLetter('M'); } } className="ckv3 M"></span>
-                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="tm_Backspace"></span>
+                    <span onClick={() => { nextWord.length > 0 && handleDeleteLetter(); } } class="ckv3 Backspace"></span>
                 </div>
                 {SubmitWordDiv}
             </div>
@@ -268,7 +283,7 @@ const Transmogrify = ({setWhereto}) => {
     </div>;
     const SolutionSection = <div className="tm_solutionOuterDiv">
         <div className="tm_solutionDiv">
-            <table>
+            {puzzle && puzzle.startWord && <table>
                 <tbody>
                     <tr><td>{puzzle.startWord}</td></tr>
                     {downWords.map((w,i) => (
@@ -280,7 +295,7 @@ const Transmogrify = ({setWhereto}) => {
                     ))}
                     <tr><td>{puzzle.targetWord}</td></tr>
                 </tbody>
-            </table>
+            </table>}
         </div>
         {solved ?
             <p className="tm_congrats">👏🏽 Solved in {downWords.length + upWords.length + 1} moves 👏🏽</p>
@@ -308,6 +323,14 @@ const Transmogrify = ({setWhereto}) => {
             </div>
         }
     </div>
+    const ExplainHints = <ul className="trParagraph">
+        <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>
+        <li><span className="swapCount">&nbsp;2&nbsp;</span>Shows swaps counts/letters</li>
+        <li><span className="anagramCount">3</span>Shows anagram counts/words</li>
+        <li>Click to toggle between count and info</li>
+        <li>The black dot represents a drop</li>
+        <li>Click the <span className="closemebutton"></span> to remove your word</li>
+    </ul>;
     const HintSection = <div>
         <Showinfo key={`hintstartword${puzzle.startWord}`} word={puzzle.startWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
@@ -321,15 +344,14 @@ const Transmogrify = ({setWhereto}) => {
         ))}
         <Showinfo key={`hinttargetword${puzzle.targetWord}`} word={puzzle.targetWord} showInserts="Y" showSwaps="Y" showAnagrams="Y" showDrops="Y"
              removeEntry={() => {}} entryIndex={-1}/>
-        <ul className="trParagraph">
-            <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>
-            <li><span className="swapCount">&nbsp;2&nbsp;</span>Shows swaps counts/letters</li>
-            <li><span className="anagramCount">3</span>Shows anagram counts/words</li>
-            <li>Click to toggle between count and info</li>
-            <li>The black dot represents a drop</li>
-            <li>Click the <span className="closemebutton"></span> to remove</li>
-        </ul>
     </div>
+    const MainSection = <table>
+        <tbody>
+            {(solved || !solving) && <tr><td>{GameStartSection}</td></tr>}
+            {puzzle && puzzle.startWord && <tr><td>{PuzzleSection}</td></tr>}
+            <tr><td>{SolutionSection}</td></tr>
+        </tbody>
+    </table>;
     return (
         <div className="trBackground">
             <div className="trTitle">
@@ -338,14 +360,38 @@ const Transmogrify = ({setWhereto}) => {
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
             </div>
-            <table>
-                <tbody>
-                    {(solved || !solving) && <tr><td>{GameStartSection}</td></tr>}
-                    {puzzle && puzzle.startWord && <tr><td>{PuzzleSection}</td></tr>}
-                    {puzzle && puzzle.startWord && <tr><td>{SolutionSection}</td></tr>}
-                    {puzzle && puzzle.startWord && !solved && <tr><td>{HintSection}</td></tr>}
-                </tbody>
-            </table>
+            <BrowserView>
+                <table onKeyDown={(e) => { handleKeyDown(e); } } tabIndex={-1}>
+                    <tbody>
+                        <tr>
+                            <td className="aligntop">
+                                {MainSection}
+                                {puzzle && puzzle.startWord && !solved && <div>
+                                <p>If your computer keyboard is not responding,</p>
+                                <p>click the transmogrify picture and try again.</p>
+                                </div>}
+                            </td>
+                            {puzzle && puzzle.startWord && !solved && <td className="aligntop">
+                                <div className="tm_hintsheader">
+                                    Hints
+                                </div>
+                                {HintSection}
+                            </td>}
+                            {puzzle && puzzle.startWord && !solved && <td className="aligntop">
+                            <div className="tm_hintsheader">
+                                    Hints Explanation
+                                </div>
+                                {ExplainHints}
+                            </td>}
+                        </tr>
+                    </tbody>
+                </table>
+            </BrowserView>
+            <MobileOnlyView>
+                {MainSection}
+                {puzzle && puzzle.startWord && !solved && {HintSection}}
+                {puzzle && puzzle.startWord && !solved && ExplainHints}
+            </MobileOnlyView>
             <div>
                 {puzzle && puzzle.notes && puzzle.notes.length > 0 &&
                 <div className="trDanger">
