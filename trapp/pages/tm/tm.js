@@ -41,13 +41,22 @@ const Transmogrify = ({setWhereto}) => {
         setSolved(false);
         setSolving(newSolving);
     }
+    const resetEnteredWords = async() => {
+        let validDownWords = await getTransmogrifyValidNextWords(puzzle.startWord);
+        let validUpWords = await getTransmogrifyValidNextWords(puzzle.targetWord);
+        setDownWords([]);
+        setValidNextDownWords(validDownWords);
+        setUpWords([]);
+        setValidNextUpWords(validUpWords);
+        setNextWord('');
+    }
     const quitThisPuzzle = () => {
         setSolving(false);
     }
     const handleKeyDown = async(event) => {
         if (event.key === "F12") {return;}
         if (event.key === "Enter") {
-            acceptNextWord(event);
+            acceptNextWordAsEvent(event);
             return;
         }
         event.preventDefault();
@@ -70,14 +79,22 @@ const Transmogrify = ({setWhereto}) => {
             setNextWord(newsofar);
         }
     }
-    const acceptNextWord = async(e) => {
+    const acceptNextWordAsEvent = async(e) => {
         e.preventDefault();
         if (nextWord.length === 0) {
             return;
         }
+        await acceptTheNextWord(nextWord);
+    }
+    const acceptThisWord = async(w) => {
+        let newNextWord = w.toUpperCase();
+        setNextWord(newNextWord);
+        await acceptTheNextWord(newNextWord);
+    }
+    const acceptTheNextWord = async(newWord) => {
         // Is the word valid in the down direction?
         let prevWord = (downWords.length === 0 ? puzzle.startWord : downWords[downWords.length - 1]);
-        let newWord = nextWord; // upper case
+        newWord = newWord.toUpperCase();
         if (validMove(prevWord, newWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
@@ -121,18 +138,24 @@ const Transmogrify = ({setWhereto}) => {
             }
         }
     }
-    const removeDownWords =(wi) => {
+    const removeDownWords = async(wi) => {
         if (wi < downWords.length) {
-            let newWords = [...downWords];
-            newWords.splice(wi);
-            setDownWords(newWords);
+            let newDownWords = [...downWords];
+            newDownWords.splice(wi);
+            let fromWord = newDownWords.length === 0 ? puzzle.startWord : newDownWords[newDownWords.length - 1];
+            let validDownWords = await getTransmogrifyValidNextWords(fromWord);
+            setDownWords(newDownWords);
+            setValidNextDownWords(validDownWords);
         }
     }
-    const removeUpWords =(wi) => {
+    const removeUpWords = async(wi) => {
         if (wi < upWords.length) {
             let newUpWords = [...upWords];
             newUpWords.splice(0,wi+1);
+            let fromWord = newUpWords.length === 0 ? puzzle.targetWord : newUpWords[newUpWords.length - 1];
+            let validUpWords = await getTransmogrifyValidNextWords(fromWord);
             setUpWords(newUpWords);
+            setValidNextUpWords(validUpWords);
         }
     }
     const validMove = (prevWord="", newWord="") => {
@@ -172,7 +195,7 @@ const Transmogrify = ({setWhereto}) => {
         <span>moves</span>
     </div>;
     const SubmitWordDiv = <div className="tm_KeyGoDiv">
-        <button key="keyGo" onClick={acceptNextWord} className={`tm_KeyGo ${nextWord.length > 0 ? "" : "disabled"}`}>
+        <button key="keyGo" onClick={acceptNextWordAsEvent} className={`tm_KeyGo ${nextWord.length > 0 ? "" : "disabled"}`}>
             SUBMIT WORD
         </button>
     </div>;
@@ -304,7 +327,7 @@ const Transmogrify = ({setWhereto}) => {
             {puzzle && puzzle.startWord && <table>
                 <tbody>
                     <tr>
-                        <td>{puzzle.startWord}</td>
+                        <td><span className="tm_arrow">↧</span>{puzzle.startWord}</td>
                     </tr>
                     {downWords.map((w,i) => (
                         <tr key={`userDownWord${i}`}>
@@ -313,9 +336,7 @@ const Transmogrify = ({setWhereto}) => {
                     ))}
                     {!solved && <tr>
                         <td>
-                            <span className="tm_nextword"
-                             data-toggle="tooltip" title={`Valid down words: ${validNextDownWords}\nValid up words: ${validNextUpWords}`}
-                            >&nbsp;{nextWord}&nbsp;</span>
+                            <span className="tm_nextword">&nbsp;{nextWord}&nbsp;</span>
                         </td>
                     </tr>}
                     {upWords.map((w,i) => (
@@ -324,19 +345,36 @@ const Transmogrify = ({setWhereto}) => {
                         </tr>
                     ))}
                     <tr>
-                        <td>{puzzle.targetWord}</td>
+                        <td>{puzzle.targetWord}<span className="tm_arrow">↥</span></td>
                     </tr>
                 </tbody>
             </table>}
         </div>
+        {puzzle && puzzle.startWord && !solved && <div className="tm_validwordsdiv">
+            <p>Valid down words</p>
+            {validNextDownWords.map((w,i) => (
+                <span key={`validdownword${i}`}
+                onClick={() => {
+                    acceptThisWord(w);
+                }}>{w}{i + 1 === validNextDownWords.length ? '' : ','}&nbsp;</span>
+            ))}
+            <p>Valid up words</p>
+            {validNextUpWords.map((w,i) => (
+                <span key={`validupword${i}`}
+                onClick={() => {
+                    acceptThisWord(w);
+                }}>{w}{i + 1 === validNextUpWords.length ? '' : ','}&nbsp;</span>
+            ))}
+            <p>Click Your Chosen Next Word</p>
+        </div>}
         {solved ?
             <p className="tm_congrats">👏🏽 Solved in {downWords.length + upWords.length + 1} moves 👏🏽</p>
         :
             <div>
-                {ShowKeyboard}
+                {/* {ShowKeyboard} */}
                 <div className="tm_lastbuttons">
                     {downWords.length + upWords.length > 0 &&
-                    <button onClick={() => {setDownWords([]); setUpWords([]); setNextWord('');}}
+                    <button onClick={() => {resetEnteredWords();}}
                     data-toggle="tooltip" title="Remove all enter words"
                     >
                         RESET
@@ -395,8 +433,6 @@ const Transmogrify = ({setWhereto}) => {
             {isMobile ?
             <div>
                 {MainSection}
-                {puzzle && puzzle.startWord && !solved && HintSection}
-                {puzzle && puzzle.startWord && !solved && ExplainHints}
             </div>
             :
             <div>
@@ -405,20 +441,16 @@ const Transmogrify = ({setWhereto}) => {
                         <tr>
                             <td className="aligntop">
                                 {MainSection}
-                                {puzzle && puzzle.startWord && !solved && <div>
-                                    <p>If your computer keyboard is not responding,</p>
-                                    <p>click the transmogrify picture and try again.</p>
-                                </div>}
                             </td>
                             {puzzle && puzzle.startWord && !solved && <td className="aligntop">
                                 <div className="tm_hintsheader">
-                                    Hints
+                                    Word Info
                                 </div>
                                 {HintSection}
                             </td>}
                             {puzzle && puzzle.startWord && !solved && <td className="aligntop">
                             <div className="tm_hintsheader">
-                                    Hints Explanation
+                                    Word Info Explanation
                                 </div>
                                 {ExplainHints}
                             </td>}

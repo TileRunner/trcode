@@ -139,6 +139,34 @@
     color: whitesmoke;
     border: 1px solid white;
 }
+.tm_validwordsdiv {
+    width: 370px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.tm_validwordsdiv p {
+    border-top: 8px solid white;
+    border-bottom: 8px solid white;
+    background-color: blue;
+    color: white;
+    margin-top: 10px;
+    flex-basis: 100%;
+    text-align: center;
+    text-transform: capitalize;
+}
+.tm_validwordsdiv p::before {
+    content: '<<< ';
+}
+.tm_validwordsdiv p::after {
+    content: ' >>>';
+}
+.tm_validwordsdiv span {
+    text-transform: uppercase;
+    color: yellow;
+    text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;
+    font-weight: bold;
+    cursor: pointer;
+}
 .tm_congrats {
     margin-top: 5px;
     text-align: center;

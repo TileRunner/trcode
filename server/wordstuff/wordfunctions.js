@@ -320,7 +320,7 @@ function getTransmogrifyValidNextWords(used = {}, fromWord="", anagramsByLength=
   let anagrams = ea ? ea.anagrams : [];
   let candidates = swaps.concat(drops).concat(inserts).concat(anagrams);
   candidates.forEach(cw => {
-    if (!used[cw]) {
+    if (fromWord !== cw && !used[cw]) {
       used = Object.assign(used, {[cw]: true});
       validNextWords.push(cw);
     }
