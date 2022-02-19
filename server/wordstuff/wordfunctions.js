@@ -1,6 +1,16 @@
 const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
 /* Private methods */
+
+/**
+ * Get the alphagram for the given letters (word).
+ * @param {string} letters The letters (word) that you want the alphagram for
+ * @returns The alphagram for the given letters (word) in the same case that letters were passed as.
+ */
+function getAlphagram(letters="") {
+  return Array.from(letters).sort().join('');
+}
+
 function pickRandomWord(wordArray, removeFromArray=false) {
     let rand = Math.floor(Math.random() * wordArray.length);
     let randomword = wordArray[rand];
@@ -92,9 +102,9 @@ function areAnagrams(word1="", word2="") {
   if (w1 === w2) {
       return false;
   }
-  let a1 = Array.from(w1).sort();
-  let a2 = Array.from(w2).sort();
-  return a1.join('') === a2.join('');
+  let a1 = getAlphagram(w1);
+  let a2 = getAlphagram(w2);
+  return a1 === a2;
 }
 
 /* Public methods to be exported */
@@ -104,6 +114,7 @@ function getAnagrams(word, wordssamelength) {
   let anagrams = wordssamelength.filter((w) => {return areAnagrams(wlc, w);});
   return anagrams;
 }
+
 /**
  * Determine the words that can be reached by swapping one letter in the provided word.
  * @param {string} word The word that you want to know the swaps for (words that you swap one letter to get to)
@@ -255,8 +266,6 @@ function createTransmogrifyPuzzle(anagramsByLength=[], alphagramsByLength=[], mi
   let protector = 0;
   let protectorMax = 200;
   let puzzle = Array(numRows).fill([]);
-  let minWordLength = 2;
-  let maxWordLength = 8;
   let untriedFirstWords = Object.keys(anagramsByLength[5]); // Always start with a 5 for now.
   let madePuzzle = false;
   let startWord = '';
@@ -270,7 +279,6 @@ function createTransmogrifyPuzzle(anagramsByLength=[], alphagramsByLength=[], mi
     } else {
       startWord = pickRandomWord(untriedFirstWords, true);
       puzzle[0] = [startWord];
-      //TODO L@@K switch used array to Object.assign thingy
       let used = {};
       used = Object.assign(used, {[startWord]: true});
       for(let rowIndex=1; rowIndex<numRows; rowIndex++) {
@@ -278,21 +286,8 @@ function createTransmogrifyPuzzle(anagramsByLength=[], alphagramsByLength=[], mi
         // Loop through words at previous row index
         for (let i = 0; i < puzzle[rowIndex-1].length; i++) {
           const pw = puzzle[rowIndex-1][i]; // A word from the previous row
-          let swaps = getSwapWords(pw, anagramsByLength[pw.length]);
-          let drops = pw.length - 1 < minWordLength ? [] : getDropWords(pw, anagramsByLength[pw.length-1]);
-          let inserts = pw.length + 1 > maxWordLength ? [] : getInsertWords(pw, anagramsByLength[pw.length+1]);
-          let letters = Array.from(pw);
-          letters.sort();
-          let alphagram = letters.join('');
-          let ea = alphagramsByLength[pw.length][alphagram];
-          let anagrams = ea ? ea.anagrams : [];
-          let candidates = swaps.concat(drops).concat(inserts).concat(anagrams);
-          candidates.forEach(cw => {
-            if (!used[cw]) {
-              used = Object.assign(used, {[cw]: true});
-              puzzle[rowIndex].push(cw);
-            }
-          });
+          let validNextWords = getTransmogrifyValidNextWords(used, pw, anagramsByLength, alphagramsByLength);
+          puzzle[rowIndex] = puzzle[rowIndex].concat(validNextWords);
         }
       }
       if (puzzle[numRows-1].length > 0) {
@@ -305,4 +300,34 @@ function createTransmogrifyPuzzle(anagramsByLength=[], alphagramsByLength=[], mi
   return {startWord: startWord, targetWord: targetWord, fail: fail};
 }
 
-module.exports = {getAnagrams, getSwaps, getDrops, getInserts, createMorphoPuzzle, createTransmogrifyPuzzle};
+/**
+ * Determine valid next words from a given word per transmogrify move rules
+ * @param {object} used Words already used that you do not want to use again, if any. This gets modified with the valid next words.
+ * @param {string} fromWord The word you are moving from to get a new word
+ * @param {object[]} anagramsByLength An array of word lists where the index is the word length 2 to 8.
+ * @param {object[]} alphagramsByLength An array of alphagrams lists with anagrams where the index is the word length 2 to 8.
+ * @returns A distinct array of valid next words
+ */
+function getTransmogrifyValidNextWords(used = {}, fromWord="", anagramsByLength=[], alphagramsByLength=[]) {
+  let validNextWords = [];
+  let swaps = getSwapWords(fromWord, anagramsByLength[fromWord.length]);
+  let drops = fromWord.length - 1 < 2 ? [] : getDropWords(fromWord, anagramsByLength[fromWord.length-1]);
+  let inserts = fromWord.length + 1 > 8 ? [] : getInsertWords(fromWord, anagramsByLength[fromWord.length+1]);
+  let letters = Array.from(fromWord);
+  letters.sort();
+  let alphagram = letters.join('');
+  let ea = alphagramsByLength[fromWord.length][alphagram];
+  let anagrams = ea ? ea.anagrams : [];
+  let candidates = swaps.concat(drops).concat(inserts).concat(anagrams);
+  candidates.forEach(cw => {
+    if (!used[cw]) {
+      used = Object.assign(used, {[cw]: true});
+      validNextWords.push(cw);
+    }
+  });
+  return validNextWords;
+}
+
+module.exports = {getAnagrams, getSwaps, getDrops, getInserts
+  , createMorphoPuzzle
+  , createTransmogrifyPuzzle, getTransmogrifyValidNextWords};

@@ -36,7 +36,7 @@ function MyApp({Component,pageProps}) {
                     rel="stylesheet"
                     href="https://www.w3schools.com/w3css/4/w3.css"
                     />
-                <link /* I have my own css file on github so I can change the UI with deploying this app */
+                <link /* I have my own css file on github so I can change the UI but still have to deploying this app to see changes */
                     rel="stylesheet"
                     href="https://tilerunner.github.io/trcss.css"
                     />

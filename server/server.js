@@ -11,7 +11,9 @@ const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { fybInitialize, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
 const { fybPrepickTiles} = require('./fyb/functions/pickLetters');
-const { getAnagrams, getSwaps, getDrops, getInserts, createMorphoPuzzle, createTransmogrifyPuzzle} = require('./wordstuff/wordfunctions');
+const { getAnagrams, getSwaps, getDrops, getInserts
+  , createMorphoPuzzle
+  , createTransmogrifyPuzzle, getTransmogrifyValidNextWords} = require('./wordstuff/wordfunctions');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 // 2 letters words at [2] .... 8 letter words at [8].
@@ -395,6 +397,13 @@ const server = express()
         if (req.query.letters) {
             // The desired group of letters is passed in 'letters'
             let word = req.query.letters.toLowerCase();
+            // If they send with tm=true then return valid transmogrify moves
+            if (req.query.tm) {
+              let tm = getTransmogrifyValidNextWords({}, word, anagramsByLength, alphagramsByLength);
+              tm.sort();
+              res.send({func: 'tm moves', from: word, to: tm});
+              return;
+            }
             let wlen = word.length;
             let wordssamelength = allwords.filter(function (e) {
               return e.length === wlen;

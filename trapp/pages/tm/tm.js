@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { isMobile } from "react-device-detect";
-import { countSwaps, areAnagrams, isDrop, isWordValid } from '../../lib/wordfunctions';
+import { countSwaps, areAnagrams, isDrop, isWordValid, getTransmogrifyValidNextWords } from '../../lib/wordfunctions';
 import Showinfo from '../wi/showinfo'
 
 const Transmogrify = ({setWhereto}) => {
@@ -11,16 +11,22 @@ const Transmogrify = ({setWhereto}) => {
     const [puzzle, setPuzzle] = useState({});
     const [nextWord, setNextWord] = useState('');
     const [downWords, setDownWords] = useState([]); // Users words going down from the start word
+    const [validNextDownWords, setValidNextDownWords] = useState([]); // Valid next words in down direction
     const [upWords, setUpWords] = useState([]); // Users words going up from the target word
+    const [validNextUpWords, setValidNextUpWords] = useState([]); // Valid next words in up direction
     const [solved, setSolved] = useState(false);
     const [solving, setSolving] = useState(false);
     const callForPuzzle = async() => {
         let data = {};
+        let validDownWords = [];
+        let validUpWords = [];
         let newSolving = false;
         try {
             let url = `${baseurl}/ENABLE2K?transmogrify=true&numMoves=${numMoves}`;
             const response = await fetch(url);
-            data = await response.json();                
+            data = await response.json();
+            validDownWords = await getTransmogrifyValidNextWords(data.startWord);
+            validUpWords = await getTransmogrifyValidNextWords(data.targetWord);
             newSolving = true;
         } catch (error) {
             data.notes = ["Problem with the server. Sorry about that."];
@@ -28,7 +34,9 @@ const Transmogrify = ({setWhereto}) => {
         }
         setPuzzle(data);
         setDownWords([]);
+        setValidNextDownWords(validDownWords);
         setUpWords([]);
+        setValidNextUpWords(validUpWords);
         setNextWord('');
         setSolved(false);
         setSolving(newSolving);
@@ -69,7 +77,7 @@ const Transmogrify = ({setWhereto}) => {
         }
         // Is the word valid in the down direction?
         let prevWord = (downWords.length === 0 ? puzzle.startWord : downWords[downWords.length - 1]);
-        let newWord = nextWord;
+        let newWord = nextWord; // upper case
         if (validMove(prevWord, newWord)) {
             if (!await isWordValid(newWord)) {
                 alert(`${newWord} is not a valid word`);
@@ -77,10 +85,15 @@ const Transmogrify = ({setWhereto}) => {
                 let wordBelowNewWord = (upWords.length === 0 ? puzzle.targetWord : upWords[0]);
                 let newDownWords = [...downWords];
                 newDownWords.push(newWord);
-                setDownWords(newDownWords);
-                setNextWord('');    
                 if (validMove(newWord, wordBelowNewWord)) {
+                    setDownWords(newDownWords);
+                    setNextWord('');    
                     setSolved(true);
+                } else {
+                    let validNextWords = await getTransmogrifyValidNextWords(newWord); // lower case valid next words
+                    setValidNextDownWords(validNextWords);
+                    setDownWords(newDownWords);
+                    setNextWord('');    
                 }
             }
         } else {
@@ -92,11 +105,16 @@ const Transmogrify = ({setWhereto}) => {
                 } else {
                     let wordAboveNewWord = (downWords.length === 0 ? puzzle.startWord : downWords[downWords.length-1]);
                     let newUpWords = [newWord,...upWords];
-                    setUpWords(newUpWords);
-                    setNextWord('');    
                     if (validMove(newWord, wordAboveNewWord)) {
+                        setUpWords(newUpWords);
+                        setNextWord('');    
                         setSolved(true);
-                    }                        
+                    } else {
+                        let validNextWords = await getTransmogrifyValidNextWords(newWord); // lower case valid next words
+                        setValidNextUpWords(validNextWords);
+                        setUpWords(newUpWords);
+                        setNextWord('');   
+                    }
                 }
             } else {
                 alert('Only anagrams, drops, swaps and inserts allowed.');
@@ -285,15 +303,29 @@ const Transmogrify = ({setWhereto}) => {
         <div className="tm_solutionDiv">
             {puzzle && puzzle.startWord && <table>
                 <tbody>
-                    <tr><td>{puzzle.startWord}</td></tr>
+                    <tr>
+                        <td>{puzzle.startWord}</td>
+                    </tr>
                     {downWords.map((w,i) => (
-                        <tr key={`userDownWord${i}`}><td><span className="tm_arrow">↧</span>{w}</td></tr>
+                        <tr key={`userDownWord${i}`}>
+                            <td><span className="tm_arrow">↧</span>{w}</td>
+                        </tr>
                     ))}
-                    {!solved && <tr><td><span className="tm_nextword">&nbsp;{nextWord}&nbsp;</span></td></tr>}
+                    {!solved && <tr>
+                        <td>
+                            <span className="tm_nextword"
+                             data-toggle="tooltip" title={`Valid down words: ${validNextDownWords}\nValid up words: ${validNextUpWords}`}
+                            >&nbsp;{nextWord}&nbsp;</span>
+                        </td>
+                    </tr>}
                     {upWords.map((w,i) => (
-                        <tr key={`userUpWord${i}`}><td>{w}<span className="tm_arrow">↥</span></td></tr>
+                        <tr key={`userUpWord${i}`}>
+                            <td>{w}<span className="tm_arrow">↥</span></td>
+                        </tr>
                     ))}
-                    <tr><td>{puzzle.targetWord}</td></tr>
+                    <tr>
+                        <td>{puzzle.targetWord}</td>
+                    </tr>
                 </tbody>
             </table>}
         </div>

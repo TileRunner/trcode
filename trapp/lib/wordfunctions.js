@@ -81,3 +81,15 @@ export async function isWordValid(word) {
     const jdata = await response.json();
     return jdata.exists;
 }
+
+/**
+ * Determine valid next words per transmogrify rules
+ * @param {string} word The word being moved from, case insensitive
+ * @returns The string array of valid words to move to, in lower case
+ */
+export async function getTransmogrifyValidNextWords(word) {
+    let url = `${baseurl}/ENABLE2K?letters=${word.toLowerCase()}&tm=true`;
+    const response = await fetch(url);
+    const jdata = await response.json();
+    return jdata.to;
+}
