@@ -58,42 +58,52 @@ a {
 .artworkDiv {
   color: black;
   background-color: cyan;
-  width: 350px;
+  width: 370px;
 }
+.artworkDiv div {
+  display: flex;
+  justify-content: space-between;
+}
+
 .moveLeftButton {
   background-color: blue;
   color: cyan;
   height: 30px;
   width: 30px;
-  margin: 0px 10px 0px 10px;
 }
 .moveRightButton {
   background-color: blue;
   color: cyan;
   height: 30px;
   width: 30px;
-  margin: 0px 10px 0px 10px;
 }
 .artwork1 {
   background-image: url('../public/MorphoCaterpillar.png');
   background-repeat: no-repeat;
   background-size: cover;
-  height: 350px;
-  width: 350px;
+  height: 280px;
+  width: 370px;
 }
 .artwork2 {
   background-image: url('../public/MorphoCocoon.png');
   background-repeat: no-repeat;
   background-size: cover;
-  height: 350px;
-  width: 350px;
+  height: 370px;
+  width: 370px;
 }
 .artwork3 {
   background-image: url('../public/MorphoButterfly.png');
   background-repeat: no-repeat;
   background-size: cover;
   height: 350px;
-  width: 350px;
+  width: 370px;
+}
+.artwork4 {
+  background-image: url('../public/transmogrify.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 225px;
+  width: 370px;
 }
 /* Custom keyboards */
 .switchkb {

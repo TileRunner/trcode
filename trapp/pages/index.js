@@ -140,7 +140,6 @@ const Menu = (props) => {
   </div>
 
   const DescribeTransmogrify = <div className="trParagraph">
-    <p>Under construction.</p>
     <p>Like Morpho, but you can also insert a letter, drop a letter, or anagram the word.</p>
   </div>
 
@@ -177,7 +176,8 @@ const Menu = (props) => {
 
   const DescribePhotos = () => {
     const [artindex, setArtindex] = useState(1);
-    const artindexMax = 3;
+    const artindexMax = 4;
+  
     function moveLeft() {
       if (artindex === 1) {
         setArtindex(artindexMax);
@@ -193,13 +193,13 @@ const Menu = (props) => {
       }
     }
     return (<div className="artworkDiv">
-    <div>
-      Drawings by Lennon Sykes.
-      <button onClick={() => {moveLeft();}} className="moveLeftButton">&lt;</button>
-      <button onClick={() => {moveLeft();}} className="moveRightButton">&gt;</button>
-    </div>
-    <div className={`artwork${artindex}`}></div>
-  </div>);
+      <div>
+        <button onClick={() => {moveLeft();}} className="moveLeftButton">&lt;</button>
+        <div>Drawings by Lennon Sykes.</div>
+        <button onClick={() => {moveRight();}} className="moveRightButton">&gt;</button>
+      </div>
+      <div className={`artwork${artindex}`}></div>
+    </div>);
   }
 
   const MenuOptionKmMarkers = () => <div className="trParagraph">
@@ -207,7 +207,7 @@ const Menu = (props) => {
     <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank"> Km Marker Videos</a>
   </div>
 
-return (
+  return (
     <div className="trBackground">
       <div className="trParagraph">
         <div className="trTitle">Tile Stuff</div>
