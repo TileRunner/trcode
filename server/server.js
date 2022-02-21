@@ -57,6 +57,10 @@ function readclubdata() {
     var wpath = path.join(__dirname, "ScrabbleClubData.js");
     data = fs.readFileSync(wpath).toString();
     scdata = JSON.parse(data);
+    // do some convenience stuff
+    scdata.clubGameList.forEach(g => {
+      g.ClubId = scdata.clubNightList.find(n => n.Id === g.ClubNightId).ClubId;
+    });
   }
   catch (e) {
     console.log(`Error reading club data ${e}`);
@@ -186,16 +190,21 @@ const server = express()
       res.json(clubnights);
       return;
     })
-    // Handle request for club game list for a club night
+    // Handle request for club game list for a club night or for a club
     .get("/clubdata/clubgamelist", (req, res) => {
       // Handle who can call this
       res.header("Access-Control-Allow-Origin", allowedCaller);
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // Get the club game list for the club night
-      let clubnightid = parseInt(req.query.clubnightid);
-      let clubgames = clubdata.clubGameList.filter(function (e) {
-        return e.ClubNightId === clubnightid;
-      });
+      // Return variable
+      let clubgames = [];
+      // Get the club game list for the club night if by club night id
+      if (req.query.clubnightid) {
+        let clubnightid = parseInt(req.query.clubnightid);
+        clubgames = clubdata.clubGameList.filter(g => { return g.ClubNightId === clubnightid; });  
+      } else if (req.query.clubid) {
+        let clubid = parseInt(req.query.clubid);
+        clubgames = clubdata.clubGameList.filter(g => { return g.ClubId === clubid; });
+      }
       // Return the club game list
       res.json(clubgames);
       return;

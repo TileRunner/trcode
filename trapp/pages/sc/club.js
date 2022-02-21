@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ClubList = ({clubs=[], getClubNights}) => {
+const ClubList = ({clubs=[], getClubNights, getClubGames}) => {
     const [snat, setSnat] = useState('No club selection made.');
 
     return (<div className="trBackground">
@@ -28,6 +28,13 @@ const ClubList = ({clubs=[], getClubNights}) => {
                                     setSnat(`Selected ${club.Name} club nights.`);
                                     } }>
                                 CLUB NIGHTS
+                            </button>
+                            <button className="trButton"
+                                onClick={function() {
+                                    getClubGames(club.Id);
+                                    setSnat(`Select ${club.Name} club players.`);
+                                }}>
+                                CLUB PLAYERS
                             </button>
                         </td>
                     </tr>
