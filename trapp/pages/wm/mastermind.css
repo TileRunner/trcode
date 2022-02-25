@@ -72,3 +72,15 @@
     color: lightgreen;
     padding-right: 5px;
 }
+.wmCorrectLetterCorrectPosition {
+    background-color: greenyellow;
+    color: black !important;
+}
+.wmCorrectLetterWrongPosition {
+    background-color: gold;
+    color: black !important;
+}
+.wmWrongLetter {
+    background-color: black;
+    color: white !important;
+}

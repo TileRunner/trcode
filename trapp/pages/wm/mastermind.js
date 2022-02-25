@@ -10,6 +10,7 @@ const WordMastermind = ({setWhereto}) => {
     const [guess, setGuess] = useState('');
     const [guesses, setGuesses] = useState([]);
     const [solved, setSolved] = useState(false);
+    const [gameMode, setGameMode] = useState(0); // 0=show counts only, 1=show which are right spot and wrong spot
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
@@ -40,6 +41,12 @@ const WordMastermind = ({setWhereto}) => {
                             <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                         </button>
                     </div>
+                </div>
+                <div className="row">
+                    {gameMode === 0 ? "Normal mode" : "Easy mode"}
+                    <button className="trButton" onClick={() => {setGameMode(1-gameMode);}}>
+                        {gameMode === 0 ? "Go to easy mode" : "Go to normal mode"}
+                    </button>
                 </div>
                 <div className="row">
                     <div className="col-11">
@@ -166,7 +173,8 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessesTable() {
-        return <table className="trTable">
+        return <div>{gameMode === 0 ?
+        <table className="trTable">
             <thead>
                 <tr>
                     <th>Guess</th>
@@ -175,8 +183,8 @@ const WordMastermind = ({setWhereto}) => {
                 </tr>
             </thead>
             <tbody>
-                {guesses.map((g) => (
-                    <tr>
+                {guesses.map((g,i) => (
+                    <tr key={`mode0guess${i}`}>
                         <td>{g}</td>
                         <td className="AlignCenter">{calcCorrectLetterCount(g)}</td>
                         <td className="AlignCenter">{calcCorrectPositionCount(g)}</td>
@@ -184,7 +192,22 @@ const WordMastermind = ({setWhereto}) => {
                 )
                 )}
             </tbody>
-        </table>;
+        </table>
+        :
+        <table className="trTable">
+            <tbody>
+                {guesses.map((g,i) => (
+                    <tr key={`mode1guess${i}`}>
+                        {g.split('').map((l,j) => (
+                            <td key={`mode1guess${i}letter${j}`} class={calcMode1css(g,j)}>
+                                {l}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+        }</div>;
     }
 
     function pickRandomWord() {
@@ -219,6 +242,35 @@ const WordMastermind = ({setWhereto}) => {
             n = n + (secretWord[i] === guessletters[i] ? 1 : 0)
         }
         return n
+    }
+
+    function calcMode1css(guessLetters,guessLetterIndex) {
+        let letter = guessLetters[guessLetterIndex];
+        // g is the whoe guess, j is the letter index for which we want the css style name
+        if (letter === secretWord[guessLetterIndex]) {
+            return "wmCorrectLetterCorrectPosition";
+        }
+        if (secretWord.indexOf(letter) > -1) {
+            // the guess letter is in the secret word and is not in the right spot
+            // has it already been counted earlier though?
+            // will it be counted later as correct letter correct spot?
+            let nextjstart = 0;
+            for (let i = 0; i < secretWord.length; i++) {
+                if (secretWord[i] === letter && guessLetters[i] !== letter) {
+                    let jfound = false;
+                    for(let j = nextjstart; !jfound && j < secretWord.length; j++) {
+                        if (guessLetters[j] === letter && secretWord[j] !== letter) {
+                            if (j === guessLetterIndex) {
+                                return "wmCorrectLetterWrongPosition";
+                            }
+                            jfound = true;
+                            nextjstart = j + 1;
+                        }
+                    }
+                }
+            }
+        }
+        return "wmWrongLetter";
     }
 }
 
