@@ -332,6 +332,7 @@ const server = express()
           }
           if (notes.length > 0) {
             jret.notes = notes;
+            console.log(`topfry fail notes ${JSON.stringify(jret)}`);
             res.send(jret);
             return;
           }
@@ -373,6 +374,7 @@ const server = express()
           }
           if (notes.length > 0) {
             jret.notes = notes;
+            console.log(`prepickfry fail notes ${JSON.stringify(jret)}`);
             res.send(jret);
             return;
           }

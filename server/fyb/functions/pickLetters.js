@@ -76,14 +76,23 @@ function fybPrepickTiles(words=[], guarantee=6) {
                 j = k;
             }
         }
-        tiles.splice(j,1);
+        if (j > -1) { // We might have picked a random word that the tile pool does not have the tiles for, like two zeds
+            tiles.splice(j,1);
+        }
     }
     let loop = true;
     while (loop) {
         let picked = pickNextTile(tiles, fryLetters);
-        if (words.filter((checkword) => {return wordHasFryLetters(picked.newFryLetters, checkword);}).length > 0) {
+        let newmatches = words.filter((checkword) => {return wordHasFryLetters(picked.newFryLetters, checkword);});
+        if (newmatches.length > 0) {
             tiles = [...picked.newTiles];
-            fryLetters = [...picked.newFryLetters];
+            let oldfl = [...fryLetters];
+            fryLetters = Array.from(picked.newFryLetters.join('').toLowerCase());
+            if (!wordHasFryLetters(fryLetters, newmatches[0])) {
+                console.log(`Whuh? Fry letters ${fryLetters} not in found sample word ${newmatches[0]}`);
+                loop = false;
+                fryLetters = [...oldfl];
+            }
         } else {
             loop = false;
         }   
@@ -91,14 +100,14 @@ function fybPrepickTiles(words=[], guarantee=6) {
     return fryLetters;
 }
 
-//TODO Make this a common function. Take this version since it handles upper or lower case for fry letter array.
+//TODO Make this a common function. Take this version since it handles upper or lower case for both parameters.
 function wordHasFryLetters(fryLetterArray, checkword) {
     let word = checkword.toUpperCase();
     for (let i = 0; i < fryLetterArray.length; i++) {
         let letterCountRequired = 0;
         let actualLetterCount = 0;
         for (let j = 0; j < fryLetterArray.length; j++) {
-            if (fryLetterArray[i] === fryLetterArray[j]) {
+            if (fryLetterArray[i].toUpperCase() === fryLetterArray[j].toUpperCase()) {
                 letterCountRequired = letterCountRequired + 1;
             }
         }

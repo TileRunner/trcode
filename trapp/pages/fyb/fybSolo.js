@@ -42,7 +42,6 @@ const FryYourBrainSolo = ({setWhereto}) => {
     const submitPlayerWord = async() => {
         let fixedword = word.toUpperCase().trim();
         // Check if they have all the fry letters
-        //TODO: See if you can use a routine shared by server and front end
         for (let i = 0; i < fryLetters.length; i++) {
             let letterCountRequired = 0;
             let actualLetterCount = 0;
@@ -129,6 +128,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
                     </tbody>
                 </table>
             </div>}
+            <div>Prepicked fry letters: {pickedLetters}</div>
             {fryLetters.length > 0 && <div>
                 <div className="trParagraph">Fry Letters:
                     <button className="trButton fryLetterActionButton" onClick={() => {
@@ -194,12 +194,14 @@ const FryYourBrainSolo = ({setWhereto}) => {
                 <div onKeyDownCapture={handleKeyDown}>
                     <div className="trEmphasis">Enter Word:</div>
                     <input
-                        type="text" autoComplete="off" spellCheck="false"
+                        type="text" placeholder="Enter word here"
+                        autoComplete="off" spellCheck="false"
                         name="word"
                         value={word}
                         onChange={(e) => {
                             setWord(e.target.value);
                         } } />
+                    <button className="closemebutton" onClick={() => {setWord('');}}/>
                     <div>
                         {word.toUpperCase().trim().match("^[a-zA-Z]*$") && 
                             <button className="trButton" key="submitWord"
