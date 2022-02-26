@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Showinfo from '../wi/showinfo'
-import {BrowserView} from 'react-device-detect'
+import { isMobile } from 'react-device-detect'
 
 const WordMastermind = ({setWhereto}) => {
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
@@ -43,22 +43,18 @@ const WordMastermind = ({setWhereto}) => {
                     </div>
                 </div>
                 <div className="row">
-                    {gameMode === 0 ? "Normal mode" : "Easy mode"}
+                    <p className="trParagraph">Mode:&nbsp;{gameMode === 0 ? "Normal" : "Easy"}&nbsp;</p>
                     <button className="trButton" onClick={() => {setGameMode(1-gameMode);}}>
                         {gameMode === 0 ? "Go to easy mode" : "Go to normal mode"}
                     </button>
                 </div>
                 <div className="row">
-                    <div className="col-11">
-                        <p className="trParagraph">Cycle through 2-8 letter words per set.</p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-8">
+                    <div className="col-lg-6">
                         <div className="row">
-                            <div className="col-lg-6">
+                            <div className="col-lg-4">
                                 <div className="Outertable">
                                     <div className="trParagraph AlignLeft">
+                                        <p>2-8 letter words per set.</p>
                                         <p>Guesses this word: {guesses.length}</p>
                                         <p>Guesses this set: {setGuessCount}</p>
                                         {setSolveCounts.length === 0 ?
@@ -66,6 +62,10 @@ const WordMastermind = ({setWhereto}) => {
                                         :
                                             <p>Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
                                         }
+                                        {gameMode === 1 && <><p><span className="wmEasyModeLetter wmCorrectLetterCorrectPosition">C</span>orrect position</p>
+                                        <p><span className="wmEasyModeLetter wmCorrectLetterWrongPosition">I</span>ncorrect position</p>
+                                        <p><span className="wmEasyModeLetter wmWrongLetter">W</span>rong letter</p>
+                                        </>}
                                     </div>
                                 </div>
                             </div>
@@ -91,34 +91,26 @@ const WordMastermind = ({setWhereto}) => {
                                                 <p className="AlignCenter">Keep guessing</p>
                                         }
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <BrowserView>
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    {guesses.length > 0 &&
-                                        <div className="trSubtitle">
-                                            Guess info:
-                                        </div>
+                                    {guesses.length === 0 ?
+                                        <p className="trParagraph">No guesses yet</p> 
+                                        :
+                                        displayGuesses
                                     }
-                                    {guesses.map((g,gi) => (
-                                        !hintshidden(g) &&
-                                            <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi}/>
-                                    ))}
                                 </div>
                             </div>
-                        </BrowserView>
-                    </div>
-                    <div className="col-lg-4">
-                        <div className="Outertable">
-                            {guesses.length === 0 ?
-                                <p className="trParagraph">No guesses yet</p> 
-                                :
-                                displayGuesses
-                            }
                         </div>
                     </div>
+                    {!isMobile &&
+                        <div className="col-lg-6">
+                            <div className="trSubtitle">
+                                Guess info:
+                            </div>
+                            {guesses.map((g,gi) => (
+                                !hintshidden(g) &&
+                                    <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi}/>
+                            ))}
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -126,7 +118,7 @@ const WordMastermind = ({setWhereto}) => {
 
     function showPlayAgainPrompt() {
         return <div className="trParagraph">
-            <h2 className="trEmphasis">Solved in {guesses.length} moves!</h2>
+            <h4 className="tmCongrats">👏🏽 Solved in {guesses.length} moves! 👏🏽</h4>
             <button className="trButton"
             onClick={function () {
                 pickRandomWord();
@@ -248,7 +240,7 @@ const WordMastermind = ({setWhereto}) => {
         let letter = guessLetters[guessLetterIndex];
         // g is the whoe guess, j is the letter index for which we want the css style name
         if (letter === secretWord[guessLetterIndex]) {
-            return "wmCorrectLetterCorrectPosition";
+            return "wmEasyModeLetter wmCorrectLetterCorrectPosition";
         }
         if (secretWord.indexOf(letter) > -1) {
             // the guess letter is in the secret word and is not in the right spot
@@ -261,7 +253,7 @@ const WordMastermind = ({setWhereto}) => {
                     for(let j = nextjstart; !jfound && j < secretWord.length; j++) {
                         if (guessLetters[j] === letter && secretWord[j] !== letter) {
                             if (j === guessLetterIndex) {
-                                return "wmCorrectLetterWrongPosition";
+                                return "wmEasyModeLetter wmCorrectLetterWrongPosition";
                             }
                             jfound = true;
                             nextjstart = j + 1;
@@ -270,7 +262,7 @@ const WordMastermind = ({setWhereto}) => {
                 }
             }
         }
-        return "wmWrongLetter";
+        return "wmEasyModeLetter wmWrongLetter";
     }
 }
 
