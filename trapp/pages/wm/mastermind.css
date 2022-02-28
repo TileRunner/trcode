@@ -83,3 +83,12 @@
     background-color: black;
     color: white !important;
 }
+.wmWordUnderKeyboard {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 50px;
+    letter-spacing: 2px;
+    text-align: center;
+    border: 1px solid white;
+    background-color: blue;
+    color: white;
+}

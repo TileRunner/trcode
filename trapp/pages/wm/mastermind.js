@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Showinfo from '../wi/showinfo'
 import { isMobile } from 'react-device-detect'
+import ShowCustomKeyboard from '../showCustomKeyboard';
 
 const WordMastermind = ({setWhereto}) => {
+    const [keyboardVersion, setKeyboardVersion] = useState(1);
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
     const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the 2-8 letter set
     const [secretWord, setSecretWord] = useState('');
@@ -11,10 +13,40 @@ const WordMastermind = ({setWhereto}) => {
     const [guesses, setGuesses] = useState([]);
     const [solved, setSolved] = useState(false);
     const [gameMode, setGameMode] = useState(0); // 0=show counts only, 1=show which are right spot and wrong spot
+    const [showInitialInfo, setShowInitialInfo] = useState(true); // set info, easy mode info
+    const divUnderKeyboard = showDivUnderKeyboard();
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
     const [hidehints, setHidehints] = useState([]);
+    function handleInputLetter(letter) {
+        handleUpdatedGuess(guess + letter);
+    }
+    function handleDeleteLetter() {
+        if (guess.length > 0) {
+            setGuess(guess.substring(0,guess.length-1));
+        }
+    }
+    function showDivUnderKeyboard() {
+        return <div className="wmWordUnderKeyboard">&nbsp;{guess}&nbsp;</div>;
+    }
+    function handleUpdatedGuess(guessword) {
+        if (guessword.length === secretWord.length) {
+            const newSetGuessCount = setGuessCount + 1;
+            setSetGuessCount(newSetGuessCount);
+            setGuesses([guessword, ...guesses]);
+            setGuess('');
+            if (guessword === secretWord)
+            {
+                setSolved(true);
+                if (secretWord.length === 8) {
+                    setSetSolveCounts([...setSolveCounts, newSetGuessCount]);
+                }
+            }
+        } else {
+            setGuess(guessword);
+        }
+    }
     function hintshidden(checkword) {
         for (let index = 0; index < hidehints.length; index++) {
             const hideword = hidehints[index];
@@ -43,16 +75,19 @@ const WordMastermind = ({setWhereto}) => {
                     </div>
                 </div>
                 <div className="row">
-                    <p className="trParagraph">Mode:&nbsp;{gameMode === 0 ? "Normal" : "Easy"}&nbsp;</p>
+                    <p className="trParagraph">Mode:&nbsp;{gameMode === 0 ? "Hard" : "Easy"}&nbsp;</p>
                     <button className="trButton" onClick={() => {setGameMode(1-gameMode);}}>
-                        {gameMode === 0 ? "Go to easy mode" : "Go to normal mode"}
+                        {gameMode === 0 ? "Go to easy mode" : "Go to hard mode"}
                     </button>
                 </div>
                 <div className="row">
                     <div className="col-lg-6">
                         <div className="row">
                             <div className="col-lg-4">
-                                <div className="Outertable">
+                                <button className="trButton" onClick={() => {setShowInitialInfo(!showInitialInfo);}}>
+                                    {showInitialInfo ? "Hide" : "Show"}
+                                </button>
+                                {showInitialInfo && <div className="Outertable">
                                     <div className="trParagraph AlignLeft">
                                         <p>2-8 letter words per set.</p>
                                         <p>Guesses this word: {guesses.length}</p>
@@ -67,7 +102,7 @@ const WordMastermind = ({setWhereto}) => {
                                         <p><span className="wmEasyModeLetter wmWrongLetter">W</span>rong letter</p>
                                         </>}
                                     </div>
-                                </div>
+                                </div>}
                             </div>
                             <div className="col-lg-6">
                                 <div className="Outertable">
@@ -134,34 +169,32 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessPrompt() {
-        return <div className="form-group trParagraph">
-            {guesses.length === 0 ?
-                <label>First guess:</label>
-                :
-                <label>Next guess:</label>
-            }
-            <input className="form-control"
-                name="guess"
-                value={guess}
-                onChange={(e) => {
-                    const guessword = e.target.value.toUpperCase().replace( /\W/g , '');
-                    if (guessword.length === secretWord.length) {
-                        const newSetGuessCount = setGuessCount + 1;
-                        setSetGuessCount(newSetGuessCount);
-                        setGuesses([guessword, ...guesses]);
-                        setGuess('');
-                        if (guessword === secretWord)
-                        {
-                            setSolved(true);
-                            if (secretWord.length === 8) {
-                                setSetSolveCounts([...setSolveCounts, newSetGuessCount]);
-                            }
-                        }
-                    } else {
-                        setGuess(guessword);
-                    }
-            } } />
-        </div>;
+        return (
+        isMobile ?
+            <ShowCustomKeyboard
+                keyboardVersion={keyboardVersion}
+                setKeyboardVersion={setKeyboardVersion}
+                inputWord={guess}
+                handleInputLetter={handleInputLetter}
+                handleDeleteLetter={handleDeleteLetter}
+                divUnderKeyboard={divUnderKeyboard}
+            ></ShowCustomKeyboard>        
+        :
+            <div className="form-group trParagraph">
+                {guesses.length === 0 ?
+                    <label>First guess:</label>
+                    :
+                    <label>Next guess:</label>
+                }
+                <input className="form-control"
+                    name="guess"
+                    value={guess}
+                    onChange={(e) => {
+                        const guessword = e.target.value.toUpperCase().replace( /\W/g , '');
+                        handleUpdatedGuess(guessword);
+                } } />
+            </div>
+        );
     }
 
     function showGuessesTable() {
