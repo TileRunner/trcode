@@ -1,3 +1,17 @@
+.wmModeOptionForm {
+    background-color: blue;
+    color: white;
+    font-size: 25px;
+}
+.wmModeOptionForm label {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.wmModeOptionForm input {
+    height: 20px;
+    width: 20px;
+    margin-left: 10px;
+}
 .Outertable {
     /* border-style: none; */
     border: 1px dashed cyan;

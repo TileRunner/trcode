@@ -12,13 +12,28 @@ const WordMastermind = ({setWhereto}) => {
     const [guess, setGuess] = useState('');
     const [guesses, setGuesses] = useState([]);
     const [solved, setSolved] = useState(false);
-    const [gameMode, setGameMode] = useState(0); // 0=show counts only, 1=show which are right spot and wrong spot
+    const [gameMode, setGameMode] = useState('easy');
     const [showInitialInfo, setShowInitialInfo] = useState(true); // set info, easy mode info
     const divUnderKeyboard = showDivUnderKeyboard();
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
     const [hidehints, setHidehints] = useState([]);
+    const handleModeChange = (e) => {
+        setGameMode(e.target.value);
+    }
+    const WMTitle = <div className="trTitle">
+        Word Mastermind
+        <button className="trButton" onClick={() => { setWhereto('menu'); } }>
+            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+        </button>
+    </div>;
+    const ShowModeOptions = <form className="wmModeOptionForm">
+        <input type="radio" value="easy" checked={gameMode === 'easy'} id="mode0" onChange={(e) => {handleModeChange(e);}} name="mode"/>
+        <label for="mode0">Easy</label>
+        <input type="radio" value="hard" checked={gameMode === 'hard'} id="mode1" onChange={(e) => {handleModeChange(e);}} name="mode"/>
+        <label for="mode1">Hard</label>
+    </form>;
     function handleInputLetter(letter) {
         handleUpdatedGuess(guess + letter);
     }
@@ -63,91 +78,85 @@ const WordMastermind = ({setWhereto}) => {
             setHidehints(newhidehints);  
         }
     }
-    return (
-        <div className="trBackground">
-            <div className="container-fluid">
+    const InitialInfo = <div className="Outertable">
+        <div className="trParagraph AlignLeft">
+            <p>2-8 letter words per set.</p>
+            <p>Guesses this word: {guesses.length}</p>
+            <p>Guesses this set: {setGuessCount}</p>
+            {setSolveCounts.length === 0 ?
+                <p>No completed sets yet</p>
+                :
+                <p>Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>}
+            {gameMode === 'easy' && <><p><span className="wmEasyModeLetter wmCorrectLetterCorrectPosition">C</span>orrect position</p>
+                <p><span className="wmEasyModeLetter wmCorrectLetterWrongPosition">I</span>ncorrect position</p>
+                <p><span className="wmEasyModeLetter wmWrongLetter">W</span>rong letter</p>
+            </>}
+        </div>
+    </div>;
+    const MainInfo = <div className="Outertable">
+        {secretWord === '' ? pickRandomWord() : ''}
+        <div className="trParagraph">
+            <h3>Secret Word: {solved ? secretWord : secretDisplay}</h3>
+            {secretWord === '' ?
+                <h1>Loading ...</h1>
+                :
+                solved ?
+                    promptForPlayAgain
+                    :
+                    promptForGuess}
+            {solved ?
+                <br></br>
+                :
+                guesses.length === 0 ?
+                    <p className="AlignCenter">Start guessing</p>
+                    :
+                    <p className="AlignCenter">Keep guessing</p>}
+        </div>
+        {guesses.length === 0 ?
+            <p className="trParagraph">No guesses yet</p>
+            :
+            displayGuesses}
+    </div>;
+    const GuessInfo = <div className="Outertable">
+        <div className="trSubtitle">
+            Guess info:
+        </div>
+        {guesses.map((g, gi) => (
+            !hintshidden(g) &&
+            <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi} />
+        ))}
+    </div>;
+    const BrowserLayout = <div className="container-fluid">
+        <div className="row">
+            {WMTitle}
+        </div>
+        <div className="row">
+            {ShowModeOptions}
+        </div>
+        <div className="row">
+            <div className="col-lg-6">
                 <div className="row">
-                    <div className="trTitle">
-                        Word Mastermind
-                        <button className="trButton" onClick={() => {setWhereto('menu');}}>
-                            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-                        </button>
-                    </div>
-                </div>
-                <div className="row">
-                    <p className="trParagraph">Mode:&nbsp;{gameMode === 0 ? "Hard" : "Easy"}&nbsp;</p>
-                    <button className="trButton" onClick={() => {setGameMode(1-gameMode);}}>
-                        {gameMode === 0 ? "Go to easy mode" : "Go to hard mode"}
-                    </button>
-                </div>
-                <div className="row">
-                    <div className="col-lg-6">
-                        <div className="row">
-                            <div className="col-lg-4">
-                                <button className="trButton" onClick={() => {setShowInitialInfo(!showInitialInfo);}}>
-                                    {showInitialInfo ? "Hide" : "Show"}
-                                </button>
-                                {showInitialInfo && <div className="Outertable">
-                                    <div className="trParagraph AlignLeft">
-                                        <p>2-8 letter words per set.</p>
-                                        <p>Guesses this word: {guesses.length}</p>
-                                        <p>Guesses this set: {setGuessCount}</p>
-                                        {setSolveCounts.length === 0 ?
-                                            <p>No completed sets yet</p>
-                                        :
-                                            <p>Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>
-                                        }
-                                        {gameMode === 1 && <><p><span className="wmEasyModeLetter wmCorrectLetterCorrectPosition">C</span>orrect position</p>
-                                        <p><span className="wmEasyModeLetter wmCorrectLetterWrongPosition">I</span>ncorrect position</p>
-                                        <p><span className="wmEasyModeLetter wmWrongLetter">W</span>rong letter</p>
-                                        </>}
-                                    </div>
-                                </div>}
-                            </div>
-                            <div className="col-lg-6">
-                                <div className="Outertable">
-                                    {secretWord === '' ? pickRandomWord() : ''}
-                                    <div className="trParagraph">
-                                        <h3>Secret Word: {solved ? secretWord : secretDisplay}</h3>
-                                        {secretWord === '' ?
-                                            <h1>Loading ...</h1>
-                                        :
-                                            solved ?
-                                                promptForPlayAgain
-                                            :
-                                                promptForGuess
-                                        }
-                                        {solved ?
-                                            <br></br>
-                                            :
-                                            guesses.length === 0 ?
-                                                <p className="AlignCenter">Start guessing</p>
-                                                :
-                                                <p className="AlignCenter">Keep guessing</p>
-                                        }
-                                    </div>
-                                    {guesses.length === 0 ?
-                                        <p className="trParagraph">No guesses yet</p> 
-                                        :
-                                        displayGuesses
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {!isMobile &&
-                        <div className="col-lg-6">
-                            <div className="trSubtitle">
-                                Guess info:
-                            </div>
-                            {guesses.map((g,gi) => (
-                                !hintshidden(g) &&
-                                    <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi}/>
-                            ))}
-                        </div>
-                    }
+                    <div className="col">{InitialInfo}</div>
+                    <div className="col">{MainInfo}</div>
                 </div>
             </div>
+            <div className="col">{GuessInfo}</div>
+        </div>
+    </div>;
+    const MobileLayout = <div>
+        {WMTitle}
+        {ShowModeOptions}
+        <div>
+            <button className="trButton" onClick={() => { setShowInitialInfo(!showInitialInfo); } }>
+                {showInitialInfo ? "Hide" : "Show"}
+            </button>
+            {showInitialInfo && InitialInfo}
+        </div>
+        {MainInfo}
+    </div>;
+    return (
+        <div className="trBackground">
+            { isMobile ? MobileLayout : BrowserLayout }
         </div>
     );
 
@@ -198,7 +207,7 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessesTable() {
-        return <div>{gameMode === 0 ?
+        return <div>{gameMode === 'hard' ?
         <table className="trTable">
             <thead>
                 <tr>
