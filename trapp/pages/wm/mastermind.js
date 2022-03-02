@@ -22,17 +22,14 @@ const WordMastermind = ({setWhereto}) => {
     const handleModeChange = (e) => {
         setGameMode(e.target.value);
     }
-    const WMTitle = <div className="trTitle">
-        Word Mastermind
-        <button className="trButton" onClick={() => { setWhereto('menu'); } }>
-            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-        </button>
-    </div>;
     const ShowModeOptions = <form className="wmModeOptionForm">
         <input type="radio" value="easy" checked={gameMode === 'easy'} id="mode0" onChange={(e) => {handleModeChange(e);}} name="mode"/>
         <label for="mode0">Easy</label>
         <input type="radio" value="hard" checked={gameMode === 'hard'} id="mode1" onChange={(e) => {handleModeChange(e);}} name="mode"/>
         <label for="mode1">Hard</label>
+        <button className="trButton" onClick={() => { setWhereto('menu'); } }>
+            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+        </button>
     </form>;
     function handleInputLetter(letter) {
         handleUpdatedGuess(guess + letter);
@@ -118,7 +115,7 @@ const WordMastermind = ({setWhereto}) => {
             displayGuesses}
     </div>;
     const GuessInfo = <div className="Outertable">
-        <div className="trSubtitle">
+        <div className="wmModeOptionForm">
             Guess info:
         </div>
         {guesses.map((g, gi) => (
@@ -127,9 +124,6 @@ const WordMastermind = ({setWhereto}) => {
         ))}
     </div>;
     const BrowserLayout = <div className="container-fluid">
-        <div className="row">
-            {WMTitle}
-        </div>
         <div className="row">
             {ShowModeOptions}
         </div>
@@ -144,7 +138,6 @@ const WordMastermind = ({setWhereto}) => {
         </div>
     </div>;
     const MobileLayout = <div>
-        {WMTitle}
         {ShowModeOptions}
         <div>
             <button className="trButton" onClick={() => { setShowInitialInfo(!showInitialInfo); } }>
