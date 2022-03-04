@@ -4,6 +4,7 @@ import { isMobile } from 'react-device-detect'
 import ShowCustomKeyboard from '../showCustomKeyboard';
 
 const WordMastermind = ({setWhereto}) => {
+    const [history, setHistory] = useState([]);
     const [keyboardVersion, setKeyboardVersion] = useState(1);
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
     const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the 2-8 letter set
@@ -44,6 +45,7 @@ const WordMastermind = ({setWhereto}) => {
     }
     function handleUpdatedGuess(guessword) {
         if (guessword.length === secretWord.length) {
+            addGuessToHistory(guessword);
             const newSetGuessCount = setGuessCount + 1;
             setSetGuessCount(newSetGuessCount);
             setGuesses([guessword, ...guesses]);
@@ -58,6 +60,65 @@ const WordMastermind = ({setWhereto}) => {
         } else {
             setGuess(guessword);
         }
+    }
+    function addRoundToHistory(newsecretword) {
+        // history array by set, new sets at last position
+        // each set is an array of rounds (2-8 letter secret words, so 7 rounds)
+        // each round has secret word and guess info
+        let newhistory = JSON.parse(JSON.stringify(history));
+        let newround = {secretWord: newsecretword, guesses: [], solved: false};
+        if (newsecretword.length === 2) { // new set
+            let newset = {rounds: [newround]};
+            newhistory.push(newset);
+        } else { // existing set
+            let currset = newhistory[newhistory.length-1];
+            currset.rounds.push(newround);
+        }
+        setHistory(newhistory);
+    }
+    function addGuessToHistory(guessword) {
+        let newhistory = JSON.parse(JSON.stringify(history));
+        let currset = newhistory[newhistory.length-1];
+        let currround = currset.rounds[currset.rounds.length-1];
+        let guessLetters = Array.from(guessword);
+        let letterinfo = [];
+        for (let i = 0; i < guessLetters.length; i++) {
+            const guessletter = guessLetters[i];
+            const letterResult = calcLetterResult(guessLetters, i); // C, I, or W
+            letterinfo.push({letter: guessletter, result: letterResult});
+        }
+        let newguess = {guess: guessword, letterinfo: letterinfo, solves: guessword === secretWord};
+        currround.solved = newguess.solves;
+        currround.guesses.push(newguess);
+        setHistory(newhistory);
+    }
+    function copyToClipboard() {
+        let copyText = "Word Mastermind\n";
+        for (let s = 0; s < history.length; s++) {
+            const si = history[s];
+            copyText = `${copyText}>Set ${s}:\n`
+            for (let r = 0; r < si.rounds.length; r++) {
+                const ri = si.rounds[r];
+                copyText = `${copyText}>>Round ${r}, ${ri.secretWord}:\n`;
+                for (let g = 0; g < ri.guesses.length; g++) {
+                    const gi = ri.guesses[g];
+                    copyText = `${copyText}>>>Guess ${g}, ${gi.guess}: `;
+                    for (let l = 0; l < gi.letterinfo.length; l++) {
+                        const li = gi.letterinfo[l];
+                        if (li.result === 'C') {
+                            copyText = copyText + "🟩";
+                        } else if (li.result === 'I') {
+                            copyText = copyText + "🟨";
+                        } else {
+                            copyText = copyText + "⬛";
+                        }
+                    }
+                    copyText = copyText + "\n";
+                }
+            }
+        }
+        navigator.clipboard.writeText(copyText);
+        alert("Clipboard updated");
     }
     function hintshidden(checkword) {
         for (let index = 0; index < hidehints.length; index++) {
@@ -167,6 +228,11 @@ const WordMastermind = ({setWhereto}) => {
             >
                 {secretWord.length === 8 ? "Start Another Set!" : "Start Next Word"}
             </button>
+            <button className="trButton"
+            onClick={() => {copyToClipboard();}}
+            >
+                Clipboard
+            </button>
             </div>;
     }
 
@@ -249,6 +315,7 @@ const WordMastermind = ({setWhereto}) => {
             let randomword=JSON.parse(text).toUpperCase(); // It is just a word in double quotes but it is json nonetheless
             setSecretWord(randomword);
             setSecretDisplay(randomword.split("").map(()=>("*")));
+            addRoundToHistory(randomword);
         })
     }
 
@@ -271,11 +338,11 @@ const WordMastermind = ({setWhereto}) => {
         return n
     }
 
-    function calcMode1css(guessLetters,guessLetterIndex) {
+    function calcLetterResult(guessLetters, guessLetterIndex) {
         let letter = guessLetters[guessLetterIndex];
         // g is the whoe guess, j is the letter index for which we want the css style name
         if (letter === secretWord[guessLetterIndex]) {
-            return "wmEasyModeLetter wmCorrectLetterCorrectPosition";
+            return "C";
         }
         if (secretWord.indexOf(letter) > -1) {
             // the guess letter is in the secret word and is not in the right spot
@@ -288,7 +355,7 @@ const WordMastermind = ({setWhereto}) => {
                     for(let j = nextjstart; !jfound && j < secretWord.length; j++) {
                         if (guessLetters[j] === letter && secretWord[j] !== letter) {
                             if (j === guessLetterIndex) {
-                                return "wmEasyModeLetter wmCorrectLetterWrongPosition";
+                                return "I";
                             }
                             jfound = true;
                             nextjstart = j + 1;
@@ -297,6 +364,12 @@ const WordMastermind = ({setWhereto}) => {
                 }
             }
         }
+        return "W";
+    }
+    function calcMode1css(guessLetters,guessLetterIndex) {
+        let letterResult = calcLetterResult(guessLetters, guessLetterIndex);
+        if (letterResult === 'C') {return "wmEasyModeLetter wmCorrectLetterCorrectPosition";}
+        if (letterResult === 'I') {return "wmEasyModeLetter wmCorrectLetterWrongPosition";}
         return "wmEasyModeLetter wmWrongLetter";
     }
 }
