@@ -96,13 +96,13 @@ const WordMastermind = ({setWhereto}) => {
         let copyText = "Word Mastermind\n";
         for (let s = 0; s < history.length; s++) {
             const si = history[s];
-            copyText = `${copyText}>Set ${s}:\n`
+            copyText = `${copyText}Set ${s+1}:\n`
             for (let r = 0; r < si.rounds.length; r++) {
                 const ri = si.rounds[r];
-                copyText = `${copyText}>>Round ${r}, ${ri.secretWord}:\n`;
+                copyText = `${copyText}Round ${r+1}:\n`;
                 for (let g = 0; g < ri.guesses.length; g++) {
                     const gi = ri.guesses[g];
-                    copyText = `${copyText}>>>Guess ${g}, ${gi.guess}: `;
+                    copyText = `${copyText}Guess ${g+1}, ${gi.guess}:\n`;
                     for (let l = 0; l < gi.letterinfo.length; l++) {
                         const li = gi.letterinfo[l];
                         if (li.result === 'C') {
