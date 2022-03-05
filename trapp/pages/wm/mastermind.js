@@ -68,7 +68,7 @@ const WordMastermind = ({setWhereto}) => {
         let newhistory = JSON.parse(JSON.stringify(history));
         let newround = {secretWord: newsecretword, guesses: [], solved: false};
         if (newsecretword.length === 2) { // new set
-            let newset = {rounds: [newround]};
+            let newset = {rounds: [newround], numguesses: 0};
             newhistory.push(newset);
         } else { // existing set
             let currset = newhistory[newhistory.length-1];
@@ -88,6 +88,7 @@ const WordMastermind = ({setWhereto}) => {
             letterinfo.push({letter: guessletter, result: letterResult});
         }
         let newguess = {guess: guessword, letterinfo: letterinfo, solves: guessword === secretWord};
+        currset.numguesses++;
         currround.solved = newguess.solves;
         currround.guesses.push(newguess);
         setHistory(newhistory);
@@ -96,13 +97,13 @@ const WordMastermind = ({setWhereto}) => {
         let copyText = "Word Mastermind\n";
         for (let s = 0; s < history.length; s++) {
             const si = history[s];
-            copyText = `${copyText}Set ${s+1}:\n`
+            copyText = `${copyText}Set ${s+1}: ${si.numguesses} guesses\n`
             for (let r = 0; r < si.rounds.length; r++) {
                 const ri = si.rounds[r];
-                copyText = `${copyText}Round ${r+1}:\n`;
+                copyText = `${copyText}Round ${r+1}: ${ri.guesses.length} guesses\n`;
                 for (let g = 0; g < ri.guesses.length; g++) {
                     const gi = ri.guesses[g];
-                    copyText = `${copyText}Guess ${g+1}, ${gi.guess}:\n`;
+                    copyText += `${gi.guess}:\n`;
                     for (let l = 0; l < gi.letterinfo.length; l++) {
                         const li = gi.letterinfo[l];
                         if (li.result === 'C') {
@@ -110,7 +111,7 @@ const WordMastermind = ({setWhereto}) => {
                         } else if (li.result === 'I') {
                             copyText = copyText + "🟨";
                         } else {
-                            copyText = copyText + "⬛";
+                            copyText = copyText + "⬜";
                         }
                     }
                     copyText = copyText + "\n";
@@ -183,6 +184,16 @@ const WordMastermind = ({setWhereto}) => {
             !hintshidden(g) &&
             <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi} />
         ))}
+        <div className="wmModeOptionForm">
+            Explanation:
+        </div>
+        <ul className="trParagraph">
+            <li><span className="insertCount">&nbsp;1&nbsp;</span>Shows insert counts/letters</li>
+            <li><span className="swapCount">&nbsp;2&nbsp;</span>Shows swaps counts/letters</li>
+            <li><span className="anagramCount">3</span>Shows anagram counts/words</li>
+            <li>Click to toggle between count and info</li>
+            <li>Click the <span className="closemebutton"></span> to remove your word</li>
+        </ul>
     </div>;
     const BrowserLayout = <div className="container-fluid">
         <div className="row">
