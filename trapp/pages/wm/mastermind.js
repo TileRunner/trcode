@@ -2,36 +2,25 @@ import React, { useState } from 'react';
 import Showinfo from '../wi/showinfo'
 import { isMobile } from 'react-device-detect'
 import ShowCustomKeyboard from '../showCustomKeyboard';
-
+import GetWMOptions from './wmoptions';
 const WordMastermind = ({setWhereto}) => {
+    const [gameOptions, setGameOptions] = useState({set:false, lenMin:2, lenMax:8, mode: 'easy'});
     const [history, setHistory] = useState([]);
     const [keyboardVersion, setKeyboardVersion] = useState(1);
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
-    const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the 2-8 letter set
+    const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the min-max word len set
     const [secretWord, setSecretWord] = useState('');
     const [secretDisplay, setSecretDisplay] = useState('');
     const [guess, setGuess] = useState('');
     const [guesses, setGuesses] = useState([]);
     const [solved, setSolved] = useState(false);
-    const [gameMode, setGameMode] = useState('easy');
     const [showInitialInfo, setShowInitialInfo] = useState(true); // set info, easy mode info
     const divUnderKeyboard = showDivUnderKeyboard();
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
     const promptForPlayAgain = showPlayAgainPrompt();
     const [hidehints, setHidehints] = useState([]);
-    const handleModeChange = (e) => {
-        setGameMode(e.target.value);
-    }
-    const ShowModeOptions = <form className="wmModeOptionForm">
-        <input type="radio" value="easy" checked={gameMode === 'easy'} id="mode0" onChange={(e) => {handleModeChange(e);}} name="mode"/>
-        <label for="mode0">Easy</label>
-        <input type="radio" value="hard" checked={gameMode === 'hard'} id="mode1" onChange={(e) => {handleModeChange(e);}} name="mode"/>
-        <label for="mode1">Hard</label>
-        <button className="trButton" onClick={() => { setWhereto('menu'); } }>
-            <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
-        </button>
-    </form>;
+
     function handleInputLetter(letter) {
         handleUpdatedGuess(guess + letter);
     }
@@ -53,7 +42,7 @@ const WordMastermind = ({setWhereto}) => {
             if (guessword === secretWord)
             {
                 setSolved(true);
-                if (secretWord.length === 8) {
+                if (secretWord.length === gameOptions.lenMax) {
                     setSetSolveCounts([...setSolveCounts, newSetGuessCount]);
                 }
             }
@@ -63,11 +52,11 @@ const WordMastermind = ({setWhereto}) => {
     }
     function addRoundToHistory(newsecretword) {
         // history array by set, new sets at last position
-        // each set is an array of rounds (2-8 letter secret words, so 7 rounds)
+        // each set is an array of rounds (min to max length)
         // each round has secret word and guess info
         let newhistory = JSON.parse(JSON.stringify(history));
         let newround = {secretWord: newsecretword, guesses: [], solved: false};
-        if (newsecretword.length === 2) { // new set
+        if (newsecretword.length === gameOptions.lenMin) { // new set
             let newset = {rounds: [newround], numguesses: 0};
             newhistory.push(newset);
         } else { // existing set
@@ -139,21 +128,25 @@ const WordMastermind = ({setWhereto}) => {
     }
     const InitialInfo = <div className="Outertable">
         <div className="trParagraph AlignLeft">
-            <p>2-8 letter words per set.</p>
+            <p>{gameOptions.lenMin}-{gameOptions.lenMax} letter words per set.</p>
             <p>Guesses this word: {guesses.length}</p>
             <p>Guesses this set: {setGuessCount}</p>
             {setSolveCounts.length === 0 ?
                 <p>No completed sets yet</p>
                 :
                 <p>Guesses for completed sets: {setSolveCounts.map(num => (<span key={num.toString()}>{num} </span>))}</p>}
-            {gameMode === 'easy' && <><p><span className="wmEasyModeLetter wmCorrectLetterCorrectPosition">C</span>orrect position</p>
+            {gameOptions.mode === 'easy' && <><p><span className="wmEasyModeLetter wmCorrectLetterCorrectPosition">C</span>orrect position</p>
                 <p><span className="wmEasyModeLetter wmCorrectLetterWrongPosition">I</span>ncorrect position</p>
                 <p><span className="wmEasyModeLetter wmWrongLetter">W</span>rong letter</p>
             </>}
         </div>
     </div>;
     const MainInfo = <div className="Outertable">
-        {secretWord === '' ? pickRandomWord() : ''}
+        {/* If I don't check gameOptions.set then it will call pickRandomWord
+           even when the options are not set and this is not called by my
+           code. It must be some kind of pre-rendering.
+         */}
+        {gameOptions.set && secretWord === '' ? pickRandomWord() : ''}
         <div className="trParagraph">
             <h3>Secret Word: {solved ? secretWord : secretDisplay}</h3>
             {secretWord === '' ?
@@ -177,14 +170,14 @@ const WordMastermind = ({setWhereto}) => {
             displayGuesses}
     </div>;
     const GuessInfo = <div className="Outertable">
-        <div className="wmModeOptionForm">
+        <div className="wmGuessInfoDiv">
             Guess info:
         </div>
         {guesses.map((g, gi) => (
             !hintshidden(g) &&
             <Showinfo key={`${guesses.length - gi}.${g}`} word={g} showInserts="N" showSwaps="Y" showAnagrams="Y" showDrops="N" removeEntry={removeEntry} entryIndex={gi} />
         ))}
-        <div className="wmModeOptionForm">
+        <div className="wmGuessInfoDiv">
             Explanation:
         </div>
         <ul className="trParagraph">
@@ -197,9 +190,6 @@ const WordMastermind = ({setWhereto}) => {
     </div>;
     const BrowserLayout = <div className="container-fluid">
         <div className="row">
-            {ShowModeOptions}
-        </div>
-        <div className="row">
             <div className="col-lg-6">
                 <div className="row">
                     <div className="col">{InitialInfo}</div>
@@ -210,7 +200,6 @@ const WordMastermind = ({setWhereto}) => {
         </div>
     </div>;
     const MobileLayout = <div>
-        {ShowModeOptions}
         <div>
             <button className="trButton" onClick={() => { setShowInitialInfo(!showInitialInfo); } }>
                 {showInitialInfo ? "Hide" : "Show"}
@@ -221,7 +210,17 @@ const WordMastermind = ({setWhereto}) => {
     </div>;
     return (
         <div className="trBackground">
-            { isMobile ? MobileLayout : BrowserLayout }
+            <div className="trTitle">
+                Word Mastermind
+                <button className="trButton" onClick={() => {setWhereto('menu');}}>
+                    <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
+                </button>
+            </div>
+        {!gameOptions.set ?
+            <GetWMOptions setGameOptions={setGameOptions}/>
+        :
+            isMobile ? MobileLayout : BrowserLayout
+        }
         </div>
     );
 
@@ -237,7 +236,7 @@ const WordMastermind = ({setWhereto}) => {
                 setSolved(false);
             } }
             >
-                {secretWord.length === 8 ? "Start Another Set!" : "Start Next Word"}
+                {secretWord.length === gameOptions.lenMax ? "Start Another Set!" : "Start Next Word"}
             </button>
             <button className="trButton"
             onClick={() => {copyToClipboard();}}
@@ -277,7 +276,7 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function showGuessesTable() {
-        return <div>{gameMode === 'hard' ?
+        return <div>{gameOptions.mode === 'hard' ?
         <table className="trTable">
             <thead>
                 <tr>
@@ -315,8 +314,16 @@ const WordMastermind = ({setWhereto}) => {
     }
 
     function pickRandomWord() {
-        const newlen = secretWord ? secretWord.length < 2 ? 2 : secretWord.length > 7 ? 2 : secretWord.length + 1 : 2;
-        if (newlen === 2 && setGuessCount !== 0)
+        const newlen =
+            secretWord ?
+                secretWord.length < gameOptions.lenMin ?
+                    gameOptions.lenMin
+                : secretWord.length >= gameOptions.lenMax ?
+                    gameOptions.lenMin
+                : secretWord.length + 1
+            :
+                gameOptions.lenMin;
+        if (newlen === gameOptions.lenMin && setGuessCount !== 0)
         {
             setSetGuessCount(0);
         }

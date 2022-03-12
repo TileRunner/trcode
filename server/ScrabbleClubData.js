@@ -533,6 +533,13 @@
       "Date": "2021-09-01",
       "Description": "Club night",
       "Amount": -11.0
+    },
+    {
+      "Id": 73,
+      "ClubId": 1,
+      "Date": "2022-03-11",
+      "Description": "9 letter bingo",
+      "Amount": -3.0
     }
   ],
   "clubGameList": [
@@ -25339,6 +25346,114 @@
       "OpponentId": 81,
       "PlayerScore": 351,
       "OpponentScore": 319
+    },
+    {
+      "Id": 2758,
+      "ClubNightId": 231,
+      "Round": 1,
+      "PlayerId": 2,
+      "OpponentId": 8,
+      "PlayerScore": 435,
+      "OpponentScore": 263
+    },
+    {
+      "Id": 2759,
+      "ClubNightId": 231,
+      "Round": 1,
+      "PlayerId": 5,
+      "OpponentId": 6,
+      "PlayerScore": 280,
+      "OpponentScore": 478
+    },
+    {
+      "Id": 2760,
+      "ClubNightId": 231,
+      "Round": 2,
+      "PlayerId": 2,
+      "OpponentId": 6,
+      "PlayerScore": 403,
+      "OpponentScore": 386
+    },
+    {
+      "Id": 2761,
+      "ClubNightId": 231,
+      "Round": 2,
+      "PlayerId": 8,
+      "OpponentId": 5,
+      "PlayerScore": 219,
+      "OpponentScore": 451
+    },
+    {
+      "Id": 2762,
+      "ClubNightId": 231,
+      "Round": 3,
+      "PlayerId": 2,
+      "OpponentId": 5,
+      "PlayerScore": 378,
+      "OpponentScore": 472
+    },
+    {
+      "Id": 2763,
+      "ClubNightId": 231,
+      "Round": 3,
+      "PlayerId": 6,
+      "OpponentId": 8,
+      "PlayerScore": 341,
+      "OpponentScore": 378
+    },
+    {
+      "Id": 2764,
+      "ClubNightId": 232,
+      "Round": 1,
+      "PlayerId": 3,
+      "OpponentId": 4,
+      "PlayerScore": 571,
+      "OpponentScore": 280
+    },
+    {
+      "Id": 2765,
+      "ClubNightId": 232,
+      "Round": 1,
+      "PlayerId": 8,
+      "OpponentId": 6,
+      "PlayerScore": 330,
+      "OpponentScore": 474
+    },
+    {
+      "Id": 2766,
+      "ClubNightId": 232,
+      "Round": 2,
+      "PlayerId": 6,
+      "OpponentId": 3,
+      "PlayerScore": 412,
+      "OpponentScore": 517
+    },
+    {
+      "Id": 2767,
+      "ClubNightId": 232,
+      "Round": 2,
+      "PlayerId": 8,
+      "OpponentId": 4,
+      "PlayerScore": 334,
+      "OpponentScore": 404
+    },
+    {
+      "Id": 2768,
+      "ClubNightId": 232,
+      "Round": 3,
+      "PlayerId": 3,
+      "OpponentId": 8,
+      "PlayerScore": 430,
+      "OpponentScore": 375
+    },
+    {
+      "Id": 2769,
+      "ClubNightId": 232,
+      "Round": 3,
+      "PlayerId": 6,
+      "OpponentId": 4,
+      "PlayerScore": 290,
+      "OpponentScore": 418
     }
   ],
   "clubMemberList": [
@@ -27083,6 +27198,20 @@
       "Id": 230,
       "ClubId": 3,
       "Date": "2022-02-25",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 231,
+      "ClubId": 1,
+      "Date": "2022-03-04",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 232,
+      "ClubId": 1,
+      "Date": "2022-03-11",
       "BingoLetter": "",
       "BingoLetterGotPlayed": ""
     }
