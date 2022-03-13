@@ -1,7 +1,7 @@
 .wmGetOptionsDiv {
     background-color: blue;
     color: white;
-    font-size: 25px;
+    font-size: 20px;
     width: fit-content;
     padding: 2px 3px;
     border: 1px solid blue;
@@ -126,10 +126,16 @@
     font-family: 'Courier New', Courier, monospace;
     border: 1px solid white;
     text-align: center;
-    min-width: 45px;
-    height: 45px;
     padding: 5px 10px;
     font-size: larger;
+}
+.wmEasyModeLetter.small {
+    width: 40px;
+    height: 40px;
+}
+.wmEasyModeLetter.normal {
+    width: 45px;
+    height: 45px;
 }
 .wmCorrectLetterCorrectPosition {
     background-color: greenyellow;

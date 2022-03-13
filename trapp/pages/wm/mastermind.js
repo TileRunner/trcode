@@ -4,7 +4,7 @@ import { isMobile } from 'react-device-detect'
 import ShowCustomKeyboard from '../showCustomKeyboard';
 import GetWMOptions from './wmoptions';
 const WordMastermind = ({setWhereto}) => {
-    const [gameOptions, setGameOptions] = useState({set:false, lenMin:2, lenMax:8, mode: 'easy'});
+    const [gameOptions, setGameOptions] = useState({set:false});
     const [history, setHistory] = useState([]);
     const [keyboardVersion, setKeyboardVersion] = useState(1);
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
@@ -83,27 +83,36 @@ const WordMastermind = ({setWhereto}) => {
         setHistory(newhistory);
     }
     function copyToClipboard() {
-        let copyText = "Word Mastermind\n";
+        if (!gameOptions.cliprule) {
+            return;
+        }
+        let copyText = "Word Mastermind\nhttps://tilerunner.herokuapp.com/\n";
         for (let s = 0; s < history.length; s++) {
             const si = history[s];
-            copyText = `${copyText}Set ${s+1}: ${si.numguesses} guesses\n`
-            for (let r = 0; r < si.rounds.length; r++) {
-                const ri = si.rounds[r];
-                copyText = `${copyText}Round ${r+1}: ${ri.guesses.length} guesses\n`;
-                for (let g = 0; g < ri.guesses.length; g++) {
-                    const gi = ri.guesses[g];
-                    copyText += `${gi.guess}:\n`;
-                    for (let l = 0; l < gi.letterinfo.length; l++) {
-                        const li = gi.letterinfo[l];
-                        if (li.result === 'C') {
-                            copyText = copyText + "🟩";
-                        } else if (li.result === 'I') {
-                            copyText = copyText + "🟨";
-                        } else {
-                            copyText = copyText + "⬜";
+            if (gameOptions.cliprule === 'all' || s === history.length - 1) {
+                if (gameOptions.cliprule !== 'round') {
+                    copyText += `Set ${s+1}: ${si.numguesses} guesses\n`
+                }
+                for (let r = 0; r < si.rounds.length; r++) {
+                    const ri = si.rounds[r];
+                    if (gameOptions.cliprule !== 'round' || r === si.rounds.length - 1) {
+                        copyText = `${copyText}Round ${r+1}: ${ri.guesses.length} guesses\n`;
+                        for (let g = 0; g < ri.guesses.length; g++) {
+                            const gi = ri.guesses[g];
+                            copyText += `${gi.guess}:\n`;
+                            for (let l = 0; l < gi.letterinfo.length; l++) {
+                                const li = gi.letterinfo[l];
+                                if (li.result === 'C') {
+                                    copyText = copyText + "🟩";
+                                } else if (li.result === 'I') {
+                                    copyText = copyText + "🟨";
+                                } else {
+                                    copyText = copyText + "⬜";
+                                }
+                            }
+                            copyText = copyText + "\n";
                         }
                     }
-                    copyText = copyText + "\n";
                 }
             }
         }
@@ -267,6 +276,7 @@ const WordMastermind = ({setWhereto}) => {
                 <input className="form-control"
                     name="guess"
                     value={guess}
+                    autoComplete="new-password"
                     onChange={(e) => {
                         const guessword = e.target.value.toUpperCase().replace( /\W/g , '');
                         handleUpdatedGuess(guessword);
@@ -299,6 +309,11 @@ const WordMastermind = ({setWhereto}) => {
         :
         <table className="trTable">
             <tbody>
+                {!solved && guess && <tr key='easymodeguessletters'>
+                    {guess.split("").map((l,i) => (
+                        <td key={`guessletter${i}`} className={`wmEasyModeLetter ${cssEasyModeLetterSize()}`}>{l}</td>
+                    ))}
+                </tr>}
                 {guesses.map((g,i) => (
                     <tr key={`mode1guess${i}`}>
                         {g.split('').map((l,j) => (
@@ -385,10 +400,14 @@ const WordMastermind = ({setWhereto}) => {
         return "W";
     }
     function calcMode1css(guessLetters,guessLetterIndex) {
+        let size = cssEasyModeLetterSize();
         let letterResult = calcLetterResult(guessLetters, guessLetterIndex);
-        if (letterResult === 'C') {return "wmEasyModeLetter wmCorrectLetterCorrectPosition";}
-        if (letterResult === 'I') {return "wmEasyModeLetter wmCorrectLetterWrongPosition";}
-        return "wmEasyModeLetter wmWrongLetter";
+        if (letterResult === 'C') {return "wmEasyModeLetter wmCorrectLetterCorrectPosition " + size;}
+        if (letterResult === 'I') {return "wmEasyModeLetter wmCorrectLetterWrongPosition " + size;}
+        return "wmEasyModeLetter wmWrongLetter " + size;
+    }
+    function cssEasyModeLetterSize() {
+        return (secretWord && secretWord.length > 8 ? 'small' : 'normal');
     }
 }
 
