@@ -3,6 +3,7 @@ import Showinfo from '../wi/showinfo'
 import { isMobile } from 'react-device-detect'
 import ShowCustomKeyboard from '../showCustomKeyboard';
 import GetWMOptions from './wmoptions';
+import { isWordValid } from '../../lib/wordfunctions';
 const WordMastermind = ({setWhereto}) => {
     const [gameOptions, setGameOptions] = useState({set:false});
     const [history, setHistory] = useState([]);
@@ -32,8 +33,15 @@ const WordMastermind = ({setWhereto}) => {
     function showDivUnderKeyboard() {
         return <div className="wmWordUnderKeyboard">&nbsp;{guess}&nbsp;</div>;
     }
-    function handleUpdatedGuess(guessword) {
+    async function handleUpdatedGuess(guessword) {
         if (guessword.length === secretWord.length) {
+            if (gameOptions.validOnly) {
+                let isvalid = await isWordValid(guessword);
+                if (!isvalid) {
+                    alert(`Sorry, ${guessword} is not in my word list.`);
+                    return;
+                }
+            }
             addGuessToHistory(guessword);
             const newSetGuessCount = setGuessCount + 1;
             setSetGuessCount(newSetGuessCount);
