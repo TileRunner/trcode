@@ -123,6 +123,7 @@ const processFybCreateGame = (wss, pm) => {
                 gameid: pm.gameid,
                 numPlayers: Number(pm.numPlayers), // For some reason, when I go past the default of 2 players in the lobby it was treating pm.numPlayers as a string.
                 goal: Number(pm.goal),
+                validOnly: pm.validOnly,
                 players: [{
                     nickname: pm.nickname,
                     points: 0,

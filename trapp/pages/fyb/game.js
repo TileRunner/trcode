@@ -5,8 +5,10 @@ import { usePrevious } from "../../lib/usePrevious";
 import ThinChat from "./thinChatSection";
 import Chat from "../pb/chatSection";
 import { scrollToBottom } from "../../lib/scrollToBottom";
+import { isWordValid } from "../../lib/wordfunctions";
 
 const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
+    const [sounds, setSounds] = useState(true);
     const [chatmsgs, setChatmsgs] = useState([]);
     const [snat, setSnat] = useState('');
     const [warning, setWarning] = useState('');
@@ -51,6 +53,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
     },[wsmessage]);
 
     useEffect(() => {
+        if (!sounds) {return;}
         // Sounds will not play on some mobiles. Something about needing a user interaction (protecting cell data usage).
         // Only play sound if gamedata update didn't jump to a different game or round
         if (prevGamedata && gamedata.gameindex === prevGamedata.gameindex && gamedata.round === prevGamedata.round) {
@@ -304,6 +307,9 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 <button className="trButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
+                <button className="trButton" onClick={() => {setSounds(!sounds);}}>
+                    <i className="material-icons" data-toggle="tooltip" title="Sounds on/off">{sounds ? 'volume_mute' : 'volume_off'}</i>
+                </button>
             </div>
             <MobileOnlyView>
                 <div className="container-fluid">
@@ -389,7 +395,7 @@ function getPlayerWord(handleKeyDown, word, setWord, gamedata, setWarning, clien
     </div>;
 }
 
-function submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname, setWord) {
+async function submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname, setWord) {
     let fixedword = word.toUpperCase().trim();
     // Check if the word is allowed based on previous words this round
     for (let i = 0; i < gamedata.movesThisRound.length; i++) {
@@ -422,7 +428,15 @@ function submitPlayerWord(word, gamedata, setWarning, client, thisisme, nickname
             return;
         }
     }
-    // If you get here they have all the required letters. Send the guess to the server.
+    // If you get here they have all the required letters.
+    if (gamedata.validOnly) {
+        let isvalid = await isWordValid(fixedword);
+        if (!isvalid) {
+            alert(`Sorry, ${fixedword} is not in my word list. You can try again.`);
+            return;
+        }
+    }
+    // Send the guess to the server.
     setWarning(`Checking your word ... shouldn't take long. If it does, please try rejoining the game.`);
     client.send({
         type: c.CLIENT_TYPE_FYB,

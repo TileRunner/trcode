@@ -11,11 +11,36 @@ const CreateGame = ({
 
     const [numPlayers, setNumPlayers] = useState(2); // How many players, default 2
     const [goal, setGoal] = useState(11); // How many points needed to win, default 11
+    const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
 
+    function sendCreateGameRequest() {
+        client.send({
+            type: c.CLIENT_TYPE_FYB,
+            func: 'create',
+            thisisme: thisisme,
+            gameid: gameid,
+            numPlayers: numPlayers,
+            goal: goal,
+            nickname: nickname,
+            timestamp: Date.now(),
+            validOnly: validOnly
+        });
+    }
+    
     return (
         <div>
             <div className="trSubtitle">
                 Create Game
+            </div>
+            <div className="trOptionsDiv">
+            <div>
+                <button key='buttonvalidonly'
+                className={validOnly ? 'trOptionsCheckboxOn' : 'trOptionsCheckboxOff'}
+                data-toggle="tooltip" title="Whether guess must be valid words"
+                onClick={() => {setValidOnly(!validOnly);}}
+                />
+                <span key='labelvalidonly' className='trOptionsCheckboxLabel'>Guesses must be valid words</span>
+            </div>
             </div>
             <table className="trTable">
                 <tbody>
@@ -57,7 +82,7 @@ const CreateGame = ({
                     onClick={() => {
                         let trimmed = gameid.trim();
                         setGameid(trimmed);
-                        sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname);
+                        sendCreateGameRequest();
                         }}>
                     SUBMIT
                 </button>
@@ -73,19 +98,6 @@ const CreateGame = ({
             }
         </div>
     );
-}
-
-function sendCreateGameRequest(client, thisisme, gameid, numPlayers, goal, nickname) {
-    client.send({
-        type: c.CLIENT_TYPE_FYB,
-        func: 'create',
-        thisisme: thisisme,
-        gameid: gameid,
-        numPlayers: numPlayers,
-        goal: goal,
-        nickname: nickname,
-        timestamp: Date.now()
-    });
 }
 
 export default CreateGame;
