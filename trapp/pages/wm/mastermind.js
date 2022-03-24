@@ -94,7 +94,7 @@ const WordMastermind = ({setWhereto}) => {
         if (!gameOptions.cliprule) {
             return;
         }
-        let copyText = "Word Mastermind\nhttps://tilerunner.herokuapp.com/\n";
+        let copyText = gameOptions.showHeader ? "Word Mastermind\nhttps://tilerunner.herokuapp.com/\n" : "";
         for (let s = 0; s < history.length; s++) {
             const si = history[s];
             if (gameOptions.cliprule === 'all' || s === history.length - 1) {
@@ -111,11 +111,11 @@ const WordMastermind = ({setWhereto}) => {
                             for (let l = 0; l < gi.letterinfo.length; l++) {
                                 const li = gi.letterinfo[l];
                                 if (li.result === 'C') {
-                                    copyText = copyText + "🟩";
+                                    copyText = copyText + gameOptions.ciw.c;
                                 } else if (li.result === 'I') {
-                                    copyText = copyText + "🟨";
+                                    copyText = copyText + gameOptions.ciw.i;
                                 } else {
-                                    copyText = copyText + "⬜";
+                                    copyText = copyText + gameOptions.ciw.w;
                                 }
                             }
                             copyText = copyText + "\n";

@@ -5,10 +5,17 @@ const GetWMOptions = ({setGameOptions}) => {
     const [mode, setMode] = useState('easy');
     const [lenMin, setLenMin] = useState(5);
     const [lenMax, setLenMax] = useState(8);
+    const [showHeader, setShowHeader] = useState(true); // whether to show "Word Mastermin" and link in clipboard capture
     const [cliprule, setCliprule] = useState('round');
     const [validOnly, setValidOnly] = useState(true); // whether guesses must be valid words
+    const [theme, setTheme] = useState(2); // Array index for themes
+    const themes = [
+        {c:"😎",i:"🤨",w:"😒"},
+        {c:"🟩",i:"🟨",w:"⬜"},
+        {c:"✅",i:"🔁",w:"❌"}
+    ];
     const handleStartPuzzle = () => {
-        let newGameOptions = {set: true, mode: mode, validOnly: validOnly, cliprule: cliprule};
+        let newGameOptions = {set: true, mode: mode, validOnly: validOnly, cliprule: cliprule, ciw: themes[theme]};
         if (lenMin > lenMax) {
             newGameOptions.lenMax = lenMin;
             newGameOptions.lenMin = lenMax;
@@ -31,14 +38,28 @@ const GetWMOptions = ({setGameOptions}) => {
         >
             <label>Color code the guess letters</label>
         </div>
+        <div className={showHeader ? "trCheckbox On" : "trCheckbox"}
+            onClick={() => {setShowHeader(!showHeader);}}
+        >
+            <label>Title and link in clipboard</label>
+        </div>
         <div>
-            <h3 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Clipboard Capture</h3>
-            <button key='buttonclipround' className={cliprule === 'round' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('round');}}/>
-            <span key='labelclipround' className="trOptionsRadioLabel">Round</span>
-            <button key='buttonclipset' className={cliprule === 'set' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('set');}}/>
-            <span key='labelclipset' className="trOptionsRadioLabel">Set</span>
-            <button key='buttonclipall' className={cliprule === 'all' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('all');}}/>
-            <span key='labelclipall' className="trOptionsRadioLabel">All</span>
+            <h4 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Clipboard Capture</h4>
+            <button className={cliprule === 'round' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('round');}}/>
+            <span className="trOptionsRadioLabel">Round</span>
+            <button className={cliprule === 'set' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('set');}}/>
+            <span className="trOptionsRadioLabel">Set</span>
+            <button className={cliprule === 'all' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('all');}}/>
+            <span className="trOptionsRadioLabel">All</span>
+            <h4 className="AlignCenter">Emoji Theme</h4>
+            <button className={theme === 0 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(0);}}/>
+            <span className="trOptionsRadioLabel">{themes[0].c}{themes[0].i}{themes[0].w}</span>
+            <br/>
+            <button className={theme === 1 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(1);}}/>
+            <span className="trOptionsRadioLabel">{themes[1].c}{themes[1].i}{themes[1].w}</span>
+            <br/>
+            <button className={theme === 2 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(2);}}/>
+            <span className="trOptionsRadioLabel">{themes[2].c}{themes[2].i}{themes[2].w}</span>
         </div>
         <div className="wm_lenDiv">
             <h3>Start Length</h3>
