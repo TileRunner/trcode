@@ -6,7 +6,7 @@ const GetWMOptions = ({setGameOptions}) => {
     const [lenMin, setLenMin] = useState(5);
     const [lenMax, setLenMax] = useState(8);
     const [cliprule, setCliprule] = useState('round');
-    const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
+    const [validOnly, setValidOnly] = useState(true); // whether guesses must be valid words
     const handleStartPuzzle = () => {
         let newGameOptions = {set: true, mode: mode, validOnly: validOnly, cliprule: cliprule};
         if (lenMin > lenMax) {
@@ -19,20 +19,17 @@ const GetWMOptions = ({setGameOptions}) => {
         setGameOptions(newGameOptions);
     }
     return ( <div className="trOptionsDiv">
-        <div>
-            <h3 className="AlignCenter" data-toggle="tooltip" title="Easy mode shows which letters are correct or in the wrong place. Hard mode shows counts only.">Difficulty</h3>
-            <button key='buttonmodeeasy' className={mode === 'easy' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setMode('easy');}}/>
-            <span key='labelmodeeasy' className="trOptionsRadioLabel">Easy</span>
-            <button key='buttonmodehard' className={mode === 'hard' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setMode('hard');}}/>
-            <span key='labelmodehard' className="trOptionsRadioLabel">Hard</span>
-        </div>
-        <div>
-            <button key='buttonvalidonly'
-             className={validOnly ? 'trOptionsCheckboxOn' : 'trOptionsCheckboxOff'}
+        <div className={validOnly ? "trCheckbox On" : "trCheckbox"}
              data-toggle="tooltip" title="Whether guess must be valid words"
              onClick={() => {setValidOnly(!validOnly);}}
-             />
-            <span key='labelvalidonly' className='trOptionsCheckboxLabel'>Guesses must be valid words</span>
+        >
+            <label>Guesses must be valid words</label>
+        </div>
+        <div className={mode === 'easy' ? "trCheckbox On" : "trCheckbox"}
+             data-toggle="tooltip" title="Color coding shows which letters are correct or in the wrong place. Otherwise show counts only."
+             onClick={() => {setMode(mode === 'easy' ? 'hard' : 'easy');}}
+        >
+            <label>Color code the guess letters</label>
         </div>
         <div>
             <h3 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Clipboard Capture</h3>

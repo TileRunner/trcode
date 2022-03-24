@@ -11,7 +11,7 @@ const CreateGame = ({
 
     const [numPlayers, setNumPlayers] = useState(2); // How many players, default 2
     const [goal, setGoal] = useState(11); // How many points needed to win, default 11
-    const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
+    const [validOnly, setValidOnly] = useState(true); // whether guesses must be valid words
 
     function sendCreateGameRequest() {
         client.send({
@@ -33,14 +33,12 @@ const CreateGame = ({
                 Create Game
             </div>
             <div className="trOptionsDiv">
-            <div>
-                <button key='buttonvalidonly'
-                className={validOnly ? 'trOptionsCheckboxOn' : 'trOptionsCheckboxOff'}
-                data-toggle="tooltip" title="Whether guess must be valid words"
-                onClick={() => {setValidOnly(!validOnly);}}
-                />
-                <span key='labelvalidonly' className='trOptionsCheckboxLabel'>Guesses must be valid words</span>
-            </div>
+                <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
+                    onClick={() => {setValidOnly(!validOnly);}}
+                    data-toggle="tooltip" title="Whether guess must be valid words"
+                    >
+                    <label>Guesses must be valid words</label>
+                </div>
             </div>
             <table className="trTable">
                 <tbody>

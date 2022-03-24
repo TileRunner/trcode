@@ -9,6 +9,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
     const [selected, setSelected] = useState(-1); // Used for letting the user move fry letters around
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Practice session.');
+    const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
 
     useEffect(() => {
         pickAllFryLetters();
@@ -61,6 +62,10 @@ const FryYourBrainSolo = ({setWhereto}) => {
             }
         }
         let valid = await isWordValid(word);
+        if (validOnly && !valid) {
+            alert(`Sorry, ${fixedword} is not in my word list.`);
+            return;
+        }
         let move = {pass:false, word: word, valid: valid};
         await finishMoveAndMoveOn(move);
     }
@@ -98,6 +103,14 @@ const FryYourBrainSolo = ({setWhereto}) => {
                 <button className="trButton" onClick={() => {setWhereto('menu');}}>
                     <i className="material-icons" data-toggle="tooltip" title="Home">home</i>
                 </button>
+            </div>
+            <div className="trOptionsDiv">
+                <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
+                 onClick={() => {setValidOnly(!validOnly);}}
+                 data-toggle="tooltip" title="Whether guess must be valid words"
+                 >
+                    <label key='labelvalidonly'>Guesses must be valid words</label>
+                </div>
             </div>
             {moves.length >= 0 && <div>
                 <table className="trTable" border="1">

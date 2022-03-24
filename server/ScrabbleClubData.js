@@ -25454,6 +25454,87 @@
       "OpponentId": 4,
       "PlayerScore": 290,
       "OpponentScore": 418
+    },
+    {
+      "Id": 2770,
+      "ClubNightId": 233,
+      "Round": 1,
+      "PlayerId": 2,
+      "OpponentId": 5,
+      "PlayerScore": 440,
+      "OpponentScore": 387
+    },
+    {
+      "Id": 2771,
+      "ClubNightId": 233,
+      "Round": 1,
+      "PlayerId": 8,
+      "OpponentId": 4,
+      "PlayerScore": 252,
+      "OpponentScore": 406
+    },
+    {
+      "Id": 2772,
+      "ClubNightId": 233,
+      "Round": 1,
+      "PlayerId": 3,
+      "OpponentId": 6,
+      "PlayerScore": 461,
+      "OpponentScore": 326
+    },
+    {
+      "Id": 2773,
+      "ClubNightId": 233,
+      "Round": 2,
+      "PlayerId": 2,
+      "OpponentId": 4,
+      "PlayerScore": 436,
+      "OpponentScore": 292
+    },
+    {
+      "Id": 2774,
+      "ClubNightId": 233,
+      "Round": 2,
+      "PlayerId": 3,
+      "OpponentId": 5,
+      "PlayerScore": 389,
+      "OpponentScore": 273
+    },
+    {
+      "Id": 2775,
+      "ClubNightId": 233,
+      "Round": 2,
+      "PlayerId": 8,
+      "OpponentId": 6,
+      "PlayerScore": 312,
+      "OpponentScore": 372
+    },
+    {
+      "Id": 2776,
+      "ClubNightId": 233,
+      "Round": 3,
+      "PlayerId": 3,
+      "OpponentId": 2,
+      "PlayerScore": 437,
+      "OpponentScore": 363
+    },
+    {
+      "Id": 2777,
+      "ClubNightId": 233,
+      "Round": 3,
+      "PlayerId": 6,
+      "OpponentId": 4,
+      "PlayerScore": 372,
+      "OpponentScore": 380
+    },
+    {
+      "Id": 2778,
+      "ClubNightId": 233,
+      "Round": 3,
+      "PlayerId": 8,
+      "OpponentId": 5,
+      "PlayerScore": 370,
+      "OpponentScore": 319
     }
   ],
   "clubMemberList": [
@@ -27212,6 +27293,13 @@
       "Id": 232,
       "ClubId": 1,
       "Date": "2022-03-11",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 233,
+      "ClubId": 1,
+      "Date": "2022-03-18",
       "BingoLetter": "",
       "BingoLetterGotPlayed": ""
     }
