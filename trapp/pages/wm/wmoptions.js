@@ -43,26 +43,61 @@ const GetWMOptions = ({setGameOptions}) => {
         >
             <label>Title and link in clipboard</label>
         </div>
-        <div>
-            <h4 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Clipboard Capture</h4>
-            <button className={cliprule === 'round' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('round');}}/>
-            <span className="trOptionsRadioLabel">Round</span>
-            <button className={cliprule === 'set' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('set');}}/>
-            <span className="trOptionsRadioLabel">Set</span>
-            <button className={cliprule === 'all' ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setCliprule('all');}}/>
-            <span className="trOptionsRadioLabel">All</span>
-            <h4 className="AlignCenter">Emoji Theme</h4>
-            <button className={theme === 0 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(0);}}/>
-            <span className="trOptionsRadioLabel">{themes[0].c}{themes[0].i}{themes[0].w}</span>
-            <br/>
-            <button className={theme === 1 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(1);}}/>
-            <span className="trOptionsRadioLabel">{themes[1].c}{themes[1].i}{themes[1].w}</span>
-            <br/>
-            <button className={theme === 2 ? 'trOptionsRadioOn' : 'trOptionsRadioOff'} onClick={() => {setTheme(2);}}/>
-            <span className="trOptionsRadioLabel">{themes[2].c}{themes[2].i}{themes[2].w}</span>
+        <div className="wm_cliptable">
+            <span>Clipboard Settings</span>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <h4 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Capture</h4>
+                        </th>
+                        <th>
+                            <h4 className="AlignCenter">Emoji Theme</h4>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span className={cliprule === 'round' ? 'trRadio On' : 'trRadio'} onClick={() => {setCliprule('round');}}>
+                                <label>Round</label>
+                            </span>
+                        </td>
+                        <td>
+                            <div className={theme === 0 ? 'trRadio On' : 'trRadio'} onClick={() => {setTheme(0);}}>
+                                <label>{themes[0].c}{themes[0].i}{themes[0].w}</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span className={cliprule === 'set' ? 'trRadio On' : 'trRadio'} onClick={() => {setCliprule('set');}}>
+                                <label>Set</label>
+                            </span>
+                        </td>
+                        <td>
+                            <div className={theme === 1 ? 'trRadio On' : 'trRadio'} onClick={() => {setTheme(1);}}>
+                                <label>{themes[1].c}{themes[1].i}{themes[1].w}</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span className={cliprule === 'all' ? 'trRadio On' : 'trRadio'} onClick={() => {setCliprule('all');}}>
+                                <label>All</label>
+                            </span>
+                        </td>
+                        <td>
+                            <div className={theme === 2 ? 'trRadio On' : 'trRadio'} onClick={() => {setTheme(2);}}>
+                                <label>{themes[2].c}{themes[2].i}{themes[2].w}</label>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div className="wm_lenDiv">
-            <h3>Start Length</h3>
+            <h4>Start Length</h4>
             {lenAllowedArray.map((n) => (
                 <button className={n === lenMin ? 'wm_lenSelected' : 'wm_lenUnselected'}
                     key={`chooseLenMin${n}`}
@@ -70,7 +105,7 @@ const GetWMOptions = ({setGameOptions}) => {
                 >{n}
                 </button>
             ))}
-            <h3>End Length</h3>
+            <h4>End Length</h4>
             {lenAllowedArray.map((n) => (
                 <button className={n === lenMax ? 'wm_lenSelected' : 'wm_lenUnselected'}
                     key={`chooseLenMax${n}`}
