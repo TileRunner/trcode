@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const GetWMOptions = ({setGameOptions}) => {
-    const lenAllowedArray = [2,3,4,5,6,7,8,9];
+    const lenAllowedArray = [3,4,5,6,7,8,9];
     const [mode, setMode] = useState('easy');
     const [lenMin, setLenMin] = useState(5);
     const [lenMax, setLenMax] = useState(8);
@@ -44,12 +44,16 @@ const GetWMOptions = ({setGameOptions}) => {
             <label>Title and link in clipboard</label>
         </div>
         <div className="wm_cliptable">
-            <span>Clipboard Settings</span>
             <table>
                 <thead>
                     <tr>
                         <th>
-                            <h4 className="AlignCenter" data-toggle="tooltip" title="Set clipboard feature to capture the guesses for just the round, just the set, or all sets.">Capture</h4>
+                            <h4 className="AlignCenter">
+                                Capture
+                                <span onClick={() => alert("Set clipboard feature to capture the guesses for just the round, just the set, or all sets.")}>
+                                    <i className="material-icons trInfoIcon">info</i>
+                                </span>
+                            </h4>
                         </th>
                         <th>
                             <h4 className="AlignCenter">Emoji Theme</h4>

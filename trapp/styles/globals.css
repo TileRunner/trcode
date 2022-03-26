@@ -55,6 +55,18 @@ a {
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
 
+.mainMenuOptions {
+  padding: 2px;
+}
+.mainMenuOptions button {
+  margin-bottom: 5px;
+}
+.acknowledgements {
+  padding: 2px;
+}
+.acknowledgements div {
+  margin-bottom: 5px;
+}
 .artworkDiv {
   color: black;
   background-color: cyan;

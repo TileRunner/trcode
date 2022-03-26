@@ -1,0 +1,314 @@
+:root {
+    --trcssVerticalSpacer: 5px;
+    --trcssPageBG: #404040;
+    --trcssTitleBG: #200F60;
+    --trcssTitleFG: #BFC8EC;
+    --trcssTitleFont: Arial, Helvetica, sans-serif;
+    --trcssSubtitleBG: #200FA0;
+    --trcssSubtitleFG:var(--trcssTitleFG);
+    --trcssSubtitleFont:var(--trcssTitleFont);
+    --trcssTextFG:var(--trcssTitleFG);
+    --trcssTextFont: Verdana, Geneva, Tahoma, sans-serif;
+    --trcssEmphasisBG: black;
+    --trcssEmphasisFG: whitesmoke;
+    --trcssWarningBG: black;
+    --trcssWarningFG: yellow;
+    --trcssDangerBG: white;
+    --trcssDangerFG: red;
+    --trcssTableBorder:var(--trcssTitleBG);
+    --trcssTableBG:#505050;
+    --trcssThBG:var(--trcssSubtitleBG);
+    --trcssThFG:var(--trcssSubtitleFG);
+    --trcssThFont: var(--trcssTitleFont);
+    --trcssTdFG:var(--trcssTextFG);
+    --trcssTdFont:var(--trcssTitleFont);
+    --trcssButtonBG: blue;
+    --trcssButtonFG: whitesmoke;
+    --trcssButtonHoverBG: black;
+    --trcssButtonHoverFG: white;
+    --trcssButtonFont: 'Courier New', Courier, monospace;
+}
+.trBackground {
+    background-color: var(--trcssPageBG);
+    margin-left: 5px;
+}
+.trTitle {
+    width: fit-content;
+    padding: 2px 5px;
+    background-color: var(--trcssTitleBG);
+    color: var(--trcssTitleFG);
+    font-size: xx-large;
+    font-family: var(--trcssTitleFont);
+}
+.trSubtitle {
+    margin-top: var(--trcssVerticalSpacer);
+    width: fit-content;
+    padding: 2px 5px;
+    background-color: var(--trcssSubtitleBG);
+    color: var(--trcssSubtitleFG);
+    font-size: x-large;
+    font-family: var(--trcssSubtitleFont);
+}
+.trParagraph {
+    font-family: var(--trcssTextFont);
+    margin-top: var(--trcssVerticalSpacer);
+    color: var(--trcssTextFG);
+}
+.trEmphasis {
+    width: fit-content;
+    background-color: var(--trcssEmphasisBG);
+    color: var(--trcssEmphasisFG);
+}
+.trEmphasis::before {
+    content: '\2690 \0020'; /* Looks like a flag */
+}
+.trWarning {
+    width: fit-content;
+    background-color: var(--trcssWarningBG) !important;
+    color: var(--trcssWarningFG) !important;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.trWarning::before {
+    margin-right: 2px;
+    content: '\26A0'; /* Looks like a ! inside a triangle */
+}
+.trDanger {
+    width: fit-content;
+    background-color: var(--trcssDangerBG) !important;
+    color: var(--trcssDangerFG) !important;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.trDanger::before {
+    margin-right: 2px;
+    content: '\26D4'; /* Looks like a no entry sign */
+}
+.trTable {
+    padding: 5px;
+    background-color: var(--trcssTableBG);
+    margin-top: var(--trcssVerticalSpacer);
+    border-width: 3px;
+    border-style: solid;
+    border-color: var(--trcssTableBorder);
+}
+.trTable th {
+    background-color: var(--trcssThBG);
+    color: var(--trcssThFG);
+    font-family: var(--trcssThFont);
+    font-weight: normal;
+    padding: 3px;
+    text-align: left;
+}
+.trTable td {
+    color: var(--trcssTdFG);
+    font-family: var(--trcssTdFont);
+}
+.trButton {
+    float: none;
+    font-family: var(--trcssButtonFont);
+    font-size: large;
+    border: 1px solid var(--trcssButtonFG);
+    border-radius: 5px;
+    background-color: var(--trcssButtonBG);
+    color: var(--trcssButtonFG);
+    transition-duration: 0.4s;
+}
+.trButton:hover {
+    border: 1px solid var(--trcssButtonHoverFG);
+    background-color: var(--trcssButtonHoverBG);
+    color: var(--trcssButtonHoverFG);
+    cursor: pointer;
+}
+.trInfoIcon {
+    vertical-align: middle;
+    background-color: blue;
+    border-radius: 50%;
+    color: white;
+}
+.trKeyboard {
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px 2px;
+    background-color: var(--trcssPageBG);
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    width: fit-content;
+}
+.trKeyboard div:first-child {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+.trKeyboard div:nth-child(2) {
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
+.trKeyboard div:last-child {
+    margin-bottom: 5px;
+    margin-left: 25px;
+}
+.trKeyboard span {
+    border: 1px solid white;
+    border-radius: 5px;
+    background-color: blue;
+    text-align: center;
+    margin: 0px 0px;
+    padding: 5px 5px;
+}
+.trBackspace::before {
+    content: '\003Cx';
+}
+.trOptionsDiv {
+    margin-top: 5px;
+    background-color: blue;
+    color: white;
+    font-size: 20px;
+    width: fit-content;
+    padding: 2px 3px;
+    border: 1px solid blue;
+    border-radius: 10px;
+}
+.trOptionsHeader {
+    font-size: 25px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.trOptionsRadioOn {
+    margin-left: 5px;
+    box-shadow: inset 0 0 0 4px cyan;
+    background-color: black;
+    border: 1px solid;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+}
+.trOptionsRadioOff {
+    margin-left: 5px;
+    box-shadow: inset 0 0 0 4px cyan;
+    background-color: cyan;
+    border: 1px solid;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+}
+.trOptionsRadioLabel {
+    margin-left: 5px;
+    margin-right: 10px;
+    vertical-align: top;
+}
+.trOptionsCheckboxOn {
+    vertical-align: top;
+    background-color: cyan;
+    margin-left: 5px;
+    border: 1px solid;
+    border-radius: 0%;
+    width: 30px;
+    height: 30px;
+}
+.trOptionsCheckboxOn::after {
+    content: '\2714';
+    font-weight: bolder;
+    font-size: medium;
+}
+.trOptionsCheckboxOn:focus {
+    outline: none;
+}
+.trOptionsCheckboxOff {
+    margin-left: 5px;
+    background-color: cyan;
+    border: 1px solid;
+    border-radius: 0%;
+    width: 30px;
+    height: 30px;
+}
+.trOptionsCheckboxOff:focus {
+    outline: none;
+}
+.trOptionsCheckboxLabel {
+    margin-left: 5px;
+    margin-right: 10px;
+    vertical-align: top;
+}
+/* trCheckbox:
+    Main code taken from https://medium.com/claritydesignsystem/pure-css-accessible-checkboxes-and-radios-buttons-54063e759bb3
+    When checked use <div className="trCheckbox On" onClick={some code to toggle whether checked}><label>Some text</label></div> 
+    When unchecked use  <div className="trCheckbox" onClick={some code to toggle whether checked}><label>Some text</label></div> 
+*/
+.trCheckbox {
+    line-height: 24px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+.trCheckbox label {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    /* 16px of the checkbox and 6px between it and text*/
+    padding-left: 22px;
+}
+.trCheckbox label::before,
+.trCheckbox label::after {
+    position: absolute;
+    content: "";
+    display: inline-block;
+}
+/* The box */
+.trCheckbox label::before {
+    height: 16px;
+    width: 16px;
+    border: 1px solid;
+    left: 0px;
+    top: 3px;
+}
+/* The check mark (<div className="trCheckbox On">) */
+.trCheckbox.On label::after {
+    height: 5px;
+    width: 9px;
+    border-left: 2px solid;
+    border-bottom: 2px solid;
+    transform: rotate(-45deg);
+    left: 4px;
+    top: 7px;
+}
+
+
+
+
+.trRadio {
+    line-height: 24px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+.trRadio label {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    /* 16px of the radio circle and 6px between it and text*/
+    padding-left: 22px;
+}
+.trRadio label::before,
+.trRadio label::after {
+    position: absolute;
+    content: "";
+    display: inline-block;
+}
+/* The circle */
+.trRadio label::before {
+    height: 16px;
+    width: 16px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background-color: blue;
+    left: 0px;
+    top: 3px;
+}
+/* The circle filler (<div className="trRadio On"> ... use <span> instead of <div> to make them side by side) */
+.trRadio.On label::after {
+    height: 8px;
+    width: 8px;
+    border: 1px solid white;
+    border-radius: 50%;
+    background-color: white;
+    left: 4px;
+    top: 7px;
+}

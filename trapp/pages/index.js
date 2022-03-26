@@ -1,4 +1,4 @@
-import {BrowserView, MobileOnlyView} from 'react-device-detect'
+import {isMobile} from 'react-device-detect'
 import React, { useState } from 'react';
 import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
@@ -48,22 +48,17 @@ const Menu = (props) => {
     }
 
     return (
-      <tr>
-        <td>
+      <div>
           <button className="trButton"
             onClick={() => {props.setWhereto(props.targetWhereto);}}
           >
             {props.optionText}
           </button>
-        </td>
-        <td>
-          <button id="toggleDescribeFlag" className="trButton"
-            onClick={() => toggleDescFlag()}
-          >
-            {props.descFlag ? "Hide info" : "Show info"}
-          </button>
-        </td>
-      </tr>
+          &nbsp;
+          <span id="toggleDescribeFlag" onClick={() => toggleDescFlag()}>
+            <i className="material-icons trInfoIcon">info</i>
+          </span>
+      </div>
     )
   }
 
@@ -74,9 +69,7 @@ const Menu = (props) => {
       <li>You enter guesses until you guess correctly.</li>
       <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
       <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
-      <BrowserView>
-        <li>The computer shows you word info for guessed words.</li>
-      </BrowserView>
+      {!isMobile && <li>The computer shows you word info for guessed words.</li>}
     </ul>
   </div>;
 
@@ -149,18 +142,12 @@ const Menu = (props) => {
     }
 
     return (
-      <tr>
-        <td>
-            {props.ackText}
-        </td>
-        <td>
-          <button className="trButton"
-            onClick={() => toggleDescFlag()}
-          >
-            {props.descFlag ? "Hide info" : "Show info"}
-          </button>
-        </td>
-      </tr>
+      <div>
+          {props.ackText}&nbsp;
+          <span onClick={() => toggleDescFlag()}>
+            <i className="material-icons trInfoIcon">info</i>
+          </span>
+      </div>
     )
   }
 
@@ -195,7 +182,7 @@ const Menu = (props) => {
     return (<div className="artworkDiv">
       <div>
         <button onClick={() => {moveLeft();}} className="moveLeftButton">&lt;</button>
-        <div>Drawings by Lennon Sykes.</div>
+        <span>Drawings by Lennon Sykes.</span>
         <button onClick={() => {moveRight();}} className="moveRightButton">&gt;</button>
       </div>
       <div className={`artwork${artindex}`}></div>
@@ -213,32 +200,16 @@ const Menu = (props) => {
         <div className="trTitle">Tile Stuff</div>
       </div>
       <div className="trParagraph">
-        <BrowserView>
-          <table>
-            <tbody>
-              <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
-              <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
-              <MenuOption descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>
-              <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
-              <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
-              <MenuOption descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>
-              <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
-              <MenuOption descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
-            </tbody>
-          </table>
-        </BrowserView>
-        <MobileOnlyView>
-          <table>
-            <tbody>
-              <MenuOption descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
-              <MenuOption descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
-              <MenuOption descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
-              <MenuOption descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
-              <MenuOption descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
-              <MenuOption descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
-            </tbody>
-          </table>
-        </MobileOnlyView>
+        <div className="mainMenuOptions">
+            <MenuOption key='bvmoWm' descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
+            <MenuOption key='bvmoWi' descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
+            <MenuOption key='bvmoFyb' descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
+            <MenuOption key='bvmoFybSolo' descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
+            <MenuOption key='bvmoMorpho' descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
+            <MenuOption key='bvmoTm' descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
+            {!isMobile && <MenuOption key='bvmoPb' descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>}
+            {!isMobile && <MenuOption key='bvmoSc' descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>}
+        </div>
         {descWm && DescribeWordMastermind}
         {descWi && DescribeWordInfo}
         {descPb && DescribePrisonBreak}
@@ -259,13 +230,11 @@ const Menu = (props) => {
           Special Thanks
         </div>
         <div className="trParagraph">
-          <table>
-            <tbody>
-              <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
-              <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
-              <Acknowledge ackText='Art Work' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
-            </tbody>
-          </table>
+          <div className="acknowledgements">
+            <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
+            <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
+            <Acknowledge ackText='Art Work' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
+          </div>
           {descEnable2k && DescribeEnable2k}
           {descFriends && DescribeFriends}
           {descPhotos && <DescribePhotos/>}
