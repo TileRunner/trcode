@@ -8,11 +8,18 @@
     border-style: none none solid none;
     padding: 0px 2px;
 }
-.wm_cliptable th:first-child, td:first-child {
+.wm_cliptable th:first-child {
     border-right: 1px solid;
     padding-right: 5px;
 }
-.wm_cliptable th:last-child, td:last-child {
+.wm_cliptable td:first-child {
+    border-right: 1px solid;
+    padding-right: 5px;
+}
+.wm_cliptable th:last-child {
+    padding-left: 5px;
+}
+.wm_cliptable td:last-child {
     padding-left: 5px;
 }
 .wm_cliptable td {

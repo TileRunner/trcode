@@ -7,7 +7,7 @@ import { isWordValid } from '../../lib/wordfunctions';
 const WordMastermind = ({setWhereto}) => {
     const [gameOptions, setGameOptions] = useState({set:false});
     const [history, setHistory] = useState([]);
-    const [keyboardVersion, setKeyboardVersion] = useState(1);
+    const [keyboardVersion, setKeyboardVersion] = useState(2);
     const [setSolveCounts, setSetSolveCounts] = useState([]); // how many guesses to solve each set
     const [setGuessCount, setSetGuessCount] = useState(0); // total guess count for the min-max word len set
     const [secretWord, setSecretWord] = useState('');
@@ -15,7 +15,7 @@ const WordMastermind = ({setWhereto}) => {
     const [guess, setGuess] = useState('');
     const [guesses, setGuesses] = useState([]);
     const [solved, setSolved] = useState(false);
-    const [showInitialInfo, setShowInitialInfo] = useState(true); // set info, easy mode info
+    const [showInitialInfo, setShowInitialInfo] = useState(false); // set info, easy mode info
     const divUnderKeyboard = showDivUnderKeyboard();
     const displayGuesses = showGuessesTable();
     const promptForGuess = showGuessPrompt();
@@ -31,7 +31,7 @@ const WordMastermind = ({setWhereto}) => {
         }
     }
     function showDivUnderKeyboard() {
-        return <div className="wmWordUnderKeyboard">&nbsp;{guess}&nbsp;</div>;
+        return gameOptions.mode === 'hard' && <div className="wmWordUnderKeyboard">&nbsp;{guess}&nbsp;</div>;
     }
     async function handleUpdatedGuess(guessword) {
         if (guessword.length === secretWord.length) {
@@ -165,7 +165,7 @@ const WordMastermind = ({setWhereto}) => {
          */}
         {gameOptions.set && secretWord === '' ? pickRandomWord() : ''}
         <div className="trParagraph">
-            <h3>Secret Word: {solved ? secretWord : secretDisplay}</h3>
+            <h3>{solved ? `Secret Word: ${secretWord}` : secretDisplay}</h3>
             {secretWord === '' ?
                 <h1>Loading ...</h1>
                 :
@@ -173,15 +173,8 @@ const WordMastermind = ({setWhereto}) => {
                     promptForPlayAgain
                     :
                     promptForGuess}
-            {solved ?
-                <br></br>
-                :
-                guesses.length === 0 ?
-                    <p className="AlignCenter">Start guessing</p>
-                    :
-                    <p className="AlignCenter">Keep guessing</p>}
         </div>
-        {guesses.length === 0 ?
+        {!guesses && !guess ?
             <p className="trParagraph">No guesses yet</p>
             :
             displayGuesses}
@@ -219,7 +212,7 @@ const WordMastermind = ({setWhereto}) => {
     const MobileLayout = <div>
         <div>
             <button className="trButton" onClick={() => { setShowInitialInfo(!showInitialInfo); } }>
-                {showInitialInfo ? "Hide" : "Show"}
+                {showInitialInfo ? "Hide Info" : "Show Info"}
             </button>
             {showInitialInfo && InitialInfo}
         </div>
@@ -355,7 +348,7 @@ const WordMastermind = ({setWhereto}) => {
         fetch(url).then(res => res.text()).then(text => {
             let randomword=JSON.parse(text).toUpperCase(); // It is just a word in double quotes but it is json nonetheless
             setSecretWord(randomword);
-            setSecretDisplay(randomword.split("").map(()=>("*")));
+            setSecretDisplay(`Guess the ${randomword.length} letter word:`);
             addRoundToHistory(randomword);
         })
     }
