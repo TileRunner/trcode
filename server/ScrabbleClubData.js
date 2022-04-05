@@ -25535,6 +25535,114 @@
       "OpponentId": 5,
       "PlayerScore": 370,
       "OpponentScore": 319
+    },
+    {
+      "Id": 2779,
+      "ClubNightId": 234,
+      "Round": 1,
+      "PlayerId": 6,
+      "OpponentId": 8,
+      "PlayerScore": 362,
+      "OpponentScore": 322
+    },
+    {
+      "Id": 2780,
+      "ClubNightId": 234,
+      "Round": 1,
+      "PlayerId": 3,
+      "OpponentId": 4,
+      "PlayerScore": 482,
+      "OpponentScore": 329
+    },
+    {
+      "Id": 2781,
+      "ClubNightId": 234,
+      "Round": 2,
+      "PlayerId": 6,
+      "OpponentId": 3,
+      "PlayerScore": 312,
+      "OpponentScore": 514
+    },
+    {
+      "Id": 2782,
+      "ClubNightId": 234,
+      "Round": 2,
+      "PlayerId": 4,
+      "OpponentId": 8,
+      "PlayerScore": 419,
+      "OpponentScore": 329
+    },
+    {
+      "Id": 2783,
+      "ClubNightId": 234,
+      "Round": 3,
+      "PlayerId": 3,
+      "OpponentId": 8,
+      "PlayerScore": 548,
+      "OpponentScore": 309
+    },
+    {
+      "Id": 2784,
+      "ClubNightId": 234,
+      "Round": 3,
+      "PlayerId": 4,
+      "OpponentId": 6,
+      "PlayerScore": 363,
+      "OpponentScore": 294
+    },
+    {
+      "Id": 2785,
+      "ClubNightId": 235,
+      "Round": 1,
+      "PlayerId": 8,
+      "OpponentId": 2,
+      "PlayerScore": 283,
+      "OpponentScore": 490
+    },
+    {
+      "Id": 2786,
+      "ClubNightId": 235,
+      "Round": 1,
+      "PlayerId": 6,
+      "OpponentId": 3,
+      "PlayerScore": 293,
+      "OpponentScore": 470
+    },
+    {
+      "Id": 2787,
+      "ClubNightId": 235,
+      "Round": 2,
+      "PlayerId": 2,
+      "OpponentId": 3,
+      "PlayerScore": 473,
+      "OpponentScore": 363
+    },
+    {
+      "Id": 2788,
+      "ClubNightId": 235,
+      "Round": 2,
+      "PlayerId": 8,
+      "OpponentId": 6,
+      "PlayerScore": 313,
+      "OpponentScore": 464
+    },
+    {
+      "Id": 2789,
+      "ClubNightId": 235,
+      "Round": 3,
+      "PlayerId": 2,
+      "OpponentId": 6,
+      "PlayerScore": 473,
+      "OpponentScore": 323
+    },
+    {
+      "Id": 2790,
+      "ClubNightId": 235,
+      "Round": 3,
+      "PlayerId": 3,
+      "OpponentId": 8,
+      "PlayerScore": 482,
+      "OpponentScore": 244
     }
   ],
   "clubMemberList": [
@@ -27300,6 +27408,20 @@
       "Id": 233,
       "ClubId": 1,
       "Date": "2022-03-18",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 234,
+      "ClubId": 1,
+      "Date": "2022-03-25",
+      "BingoLetter": "",
+      "BingoLetterGotPlayed": ""
+    },
+    {
+      "Id": 235,
+      "ClubId": 1,
+      "Date": "2022-04-01",
       "BingoLetter": "",
       "BingoLetterGotPlayed": ""
     }

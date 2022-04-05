@@ -210,6 +210,32 @@ const server = express()
       return;
     })
     .get("/ENABLE2K", (req, res) => {
+        // Handle picking random word for Word Mastermind
+        if (req.query.random) {
+          // Handle who can call this
+          res.header("Access-Control-Allow-Origin", "*");
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+          // The desired word length is passed in 'random'
+          let wlen = parseInt(req.query.random);
+          let wordssamelength = allwords.filter(function (e) {
+            return e.length === wlen;
+          });
+          let rand = Math.floor(Math.random() * wordssamelength.length);
+          let randomword = wordssamelength[rand];
+          res.json(randomword);
+          return;
+        }
+        // Handle checking if passed word exists
+        if (req.query.exists) {
+          // Handle who can call this
+          res.header("Access-Control-Allow-Origin", "*");
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+          // The word to check is passed in 'exists'
+          let word = req.query.exists.toLowerCase();
+          let exists = {exists:allwords.indexOf(word) > -1};
+          res.json(exists);
+          return;
+        }
         // Handle request for a morpho puzzle
         if (req.query.morpho) {
           // Handle who can call this
@@ -383,26 +409,6 @@ const server = express()
           jret.fryLetters = fryLetters;
           res.send(jret);
           return;
-        }
-        // Handle picking random word for Word Mastermind
-        if (req.query.random) {
-            // The desired word length is passed in 'random'
-            let wlen = parseInt(req.query.random);
-            let wordssamelength = allwords.filter(function (e) {
-              return e.length === wlen;
-            });
-            let rand = Math.floor(Math.random() * wordssamelength.length);
-            let randomword = wordssamelength[rand];
-            res.json(randomword);
-            return;
-        }
-        // Handle checking if passed word exists
-        if (req.query.exists) {
-            // The word to check is passed in 'exists'
-            let word = req.query.exists.toLowerCase();
-            let exists = {exists:allwords.indexOf(word) > -1};
-            res.json(exists);
-            return;
         }
         // Handle getting info for passed letters
         if (req.query.letters) {
