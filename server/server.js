@@ -125,7 +125,7 @@ const server = express()
     // Handle request for club list
     .get("/clubdata/clublist", (_req, res) => {
         // Handle who can call this
-        res.header("Access-Control-Allow-Origin", allowedCaller);
+        res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         // Return the club list
         res.json(clubdata.clubList);
@@ -134,7 +134,7 @@ const server = express()
     // Handle request for player list
     .get("/clubdata/playerlist", (_req, res) => {
       // Handle who can call this
-      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       // Return the player list
       res.json(clubdata.playerList);
@@ -143,7 +143,7 @@ const server = express()
     // Handle request for club night list for a club
     .get("/clubdata/clubnightlist", (req, res) => {
       // Handle who can call this
-      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       // Get the club night list for the club
       let clubid = parseInt(req.query.clubid);
@@ -193,7 +193,7 @@ const server = express()
     // Handle request for club game list for a club night or for a club
     .get("/clubdata/clubgamelist", (req, res) => {
       // Handle who can call this
-      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       // Return variable
       let clubgames = [];
