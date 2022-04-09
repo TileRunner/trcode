@@ -118,7 +118,7 @@ const Menu = (props) => {
   </div>;
 
   const DescribeScrabbleClub = <div className="trParagraph">
-    <div className="trSubtitle">The Scrabble Club page is Scrabble Club stuff</div>
+    Scrabble Club has moved to here: <a href='https://tilerunner.github.io/scrabble-club/'>link</a>
   </div>;
 
   const DescribeMorpho = <div className="trParagraph">
