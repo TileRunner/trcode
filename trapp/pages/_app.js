@@ -1,7 +1,6 @@
 import '../styles/globals.css'
 import '../styles/trcss.css'
 import './wi/wordinfo.css'
-import './wm/mastermind.css'
 import './pb/prisonbreak.css'
 import './fyb/fyb.css'
 import './morpho/morpho.css'

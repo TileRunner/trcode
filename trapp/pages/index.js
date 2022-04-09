@@ -62,15 +62,8 @@ const Menu = (props) => {
     )
   }
 
-  const DescribeWordMastermind = <div className="trParagraph">
-    <div className="trSubtitle">Word Mastermind is a single player code cracking game.</div>
-    <ul>
-      <li>The computer picks a random word.</li>
-      <li>You enter guesses until you guess correctly.</li>
-      <li>The computer tells you how many letters are correct and how many are in the correct position.</li>
-      <li>The computer will start with length 2, and add 1 each round up to length 8. Then it starts a new set back at 2.</li>
-      {!isMobile && <li>The computer shows you word info for guessed words.</li>}
-    </ul>
+  const DescribeWordMastermind = <div>
+    Word Mastermind has moved to here: <a href='https://tilerunner.github.io/word-mastermind/'>link</a>
   </div>;
 
   const DescribeWordInfo = <div className="trParagraph">
