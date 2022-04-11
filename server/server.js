@@ -317,7 +317,7 @@ const server = express()
           return;
         }
         // Handle who can call this
-        res.header("Access-Control-Allow-Origin", allowedCaller);
+        res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         // Handle request for top answers for fry letters
         if (req.query.topfry) {
