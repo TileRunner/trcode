@@ -3,7 +3,6 @@ import '../styles/trcss.css'
 import './wi/wordinfo.css'
 import './pb/prisonbreak.css'
 import './fyb/fyb.css'
-import './morpho/morpho.css'
 import './tm/tm.css'
 import Head from 'next/head'
 

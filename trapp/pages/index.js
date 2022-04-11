@@ -122,7 +122,7 @@ const Menu = (props) => {
   </div>;
 
   const DescribeMorpho = <div className="trParagraph">
-    <p>This is a single player puzzle where you swap one letter at a time to get from one word to another. Each interim word must be valid.</p>
+    Morpho has moved to here: <a href='https://tilerunner.github.io/morpho/'>link</a>
   </div>
 
   const DescribeTransmogrify = <div className="trParagraph">
