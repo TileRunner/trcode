@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {BrowserView, MobileOnlyView} from 'react-device-detect';
 import * as c from '../../lib/fyb/constants';
 import { usePrevious } from "../../lib/usePrevious";
@@ -211,7 +212,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                             let rand = Math.floor(Math.random() * beforeShuffle.length);
                             afterShuffle.push(beforeShuffle[rand]);
                             beforeShuffle.splice(rand, 1);
-                        };
+                        }
                         let newGamedata = JSON.parse(JSON.stringify(gamedata));
                         newGamedata.fryLetters = [...afterShuffle];
                         setGamedata(newGamedata);
@@ -338,6 +339,15 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
         </div>
     );
 }
+
+Game.propTypes = {
+    setWhereto: PropTypes.func.isRequired,
+    client: PropTypes.any,
+    thisisme: PropTypes.string.isRequired,
+    wsmessage: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    gameid: PropTypes.string.isRequired
+};
 
 function showMoveList(moveListKey, moveArray) {
     return (

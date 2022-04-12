@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Showinfo from './showinfo'
+import PropTypes from "prop-types";
+import Showinfo from './showinfo';
 
 const WordInfo = ({setWhereto}) => {
     const [word, setWord] = useState('');
@@ -40,6 +41,7 @@ const WordInfo = ({setWhereto}) => {
                 <button id="acceptAlphagram"
                     className="trButton"
                     onClick={function() {
+                        // eslint-disable-next-line
                         let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?letters=' : 'https://tilerunner.herokuapp.com/ENABLE2K?letters='
                         // 'https://words-scrabble.herokuapp.com/api/info/'
                         fetch(url + word).then(res => res.text()).then(text => {
@@ -64,6 +66,7 @@ const WordInfo = ({setWhereto}) => {
                 <button id="acceptRegex"
                     className="trButton"
                     onClick={function() {
+                        // eslint-disable-next-line
                         let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?regex=' : 'https://tilerunner.herokuapp.com/ENABLE2K?regex='
                         fetch(url + word.toLocaleLowerCase()).then(res => res.text()).then(text => {
                             // console.log("regex response data=" + text)
@@ -83,7 +86,7 @@ const WordInfo = ({setWhereto}) => {
                     Get Regex Matches
                 </button>
                 <label>&nbsp;</label>
-                {process.env.NODE_ENV === 'development' && <button id="validateWords"
+                {process.env.NODE_ENV === 'development' && <button id="validateWords" // eslint-disable-line
                     className="trButton"
                     onClick={function() {
                         let url = 'http://localhost:5000/ENABLE2K?validate='
@@ -103,5 +106,9 @@ const WordInfo = ({setWhereto}) => {
         </div>
         );
 }
+
+WordInfo.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default WordInfo;

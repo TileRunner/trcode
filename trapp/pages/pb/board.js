@@ -1,3 +1,5 @@
+import React from "react";
+import PropTypes from "prop-types";
 import Square from './square';
 import * as c from '../../lib/pb/prisonBreakConstants';
 
@@ -59,4 +61,10 @@ const Board = ({ onClick, squareArray=[], rcd }) => {
     );
   };
   
-export default Board;  
+Board.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  squareArray: PropTypes.arrayOf(PropTypes.any),
+  rcd: PropTypes.any
+};
+
+export default Board;

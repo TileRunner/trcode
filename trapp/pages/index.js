@@ -1,5 +1,6 @@
 import {isMobile} from 'react-device-detect'
 import React, { useState } from 'react';
+import PropTypes from "prop-types";
 import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
@@ -40,8 +41,7 @@ const Menu = (props) => {
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
-  const [descPhotos, setDescPhotos] = useState(false); // describe photo takers
-
+ 
   const MenuOption = (props) => {
     const toggleDescFlag = () => {
       props.setDescFlag(!props.descFlag);
@@ -61,6 +61,13 @@ const Menu = (props) => {
       </div>
     )
   }
+
+  MenuOption.propTypes = {
+    descFlag: PropTypes.bool.isRequired,
+    setDescFlag: PropTypes.func.isRequired,
+    targetWhereto: PropTypes.string.isRequired,
+    optionText: PropTypes.string.isRequired
+  };
 
   const DescribeWordMastermind = <div>
     Word Mastermind has moved to here: <a href='https://tilerunner.github.io/word-mastermind/'>link</a>
@@ -84,7 +91,7 @@ const Menu = (props) => {
       <li>The first word played must touch the centre square.</li>
       <li>To free a prisoner, the Prisoners must play a tile on one of the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares.</li>
       <li>When a <span className="pbSquareUsedByGuards">&nbsp;?&nbsp;</span> is played it represents any letter and does not have to remain as the same letter throughout the game.</li>
-      <li>The <span className="pbSquareUsedByGuards u">Q</span> tile can represent "Q" or "QU", does not have to be the same in both directions, and does not have to remain at the same designation throughout the game.</li>
+      <li>The <span className="pbSquareUsedByGuards u">Q</span> tile can represent &quot;Q&quot; or &quot;QU&quot;, does not have to be the same in both directions, and does not have to remain at the same designation throughout the game.</li>
       <li>The game ends if a player empties their rack.</li>
       <li>The game ends if all the special <span className="material-icons pbSquareEscapeHatch">run_circle</span> squares are used.</li>
       <li>The game ends if both players pass.</li>
@@ -126,7 +133,7 @@ const Menu = (props) => {
   </div>
 
   const DescribeTransmogrify = <div className="trParagraph">
-    <p>Like Morpho, but you can also insert a letter, drop a letter, or anagram the word.</p>
+    Transmogrify has moved to here: <a href='https://tilerunner.github.io/transmogrify/'>link</a>
   </div>
 
   const Acknowledge = (props) => {
@@ -144,6 +151,12 @@ const Menu = (props) => {
     )
   }
 
+  Acknowledge.propTypes = {
+    descFlag: PropTypes.bool.isRequired,
+    setDescFlag: PropTypes.func.isRequired,
+    ackText: PropTypes.string.isRequired
+  };
+  
   const DescribeEnable2k = <div className="trParagraph trEmphasis">
     <p>This site uses the Enhanced North American Benchmark LEexicon, millenial edition, a public domain word list that I gratefully acknowledge.</p>
     <p>I took some words out to try and keep things family friendly, but there still could be some bad words.</p>
@@ -154,37 +167,9 @@ const Menu = (props) => {
     <p>Thanks for technical help, feedback, suggestions, or simply having fun here. <i className="material-icons heart">favorite</i></p>
   </div>
 
-  const DescribePhotos = () => {
-    const [artindex, setArtindex] = useState(1);
-    const artindexMax = 4;
-  
-    function moveLeft() {
-      if (artindex === 1) {
-        setArtindex(artindexMax);
-      } else {
-        setArtindex(artindex-1);
-      }
-    }
-    function moveRight() {
-      if (artindex === artindexMax) {
-        setArtindex(1);
-      } else {
-        setArtindex(artindex+1);
-      }
-    }
-    return (<div className="artworkDiv">
-      <div>
-        <button onClick={() => {moveLeft();}} className="moveLeftButton">&lt;</button>
-        <span>Drawings by Lennon Sykes.</span>
-        <button onClick={() => {moveRight();}} className="moveRightButton">&gt;</button>
-      </div>
-      <div className={`artwork${artindex}`}></div>
-    </div>);
-  }
-
   const MenuOptionKmMarkers = () => <div className="trParagraph">
-    Hamilton to Cambridge Rail Trail:
-    <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank"> Km Marker Videos</a>
+    Hamilton to Cambridge Rail Trail:&nbsp;
+    <a href="https://1drv.ms/u/s!AoRKcQVZC5rH4XIvB_r0uq414KU2?e=aSSkK1" target="_blank" rel="noreferrer">Km Marker Videos</a>
   </div>
 
   return (
@@ -226,13 +211,14 @@ const Menu = (props) => {
           <div className="acknowledgements">
             <Acknowledge ackText='ENABLE2K' descFlag={descEnable2k} setDescFlag={setDescEnable2k}/>
             <Acknowledge ackText='Friends' descFlag={descFriends} setDescFlag={setDescFriends}/>
-            <Acknowledge ackText='Art Work' descFlag={descPhotos} setDescFlag={setDescPhotos}/>
           </div>
           {descEnable2k && DescribeEnable2k}
           {descFriends && DescribeFriends}
-          {descPhotos && <DescribePhotos/>}
         </div>
       </div>
     </div>
   )
 }
+Menu.propTypes = {
+  setWhereto: PropTypes.func.isRequired
+};

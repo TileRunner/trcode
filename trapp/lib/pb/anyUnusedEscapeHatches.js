@@ -13,7 +13,7 @@ export function anyUnusedEscapeHatches(squareArray=[]) { // Used to check for ga
       squareArray[edge][0].usedby      !== USED_BY_NONE &&
       squareArray[edge][middle].usedby !== USED_BY_NONE &&
       squareArray[edge][edge].usedby   !== USED_BY_NONE) {
-        anyLeft = false;; // No escape hatches left
+        anyLeft = false; // No escape hatches left
     }
     return anyLeft;
 }

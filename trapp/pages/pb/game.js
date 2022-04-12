@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-//import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import PlayerSection from '../pb/playerSection';
 import Board from '../pb/board';
 import ShowUnseenTiles from '../pb/unseenTilesSection';
@@ -407,7 +407,7 @@ const Game = ({setWhereto
       };
       participant === c.PARTY_TYPE_PRISONERS ? jsend.ptiles = newPlayerTiles : jsend.gtiles = newPlayerTiles;
       sendNextMessage(jsend);
-    };
+    }
   
     const swapPlayersTiles = () => {
       if (tiles.length < racksize) {
@@ -657,6 +657,7 @@ const Game = ({setWhereto
       extrawords.forEach((ew) => {
         allwords = allwords + "," + ew;
       })
+      // eslint-disable-next-line
       let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?validate=' : 'https://tilerunner.herokuapp.com/ENABLE2K?validate='
       const response = await fetch(url + allwords.toLocaleLowerCase());
       const jdata = await response.json();
@@ -755,6 +756,7 @@ const Game = ({setWhereto
         recallTiles();
         return;
       }
+      // eslint-disable-next-line
       let lettertest = /^[A-Za-z\?]$/; // single letter or question mark key pressed
       if (event.key.match(lettertest)) {
         let letter = event.key.toUpperCase();
@@ -850,7 +852,7 @@ const Game = ({setWhereto
         setSelection(newSelection);
       }
     }
-    const handleMoveClick = (_mi) => {}
+    const handleMoveClick = () => {}
     return (
       <div className="prisonbreak">
         <div className="w3-display-container w3-teal topBarHeight">
@@ -995,6 +997,17 @@ const Game = ({setWhereto
     );
   };
 
+  Game.propTypes = {
+    setWhereto: PropTypes.func.isRequired,
+    isrejoin: PropTypes.bool.isRequired,
+    participant: PropTypes.string.isRequired,
+    gameid: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    wsmessage: PropTypes.string.isRequired,
+    client: PropTypes.any,
+    racksize: PropTypes.number.isRequired
+  };
+  
 const ObserverRackTile = (props) => {
   const selectedUnselected = "Unselected ";
   const uNotU = props.tilevalue === "Q" ? "u " : "";
@@ -1009,5 +1022,10 @@ const ObserverRackTile = (props) => {
   );
 }
 
+ObserverRackTile.propTypes = {
+  tilevalue: PropTypes.string.isRequired,
+  participant: PropTypes.string.isRequired,
+  tileindex: PropTypes.number.isRequired
+};
 
 export default Game;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const ThinChat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) => {
     const [nextmsg, setNextmsg] = useState('');
@@ -62,4 +63,13 @@ const ThinChat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""
     )
 }
   
+ThinChat.propTypes = {
+  gameid: PropTypes.string.isRequired,
+  client: PropTypes.any,
+  nickname: PropTypes.string.isRequired,
+  msgs: PropTypes.arrayOf(PropTypes.string),
+  setMsgs: PropTypes.func.isRequired,
+  participant: PropTypes.string.isRequired
+};
+
 export default ThinChat;

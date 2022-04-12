@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 const WordMastermind = ({setWhereto}) => {
     return (
         <div className="trBackground">
@@ -11,5 +14,9 @@ const WordMastermind = ({setWhereto}) => {
         </div>
     );
 }
+
+WordMastermind.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default WordMastermind;

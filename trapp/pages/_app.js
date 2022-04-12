@@ -1,10 +1,11 @@
-import '../styles/globals.css'
-import '../styles/trcss.css'
-import './wi/wordinfo.css'
-import './pb/prisonbreak.css'
-import './fyb/fyb.css'
-import './tm/tm.css'
-import Head from 'next/head'
+import '../styles/globals.css';
+import '../styles/trcss.css';
+import './wi/wordinfo.css';
+import './pb/prisonbreak.css';
+import './fyb/fyb.css';
+import Head from 'next/head';
+import React from 'react';
+import PropTypes from "prop-types";
 
 function MyApp({Component,pageProps}) {
     return (
@@ -65,4 +66,8 @@ function MyApp({Component,pageProps}) {
     );
 }
 
+MyApp.propTypes = {
+    Component: PropTypes.any,
+    pageProps: PropTypes.any
+}
 export default MyApp;

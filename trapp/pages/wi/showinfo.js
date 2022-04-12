@@ -1,13 +1,25 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from "prop-types";
 import ShowInsertsForOnePosition from './showInsertsForOnePosition';
 import ShowSwapsForOnePosition from './showSwapsForOnePosition';
 import ShowAnagramsForOneWord from './showAnagramsForOneWord';
+
+Showinfo.propTypes = {
+    word: PropTypes.string.isRequired,
+    showAnagrams: PropTypes.string,
+    showInserts: PropTypes.string,
+    showSwaps: PropTypes.string,
+    showDrops: PropTypes.string,
+    entryIndex: PropTypes.number,
+    removeEntry: PropTypes.func
+};
 
 export default function Showinfo( props ) {
     const [info, setInfo] = useState([])
     const [loaded, setLoaded] = useState(false)
     useEffect(()=>{
         const apiCall = async ()=>{
+            // eslint-disable-next-line
             let url = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000/ENABLE2K?letters=' : 'https://tilerunner.herokuapp.com/ENABLE2K?letters='
             //  'https://words-scrabble.herokuapp.com/api/info/'
             // let response = await fetch('https://words-scrabble.herokuapp.com/api/info/' + props.word)

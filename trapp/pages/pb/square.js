@@ -1,3 +1,5 @@
+import React from "react";
+import PropTypes from "prop-types";
 import * as c from '../../lib/pb/prisonBreakConstants';
 
 const Square = ({usedby, type, letter, ri, ci, rcd, onClick}) => {
@@ -26,5 +28,15 @@ const Square = ({usedby, type, letter, ri, ci, rcd, onClick}) => {
         </button>
     );
 };
-  
+
+Square.propTypes = {
+  usedby: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  letter: PropTypes.string.isRequired,
+  ri: PropTypes.number.isRequired,
+  ci: PropTypes.number.isRequired,
+  rcd: PropTypes.arrayOf(PropTypes.any),
+  onClick: PropTypes.func.isRequired
+};
+ 
 export default Square;

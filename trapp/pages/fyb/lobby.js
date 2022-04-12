@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-//import Link from "next/link";
+import PropTypes from "prop-types";
 import * as c from '../../lib/fyb/constants';
 import CreateGame from "./createGame";
 
@@ -74,6 +74,17 @@ const Lobby = ({setWhereto, client, thisisme, setParticipant, wsmessage, nicknam
         </div>
     );
 }
+Lobby.propTypes = {
+    setWhereto: PropTypes.func.isRequired,
+    client: PropTypes.any,
+    thisisme: PropTypes.string.isRequired,
+    setParticipant: PropTypes.func.isRequired,
+    wsmessage: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    setNickname: PropTypes.func.isRequired,
+    gameid: PropTypes.string.isRequired,
+    setGameid: PropTypes.func.isRequired
+};
 
 function displayGamelist(gamelist, client, thisisme, nickname) {
     return <div>
@@ -90,7 +101,7 @@ function displayGamelist(gamelist, client, thisisme, nickname) {
             </thead>
             <tbody>
                 {gamelist.map((game,index) => (
-                    <tr>
+                    <tr key={`gamelist${index}`}>
                         <td>{game.gameid}</td>
                         <td>{game.players.length}/{game.numPlayers}</td>
                         <td>{game.goal}</td>

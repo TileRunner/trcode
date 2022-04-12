@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const ShowInsertsForOnePosition = ({
     insertLetters=''
@@ -26,5 +27,9 @@ const ShowInsertsForOnePosition = ({
                 {insertLetters}
             </td>
     )};
+
+ShowInsertsForOnePosition.propTypes = {
+    insertLetters: PropTypes.string.isRequired
+};
 
 export default ShowInsertsForOnePosition;

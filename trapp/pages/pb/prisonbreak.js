@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from "react";
+import PropTypes from "prop-types";
 import CustomSocket from "../../ws";
 import Lobby from '../pb/lobby';
 import Game from '../pb/game';
@@ -14,6 +15,7 @@ const PrisonBreak = ({setWhereto}) => {
   const [participant, setParticipant] = useState(c.PARTY_TYPE_UNDETERMINED)
   const [wsmessage, setWsmessage] = useState('') // Latest message from the websocket
   const [racksize, setRacksize] = useState(4); // Default to 4 letter racks
+  // eslint-disable-next-line
   let host = (process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000')
    + '/?clientType=pb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
   const acceptMessage = (message) => {
@@ -61,5 +63,9 @@ const PrisonBreak = ({setWhereto}) => {
       />
   )
 }
+
+PrisonBreak.propTypes = {
+  setWhereto: PropTypes.func.isRequired
+};
 
 export default PrisonBreak;

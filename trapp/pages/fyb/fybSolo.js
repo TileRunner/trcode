@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { isWordValid } from "../../lib/wordfunctions";
 
 const FryYourBrainSolo = ({setWhereto}) => {
+    // eslint-disable-next-line
     const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
     const [pickedLetters, setPickedLetters] = useState([]); // All pre-picked fry letters as an array
     const [fryLetters, setFryLetters] = useState([]); // Fry letters shown at current stage as an array
@@ -152,7 +154,7 @@ const FryYourBrainSolo = ({setWhereto}) => {
                             let rand = Math.floor(Math.random() * beforeShuffle.length);
                             afterShuffle.push(beforeShuffle[rand]);
                             beforeShuffle.splice(rand, 1);
-                        };
+                        }
                         setFryLetters(afterShuffle);
                         setSelected(-1);
                     } }>
@@ -233,5 +235,9 @@ const FryYourBrainSolo = ({setWhereto}) => {
         </div>
     );
 }
+
+FryYourBrainSolo.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default FryYourBrainSolo;

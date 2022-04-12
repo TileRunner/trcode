@@ -1,3 +1,5 @@
+import React from "react";
+import PropTypes from "prop-types";
 import * as c from '../../lib/pb/prisonBreakConstants';
 
 const ShowMoves = ({moves, onmoveclick}) => { // show moves made
@@ -30,4 +32,9 @@ const ShowMoves = ({moves, onmoveclick}) => { // show moves made
     );
 };
   
+ShowMoves.propTypes = {
+  moves: PropTypes.arrayOf(PropTypes.any),
+  onmoveclick: PropTypes.func.isRequired
+};
+
 export default ShowMoves;  

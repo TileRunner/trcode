@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import * as c from '../../lib/fyb/constants';
 
 const CreateGame = ({
@@ -97,5 +98,13 @@ const CreateGame = ({
         </div>
     );
 }
+
+CreateGame.propTypes = {
+    client: PropTypes.any,
+    thisisme: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    gameid: PropTypes.string.isRequired,
+    setGameid: PropTypes.func.isRequired
+};
 
 export default CreateGame;

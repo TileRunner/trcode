@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) => {
     const [nextmsg, setNextmsg] = useState('');
@@ -71,4 +72,13 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
     )
 }
   
+Chat.propTypes = {
+  gameid: PropTypes.string.isRequired,
+  client: PropTypes.any,
+  nickname: PropTypes.string.isRequired,
+  msgs: PropTypes.arrayOf(PropTypes.string),
+  setMsgs: PropTypes.func.isRequired,
+  participant: PropTypes.string.isRequired
+};
+
 export default Chat;

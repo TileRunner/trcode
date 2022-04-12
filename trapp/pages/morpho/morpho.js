@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 const Morpho = ({setWhereto}) => {
     return (
         <div className="trBackground">
@@ -11,5 +14,9 @@ const Morpho = ({setWhereto}) => {
         </div>
     );
 }
+
+Morpho.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default Morpho;

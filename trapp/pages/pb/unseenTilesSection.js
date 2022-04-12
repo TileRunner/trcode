@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 const ShowUnseenTiles = ({tiles, othertiles}) => { // tiles = tiles in bag, othertiles = tiles on other players rack
     let unseenTiles = [...tiles || [], ...othertiles || []];
     // Sort the tiles then put the blanks at the end
@@ -27,4 +30,9 @@ const ShowUnseenTiles = ({tiles, othertiles}) => { // tiles = tiles in bag, othe
     );
   };
   
+ShowUnseenTiles.propTypes = {
+  tiles: PropTypes.arrayOf(PropTypes.string),
+  othertiles: PropTypes.arrayOf(PropTypes.string)
+};
+
 export default ShowUnseenTiles;  

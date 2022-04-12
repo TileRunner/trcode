@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const ShowSwapsForOnePosition = ({
     swapLetters=''
@@ -26,5 +27,9 @@ const ShowSwapsForOnePosition = ({
                 {swapLetters}
             </td>
 )};
+
+ShowSwapsForOnePosition.propTypes = {
+    swapLetters: PropTypes.string.isRequired
+};
 
 export default ShowSwapsForOnePosition;

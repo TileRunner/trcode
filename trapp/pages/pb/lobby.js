@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import PropTypes from "prop-types";
 import Chat from '../pb/chatSection';
 import * as c from '../../lib/pb/prisonBreakConstants';
 import { scrollToBottom } from "../../lib/scrollToBottom";
@@ -185,14 +185,14 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
                   <h3><span className="trEmphasis">Guards &gt;</span></h3>
                 </div>
                 <div className="w3-bar-item">
-                  <span className="trParagraph"><h2>Find and click the "Join Game" button for your game.</h2></span>
+                  <span className="trParagraph"><h2>Find and click the &quot;Join Game&quot; button for your game.</h2></span>
                 </div>
               </div>
             </div>
             <div className="w3-container">
               <div className="w3-bar">
                 <div className="w3-bar-item">
-                  <h3 className="trWarning">If you lost connection, find and click the "Reconnect" button for your nickname.</h3>
+                  <h3 className="trWarning">If you lost connection, find and click the &quot;Reconnect&quot; button for your nickname.</h3>
                 </div>
               </div>
             </div>
@@ -326,6 +326,20 @@ const Lobby = ({setWhereto, client, setIsrejoin, wsmessage, gameid, setGameid, n
         </div>
       </div>
     )
-  }
+}
   
+Lobby.propTypes = {
+  setWhereto: PropTypes.func.isRequired,
+  client: PropTypes.any,
+  setIsrejoin: PropTypes.func.isRequired,
+  wsmessage: PropTypes.string.isRequired,
+  gameid: PropTypes.string.isRequired,
+  setGameid: PropTypes.func.isRequired,
+  nickname: PropTypes.string.isRequired,
+  setNickname: PropTypes.func.isRequired,
+  setParticipant: PropTypes.func.isRequired,
+  racksize: PropTypes.number.isRequired,
+  setRacksize: PropTypes.func.isRequired
+};
+
 export default Lobby;  

@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 const ShowRescues = ({rescues}) => {
     return (
       <div className="pbRescuesMade">
@@ -6,4 +9,8 @@ const ShowRescues = ({rescues}) => {
     );
 };
   
+ShowRescues.propTypes = {
+  rescues: PropTypes.number.isRequired
+};
+
 export default ShowRescues;

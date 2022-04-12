@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-//import Link from "next/link";
+import PropTypes from "prop-types";
 import Board from '../pb/board';
 import ShowUnseenTiles from '../pb/unseenTilesSection';
 import ShowMoves from '../pb/movesSection';
@@ -9,7 +9,6 @@ import * as c from '../../lib/pb/prisonBreakConstants';
 import { buildExamineDataFromGameJson } from "../../lib/pb/buildExamineDataFromGameJson";
 import { scrollToBottom } from "../../lib/scrollToBottom";
 
-// I am setting up a default skeleton so the build does not try reference properties of undefined objects
 const Examine = ({setWhereto, client, wsmessage, gameid, nickname, participant}) => {
     const [snapshotIndex, setSnapshotIndex] = useState(0); // Start at the end of the first snapshot (tiles picked, no moves made)
     const [examineData, setExamineData] = useState({pname: 'loading...', gname: 'loading...', moves: [], snapshots:[{tiles: [], ptiles: [], gtiles: [], rescues: 0, whoseturn: 'P'}]});
@@ -224,6 +223,15 @@ const Examine = ({setWhereto, client, wsmessage, gameid, nickname, participant})
     );
 };
 
+Examine.propTypes = {
+  setWhereto: PropTypes.func.isRequired,
+  client: PropTypes.any,
+  wsmessage: PropTypes.string.isRequired,
+  gameid: PropTypes.string.isRequired,
+  nickname: PropTypes.string.isRequired,
+  participant: PropTypes.string.isRequired
+};
+
 const ExaminerTileRack = (props) => {
   const selectedUnselected = "Unselected ";
   const uNotU = props.tilevalue === "Q" ? "u " : "";
@@ -238,4 +246,9 @@ const ExaminerTileRack = (props) => {
   );
 }
 
+ExaminerTileRack.propTypes = {
+  participant: PropTypes.string.isRequired,
+  tilevalue: PropTypes.string.isRequired,
+  tileindex: PropTypes.number.isRequired
+};
 export default Examine;

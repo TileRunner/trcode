@@ -1,4 +1,7 @@
+import React from "react";
+import PropTypes from "prop-types";
 import * as c from '../../lib/pb/prisonBreakConstants';
+
 
 const PlayerSection = (props) => {
     const playerIcon = props.participant === c.PARTY_TYPE_PRISONERS ? c.PARTY_ICON_PRISONERS : c.PARTY_ICON_GUARDS;
@@ -36,6 +39,16 @@ const PlayerSection = (props) => {
     );
   };
 
+PlayerSection.propTypes = {
+    participant: PropTypes.string.isRequired,
+    racktiles: PropTypes.arrayOf(PropTypes.string),
+    whoseturn: PropTypes.string.isRequired,
+    selection: PropTypes.number.isRequired,
+    onClick: PropTypes.func.isRequired,
+    allowRewind: PropTypes.bool.isRequired,
+    moves: PropTypes.arrayOf(PropTypes.any)
+};
+
 const RackTile = (props) => {
     const selectedUnselected = props.selection === props.tileindex ? "Selected " : "Unselected ";
     const uNotU = props.tilevalue === "Q" ? "u " : "";
@@ -52,6 +65,14 @@ const RackTile = (props) => {
     );
 }
 
+RackTile.propTypes = {
+    selection: PropTypes.number.isRequired,
+    tileindex: PropTypes.number.isRequired,
+    tilevalue: PropTypes.string.isRequired,
+    participant: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired
+};
+
 const FinishTurnButton = (props) => {
     return (
       <button className="pbActionButton" onClick={props.onClick}>
@@ -59,13 +80,21 @@ const FinishTurnButton = (props) => {
       </button>
     );
   };
-  
+
+  FinishTurnButton.propTypes = {
+    onClick: PropTypes.func.isRequired
+};
+
 const TileRecallButton = (props) => {
     return (
         <button className="pbActionButton" onClick={props.onClick}>
             <span className="pbActionButtonText"><i className="material-icons">undo</i>&nbsp;Recall Tiles</span>
         </button>
     );
+};
+
+TileRecallButton.propTypes = {
+    onClick: PropTypes.func.isRequired
 };
 
 const TileExchangeButton = (props) => {
@@ -76,12 +105,20 @@ const TileExchangeButton = (props) => {
     );
 };
 
+TileExchangeButton.propTypes = {
+    onClick: PropTypes.func.isRequired
+};
+
 const PassPlayButton = (props) => {
     return (
         <button className="pbActionButton" onClick={props.onClick}>
             <span className="pbActionButtonText"><i className="material-icons">not_interested</i>&nbsp;Pass Turn</span>
         </button>
     );
+};
+
+PassPlayButton.propTypes = {
+    onClick: PropTypes.func.isRequired
 };
 
 const AllowUndoLastPlay = (props) => {
@@ -103,6 +140,11 @@ const AllowUndoLastPlay = (props) => {
     );
 };
 
+AllowUndoLastPlay.propTypes = {
+    alreadyAllowed: PropTypes.bool.isRequired,
+    onClick: PropTypes.func.isRequired
+};
+
 const UndoLastPlay = (props) => {
     return (
         <button className="pbActionButtonSevere" onClick={props.onClick}>
@@ -114,6 +156,10 @@ const UndoLastPlay = (props) => {
     );
 };
   
+UndoLastPlay.propTypes = {
+    onClick: PropTypes.func.isRequired
+};
+
 function showActionButtons(props) {
     return <div className="pbActionButtonDiv">
         <p>

@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
 
 /**
@@ -24,7 +25,6 @@ export function countSwaps(word1="", word2="") {
     let letters2 = Array.from(word2.toLowerCase());
     if (letters1.length === letters2.length) {
         for (let i = 0; i < letters1.length; i++) {
-            const l1 = letters1[i];
             if (letters1[i] !== letters2[i]) {
                 result++;
             }

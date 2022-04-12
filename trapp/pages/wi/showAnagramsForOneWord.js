@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const ShowAnagramsForOneWord = ({
     anagrams=['You','should','never','see','this']
@@ -24,5 +25,9 @@ const ShowAnagramsForOneWord = ({
                 {anagrams.join(",")}
             </span>
 )};
+
+ShowAnagramsForOneWord.propTypes = {
+    anagrams: PropTypes.arrayOf(PropTypes.string)
+};
 
 export default ShowAnagramsForOneWord;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from "react";
+import PropTypes from "prop-types";
 import CustomSocket from "../../ws";
 import Lobby from '../fyb/lobby';
 import Game from '../fyb/game';
@@ -11,6 +12,7 @@ const FryYourBrain = ({setWhereto}) => {
     const [wsmessage, setWsmessage] = useState(''); // Latest message from the websocket
     const [nickname, setNickname] = useState('');
     const [gameid, setGameid] = useState('');
+    // eslint-disable-next-line
     let host = (process.env.NODE_ENV === 'production' ? 'wss://tilerunner.herokuapp.com' : 'ws://localhost:5000')
     + '/?clientType=fyb&thisisme=' + thisisme; // Used via URLSearchParams in server.js
     const acceptMessage = (message) => {
@@ -50,5 +52,9 @@ const FryYourBrain = ({setWhereto}) => {
         </>
     );
 }
+
+FryYourBrain.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default FryYourBrain;

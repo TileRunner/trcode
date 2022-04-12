@@ -124,38 +124,6 @@
     border-radius: 50%;
     color: white;
 }
-.trKeyboard {
-    border: 1px solid white;
-    border-radius: 5px;
-    padding: 5px 2px;
-    background-color: var(--trcssPageBG);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    width: fit-content;
-}
-.trKeyboard div:first-child {
-    margin-top: 5px;
-    margin-bottom: 15px;
-}
-.trKeyboard div:nth-child(2) {
-    margin-bottom: 15px;
-    margin-left: 15px;
-}
-.trKeyboard div:last-child {
-    margin-bottom: 5px;
-    margin-left: 25px;
-}
-.trKeyboard span {
-    border: 1px solid white;
-    border-radius: 5px;
-    background-color: blue;
-    text-align: center;
-    margin: 0px 0px;
-    padding: 5px 5px;
-}
-.trBackspace::before {
-    content: '\003Cx';
-}
 .trOptionsDiv {
     margin-top: 5px;
     background-color: blue;

@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 const ScrabbleClub = ({setWhereto}) => {
     return (
         <div className="trBackground">
@@ -11,5 +14,9 @@ const ScrabbleClub = ({setWhereto}) => {
         </div>
     );
 }
+
+ScrabbleClub.propTypes = {
+    setWhereto: PropTypes.func.isRequired
+};
 
 export default ScrabbleClub;
