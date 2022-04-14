@@ -64,7 +64,7 @@ const Board = ({ onClick, squareArray=[], rcd }) => {
 Board.propTypes = {
   onClick: PropTypes.func.isRequired,
   squareArray: PropTypes.arrayOf(PropTypes.any),
-  rcd: PropTypes.any
+  rcd: PropTypes.arrayOf(PropTypes.any)
 };
 
 export default Board;

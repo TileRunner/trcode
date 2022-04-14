@@ -187,7 +187,7 @@ const Game = ({setWhereto
     function putAtMoveStart() {
       setSelection(-1);
       setAllowRewind(false);
-      setRcd(-1,-1,c.DIR_NONE);
+      setRcd([-1,-1,c.DIR_NONE]);
       setCurrentcoords([]);
     }
   
@@ -231,7 +231,7 @@ const Game = ({setWhereto
           setAllowRewind(true);
         }
         if (messageData.func === "chat") { // Server decided whether this chat was for me
-          let newChatmsgs = [...chatmsgs, {from: messageData.nickname, msg: messageData.sendmsg}];
+          let newChatmsgs = [...chatmsgs, {created: messageData.created, from: messageData.nickname, msg: messageData.sendmsg}];
           setChatmsgs(newChatmsgs);
         }
         if (messageData.func === "providesyncdata") {
@@ -299,7 +299,7 @@ const Game = ({setWhereto
         setPtiles(newPtiles);
         setGtiles(newGtiles);
         setCurrentcoords(newCurrentcoords);
-        setRcd(-1,-1,c.DIR_NONE); // make player click again to set direction
+        setRcd([-1,-1,c.DIR_NONE]); // make player click again to set direction
         return;
       }
       // They didn't click a square to place a selected tile there

@@ -7,7 +7,8 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
     const handleKeyDown = (event) => {
       if (event.key === "Enter" && nextmsg.length > 0) {
         event.preventDefault();
-        let newMsgs = [...msgs, {from: nickname, msg: nextmsg}]
+        let created = Date.now();
+        let newMsgs = [...msgs, {created: created, from: nickname, msg: nextmsg}]
         let sendmsg = nextmsg;
         setMsgs(newMsgs);
         setNextmsg('');
@@ -18,7 +19,8 @@ const Chat = ({gameid="", client, nickname, msgs=[], setMsgs, participant=""}) =
             type: client.clientType, // type of client
             func: "chat", // send chat message
             sender: participant, // who sent it
-            sendmsg: sendmsg // the message typed in the chat
+            sendmsg: sendmsg, // the message typed in the chat
+            created: created // the time the message was created
           }
         );
         return;
