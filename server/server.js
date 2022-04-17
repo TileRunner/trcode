@@ -47,34 +47,8 @@ const anagramsByLength = [
   , makeAnagramList(wordsByLength[7])
   , makeAnagramList(wordsByLength[8])
 ]
-const clubdata = readclubdata();
 const chats = [];
 const logmsgs = ['Server start'];
-
-function readclubdata() {
-  let scdata = {};
-  try {
-    var wpath = path.join(__dirname, "ScrabbleClubData.js");
-    data = fs.readFileSync(wpath).toString();
-    scdata = JSON.parse(data);
-    // do some convenience stuff
-    scdata.clubGameList.forEach(g => {
-      g.ClubId = scdata.clubNightList.find(n => n.Id === g.ClubNightId).ClubId;
-    });
-  }
-  catch (e) {
-    console.log(`Error reading club data ${e}`);
-    scdata.clubList = [];
-    scdata.clubFinancialEntryList = [];
-    scdata.clubMemberList = [];
-    scdata.clubNightList = [];
-    scdata.clubPlayerStatsList = [];
-    scdata.clubGameList = [];
-    scdata.clubWinsCertList = [];
-    scdata.playerList = [];
-  }
-  return scdata;
-}
 
 function readWordList() {
     let data = '';
@@ -121,93 +95,6 @@ const server = express()
         res.header("Access-Control-Allow-Origin", allowedCaller);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json({test: 'value', evtest: evtest, lextest: `${allwords.length.toString()} words read from ENABLE2K`});
-    })
-    // Handle request for club list
-    .get("/clubdata/clublist", (_req, res) => {
-        // Handle who can call this
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        // Return the club list
-        res.json(clubdata.clubList);
-        return;
-    })
-    // Handle request for player list
-    .get("/clubdata/playerlist", (_req, res) => {
-      // Handle who can call this
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // Return the player list
-      res.json(clubdata.playerList);
-      return;
-    })
-    // Handle request for club night list for a club
-    .get("/clubdata/clubnightlist", (req, res) => {
-      // Handle who can call this
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // Get the club night list for the club
-      let clubid = parseInt(req.query.clubid);
-      let clubnights = clubdata.clubNightList.filter(function (e) {
-        return e.ClubId === clubid;
-      });
-      // Calculate some stuff about the club night
-      clubnights.forEach(clubnight => {
-        const clubgames = clubdata.clubGameList.filter(g => {return g.ClubNightId === clubnight.Id;});
-        clubnight.numGames = clubgames.length;
-        const players = [];
-        clubgames.forEach(g => {
-          let foundPlayer = false; // found player
-          let foundOpponent = false; // found opponent
-          for (let i = 0; i < players.length; i++) {
-            const p = players[i];
-            if (g.PlayerId === p.Id) {
-              foundPlayer = true;
-              p.wins = p.wins + (g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore > g.OpponentScore ? 1 : 0);
-              p.spread = p.spread + g.PlayerScore - g.OpponentScore;
-            }
-            if (g.OpponentId === p.Id) {
-              foundOpponent = true;
-              p.wins = p.wins + (g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore < g.OpponentScore ? 1 : 0);
-              p.spread = p.spread - g.PlayerScore + g.OpponentScore;
-            }
-          }
-          if (!foundPlayer) {
-            players.push({Id: g.PlayerId, wins: g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore > g.OpponentScore ? 1 : 0, spread: g.PlayerScore - g.OpponentScore});
-          }
-          if (!foundOpponent) {
-            players.push({Id: g.OpponentId, wins: g.PlayerScore === g.OpponentScore ? 0.5 : g.PlayerScore < g.OpponentScore ? 1 : 0, spread: g.OpponentScore - g.PlayerScore});
-          }
-        });
-        clubnight.numPlayers = players.length;
-        if (players.length > 0) {
-          players.sort((a,b) => a.wins > b.wins ? -1 : a.wins < b.wins ? 1 : b.spread - a.spread);
-          let winner = players[0];
-          winner.Name = clubdata.playerList.filter(p => {return p.Id === players[0].Id;})[0].Name;
-          clubnight.winner = winner;
-        }
-    })
-      // Return the club night list
-      res.json(clubnights);
-      return;
-    })
-    // Handle request for club game list for a club night or for a club
-    .get("/clubdata/clubgamelist", (req, res) => {
-      // Handle who can call this
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // Return variable
-      let clubgames = [];
-      // Get the club game list for the club night if by club night id
-      if (req.query.clubnightid) {
-        let clubnightid = parseInt(req.query.clubnightid);
-        clubgames = clubdata.clubGameList.filter(g => { return g.ClubNightId === clubnightid; });  
-      } else if (req.query.clubid) {
-        let clubid = parseInt(req.query.clubid);
-        clubgames = clubdata.clubGameList.filter(g => { return g.ClubId === clubid; });
-      }
-      // Return the club game list
-      res.json(clubgames);
-      return;
     })
     .get("/ENABLE2K", (req, res) => {
         // Handle picking random word for Word Mastermind
