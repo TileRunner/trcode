@@ -4,12 +4,12 @@ const { Server } = require("ws");
 const fs = require('fs');
 const path = require("path");
 const PORT = process.env.PORT || 5000;
-require('dotenv').config(); // For reading environment variables
-const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://tilerunner.herokuapp.com' : 'http://localhost:3000')
+const { ServeFybChat, ServeFybCreate, ServeFybGet, ServeFybJoin, ServeFybList} = require('./fyb/functions/serveFYB');
+const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://enigmatic-lake-42795.herokuapp.com' : 'http://localhost:3000')
 const clientTypeFryYourBrain = 'fyb';
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
-const { fybInitialize, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
+const { fybInitialize, getDebugInfoFYB, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
 const { fybPrepickTiles} = require('./fyb/functions/pickLetters');
 const { getAnagrams, getSwaps, getDrops, getInserts
   , createMorphoPuzzle
@@ -88,14 +88,20 @@ function makeAlphagramList(wordlist) {
 function getValid(word, wordssamelength) {
     return wordssamelength.indexOf(word) > -1 ? 'Y' : 'N'
 }
+
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
-    .get("/evtest", (_req, res) => {
-        let evtest = process.env.NEXT_PUBLIC_CODER_MESSAGE; // On developers local computer environment variables and heroku config settings
-        res.header("Access-Control-Allow-Origin", allowedCaller);
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        res.json({test: 'value', evtest: evtest, lextest: `${allwords.length.toString()} words read from ENABLE2K`});
+    .get("/debug", (_req, res) => {
+      res.header("Access-Control-Allow-Origin", allowedCaller);
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      let fybinfo = getDebugInfoFYB();
+      res.json({status: 'ok', fybinfo: fybinfo});
     })
+    .get("/fyb/chat", (req, res) => { ServeFybChat(res, req); })
+    .get("/fyb/create", (req, res) => { ServeFybCreate(res, req); })
+    .get("/fyb/get", (req, res) => { ServeFybGet(res, req); })
+    .get("/fyb/join", (req, res) => { ServeFybJoin(res, req); })
+    .get("/fyb/list", (req, res) => { ServeFybList(res, req); })
     .get("/ENABLE2K", (req, res) => {
         // Handle picking random word for Word Mastermind
         if (req.query.random) {
@@ -511,3 +517,4 @@ const handleChatMessages = (pm, message) => { // pm=json object, message=string 
     }
   });
 }
+

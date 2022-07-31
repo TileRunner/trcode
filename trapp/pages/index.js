@@ -9,6 +9,7 @@ import FryYourBrainSolo from './fyb/fybSolo';
 import ScrabbleClub from './sc/scrabbleclub';
 import Morpho from './morpho/morpho';
 import Transmogrify from './tm/tm';
+import DebugInfo from './db/debug';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
@@ -24,6 +25,7 @@ export default function Home() {
       {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
       {whereto === 'morpho' && <Morpho setWhereto={setWhereto}></Morpho>}
       {whereto === 'tm' && <Transmogrify setWhereto={setWhereto}></Transmogrify>}
+      {whereto === 'db' && <DebugInfo setWhereto={setWhereto}></DebugInfo>}
     </div>
   )
 }
@@ -38,6 +40,7 @@ const Menu = (props) => {
   const [descSc, setDescSc] = useState(false); // describe scrabble club
   const [descMorpho, setDescMorpho] = useState(false); // describe morpho
   const [descTm, setDescTm] = useState(false); // describe transmogrify
+  const [descDb, setDescDb] = useState(false); // describe debug info
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -136,6 +139,10 @@ const Menu = (props) => {
     Transmogrify has moved to here: <a href='https://tilerunner.github.io/transmogrify/'>link</a>
   </div>
 
+  const DescribeDebugInfo = <div className='trParagraph'>
+    This is for showing debug info to help the developer.
+  </div>
+
   const Acknowledge = (props) => {
     const toggleDescFlag = () => {
       props.setDescFlag(!props.descFlag);
@@ -187,6 +194,7 @@ const Menu = (props) => {
             <MenuOption key='bvmoTm' descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
             {!isMobile && <MenuOption key='bvmoPb' descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>}
             {!isMobile && <MenuOption key='bvmoSc' descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>}
+            {!isMobile && <MenuOption key='bvmoDb' descFlag={descDb} setDescFlag={setDescDb} setWhereto={props.setWhereto} targetWhereto='db' optionText='Debug Info'/>}
         </div>
         {descWm && DescribeWordMastermind}
         {descWi && DescribeWordInfo}
@@ -196,6 +204,7 @@ const Menu = (props) => {
         {descSc && DescribeScrabbleClub}
         {descMorpho && DescribeMorpho}
         {descTm && DescribeTransmogrify}
+        {descDb && DescribeDebugInfo}
       </div>
       <div className="trParagraph">
         <div className="trTitle">

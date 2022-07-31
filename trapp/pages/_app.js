@@ -16,7 +16,7 @@ function MyApp({Component,pageProps}) {
                     href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
                     crossOrigin="anonymous"
                     />
-                <link /* I added material icons */
+                <link
                     href="https://fonts.googleapis.com/icon?family=Material+Icons"
                     rel="stylesheet"
                     />
@@ -32,18 +32,10 @@ function MyApp({Component,pageProps}) {
                     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
                     crossOrigin="anonymous"
                     />
-                <link /* I added w3.css */
+                <link
                     rel="stylesheet"
                     href="https://www.w3schools.com/w3css/4/w3.css"
                     />
-                {/* <script
-                    // for some reason these fontawesome icons are sometimish about whether to show up or not.
-                    // I switched to material-icons instead.
-                    // src="https://kit.fontawesome.com/77514d28aa.js" // Rod
-                    // src="https://kit.fontawesome.com/47e7c5fc23.js" // Christopher
-                    src="https://kit.fontawesome.com/TileRunner.js" // Christopher
-                    crossOrigin="anonymous"
-                    /> */}
         <title>Tile Runner</title>
         <link rel="icon" href="/tileTR.ico" />
         <meta name="description" content="Tile Runner - Fun with words" />

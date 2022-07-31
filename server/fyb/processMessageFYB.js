@@ -6,6 +6,9 @@ var wordlist = [];
 function fybInitialize(allwords) { // The server calls this when the server starts
     wordlist = allwords;
 }
+function getDebugInfoFYB() {
+    return({games: games});
+}
 function findGame(gameid) {
     let foundGame;
     games.forEach((game) => {
@@ -645,4 +648,4 @@ const sendGameData = (clients, game, snat) => {
     });
 }
 
-module.exports = { fybInitialize, processMessageFYB, wordHasFryLetters };
+module.exports = { fybInitialize, getDebugInfoFYB, processMessageFYB, wordHasFryLetters };

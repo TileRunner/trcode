@@ -99,7 +99,7 @@ const Game = ({setWhereto, client, thisisme, wsmessage, nickname, gameid}) => {
                 For a regular update due to player activity, this client needs the update.
 
                 For dropped connections which made this client send a rejoin to update server's
-                   info for this client, which makes the server sends game info to this client,
+                   info for this client, which makes the server send game info to this client,
                    this client is already up to date and does not need the update. We do not take
                    the update so as not to upset the fry letter rearrangements this client may have
                    made.

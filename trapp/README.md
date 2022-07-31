@@ -27,8 +27,16 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Vercel - THIS WAS NOT EASY! I COULD NOT GET IT TO WORK
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/import?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Deploy on heroku
+
+I got deploy on heroku working, and was using it for a long time, then they had a security issue. I had to switch to heroku CLI:
+
+Download the heroku CLI
+heroku create ---> this invented [this url](https://enigmatic-lake-42795.herokuapp.com)
+git push heroku main ---> this is how you push and deploy

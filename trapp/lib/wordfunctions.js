@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://tilerunner.herokuapp.com';
+const baseurl = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : 'https://enigmatic-lake-42795.herokuapp.com';
 
 /**
  * Get the alphagram for the given word, trimmed and converted to lower case.
