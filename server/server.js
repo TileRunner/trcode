@@ -4,7 +4,18 @@ const { Server } = require("ws");
 const fs = require('fs');
 const path = require("path");
 const PORT = process.env.PORT || 5000;
-const { ServeFybChat, ServeFybCreate, ServeFybGet, ServeFybJoin, ServeFybList} = require('./fyb/functions/serveFYB');
+const {
+  ServeFybChatMessage,
+  ServeFybCreateGame,
+  ServeFybGetChat,
+  ServeFybGetGame,
+  ServeFybJoinGame,
+  ServeFybListGames,
+  ServeFybMakeMove,
+  ServeFybPlayAgain,
+  ServerFybStartGame
+} = require('./fyb/functions/serveFYB');
+
 const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://enigmatic-lake-42795.herokuapp.com' : 'http://localhost:3000')
 const clientTypeFryYourBrain = 'fyb';
 const clientTypePrisonBreak = 'pb';
@@ -97,11 +108,15 @@ const server = express()
       let fybinfo = getDebugInfoFYB();
       res.json({status: 'ok', fybinfo: fybinfo});
     })
-    .get("/fyb/chat", (req, res) => { ServeFybChat(res, req); })
-    .get("/fyb/create", (req, res) => { ServeFybCreate(res, req); })
-    .get("/fyb/get", (req, res) => { ServeFybGet(res, req); })
-    .get("/fyb/join", (req, res) => { ServeFybJoin(res, req); })
-    .get("/fyb/list", (req, res) => { ServeFybList(res, req); })
+    .get("/fyb/chatmessage", (req, res) => { ServeFybChatMessage(res, req); })
+    .get("/fyb/creategame", (req, res) => { ServeFybCreateGame(res, req); })
+    .get("/fyb/getchat", (req, res) => { ServeFybGetChat(res, req); })
+    .get("/fyb/getgame", (req, res) => { ServeFybGetGame(res, req); })
+    .get("/fyb/joingame", (req, res) => { ServeFybJoinGame(res, req); })
+    .get("/fyb/listgames", (req, res) => { ServeFybListGames(res, req); })
+    .get("/fyb/makemove", (req, res) => { ServeFybMakeMove(res, req); })
+    .get("/fyb/playagain", (req, res) => { ServeFybPlayAgain(res, req); })
+    .get("/fyb/startgame", (req, res) => { ServerFybStartGame(res, req, fybPrepickTiles(allwords, 6)); })
     .get("/ENABLE2K", (req, res) => {
         // Handle picking random word for Word Mastermind
         if (req.query.random) {
@@ -280,13 +295,13 @@ const server = express()
           // Validate parameters
           let guarantee = 0;
           if (!req.query.guarantee) {
-            notes.push('Parameter &guarantee is required.');
+            notes.push('Parameter guarantee is required.');
           } else if (isNaN(req.query.guarantee)) {
-            notes.push('Value of &guarantee should be numeric.');
+            notes.push('Value of guarantee should be numeric.');
           } else if (req.query.guarantee > 15) {
-            notes.push('Maximum value of &guarantee is 15.');
+            notes.push('Maximum value of guarantee is 15.');
           } else if (req.query.guarantee < 3) {
-            notes.push('Minimum value of &guarantee is 3.');
+            notes.push('Minimum value of guarantee is 3.');
           } else {
             guarantee = req.query.guarantee;
             jret.guarantee = guarantee;
