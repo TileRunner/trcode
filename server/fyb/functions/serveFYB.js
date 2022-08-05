@@ -77,8 +77,6 @@ function ServeFybCreateGame(res, req) {
         createTime: Date.now(),
         creator: req.query.name,
         players: [{ name: req.query.name }],
-        letters: [],
-        moves: [],
         started: false,
         finished: false
     };
@@ -179,13 +177,13 @@ function ServeFybMakeMove(res, req) {
             if (newmove.type !== MOVE_TYPE_PASS) {
                 newmove.word = req.query.word;
             }
-            fybgame.moves.push(newmove);
             if (fybgame.type === GAME_TYPE_SURVIVAL) {
                 let numalive = 0;
                 let tomove = 0;
                 fybgame.players.forEach(player => {
                     if (player.name === newmove.name) {
                         if (player.tomove) { // In case they submit same play again before it is processed
+                            fybgame.rounds[fybgame.round-1].moves.push(newmove);
                             player.tomove = false;
                             if (newmove.type !== MOVE_TYPE_VALID) {
                                 player.alive = false;
@@ -200,10 +198,11 @@ function ServeFybMakeMove(res, req) {
                     }
                 });
                 if (tomove === 0) {
-                    if (numalive < 2) {
+                    if (numalive < 2 || fybgame.round + 3 > fybgame.letters.length) {
                         fybgame.finished = true;
                     } else {
                         fybgame.round++;
+                        fybgame.rounds.push({moves:[]});
                         fybgame.players.forEach(player => {
                             if (player.alive) {
                                 player.tomove = true;
@@ -232,8 +231,6 @@ function ServeFybPlayAgain(res, req) {
         const fybgame = fybgames[index];
         if (fybgame.number === gameNumber) {
             found = true;
-            fybgame.letters = [];
-            fybgame.moves = [];
             fybgame.started = false;
             fybgame.finished = false;
             AddAdminChat(fybgame.chatNumber, 'Play again');
@@ -254,8 +251,8 @@ function ServerFybStartGame(res, req, letters) {
         if (fybgame.number === gameNumber) {
             found = true;
             fybgame.round = 1;
+            fybgame.rounds = [{moves: []}];
             fybgame.letters = letters;
-            fybgame.moves = [];
             fybgame.started = true;
             fybgame.finished = false;
             fybgame.players.forEach(player => {
