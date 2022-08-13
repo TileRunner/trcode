@@ -307,20 +307,32 @@ function ServeFybMakeMove(res, req) {
                     fybgame.players[(fybgame.round - 3 + fybgame.players.length) % fybgame.players.length].points += fybgame.round;
                 }
             } else { // move in normal round
-                fybgame.round++;
-                fybgame.rounds.push({ moves: [] });
-                if (newmove.type !== MOVE_TYPE_VALID) {
-                    fybgame.freeforall = true;
-                    // Players all move in free-for-all except the one that just failed
+                if (newmove.type === MOVE_TYPE_VALID && fybgame.round + 3 > fybgame.letters.length) {
+                    // No more letters available for another round, give all players credit
                     fybgame.players.forEach(player => {
-                        if (player.alive) {
-                            player.tomove = true;
-                        }
+                        player.points += fybgame.letters.length;
                     });
+                    fybgame.finished = true;
                 } else {
-                    // Next player to move. In round 1, player [0] goes first.
-                    let pindex = (fybgame.round - 1) % fybgame.players.length;
-                    fybgame.players[pindex].tomove = true;
+                    // Normal advance to next round
+                    fybgame.round++;
+                    let newround = {moves:[]};
+                    if (newmove.type !== MOVE_TYPE_VALID) {
+                        fybgame.freeforall = true;
+                        newround.letters = fybgame.letters.slice(0,fybgame.round+1);
+                        // Players all move in free-for-all except the one that just failed
+                        fybgame.players.forEach(player => {
+                            if (player.alive) {
+                                player.tomove = true;
+                            }
+                        });
+                    } else {
+                        newround.letters = fybgame.letters.slice(0,fybgame.round+2);
+                        // Next player to move. In round 1, player [0] goes first.
+                        let pindex = (fybgame.round - 1) % fybgame.players.length;
+                        fybgame.players[pindex].tomove = true;
+                    }
+                    fybgame.rounds.push(newround);
                 }
             }
         }
@@ -382,6 +394,7 @@ function ServerFybStartGame(res, req, letters) {
                 if (fybgame.type === GAME_TYPE_CLASSIC) {
                     fybgame.players[0].tomove = true; // Play again code moves first player to end
                     fybgame.freeforall = false;
+                    fybgame.rounds[0].letters = fybgame.letters.slice(0,3);
                 }
                 AddAdminChat(fybgame.chatNumber, 'Start game');
                 res.json(fybgame);
