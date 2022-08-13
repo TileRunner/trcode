@@ -1,3 +1,5 @@
+const { json } = require("express");
+
 const GAME_TYPE_CLASSIC = 'CLASSIC';
 const GAME_TYPE_SURVIVAL = 'SURVIVAL';
 
@@ -59,6 +61,7 @@ function AddChat(number, name, msg) {
 }
 
 function ServeFybChatMessage(res, req) {
+    // console.log(`Chat ${req.query.name} says ${req.query.msg}`);
     AllowAllCallers(res);
     let chatNumber = parseInt(req.query.number);
     let chatindex = AddChat(chatNumber, req.query.name.trim(), req.query.msg.trim());
@@ -70,6 +73,7 @@ function ServeFybChatMessage(res, req) {
 }
 
 function ServeFybCreateGame(res, req) {
+    // console.log(`Create game by ${req.query.name}`);
     AllowAllCallers(res);
     let gameNumber = 1;
     for (let index = 0; index < fybgames.length; index++) {
@@ -90,7 +94,7 @@ function ServeFybCreateGame(res, req) {
         finished: false
     };
     if (newfybgame.type === GAME_TYPE_CLASSIC) {
-        newfybgame.nextstarter = 0;
+        newfybgame.players[0].points = 0;
     }
     fybgames.push(newfybgame);
     AddAdminChat(chatNumber, `Game created by ${req.query.name.trim()}`);
@@ -98,6 +102,7 @@ function ServeFybCreateGame(res, req) {
 }
 
 function ServeFybGetChat(res, req) {
+    // console.log(`Chat request for ${req.query.number}`);
     AllowAllCallers(res);
     let chatNumber = parseInt(req.query.number);
     let found = false;
@@ -114,6 +119,7 @@ function ServeFybGetChat(res, req) {
 }
 
 function ServeFybGetGame(res, req) {
+    // console.log(`Game request for ${req.query.number}`);
     AllowAllCallers(res);
     let gameNumber = parseInt(req.query.number);
     let found = false;
@@ -130,6 +136,7 @@ function ServeFybGetGame(res, req) {
 }
 
 function ServeFybJoinGame(res, req) {
+    // console.log(`Join game ${req.query.number} by ${req.query.name}`);
     AllowAllCallers(res);
     let found = false;
     let gameNumber = parseInt(req.query.number);
@@ -145,7 +152,11 @@ function ServeFybJoinGame(res, req) {
                 }
             }
             if (!found2) {
-                fybgame.players.push({"name": req.query.name.trim()});
+                let newplayer = {name: req.query.name.trim()};
+                if (fybgame.type === GAME_TYPE_CLASSIC) {
+                    newplayer.points = 0;
+                }
+                fybgame.players.push(newplayer);
             }
             AddAdminChat(fybgame.chatNumber, `${req.query.name.trim()} ${found2 ? 'rejoined' : 'joined'}`);
             res.json(fybgame);
@@ -157,6 +168,7 @@ function ServeFybJoinGame(res, req) {
 }
 
 function ServeFybListGames(res, req) {
+    // console.log(`Game list request`);
     AllowAllCallers(res);
     let gamelist = [];
     fybgames.forEach(fybgame => {
@@ -175,6 +187,7 @@ function ServeFybListGames(res, req) {
 }
 
 function ServeFybMakeMove(res, req) {
+    // console.log(`Game move for ${req.query.number} by ${req.query.name}`);
     AllowAllCallers(res);
     let gameNumber = parseInt(req.query.number);
     let found = false;
@@ -187,41 +200,9 @@ function ServeFybMakeMove(res, req) {
                 newmove.word = req.query.word;
             }
             if (fybgame.type === GAME_TYPE_SURVIVAL) {
-                let numalive = 0;
-                let tomove = 0;
-                fybgame.players.forEach(player => {
-                    if (player.name === newmove.name) {
-                        if (player.tomove) { // In case they submit same play again before it is processed
-                            fybgame.rounds[fybgame.round-1].moves.push(newmove);
-                            player.tomove = false;
-                            if (newmove.type !== MOVE_TYPE_VALID) {
-                                player.alive = false;
-                            }
-                        }
-                    }
-                    if (player.alive) {
-                        numalive++;
-                    }
-                    if (player.tomove) {
-                        tomove++;
-                    }
-                });
-                if (tomove === 0) {
-                    if (numalive < 2 || fybgame.round + 3 > fybgame.letters.length) {
-                        fybgame.finished = true;
-                    } else {
-                        fybgame.round++;
-                        fybgame.rounds.push({moves:[]});
-                        fybgame.players.forEach(player => {
-                            if (player.alive) {
-                                player.tomove = true;
-                            }
-                        });
-                    }
-                }
-            }
-            if (fybgame.type === GAME_TYPE_CLASSIC) {
-                // Lots to do here ... free for all round, sending move twice, points ...
+                serveSurvivalMove(fybgame, newmove);
+            } else if (fybgame.type === GAME_TYPE_CLASSIC) {
+                serveClassicMove(fybgame, newmove);
             }
             //AddAdminChat(fybgame.chatNumber, `Move by ${req.query.name.trim()}: ${newmove.type}`);
             res.json(fybgame);
@@ -230,9 +211,124 @@ function ServeFybMakeMove(res, req) {
     if (!found) {
         res.json({error: 'Game not found'});
     }
+
+    function serveSurvivalMove(fybgame, newmove) {
+        let numalive = 0;
+        let tomove = 0;
+        let found = false;
+        fybgame.players.forEach(player => {
+            if (player.name === newmove.name) {
+                if (player.tomove) { // In case they submit same play again before it is processed
+                    found = true;
+                    fybgame.rounds[fybgame.round - 1].moves.push(newmove);
+                    player.tomove = false;
+                    if (newmove.type !== MOVE_TYPE_VALID) {
+                        player.alive = false;
+                    }
+                }
+            }
+            if (player.alive) {
+                numalive++;
+            }
+            if (player.tomove) {
+                tomove++;
+            }
+        });
+        if (found && tomove === 0) {
+            if (numalive < 2 || fybgame.round + 3 > fybgame.letters.length) {
+                fybgame.finished = true;
+            } else {
+                fybgame.round++;
+                fybgame.rounds.push({ moves: [] });
+                fybgame.players.forEach(player => {
+                    if (player.alive) {
+                        player.tomove = true;
+                    }
+                });
+            }
+        }
+    }
+
+    function serveClassicMove(fybgame, newmove) {
+        let numalive = 0;
+        let tomove = 0;
+        let found = false;
+        fybgame.players.forEach(player => {
+            if (player.name === newmove.name) {
+                if (player.tomove) { // In case they submit same play again before it is processed
+                    found = true;
+                    fybgame.rounds[fybgame.round - 1].moves.push(newmove);
+                    player.tomove = false;
+                    if (newmove.type !== MOVE_TYPE_VALID) {
+                        player.alive = false;
+                    }
+                }
+            }
+            if (player.alive) {
+                numalive++;
+            }
+            if (player.tomove) {
+                tomove++;
+            }
+        });
+        if (found && tomove === 0) { // all free-for-all players moved, or player moved in normal round
+            if (fybgame.freeforall) {
+                fybgame.finished = true;
+                // Figure out points here
+                let shortest = 999; // ridiculously high
+                let winners = [];
+                let moves = fybgame.rounds[fybgame.round - 1].moves;
+                moves.forEach(move => {
+                    if (move.type === MOVE_TYPE_VALID) {
+                        if (move.word.length < shortest) {
+                            shortest = move.word.length;
+                            winners = [move.name];
+                        } else if (move.word.length === shortest) {
+                            winners.push(move.name);
+                        }
+                    }
+                });
+                if (winners.length > 0) {
+                    // At least one winner in free-for-all
+                    fybgame.players.forEach(player => {
+                        if (player.alive) {
+                            winners.forEach(winner => {
+                                if (winner === player.name) {
+                                    // eg fail round 1, free-for-all round 2 still at 3 letters
+                                    player.points += fybgame.round + 1;
+                                }
+                            })
+                        }
+                    });
+                } else if (fybgame.round > 2) {
+                    // No valid answers in free-for-all, we least got to round 3
+                    // eg valid in round 1, fail in round 2m free-for-all all fail in round 3
+                    // so round 1 player gets 3 points
+                    fybgame.players[(fybgame.round - 3 + fybgame.players.length) % fybgame.players.length].points += fybgame.round;
+                }
+            } else { // move in normal round
+                fybgame.round++;
+                fybgame.rounds.push({ moves: [] });
+                if (newmove.type !== MOVE_TYPE_VALID) {
+                    fybgame.freeforall = true;
+                    // Players all move in free-for-all except the one that just failed
+                    fybgame.players.forEach(player => {
+                        if (player.alive) {
+                            player.tomove = true;
+                        }
+                    });
+                } else {
+                    // Next player to move. In round 1, player [0] goes first.
+                    let pindex = (fybgame.round - 1) % fybgame.players.length;
+                    fybgame.players[pindex].tomove = true;
+                }
+            }
+        }
+    }
 }
 
 function ServeFybPlayAgain(res, req) {
+    // console.log(`Game replay for ${req.query.number}`);
     AllowAllCallers(res);
     let gameNumber = parseInt(req.query.number);
     let found = false;
@@ -240,9 +336,13 @@ function ServeFybPlayAgain(res, req) {
         const fybgame = fybgames[index];
         if (fybgame.number === gameNumber) {
             found = true;
-            fybgame.started = false;
-            fybgame.finished = false;
-            AddAdminChat(fybgame.chatNumber, 'Play again');
+            if (fybgame.started && fybgame.finished) { // in case already set up for replay (probably by other player)
+                fybgame.started = false;
+                fybgame.finished = false;
+                // Shift first player to end for next game
+                fybgame.players.push(fybgame.players.splice(0,1)[0]); // pushes first item to end
+                AddAdminChat(fybgame.chatNumber, 'Play again');
+            }
             res.json(fybgame);
         }
     }
@@ -252,6 +352,7 @@ function ServeFybPlayAgain(res, req) {
 }
 
 function ServerFybStartGame(res, req, letters) {
+    // console.log(`Game start for ${req.query.number}`);
     AllowAllCallers(res);
     let gameNumber = parseInt(req.query.number);
     let found = false;
@@ -259,7 +360,9 @@ function ServerFybStartGame(res, req, letters) {
         const fybgame = fybgames[index];
         if (fybgame.number === gameNumber) {
             found = true;
-            if (fybgame.players.length < 2) {
+            if (fybgame.started) { // Already started (probably by other player)
+                res.json(fybgame);
+            } else if (fybgame.players.length < 2) {
                 res.json({error: 'You need at least two players to start the game'});
             } else {
                 fybgame.round = 1;
@@ -268,18 +371,17 @@ function ServerFybStartGame(res, req, letters) {
                 fybgame.started = true;
                 fybgame.finished = false;
                 fybgame.players.forEach(player => {
+                    player.alive = true;
                     if (fybgame.type === GAME_TYPE_SURVIVAL) {
-                        player.alive = true;
                         player.tomove = true;
                     }
                     if (fybgame.type === GAME_TYPE_CLASSIC) {
-                        player.points = 0;
+                        player.tomove = false;
                     }
                 });
                 if (fybgame.type === GAME_TYPE_CLASSIC) {
-                    fybgame.whosemoveindex = fybgame.nextstarter;
-                    fybgame.whosemovename = fybgame.players[fybgame.whosemoveindex].name;
-                    fybgame.nextstarter = (fybgame.nextstarter + 1) % fybgame.players.length;
+                    fybgame.players[0].tomove = true; // Play again code moves first player to end
+                    fybgame.freeforall = false;
                 }
                 AddAdminChat(fybgame.chatNumber, 'Start game');
                 res.json(fybgame);
