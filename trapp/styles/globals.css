@@ -29,9 +29,6 @@ a {
 .mymaterialicon:focus {
   outline: none;
   }
-.fivepxdivider { /* fyb */
-  line-height: 5px;
-}
 .floatright {
   float: right;
 }

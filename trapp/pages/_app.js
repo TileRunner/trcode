@@ -2,7 +2,6 @@ import '../styles/globals.css';
 import '../styles/trcss.css';
 import './wi/wordinfo.css';
 import './pb/prisonbreak.css';
-import './fyb/fyb.css';
 import Head from 'next/head';
 import React from 'react';
 import PropTypes from "prop-types";

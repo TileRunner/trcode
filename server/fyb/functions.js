@@ -27,27 +27,6 @@ const fulltileset = [
     "Z"    
 ];
 
-function pickInitialTiles() {
-    let tiles = [...fulltileset];
-    let picked = [];
-    while (picked.length < 3) {
-        let rand = Math.floor(Math.random() * tiles.length);
-        picked.push(tiles[rand]);
-        tiles.splice(rand, 1);
-    }
-    return({picked: picked, tiles: tiles});
-}
-
-function pickNextTile(tiles, fryLetters) {
-    let rand = Math.floor(Math.random() * tiles.length);
-    let picked = tiles[rand];
-    let newFryLetters = [...fryLetters];
-    newFryLetters.push(picked);
-    let newTiles = [...tiles];
-    newTiles.splice(rand, 1);
-    return({newTiles: newTiles, newFryLetters: newFryLetters});
-}
-
 function fybPrepickTiles(words=[], guarantee=6) {
     // Pick all fry letters at once.
     // Param: words is the list of valid words
@@ -100,7 +79,16 @@ function fybPrepickTiles(words=[], guarantee=6) {
     return fryLetters;
 }
 
-//TODO Make this a common function. Take this version since it handles upper or lower case for both parameters.
+function pickNextTile(tiles, fryLetters) {
+    let rand = Math.floor(Math.random() * tiles.length);
+    let picked = tiles[rand];
+    let newFryLetters = [...fryLetters];
+    newFryLetters.push(picked);
+    let newTiles = [...tiles];
+    newTiles.splice(rand, 1);
+    return({newTiles: newTiles, newFryLetters: newFryLetters});
+}
+
 function wordHasFryLetters(fryLetterArray, checkword) {
     let word = checkword.toUpperCase();
     for (let i = 0; i < fryLetterArray.length; i++) {
@@ -124,4 +112,4 @@ function wordHasFryLetters(fryLetterArray, checkword) {
 }
 
 
-module.exports = {pickInitialTiles, pickNextTile, fybPrepickTiles};
+module.exports = {fybPrepickTiles, wordHasFryLetters};

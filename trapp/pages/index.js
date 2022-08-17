@@ -5,11 +5,9 @@ import WordMastermind from './wm/mastermind';
 import WordInfo from './wi/wordinfo';
 import PrisonBreak from './pb/prisonbreak';
 import FryYourBrain from './fyb/fryyourbrain';
-import FryYourBrainSolo from './fyb/fybSolo';
 import ScrabbleClub from './sc/scrabbleclub';
 import Morpho from './morpho/morpho';
 import Transmogrify from './tm/tm';
-import DebugInfo from './db/debug';
 
 export default function Home() {
   const [whereto, setWhereto] = useState('menu');
@@ -21,11 +19,9 @@ export default function Home() {
       {whereto === 'wi' && <WordInfo setWhereto={setWhereto}></WordInfo>}
       {whereto === 'pb' && <PrisonBreak setWhereto={setWhereto}></PrisonBreak>}
       {whereto === 'fyb' && <FryYourBrain setWhereto={setWhereto}></FryYourBrain>}
-      {whereto === 'fybsolo' && <FryYourBrainSolo setWhereto={setWhereto}></FryYourBrainSolo>}
       {whereto === 'sc' && <ScrabbleClub setWhereto={setWhereto}></ScrabbleClub>}
       {whereto === 'morpho' && <Morpho setWhereto={setWhereto}></Morpho>}
       {whereto === 'tm' && <Transmogrify setWhereto={setWhereto}></Transmogrify>}
-      {whereto === 'db' && <DebugInfo setWhereto={setWhereto}></DebugInfo>}
     </div>
   )
 }
@@ -36,11 +32,9 @@ const Menu = (props) => {
   const [descWi, setDescWi] = useState(false); // describe word info
   const [descPb, setDescPb] = useState(false); // describe prison break
   const [descFyb, setDescFyb] = useState(false); // describe fry your brain
-  const [descFybsolo, setDescFybsolo] = useState(false); // describe fry your brain solo
   const [descSc, setDescSc] = useState(false); // describe scrabble club
   const [descMorpho, setDescMorpho] = useState(false); // describe morpho
   const [descTm, setDescTm] = useState(false); // describe transmogrify
-  const [descDb, setDescDb] = useState(false); // describe debug info
   // Acknowledgements description toggles
   const [descEnable2k, setDescEnable2k] = useState(false); // describe ENABLE2K
   const [descFriends, setDescFriends] = useState(false); // describe friends
@@ -102,29 +96,7 @@ const Menu = (props) => {
   </div>;
 
   const DescribeFryYourBrain = <div className="trParagraph">
-    <div className="trSubtitle">Fry Your Brain is a word game that can be contested by two to six players.</div>
-    <ul>
-      <li>A tile pool is provided, starting with 3 letters. Players take turns.</li>
-      <li>When it is your turn, make a word that has all the letters in the tile pool, plus any amount of additional letters.</li>
-      <li>You cannot reuse a word from the same round.</li>
-      <li>You cannot merely add an S to a valid word from the same round, unless that word ends in S.</li>
-      <li>When a player fails to make a valid word on their turn, the other players take part in the free-for-all.</li>
-      <li>In the free-for-all, the goal is to submit the shortest answer you can. All players with the shortest of the answers get points.</li>
-      <li>The points given equals the number of letters in the tile pool the last time someone gave a valid answer for that round.</li>
-      <li>Rounds continue until someone reaches the target number of points for the game.</li>
-    </ul>
-  </div>;
-
-  const DescribeFryYourBrainSolo = <div className="trParagraph">
-    <div className="trSubtitle">Fry Your Brain Solo is a practise ground for Fry Your Brain</div>
-    <ul>
-      <li>A new tile pool is started with 3 letters.</li>
-      <li>Make a word that has all the letters in the tile pool, plus any additional letters, or pass.</li>
-      <li>A letter will be added to the pool after each word or pass, or a new tile pool will be started.</li>
-      <li>The display will indicate whether each made word is valid or not.</li>
-      <li>The display will show the shortest answer, using alphabetical order as the tiebreak.</li>
-      <li>Unlike regular Fry Your Brain, you may reuse a word or simply add or remove an S at the end.</li>
-    </ul>
+    Fry Your Brain has moved to here: <a href='https://tilerunner.github.io/binary-for-ryu/'>link</a>
   </div>;
 
   const DescribeScrabbleClub = <div className="trParagraph">
@@ -137,10 +109,6 @@ const Menu = (props) => {
 
   const DescribeTransmogrify = <div className="trParagraph">
     Transmogrify has moved to here: <a href='https://tilerunner.github.io/transmogrify/'>link</a>
-  </div>
-
-  const DescribeDebugInfo = <div className='trParagraph'>
-    This is for showing debug info to help the developer.
   </div>
 
   const Acknowledge = (props) => {
@@ -189,22 +157,18 @@ const Menu = (props) => {
             <MenuOption key='bvmoWm' descFlag={descWm} setDescFlag={setDescWm} setWhereto={props.setWhereto} targetWhereto='wm' optionText='Word Mastermind'/>
             <MenuOption key='bvmoWi' descFlag={descWi} setDescFlag={setDescWi} setWhereto={props.setWhereto} targetWhereto='wi' optionText='Word Info'/>
             <MenuOption key='bvmoFyb' descFlag={descFyb} setDescFlag={setDescFyb} setWhereto={props.setWhereto} targetWhereto='fyb' optionText='Fry Your Brain'/>
-            <MenuOption key='bvmoFybSolo' descFlag={descFybsolo} setDescFlag={setDescFybsolo} setWhereto={props.setWhereto} targetWhereto='fybsolo' optionText='FYB Solo Mode'/>
             <MenuOption key='bvmoMorpho' descFlag={descMorpho} setDescFlag={setDescMorpho} setWhereto={props.setWhereto} targetWhereto='morpho' optionText='Morpho'/>
             <MenuOption key='bvmoTm' descFlag={descTm} setDescFlag={setDescTm} setWhereto={props.setWhereto} targetWhereto='tm' optionText='Transmogrify'/>
             {!isMobile && <MenuOption key='bvmoPb' descFlag={descPb} setDescFlag={setDescPb} setWhereto={props.setWhereto} targetWhereto='pb' optionText='Prison Break'/>}
             {!isMobile && <MenuOption key='bvmoSc' descFlag={descSc} setDescFlag={setDescSc} setWhereto={props.setWhereto} targetWhereto='sc' optionText='Scrabble Club'/>}
-            {!isMobile && <MenuOption key='bvmoDb' descFlag={descDb} setDescFlag={setDescDb} setWhereto={props.setWhereto} targetWhereto='db' optionText='Debug Info'/>}
         </div>
         {descWm && DescribeWordMastermind}
         {descWi && DescribeWordInfo}
         {descPb && DescribePrisonBreak}
         {descFyb && DescribeFryYourBrain}
-        {descFybsolo && DescribeFryYourBrainSolo}
         {descSc && DescribeScrabbleClub}
         {descMorpho && DescribeMorpho}
         {descTm && DescribeTransmogrify}
-        {descDb && DescribeDebugInfo}
       </div>
       <div className="trParagraph">
         <div className="trTitle">

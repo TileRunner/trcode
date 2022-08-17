@@ -14,17 +14,17 @@ const {
   ServeFybMakeMove,
   ServeFybPlayAgain,
   ServerFybStartGame
-} = require('./fyb/functions/serveFYB');
-
-const allowedCaller = (process.env.NODE_ENV === 'production' ? 'https://enigmatic-lake-42795.herokuapp.com' : 'http://localhost:3000')
-const clientTypeFryYourBrain = 'fyb';
+} = require('./fyb/serveFYB');
+const { fybPrepickTiles, wordHasFryLetters} = require('./fyb/functions');
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
-const { fybInitialize, getDebugInfoFYB, processMessageFYB, wordHasFryLetters } = require('./fyb/processMessageFYB');
-const { fybPrepickTiles} = require('./fyb/functions/pickLetters');
-const { getAnagrams, getSwaps, getDrops, getInserts
+const { getAnagrams
+  , getSwaps
+  , getDrops
+  , getInserts
   , createMorphoPuzzle
-  , createTransmogrifyPuzzle, getTransmogrifyValidNextWords} = require('./wordstuff/wordfunctions');
+  , createTransmogrifyPuzzle
+  , getTransmogrifyValidNextWords} = require('./wordstuff/wordfunctions');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
 // 2 letters words at [2] .... 8 letter words at [8].
@@ -58,7 +58,6 @@ const anagramsByLength = [
   , makeAnagramList(wordsByLength[7])
   , makeAnagramList(wordsByLength[8])
 ]
-const chats = [];
 const logmsgs = ['Server start'];
 
 function readWordList() {
@@ -102,12 +101,6 @@ function getValid(word, wordssamelength) {
 
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
-    .get("/debug", (_req, res) => {
-      res.header("Access-Control-Allow-Origin", allowedCaller);
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      let fybinfo = getDebugInfoFYB();
-      res.json({status: 'ok', fybinfo: fybinfo});
-    })
     .get("/fyb/chatmessage", (req, res) => { ServeFybChatMessage(res, req); })
     .get("/fyb/creategame", (req, res) => { ServeFybCreateGame(res, req); })
     .get("/fyb/getchat", (req, res) => { ServeFybGetChat(res, req); })
@@ -387,7 +380,6 @@ const server = express()
     .listen(PORT, () => {
         console.log(`Listening on ${PORT} in mode ${process.env.MODE_ENV === "production" ? "production" : "development"}`);
         pbInitialize();
-        fybInitialize(allwords);
     });
 
 const wss = new Server({ server });
@@ -416,86 +408,15 @@ const processMessage = (message) => {
     let pm = JSON.parse(message);
     logmsgs.push(`${pm.type} ${pm.func} ${pm.gameid} ${pm.nickname} ${pm.thisisme}`);
     if (logmsgs.length > 20) {logmsgs.splice(0,1);}
-    let chatactions = {needchatremove: false, needchatupdate: false};
     if (pm.func === "chat") {
         handleChatMessages(pm, message);
     }
     else if (pm.type === clientTypePrisonBreak) {
         processMessagePB(wss, pm, message);
     }
-    else if (pm.type = clientTypeFryYourBrain) {
-        chatactions = processMessageFYB(wss, pm);
-    }
-    if (chatactions.needchatremove) {
-      removeGameChat(pm);
-    } else if (chatactions.needchatupdate) {
-      updateGameChatClients(pm);
-    }
-}
-
-const removeGameChat = (pm) => {
-  for (let index = 0; index < chats.length; index++) {
-    const chat = chats[index];
-    if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
-      chats.splice(index,1);
-      return;
-    }
-  }
-}
-
-const updateGameChatClients = (pm) => {
-  for (let index = 0; index < chats.length; index++) {
-    const chat = chats[index];
-    if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
-      let jsend = {
-        type: pm.clientType,
-        gameid: pm.gameid,
-        func: 'CHAT_DATA',
-        msgs: chat.msgs
-      };
-      let tsend = JSON.stringify(jsend);
-      wss.clients.forEach((client) => {
-        if (client.clientType === pm.type && client.gameid === pm.gameid) {
-          client.send(tsend);
-        }
-      });
-    }
-  }
 }
 
 const handleChatMessages = (pm, message) => { // pm=json object, message=string of json
-  // For fyb, chat is only within a game. Keep the chat array here so people can see
-  // chats from before they entered the game.
-  if (pm.clientType === clientTypeFryYourBrain) {
-    let chatfound = false;
-    let msg = {from: pm.nickname, msg: pm.sendmsg, created: Date.now()};
-    for (let index = 0; index < chats.length; index++) {
-      const chat = chats[index];
-      if (chat.clientType === pm.clientType && chat.gameid === pm.gameid) {
-        chatfound = true;
-        chat.msgs.push(msg);
-      }
-    }
-    if (!chatfound) {
-      const chat = {clientType: pm.clientType, gameid: pm.gameid, msgs: [msg]};
-      chats.push(chat);
-    }
-    // Clean up all chats
-    let cutoff = Date.now() - 600000; // this many milliseconds ago
-    for (let index = chats.length - 1; index > -1; index--) {
-      const chat = chats[index];
-      // Only keep messages for so long
-      while (chat.msgs.length > 0 && chat.msgs[0].created < cutoff) {
-        chat.msgs.splice(0,1);
-      }
-      // Remove if empty
-      if (chat.msgs.length === 0) {
-        chats.splice(index,1);
-      }
-    };
-    updateGameChatClients(pm);   
-    return;
-  }
 /* Send the chat message to clients that need it
    Overall rule - only send message to clients with the same client type (e.g. 'pb' for Prison Break)
    Overall rule - do not send message back to sender

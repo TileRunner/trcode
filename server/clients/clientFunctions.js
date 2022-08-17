@@ -1,13 +1,3 @@
-function findLobbyClient(wss, thisisme) {
-    let lobbyClient;
-    wss.clients.forEach((client) => {
-        if (client.thisisme === thisisme) {
-            lobbyClient = client;
-        }
-    });
-    return lobbyClient;
-}
-
 function findLobbyClients(wss, clientType) {
     let lobbyclients = [];
     wss.clients.forEach((client) => {
@@ -53,4 +43,4 @@ function findGameClientsExceptMe(wss, clientType, gameid, playerThisisme) {
 }
 
 
-module.exports = { findLobbyClient, findLobbyClients, findPlayerClient, findGameClients, findGameClientsExceptMe };
+module.exports = { findLobbyClients, findPlayerClient, findGameClients, findGameClientsExceptMe };
