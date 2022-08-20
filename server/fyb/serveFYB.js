@@ -18,6 +18,7 @@ const fybchats = [
         msgs:[{name: 'ADMIN', msg: 'Lobby chat created for survival mode', time: Date.now()}]
     }
 ];
+const { wordHasLetters, pickTiles } = require('./functions');
 
 function AllowAllCallers(res) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -134,6 +135,19 @@ function ServeFybGetGame(res, req) {
     if (!found) {
         res.json({error: 'Game not found'});
     }
+}
+
+function ServeFybGetTopAnswers(res, req, allwords) {
+    // console.log(`Get top answers for ${req.query.letters}`);
+    AllowAllCallers(res);
+    let letters = req.query.letters;
+    let numWanted = parseInt(req.query.count);
+    let possibleAnswers = allwords.filter(w => {return wordHasLetters(letters, w);});
+    possibleAnswers.sort(function (a, b) { return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1; });
+    if (possibleAnswers.length > numWanted) {
+      possibleAnswers.splice(numWanted); // Take only the number wanted
+    }
+    res.json({answers:possibleAnswers});
 }
 
 function ServeFybJoinGame(res, req) {
@@ -340,6 +354,13 @@ function ServeFybMakeMove(res, req) {
     }
 }
 
+function ServerFybPickLetters(res, allwords) {
+    // console.log(`Pick letters ${letters}`);
+    AllowAllCallers(res);
+    let letters = pickTiles(allwords, 6);
+    res.json({letters: letters});
+}
+
 function ServeFybPlayAgain(res, req) {
     // console.log(`Game replay for ${req.query.number}`);
     AllowAllCallers(res);
@@ -364,7 +385,7 @@ function ServeFybPlayAgain(res, req) {
     }
 }
 
-function ServerFybStartGame(res, req, letters) {
+function ServerFybStartGame(res, req, allwords) {
     // console.log(`Game start for ${req.query.number}`);
     AllowAllCallers(res);
     let gameNumber = parseInt(req.query.number);
@@ -378,6 +399,7 @@ function ServerFybStartGame(res, req, letters) {
             } else if (fybgame.players.length < 2) {
                 res.json({error: 'You need at least two players to start the game'});
             } else {
+                let letters = pickTiles(allwords, 6);
                 fybgame.round = 1;
                 fybgame.rounds = [{moves: []}];
                 fybgame.letters = letters;
@@ -412,9 +434,11 @@ module.exports = {
     ServeFybCreateGame,
     ServeFybGetChat,
     ServeFybGetGame,
+    ServeFybGetTopAnswers,
     ServeFybJoinGame,
     ServeFybListGames,
     ServeFybMakeMove,
+    ServerFybPickLetters,
     ServeFybPlayAgain,
     ServerFybStartGame
 };

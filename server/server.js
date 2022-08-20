@@ -9,13 +9,14 @@ const {
   ServeFybCreateGame,
   ServeFybGetChat,
   ServeFybGetGame,
+  ServeFybGetTopAnswers,
   ServeFybJoinGame,
   ServeFybListGames,
   ServeFybMakeMove,
+  ServerFybPickLetters,
   ServeFybPlayAgain,
   ServerFybStartGame
 } = require('./fyb/serveFYB');
-const { fybPrepickTiles, wordHasFryLetters} = require('./fyb/functions');
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { getAnagrams
@@ -105,11 +106,13 @@ const server = express()
     .get("/fyb/creategame", (req, res) => { ServeFybCreateGame(res, req); })
     .get("/fyb/getchat", (req, res) => { ServeFybGetChat(res, req); })
     .get("/fyb/getgame", (req, res) => { ServeFybGetGame(res, req); })
+    .get("/fyb/gettopanswers", (req, res) => { ServeFybGetTopAnswers(res, req, allwords); })
     .get("/fyb/joingame", (req, res) => { ServeFybJoinGame(res, req); })
     .get("/fyb/listgames", (req, res) => { ServeFybListGames(res, req); })
     .get("/fyb/makemove", (req, res) => { ServeFybMakeMove(res, req); })
+    .get("/fyb/pickletters", (_req, res) => { ServerFybPickLetters(res, allwords); })
     .get("/fyb/playagain", (req, res) => { ServeFybPlayAgain(res, req); })
-    .get("/fyb/startgame", (req, res) => { ServerFybStartGame(res, req, fybPrepickTiles(allwords, 6)); })
+    .get("/fyb/startgame", (req, res) => { ServerFybStartGame(res, req, allwords); })
     .get("/ENABLE2K", (req, res) => {
         // Handle picking random word for Word Mastermind
         if (req.query.random) {
@@ -220,97 +223,6 @@ const server = express()
         // Handle who can call this
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        // Handle request for top answers for fry letters
-        if (req.query.topfry) {
-          let notes = []; // Error notes
-          let jret = {func: 'topfry'}; // Response json
-          // Validate parameters
-          let letters = /^[A-Za-z]+$/;
-          let fryLetters = '';
-          if (!req.query.letters || req.query.letters.length < 3 || !req.query.letters.match(letters)) {
-            notes.push('&letters must be 3 or more letters.');
-          } else {
-            fryLetters = req.query.letters.toUpperCase();
-            jret.fryLetters = fryLetters;
-          }
-          let numWanted = 0;
-          if (!req.query.count) {
-            notes.push('Parameter &count is required.');
-          } else if (isNaN(req.query.count)) {
-            notes.push('Value of &count should be numeric.');
-          } else if (req.query.count > 50) {
-            notes.push('Maximum value of &count is 50.');
-          } else if (req.query.count < 1) {
-            notes.push('Minimum value of &count is 1.');
-          } else {
-            numWanted = req.query.count;
-            jret.numWanted = numWanted;
-          }
-          let numSeen = 0;
-          if (req.query.seen) {
-            if (isNaN(req.query.seen)) {
-              notes.push('Parameter &seen should be numeric if specified.');
-            } else if (req.query.seen < 0) {
-              notes.push('Parameter &seen should not be negative.');
-            } else {
-              numSeen = req.query.seen;
-              jret.numSeen = numSeen;
-            }
-          }
-          if (notes.length > 0) {
-            jret.notes = notes;
-            console.log(`topfry fail notes ${JSON.stringify(jret)}`);
-            res.send(jret);
-            return;
-          }
-          let possibleAnswers = allwords.filter(w => {return wordHasFryLetters(fryLetters, w);});
-          let numPossibleAnswers = possibleAnswers.length;
-          jret.numPossibleAnswers = numPossibleAnswers;
-          if (numSeen >= numPossibleAnswers) {
-            possibleAnswers = []; // Already seen all answers
-          } else {
-            possibleAnswers.sort(function (a, b) { return a.length < b.length ? -1 : b.length < a.length ? 1 : a < b ? -1 : 1; });
-            if (numSeen > 0) {
-              possibleAnswers.splice(0, numSeen); // Remove the ones already seen
-            }
-          }
-          if (possibleAnswers.length > numWanted) {
-            possibleAnswers.splice(numWanted); // Take only the number wanted
-          }
-          jret.answers = possibleAnswers;
-          res.send(jret);
-          return;
-        }
-        // Handle request to prepick a set of fyb letters
-        if (req.query.prepickfry) {
-          let notes = []; // Error notes
-          let jret = {func: 'prepickfry'}; // Response json
-          // Validate parameters
-          let guarantee = 0;
-          if (!req.query.guarantee) {
-            notes.push('Parameter guarantee is required.');
-          } else if (isNaN(req.query.guarantee)) {
-            notes.push('Value of guarantee should be numeric.');
-          } else if (req.query.guarantee > 15) {
-            notes.push('Maximum value of guarantee is 15.');
-          } else if (req.query.guarantee < 3) {
-            notes.push('Minimum value of guarantee is 3.');
-          } else {
-            guarantee = req.query.guarantee;
-            jret.guarantee = guarantee;
-          }
-          if (notes.length > 0) {
-            jret.notes = notes;
-            console.log(`prepickfry fail notes ${JSON.stringify(jret)}`);
-            res.send(jret);
-            return;
-          }
-          // Pick the letters
-          let fryLetters = fybPrepickTiles(allwords, guarantee);
-          jret.fryLetters = fryLetters;
-          res.send(jret);
-          return;
-        }
         // Handle getting info for passed letters
         if (req.query.letters) {
             // The desired group of letters is passed in 'letters'

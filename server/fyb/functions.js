@@ -27,7 +27,7 @@ const fulltileset = [
     "Z"    
 ];
 
-function fybPrepickTiles(words=[], guarantee=6) {
+function pickTiles(words=[], guarantee=6) {
     // Pick all fry letters at once.
     // Param: words is the list of valid words
     // Param: guarantee is the minimum number of fry letters (see disclaimer below)
@@ -62,12 +62,12 @@ function fybPrepickTiles(words=[], guarantee=6) {
     let loop = true;
     while (loop) {
         let picked = pickNextTile(tiles, fryLetters);
-        let newmatches = words.filter((checkword) => {return wordHasFryLetters(picked.newFryLetters, checkword);});
+        let newmatches = words.filter((checkword) => {return wordHasLetters(picked.newFryLetters, checkword);});
         if (newmatches.length > 0) {
             tiles = [...picked.newTiles];
             let oldfl = [...fryLetters];
             fryLetters = Array.from(picked.newFryLetters.join('').toLowerCase());
-            if (!wordHasFryLetters(fryLetters, newmatches[0])) {
+            if (!wordHasLetters(fryLetters, newmatches[0])) {
                 console.log(`Whuh? Fry letters ${fryLetters} not in found sample word ${newmatches[0]}`);
                 loop = false;
                 fryLetters = [...oldfl];
@@ -89,7 +89,7 @@ function pickNextTile(tiles, fryLetters) {
     return({newTiles: newTiles, newFryLetters: newFryLetters});
 }
 
-function wordHasFryLetters(fryLetterArray, checkword) {
+function wordHasLetters(fryLetterArray, checkword) {
     let word = checkword.toUpperCase();
     for (let i = 0; i < fryLetterArray.length; i++) {
         let letterCountRequired = 0;
@@ -111,5 +111,4 @@ function wordHasFryLetters(fryLetterArray, checkword) {
     return true;
 }
 
-
-module.exports = {fybPrepickTiles, wordHasFryLetters};
+module.exports = {pickTiles, wordHasLetters};
