@@ -90,7 +90,7 @@ function ServeFybCreateGame(res, req) {
         type: req.query.type.toUpperCase().trim(),
         createTime: Date.now(),
         creator: req.query.name.trim(),
-        validOnly: req.query.validOnly,
+        validOnly: req.query.validOnly === 'true',
         players: [{ name: req.query.name.trim() }],
         started: false,
         finished: false
