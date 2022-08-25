@@ -6,6 +6,7 @@ const GAME_TYPE_SURVIVAL = 'SURVIVAL';
 const MOVE_TYPE_VALID = 'VALID';
 const MOVE_TYPE_PHONY = 'PHONY';
 const MOVE_TYPE_PASS = 'PASS';
+const MOVE_TYPE_TIMEOUT = 'TIMEOUT';
 
 const fybgames = [];
 const fybchats = [
@@ -91,6 +92,7 @@ function ServeFybCreateGame(res, req) {
         createTime: Date.now(),
         creator: req.query.name.trim(),
         validOnly: req.query.validOnly === 'true',
+        timeLimit: req.query.timeLimit === 'true',
         players: [{ name: req.query.name.trim() }],
         started: false,
         finished: false
@@ -211,7 +213,7 @@ function ServeFybMakeMove(res, req) {
         if (fybgame.number === gameNumber) {
             found = true;
             let newmove = {name: req.query.name.trim(), type: req.query.type.toUpperCase().trim()};
-            if (newmove.type !== MOVE_TYPE_PASS) {
+            if (newmove.type === MOVE_TYPE_PHONY || newmove.type === MOVE_TYPE_VALID) {
                 newmove.word = req.query.word;
             }
             if (fybgame.type === GAME_TYPE_SURVIVAL) {
