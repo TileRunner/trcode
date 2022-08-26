@@ -267,7 +267,6 @@ function ServeFybMakeMove(res, req) {
     }
 
     function serveClassicMove(fybgame, newmove) {
-        let numalive = 0;
         let tomove = 0;
         let found = false;
         fybgame.players.forEach(player => {
@@ -280,9 +279,6 @@ function ServeFybMakeMove(res, req) {
                         player.alive = false;
                     }
                 }
-            }
-            if (player.alive) {
-                numalive++;
             }
             if (player.tomove) {
                 tomove++;
