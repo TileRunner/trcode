@@ -4,61 +4,15 @@ const { Server } = require("ws");
 const fs = require('fs');
 const path = require("path");
 const PORT = process.env.PORT || 5000;
-const {
-  ServeFybChatMessage,
-  ServeFybCreateGame,
-  ServeFybGetChat,
-  ServeFybGetGame,
-  ServeFybGetTopAnswers,
-  ServeFybJoinGame,
-  ServeFybListGames,
-  ServeFybMakeMove,
-  ServerFybPickLetters,
-  ServeFybPlayAgain,
-  ServerFybStartGame
-} = require('./fyb/serveFYB');
 const clientTypePrisonBreak = 'pb';
 const { pbInitialize, processMessagePB } = require('./pb/processMessagePB');
 const { getAnagrams
   , getSwaps
   , getDrops
   , getInserts
-  , createMorphoPuzzle
-  , createTransmogrifyPuzzle
-  , getTransmogrifyValidNextWords} = require('./wordstuff/wordfunctions');
+  } = require('./wordstuff/wordfunctions');
 const allwordsunsplit = readWordList();
 const allwords = allwordsunsplit.replace(/[\r\n]+/gm, "|").split('|');
-// 2 letters words at [2] .... 8 letter words at [8].
-const wordsByLength = [
-  [],[] // No zero or one letter words
-  , allwords.filter(w => {return w.length === 2;})
-  , allwords.filter(w => {return w.length === 3;})
-  , allwords.filter(w => {return w.length === 4;})
-  , allwords.filter(w => {return w.length === 5;})
-  , allwords.filter(w => {return w.length === 6;})
-  , allwords.filter(w => {return w.length === 7;})
-  , allwords.filter(w => {return w.length === 8;})
-  ];
-const alphagramsByLength = [
-  {},{} // No zero or one letter words
-  , makeAlphagramList(wordsByLength[2])
-  , makeAlphagramList(wordsByLength[3])
-  , makeAlphagramList(wordsByLength[4])
-  , makeAlphagramList(wordsByLength[5])
-  , makeAlphagramList(wordsByLength[6])
-  , makeAlphagramList(wordsByLength[7])
-  , makeAlphagramList(wordsByLength[8])
-  ];
-const anagramsByLength = [
-  {},{} // No zero or one letter words
-  , makeAnagramList(wordsByLength[2])
-  , makeAnagramList(wordsByLength[3])
-  , makeAnagramList(wordsByLength[4])
-  , makeAnagramList(wordsByLength[5])
-  , makeAnagramList(wordsByLength[6])
-  , makeAnagramList(wordsByLength[7])
-  , makeAnagramList(wordsByLength[8])
-]
 const logmsgs = ['Server start'];
 
 function readWordList() {
@@ -75,44 +29,12 @@ function readWordList() {
     return data;
 }
 
-function makeAnagramList(wordlist) {
-  let anagrams = Object.assign({}, ...wordlist.map(w => ({[w]: true})));
-  return anagrams;
-}
-
-function makeAlphagramList(wordlist) {
-  let alphagrams = {};
-  wordlist.forEach(word => {
-    let a = Array.from(word);
-    a.sort();
-    let alphagram = a.join('');
-    let anagrams = [];
-    if (alphagrams[alphagram]) {
-      anagrams = alphagrams[alphagram].anagrams;
-    }
-    anagrams.push(word);
-    alphagrams = Object.assign(alphagrams, {[alphagram]: {anagrams: anagrams}});
-  });
-  return alphagrams;
-}
-
 function getValid(word, wordssamelength) {
     return wordssamelength.indexOf(word) > -1 ? 'Y' : 'N'
 }
 
 const server = express()
     .use("/", express.static(path.join(__dirname, "../trapp/out")))
-    .get("/fyb/chatmessage", (req, res) => { ServeFybChatMessage(res, req); })
-    .get("/fyb/creategame", (req, res) => { ServeFybCreateGame(res, req); })
-    .get("/fyb/getchat", (req, res) => { ServeFybGetChat(res, req); })
-    .get("/fyb/getgame", (req, res) => { ServeFybGetGame(res, req); })
-    .get("/fyb/gettopanswers", (req, res) => { ServeFybGetTopAnswers(res, req, allwords); })
-    .get("/fyb/joingame", (req, res) => { ServeFybJoinGame(res, req); })
-    .get("/fyb/listgames", (req, res) => { ServeFybListGames(res, req); })
-    .get("/fyb/makemove", (req, res) => { ServeFybMakeMove(res, req); })
-    .get("/fyb/pickletters", (_req, res) => { ServerFybPickLetters(res, allwords); })
-    .get("/fyb/playagain", (req, res) => { ServeFybPlayAgain(res, req); })
-    .get("/fyb/startgame", (req, res) => { ServerFybStartGame(res, req, allwords); })
     .get("/ENABLE2K", (req, res) => {
         // Handle picking random word for Word Mastermind
         if (req.query.random) {
@@ -140,86 +62,6 @@ const server = express()
           res.json(exists);
           return;
         }
-        // Handle request for a morpho puzzle
-        if (req.query.morpho) {
-          // Handle who can call this
-          res.header("Access-Control-Allow-Origin", "*");
-          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-          let notes = [];
-          let jret = {func:'morpho'};
-          // Validate parameters
-          let numCols = 0;
-          let numRows = 0;
-          if (!req.query.len) {
-            notes.push('Parameter &len is required.');
-          } else if (isNaN(req.query.len)) {
-            notes.push('Value of &len should be numeric.');
-          } else {
-            numCols = Number(req.query.len);
-            if (numCols > 8) {
-              notes.push('Maximum value of &len is 8.');
-            } else if (numCols < 2) {
-              notes.push('Minimum value of &len is 2.');
-            } else {
-              numRows = numCols + 1;
-              if (numCols === 8) {
-                numRows = 8; // The most I ever saw it get was rowIndex 7 after many thousands of iterations
-              }
-              jret.numRows = numRows;
-              jret.numCols = numCols;
-            }
-          }
-          if (notes.length > 0) {
-            jret.notes = notes;
-            res.send(jret);
-            return;
-          }
-          let morpho = createMorphoPuzzle(anagramsByLength[numCols], numRows, numCols);
-          if (morpho.fail) {
-            jret.notes = [morpho.fail];
-          } else {
-            jret.puzzle = morpho.puzzle;
-          }
-          res.send(jret);
-          return;
-        }
-        // Handle request for a transmogrify puzzle
-        if (req.query.transmogrify) {
-          // Handle who can call this
-          res.header("Access-Control-Allow-Origin", "*");
-          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-          let notes = [];
-          let jret = {func:'transmogrify'};
-          // Validate parameters
-          if (!req.query.numMoves) {
-            notes.push('Parameter &numMoves is required.');
-          } else if (isNaN(req.query.numMoves)) {
-            notes.push('Value of &numMoves should be numeric.');
-          } else {
-            let numMoves = Number(req.query.numMoves);
-            if (numMoves > 9) {
-              notes.push('Maximum value of &numMoves is 9.');
-            } else if (numMoves < 2) {
-              notes.push('Minimum value of &numMoves is 2.');
-            } else {
-              jret.numMoves = numMoves;
-            }
-          }
-          if (notes.length > 0) {
-            jret.notes = notes;
-            res.send(jret);
-            return;
-          }
-          let tm = createTransmogrifyPuzzle(anagramsByLength, alphagramsByLength, jret.numMoves);
-          if (tm.fail) {
-            jret.notes = [tm.fail];
-          } else {
-            jret.startWord = tm.startWord;
-            jret.targetWord = tm.targetWord;
-          }
-          res.send(jret);
-          return;
-        }
         // Handle who can call this
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -227,13 +69,6 @@ const server = express()
         if (req.query.letters) {
             // The desired group of letters is passed in 'letters'
             let word = req.query.letters.toLowerCase();
-            // If they send with tm=true then return valid transmogrify moves
-            if (req.query.tm) {
-              let tm = getTransmogrifyValidNextWords({}, word, anagramsByLength, alphagramsByLength);
-              tm.sort();
-              res.send({func: 'tm moves', from: word, to: tm});
-              return;
-            }
             let wlen = word.length;
             let wordssamelength = allwords.filter(function (e) {
               return e.length === wlen;
